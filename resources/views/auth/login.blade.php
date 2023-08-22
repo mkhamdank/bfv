@@ -1,73 +1,94 @@
 @extends('layouts.app')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/login-style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        .login100-form-title {
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 600 !important;
+        }
+
+        .input100 {
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 400 !important;
+        }
+
+        .login100-form-btn {
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 600 !important;
+        }
+    </style>
+@endsection
+
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <div class="col-md-12 pl-md-5" style="margin-top: 50px;">
+                <form method="post" action="{{ route('login') }}">
+                    @csrf
+                    {{-- {{ csrf_field() }} --}}
+                    <span class="login100-form-title" style="color: white;background-color: #605ca8;padding-bottom: 0;text-align: center;font-size: 20px;font-weight: bold;padding: 10px;border-radius: 16px;margin-top: 20px;">
+                        <img src="{{ asset('img/bridgesmall.png') }}" alt="smallogo" width="50px">&nbsp;&nbsp;Bridge For Vendore
+                    </span>
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="off" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                    @if ($errors->has('email'))
+                        <div class="alert alert-danger alert-dismissible">
+                            <h4 style="font-size: 15px;font-weight: bold;"> Error!</h4>
+                            <span style="font-size: 12px">These credentials do not match our records.</span>
                         </div>
-
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="off">
-
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
+                    @endif
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible">
+                            <h4 style="font-size: 15px;font-weight: bold;"> Success!</h4>
+                            <span style="font-size: 12px">{{ session('success') }}</span>
                         </div>
+                    @endif
 
-                        <div class="row mb-3">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                    <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz" style="margin-top:20px">
+                        <input autocomplete="off" type="text" class="input100" placeholder="Email" id="email" name="email" value="{{ old('email') }}" required autofocus a>
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                        </span>
+                    </div>
 
-                                    <label class="form-check-label" for="remember">
-                                        {{ __('Remember Me') }}
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="wrap-input100 validate-input" data-validate="Password is required">
+                        <input class="input100" type="password" placeholder="Password" id="password" name="password" required>
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </span>
+                    </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Login') }}
-                                </button>
 
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
-                </div>
+
+                    <div class="container-login100-form-btn">
+                        <button class="login100-form-btn" type="submit">
+                            Login
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
+@endsection
+
+@section('script')
+    <script>
+        $(function() {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%'
+            });
+        });
+
+        jQuery(document).ready(function() {
+            $('#username').val('');
+            $('#password').val('');
+        });
+    </script>
 @endsection

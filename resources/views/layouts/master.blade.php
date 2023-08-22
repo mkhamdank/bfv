@@ -39,7 +39,9 @@
 
     <script src="{{ url('adminlte/plugins/jquery/jquery.min.js') }}"></script>
     <script src="{{ url('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url('adminlte/dist/js/adminlte.min.js') }}"></script>
+    <script src="{{ url('adminlte/dist/js/adminlte.min.js') }}"></script>    
+    <script src="{{ url('adminlte/plugins/jszip/jszip.js') }}"></script>
+    
 
 </head>
 <body class="sidebar-mini">
@@ -60,6 +62,12 @@
         $("#toggle-sidebar").ControlSidebar('toggle');
     </script>
 
+    <script src="{{ url('js/notifications.js') }}" defer></script>    
+    <script>        
+
+
+    </script>
+    
     @yield('scripts')
 </body>
 </html>

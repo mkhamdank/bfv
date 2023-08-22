@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand navbar-black navbar-dark" style="padding: 0 !important">
+<nav class="navbar navbar-expand navbar-black bg-primary" style="padding: 0 !important">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
-        <a href="#" class="brand-link bg-dark" style="text-decoration:none;">
+        <a href="{{ route('admin.dashboard') }}" class="brand-link bg-primary" style="text-decoration:none;">
 
             <img src="{{ url('img/bridgesmall.png') }}" alt="Bridge for Vendor logo" class="brand-image">
 
@@ -29,18 +29,18 @@
 
     <ul class="navbar-nav ml-auto">
         <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
+            <a class="nav-link" data-toggle="dropdown" href="#" style="color:white !important;">
                 <i class="far fa-user-circle"></i>
                 <span id="hi-user">{{ Auth::user()->name }}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <span class="dropdown-header">{{ Auth::user()->name }}</span>
-                @foreach (Auth::user()->getAllPermissions() as $permission)
+                {{-- @foreach (Auth::user()->getAllPermissions() as $permission)
                     <div class="dropdown-divider"></div>
                     <span class="ms-1">
                         - {{ $permission->name }}
                     </span>
-                @endforeach
+                @endforeach --}}
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item dropdown-footer">Setting</a>
                 <div class="dropdown-divider"></div>

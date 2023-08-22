@@ -1,6 +1,6 @@
 <aside class="main-sidebar sidebar-light-primary elevation-2 control-sidebar-push">
 
-    <a href="#" class="brand-link bg-dark" style="text-decoration:none;">
+    <a href="#" class="brand-link bg-primary" style="text-decoration:none;">
 
         <img src="{{ url('img/bridgesmall.png') }}" alt="Bridge for Vendor logo" class="brand-image">
 
@@ -50,9 +50,10 @@
                                     </li>
                                 </ul> --}}
                             </li>
-                            @endcan
+                            @endcan                            
 
 
+                            @can('view stock')                                
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="nav-icon fas fa-cubes"></i>
@@ -61,15 +62,29 @@
                                     </p>
                                 </a>
                             </li>
+                            @endcan
+
+                            @can('view molding')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-cubes"></i>
+                                    <p>
+                                        Molding
+                                    </p>
+                                </a>
+                            </li>
+                            @endcan
+                            
+                            @can('view logistic')
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="nav-icon fas fa-truck"></i>
                                     <p>
                                         Logistic
-
                                     </p>
                                 </a>
-                            </li>
+                            </li>                                
+                            @endcan                            
 
                             @can('view users')
                             <li class="nav-item">
@@ -83,9 +98,15 @@
                                 </a>
                                 <ul class="nav nav-treeview" style="display: none;">
                                     <li class="nav-item">
-                                        <a href="#" class="nav-link">
+                                        <a href="{{ route('admin.user.index') }}" class="nav-link">
                                             <i class="fa fa-user nav-icon"></i>
                                             <p>User</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('admin.permission.index') }}" class="nav-link">
+                                            <i class="fa fa-user-cog nav-icon"></i>
+                                            <p>User Permission</p>
                                         </a>
                                     </li>
                                 </ul>
