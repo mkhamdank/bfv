@@ -19,11 +19,13 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// tes
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
+Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
 
     Route::get('/', 'DashboardController@index')->name('admin.dashboard');    
 
@@ -330,15 +332,16 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     
     // Molding Workshop
     // Route::group(['nav' => 'S7', 'middleware' => 'permission'], function () {
+        Route::post('post/workshop/check_molding_vendor/schedule', 'workshopController@postSchedule');
         Route::get('index/workshop/check_molding_vendor', 'workshopController@indexCheckMolding');
         Route::get('fetch/workshop/check_molding_vendor/monitoring', 'workshopController@fetchCheckMoldingMonitoring');
         Route::get('index/workshop/check_molding_vendor/create', 'workshopController@indexCreateCheckMolding');
         Route::post('post/workshop/check_molding_vendor', 'workshopController@postCheckMolding');
         Route::get('fetch/workshop/check_molding_vendor/record', 'workshopController@fetchCheckMolding');
-        Route::post('post/workshop/check_molding_vendor/temuan', 'WorkshopController@postFindingMolding');
-        Route::get('fetch/workshop/check_molding_vendor/temuan', 'WorkshopController@fetchFindingMolding');
-        Route::get('fetch/workshop/check_molding_vendor/penanganan/log', 'WorkshopController@fetchHandlingLog');
-        Route::post('post/workshop/check_molding_vendor/penanganan', 'WorkshopController@postHandling');
+        Route::post('post/workshop/check_molding_vendor/temuan', 'workshopController@postFindingMolding');
+        Route::get('fetch/workshop/check_molding_vendor/temuan', 'workshopController@fetchFindingMolding');
+        Route::get('fetch/workshop/check_molding_vendor/penanganan/log', 'workshopController@fetchHandlingLog');
+        Route::post('post/workshop/check_molding_vendor/penanganan', 'workshopController@postHandling');
     // });
     
     Route::get('index/outgoing/ng_rate/{vendor}', 'OutgoingController@indexNgRate');

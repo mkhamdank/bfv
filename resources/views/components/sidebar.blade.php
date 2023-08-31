@@ -66,7 +66,7 @@
 
                             @can('view molding')
                             <li class="nav-item">
-                                <a href="#" class="nav-link">
+                                <a href="{{ url('/index/workshop/check_molding_vendor') }}" class="nav-link">
                                     <i class="nav-icon fas fa-cubes"></i>
                                     <p>
                                         Molding

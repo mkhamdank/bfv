@@ -31,6 +31,8 @@
     <link href="{{ url('adminlte/plugins/summernote/summernote-bs4.min.css') }}" rel="stylesheet">
     <link href="{{ url('adminlte/plugins/toastr/toastr.min.css') }}" rel="stylesheet">
     <link href="{{ url('adminlte/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+
 
     @yield('styles')
 
@@ -41,6 +43,14 @@
     <script src="{{ url('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url('adminlte/dist/js/adminlte.min.js') }}"></script>    
     <script src="{{ url('adminlte/plugins/jszip/jszip.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/select2/js/select2.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+
+    <style>
+    .main-sidebar {
+        height: 100% !important;
+    }
+    </style>
     
 
 </head>

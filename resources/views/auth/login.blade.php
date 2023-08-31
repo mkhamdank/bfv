@@ -31,7 +31,7 @@
                     @csrf
                     {{-- {{ csrf_field() }} --}}
                     <span class="login100-form-title" style="color: white;background-color: #605ca8;padding-bottom: 0;text-align: center;font-size: 20px;font-weight: bold;padding: 10px;border-radius: 16px;margin-top: 20px;">
-                        <img src="{{ asset('img/bridgesmall.png') }}" alt="smallogo" width="50px">&nbsp;&nbsp;Bridge For Vendore
+                        <img src="{{ asset('img/bridgesmall.png') }}" alt="smallogo" width="50px">&nbsp;&nbsp;Bridge For Vendor
                     </span>
 
                     @if ($errors->has('email'))

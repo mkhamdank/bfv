@@ -17,17 +17,25 @@ class workshopController extends Controller
 		$title = 'Audit Molding Vendor';
 		$title_jp = '??';
 
-		return view('workshop.check_molding.index', array(
-					'title' => $title,
-					'title_jp' => $title_jp,
-				)
-				)->with('page', 'Workshop Audit Molding');
+		$molding = db::table('pe_molding_masters')
+			->select('id', 'molding_name', 'mold_number', 'molding_type')
+			->get();
+
+		return view(
+			'workshop.check_molding.index',
+			array(
+				'title' => $title,
+				'title_jp' => $title_jp,
+				'moldings' => $molding,
+			)
+		)->with('page', 'Workshop Audit Molding');
 	}
 
 	public function fetchCheckMoldingMonitoring(Request $request)
 	{
 		try {
-			$datas = db::table('pe_molding_findings');
+			$datas = db::table('pe_molding_checks');
+			$datas2 = db::table('pe_molding_schedules');
 			$data_all = db::table('pe_molding_findings');
 
 			if (strlen($request->get('datefrom') > 0)) {
@@ -48,17 +56,21 @@ class workshopController extends Controller
 				$data_all = $data_all->whereIn('status', ["Open", "Temporary Close", "In-Progress", "Close"]);
 			}
 
-			$datas = $datas->select('check_date', 'status', db::raw('count(id) as jml'))
-				->groupBy('check_date', 'status')
+			$datas = $datas->select(db::raw('DATE_FORMAT(check_date,"%Y-%m-%d") as check_date'), 'status', db::raw('count(id) as jml'))
+				->groupBy(db::raw('DATE_FORMAT(check_date,"%Y-%m-%d")'), 'status')
 				->get();
 
-			$data_all = $data_all->select("pe_molding_findings.id", "check_date", "molding_name", "part_name", "problem", "problem_att", "pic", "handling_temporary", "handling_att", "note_problem", "close_date", "status", "pe_molding_findings.remark")
+			$data_all = $data_all->select("pe_molding_findings.id", db::raw('DATE_FORMAT(check_date,"%Y-%m-%d") as check_date'), "molding_name", "part_name", "problem", "problem_att", "pic", "handling_temporary", "handling_att", "note_problem", "close_date", "status", "pe_molding_findings.remark")
 				->orderBy("pe_molding_findings.id", "ASC")
+				->get();
+
+				$datas2 = $datas2->select(db::raw('period as check_date'),'status', db::raw('COUNT(id) as jml') )
+				->groupBy('period', 'status')
 				->get();
 
 			$response = array(
 				'status' => true,
-				'datas' => $datas,
+				'datas' => $datas2,
 				'data_all' => $data_all,
 			);
 			return Response::json($response);
@@ -80,31 +92,39 @@ class workshopController extends Controller
 		// 	->select('check_point', 'standard', 'how_check', 'handle', db::raw("SPLIT_STRING(check_point, ' - ', 1) as poin_cek"), db::raw("SPLIT_STRING(standard, ' - ', 1) as std"), db::raw("SPLIT_STRING(how_check, ' - ', 1) as how"), db::raw("SPLIT_STRING(handle, ' - ', 1) as handle2"))
 		// 	->get();
 
-		$cek_poin = db::table('pe_molding_check_masters')		
-		->select('check_point', 'standard', 'how_check', 'handle')
-		->get()
-		->map(function ($item) {
-			$item->poin_cek = explode(' - ', $item->check_point)[0];
-			$item->std = explode(' - ', $item->standard)[0];
-			$item->how = explode(' - ', $item->how_check)[0];
-			$item->handle2 = explode(' - ', $item->handle)[0];
-			return $item;
-		});
+		$cek_poin = db::table('pe_molding_check_masters')
+			->select('check_point', 'standard', 'how_check', 'handle')
+			->get()
+			->map(function ($item) {
+				$item->poin_cek = explode(' - ', $item->check_point)[0];
+				$item->std = explode(' - ', $item->standard)[0];
+				$item->how = explode(' - ', $item->how_check)[0];
+				$item->handle2 = explode(' - ', $item->handle)[0];
+				return $item;
+			});
 
 		$molding = db::table('pe_molding_masters')
-			->select('molding_name', 'mold_number', 'molding_type')
+			->select('id', 'molding_name', 'mold_number', 'molding_type')
+			->get();
+
+		$molding_part = db::table('pe_molding_part_masters')
+		->leftJoin('pe_molding_check_details', 'pe_molding_check_details.part_name', '=', 'pe_molding_part_masters.part_name')
+			->select('molding_id', 'molding_name', 'molding_type', 'molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('pe_molding_check_details.part_name as sudah'))
 			->get();
 
 		$pic = db::table('employee_datas')->select('employee_id', db::raw('employee_name as name'))->orderBy('employee_name', 'asc')->get();
 
-		return view('workshop.check_molding.index_form', array(
-					'title' => $title,
-					'title_jp' => $title_jp,
-					'check_points' => $cek_poin,
-					'moldings' => $molding,
-					'pics' => $pic
-				)
-				)->with('page', 'Workshop Audit Molding');
+		return view(
+			'workshop.check_molding.index_form',
+			array(
+				'title' => $title,
+				'title_jp' => $title_jp,
+				'check_points' => $cek_poin,
+				'moldings' => $molding,
+				'molding_parts' => $molding_part,
+				'pics' => $pic
+			)
+		)->with('page', 'Workshop Audit Molding');
 	}
 
 	public function postCheckMolding(Request $request)
@@ -121,10 +141,11 @@ class workshopController extends Controller
 				'check_date' => $request->get('date'),
 				'molding_name' => $request->get('molding_name'),
 				'molding_type' => $request->get('molding_type'),
+				'molding_number' => $request->get('molding_number'),
 				'pic' => $request->get('pic'),
 				'location' => $request->get('location'),
 				'conclusion' => 'OK',
-				'status' => 'Open',
+				'status' => 'Close',
 				'created_by' => Auth::user()->username,
 				'created_at' => date('Y-m-d H:i:s'),
 				'updated_at' => date('Y-m-d H:i:s'),
@@ -344,7 +365,7 @@ class workshopController extends Controller
 			$datas = $datas->where('molding_name', '=', $request->get('molding_select'));
 		}
 
-		$datas = $datas->select('pe_molding_checks.id', 'pe_molding_checks.check_date', 'pe_molding_checks.molding_name', 'pic', 'conclusion', 'pe_molding_check_details.part_name', 'pe_molding_check_details.point_check', 'judgement', 'photo_before1', 'photo_before2', 'photo_after1', 'photo_after2', 'photo_activity1', 'photo_activity2', 'note', 'status')->get();
+		$datas = $datas->select('pe_molding_checks.id', 'pe_molding_checks.check_date', 'pe_molding_checks.molding_name', 'pic', 'conclusion', 'pe_molding_check_details.part_name', 'pe_molding_check_details.point_check', 'judgement', 'photo_before1', 'photo_before2', 'photo_after1', 'photo_after2', 'photo_activity1', 'photo_activity2', 'note', 'pe_molding_checks.status')->get();
 
 		$emp = db::table('employee_datas')->get();
 
@@ -471,7 +492,7 @@ class workshopController extends Controller
 			]);
 
 			$response = array(
-				'status' => true				
+				'status' => true
 			);
 			return Response::json($response);
 		} catch (\Throwable $th) {
@@ -481,5 +502,39 @@ class workshopController extends Controller
 			);
 			return Response::json($response);
 		}
+	}
+
+	public function postSchedule(Request $request) {
+		try {
+			$mold_arr = explode(',',$request->get('molding'));
+			foreach ($mold_arr as $key => $value) {
+				$molding = db::table('pe_molding_masters')->where('id', '=', $value)
+				->select('molding_name', 'mold_number')
+				->first();
+
+				$insert_sch = DB::table('pe_molding_schedules')->insert([
+				'Period' => $request->get('mon_cek'),
+				'status' => 'Open',
+				'molding_id' => $value,
+				'molding_name' => $molding->molding_name,
+				'mold_number' => $molding->mold_number,
+				'created_by' => Auth::user()->username,
+				'created_at' => date('Y-m-d H:i:s'),
+				'updated_at' => date('Y-m-d H:i:s'),
+			]);
+			}
+
+			$response = array(
+				'status' => true
+			);
+			return Response::json($response);
+		} catch (\ErrorException $th) {
+			$response = array(
+				'status' => false,
+				'message' => $th->getMessage()
+			);
+			return Response::json($response);
+		}
+		
 	}
 }
