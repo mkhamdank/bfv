@@ -238,10 +238,22 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">
-                        <center>Pilih PIC & Molding</center>
+                        <center>Pilih Periode, PIC & Molding</center>
                     </h4>
                 </div>
                 <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label>Pilih Periode Cek</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <select class="select2" id="prd" style="width: 100%" data-placeholder="Pilih Periode" onchange="loadMolding(this)">
+                                <option value=""></option>
+                                <option value="2023-08-01">2023-08-01</option>
+                                <option value="2023-09-01">2023-09-01</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-xs-3">
                             <label>Pilih PIC</label>
@@ -264,9 +276,6 @@
                             <select class="select2" id="moldings" style="width: 100%"
                                 data-placeholder="Pilih Type Molding">
                                 <option value=""></option>
-                                @foreach ($moldings as $molding)
-                                    <option value="{{ $molding->id }}">{{ $molding->molding_name }}</option>
-                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -738,7 +747,8 @@
 					if (value.sudah) {
 					cls = "btn-success";
 					}
-					body += "<td><button class='btn btn-xs "+cls+"' onclick='add_point(\""+value.part_name+"\")'>"+value.part_name+"</button></td>";
+					body += "<td width='1%'><button class='btn btn-xs "+cls+"' style='width: 100%; text-align:left' onclick='add_point(\""+value.part_name+"\")'>"+num+") "+value.part_name+"</button></td>";
+                    num++;
 
 					if (index % 5 === 0 && index != 0) {
 						body += "</tr>";
@@ -1272,6 +1282,19 @@
 
         function openModal(nama_modal) {
             $("#" + nama_modal).modal('show');
+        }
+
+        function loadMolding(elem) {
+            var molds = <?php echo json_encode($period_cek); ?>;
+            $("#moldings").empty();
+            
+            var isi = "<option value=''></option>";
+            $.each(molds, function(index, value) {
+                if (value.period == $(elem).val()) {
+                    isi += "<option value='"+value.molding_id+"'>"+value.molding_name+"</option>";
+                }
+            })
+            $("#moldings").append(isi);
         }
 
         function openSuccessGritter(title, message) {

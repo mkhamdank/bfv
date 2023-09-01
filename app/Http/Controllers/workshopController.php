@@ -105,7 +105,12 @@ class workshopController extends Controller
 
 		$molding = db::table('pe_molding_masters')
 			->select('id', 'molding_name', 'mold_number', 'molding_type')
+			->limit(2)
 			->get();
+
+		$period_cek = db::table('pe_molding_schedules')
+		->select('period', 'molding_id','molding_name')
+		->get();
 
 		$molding_part = db::table('pe_molding_part_masters')
 		->leftJoin('pe_molding_check_details', 'pe_molding_check_details.part_name', '=', 'pe_molding_part_masters.part_name')
@@ -122,6 +127,7 @@ class workshopController extends Controller
 				'check_points' => $cek_poin,
 				'moldings' => $molding,
 				'molding_parts' => $molding_part,
+				'period_cek' => $period_cek,
 				'pics' => $pic
 			)
 		)->with('page', 'Workshop Audit Molding');

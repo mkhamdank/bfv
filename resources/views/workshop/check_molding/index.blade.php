@@ -46,14 +46,14 @@
         </div>
         <div class="row">
             <div class="col-md-3">
-                <span style="font-weight: bold;">Tanggal Dari</span>
+                <span style="font-weight: bold;">Tanggal Audit Dari</span>
                 <div class="form-group">
                     <input type="text" class="form-control datepicker" id="datefrom" name="datefrom"
                         placeholder="Select Date From" autocomplete="off">
                 </div>
             </div>
             <div class="col-md-3">
-                <span style="font-weight: bold;">Tanggal Sampai</span>
+                <span style="font-weight: bold;">Tanggal Audit Sampai</span>
                 <div class="form-group">
                     <input type="text" class="form-control datepicker" id="dateto" name="dateto"
                         placeholder="Select Date To" autocomplete="off">
@@ -467,7 +467,7 @@
                             backgroundColor: "#fff"
                         },
                         title: {
-                            text: "Resume Audit Molding",
+                            text: "Schedule Audit Molding",
                             style: {
                                 color: '#000',
                                 fontWeight: 'Bold'
@@ -491,7 +491,7 @@
                             lineColor: '#fff',
                             type: 'linear',
                             title: {
-                                text: 'Total Temuan',
+                                text: 'Total Molding',
                                 style: {
                                     color: '#000'
                                 }
@@ -552,11 +552,6 @@
                                 name: 'Open',
                                 data: open,
                                 color: "#dd4b39"
-                            },
-                            {
-                                name: 'In-Progress',
-                                data: inprogress,
-                                color: "#3889f2"
                             },
                             {
                                 name: 'Temporary Close',
