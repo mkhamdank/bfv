@@ -740,6 +740,8 @@
 			$("#div_part").empty();
 			var body = '';
 			body += "<tr>";
+
+                console.table(parts);
             $.each(parts, function(index, value) {
                 if (value.molding_id == $("#molding_id").val()) {
 					cls = "btn-danger";
@@ -748,12 +750,14 @@
 					cls = "btn-success";
 					}
 					body += "<td width='1%'><button class='btn btn-xs "+cls+"' style='width: 100%; text-align:left' onclick='add_point(\""+value.part_name+"\")'>"+num+") "+value.part_name+"</button></td>";
-                    num++;
+                    
 
-					if (index % 5 === 0 && index != 0) {
+					if (num % 5 === 0 && num != 1) {
 						body += "</tr>";
 						body += "<tr>";
 					}
+
+                    num++;
                 }
             })
 

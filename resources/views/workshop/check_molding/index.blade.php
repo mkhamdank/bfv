@@ -758,7 +758,7 @@
                 processData: false,
                 success: function(response) {
                     $("#loading").hide();
-                    openSuccessGritter("Success", "Penanganan Berhasil Disimpan");
+                    // openSuccessGritter("Success", "Penanganan Berhasil Disimpan");
                     $("#modal_penanganan").modal('hide');
                 },
                 error: function(response) {
@@ -857,7 +857,7 @@
                 processData: false,
                 success: function(response) {
                     $("#loading").hide();
-                    openSuccessGritter("Success", "Schedule Berhasil Disimpan");
+                    // openSuccessGritter("Success", "Schedule Berhasil Disimpan");
                 },
                 error: function(response) {
                     console.log(response.message);

@@ -113,8 +113,14 @@ class workshopController extends Controller
 		->get();
 
 		$molding_part = db::table('pe_molding_part_masters')
+		// ->leftJoin('pe_molding_checks', 'pe_molding_checks.molding_name', '=', 'pe_molding_part_masters.molding_name')
+		->leftJoin('pe_molding_checks', function($q) {
+			$q->on('pe_molding_checks.molding_name', '=', 'pe_molding_part_masters.molding_name')
+			   ->on('pe_molding_checks.molding_type', '=', 'pe_molding_part_masters.molding_type')
+			   ->on('pe_molding_checks.molding_number', '=', 'pe_molding_part_masters.molding_number');
+		}) 
 		->leftJoin('pe_molding_check_details', 'pe_molding_check_details.part_name', '=', 'pe_molding_part_masters.part_name')
-			->select('molding_id', 'molding_name', 'molding_type', 'molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('pe_molding_check_details.part_name as sudah'))
+			->select('molding_id', 'pe_molding_part_masters.molding_name', 'pe_molding_part_masters.molding_type', 'pe_molding_part_masters.molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('pe_molding_check_details.part_name as sudah'))
 			->get();
 
 		$pic = db::table('employee_datas')->select('employee_id', db::raw('employee_name as name'))->orderBy('employee_name', 'asc')->get();
