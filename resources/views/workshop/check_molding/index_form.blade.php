@@ -741,7 +741,6 @@
 			var body = '';
 			body += "<tr>";
 
-                console.table(parts);
             $.each(parts, function(index, value) {
                 if (value.molding_id == $("#molding_id").val()) {
 					cls = "btn-danger";

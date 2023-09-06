@@ -105,7 +105,6 @@ class workshopController extends Controller
 
 		$molding = db::table('pe_molding_masters')
 			->select('id', 'molding_name', 'mold_number', 'molding_type')
-			->limit(2)
 			->get();
 
 		$period_cek = db::table('pe_molding_schedules')
@@ -119,7 +118,10 @@ class workshopController extends Controller
 			   ->on('pe_molding_checks.molding_type', '=', 'pe_molding_part_masters.molding_type')
 			   ->on('pe_molding_checks.molding_number', '=', 'pe_molding_part_masters.molding_number');
 		}) 
-		->leftJoin('pe_molding_check_details', 'pe_molding_check_details.part_name', '=', 'pe_molding_part_masters.part_name')
+		->leftJoin('pe_molding_check_details', function($q) {
+			$q->on('pe_molding_check_details.check_id', '=', 'pe_molding_checks.id')
+			   ->on('pe_molding_check_details.part_name', '=', 'pe_molding_part_masters.part_name');
+		})
 			->select('molding_id', 'pe_molding_part_masters.molding_name', 'pe_molding_part_masters.molding_type', 'pe_molding_part_masters.molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('pe_molding_check_details.part_name as sudah'))
 			->get();
 
