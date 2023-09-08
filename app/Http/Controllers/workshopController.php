@@ -14,7 +14,7 @@ class workshopController extends Controller
 {
 	public function indexCheckMolding()
 	{
-		$title = 'Audit Molding Vendor';
+		$title = 'Maintenance Molding Vendor (ARISA)';
 		$title_jp = '??';
 
 		$molding = db::table('pe_molding_masters')
@@ -64,7 +64,7 @@ class workshopController extends Controller
 				->orderBy("pe_molding_findings.id", "ASC")
 				->get();
 
-				$datas2 = $datas2->select(db::raw('period as check_date'),'status', db::raw('COUNT(id) as jml') )
+				$datas2 = $datas2->select(db::raw('DATE_FORMAT(period,"%Y %b") as check_date'),'status', db::raw('COUNT(id) as jml') )
 				->groupBy('period', 'status')
 				->get();
 
@@ -85,7 +85,7 @@ class workshopController extends Controller
 
 	public function indexCreateCheckMolding()
 	{
-		$title = 'Audit Molding Vendor';
+		$title = 'Maintenance Molding Vendor (ARISA)';
 		$title_jp = '??';
 
 		// $cek_poin = db::table('pe_molding_check_masters')
@@ -140,7 +140,9 @@ class workshopController extends Controller
 
 	public function postCheckMolding(Request $request)
 	{
+		dd($request->all());
 		try {
+			// dd($request->file);
 			$before1_name = null;
 			$before2_name = null;
 			$after1_name = null;

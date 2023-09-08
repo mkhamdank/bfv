@@ -30,30 +30,30 @@
         </div>
 
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-10">
                 <h1>
                     {{ $title }}
                 </h1>
             </div>
-            <div class="col-md-2">
+            {{-- <div class="col-md-2">
                 <button class="btn btn-primary pull-right" style="color: white; width: 100%"
                     onclick="openModalSchedule()"><i class="fa fa-calendar-plus"></i> Add Schedule Check</button>
-            </div>
+            </div> --}}
             <div class="col-md-2">
                 <a href="{{ url('index/workshop/check_molding_vendor/create') }}" class="btn btn-primary pull-right"
-                    style="color: white; width: 100%"><i class="fa fa-plus"></i> Audit Molding</a>
+                    style="color: white; width: 100%"><i class="fa fa-plus"></i> Cek Molding</a>
             </div>
         </div>
         <div class="row">
             <div class="col-md-3">
-                <span style="font-weight: bold;">Tanggal Audit Dari</span>
+                <span style="font-weight: bold;">Tanggal Cek Dari</span>
                 <div class="form-group">
                     <input type="text" class="form-control datepicker" id="datefrom" name="datefrom"
                         placeholder="Select Date From" autocomplete="off">
                 </div>
             </div>
             <div class="col-md-3">
-                <span style="font-weight: bold;">Tanggal Audit Sampai</span>
+                <span style="font-weight: bold;">Tanggal Cek Sampai</span>
                 <div class="form-group">
                     <input type="text" class="form-control datepicker" id="dateto" name="dateto"
                         placeholder="Select Date To" autocomplete="off">
@@ -77,12 +77,6 @@
                 <span>&nbsp;</span>
                 <div class="form-group">
                     <button class="btn btn-primary" onclick="drawChart()"><i class="fa fa-search"></i> Cari</button>
-                </div>
-            </div>
-            <div class="col-md-1">
-                <span>&nbsp;</span>
-                <div class="form-group">
-                    <button class="btn btn-success" onclick="drawChart()"><i class="fa fa-file-excel-o"></i> Export</button>
                 </div>
             </div>
         </div>
@@ -467,7 +461,7 @@
                             backgroundColor: "#fff"
                         },
                         title: {
-                            text: "Schedule Audit Molding",
+                            text: "Schedule Maintenance Molding",
                             style: {
                                 color: '#000',
                                 fontWeight: 'Bold'
