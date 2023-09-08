@@ -140,7 +140,6 @@ class workshopController extends Controller
 
 	public function postCheckMolding(Request $request)
 	{
-		dd($request->all());
 		try {
 			// dd($request->file);
 			$before1_name = null;
