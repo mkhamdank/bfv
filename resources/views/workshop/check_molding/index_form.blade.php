@@ -174,19 +174,19 @@
 
                 <input type="hidden" id="employee_id">
 
-				<div class="col-xs-12">
-					<div class="row">
-						<div class="col-xs-12">
-							<h2>Part List Molding : </h2>
-						</div>
-						<div class="col-xs-12">
-							<table id="div_part" style="width: 100%">
+                <div class="col-xs-12">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2>Part List Molding : </h2>
+                        </div>
+                        <div class="col-xs-12">
+                            <table id="div_part" style="width: 100%">
 
-							</table>
-							<br>
-						</div>
-					</div>
-				</div>
+                            </table>
+                            <br>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-md-12" style="padding: 0">
                     <div class="row">
@@ -201,8 +201,8 @@
                                 Tambah Pengecekan</button></div> --}}
                     </div>
                     <input type="hidden" id="molding_id">
-					<input type="hidden" name="type_molding" id="type_molding">
-					<input type="hidden" name="molding_number" id="molding_number">					
+                    <input type="hidden" name="type_molding" id="type_molding">
+                    <input type="hidden" name="molding_number" id="molding_number">
                     <table class="table table-bordered" style="width: 100%; color: rgb(0, 0, 0);" id="tableResult">
                         <thead style="font-weight: bold; background-color: #f20000">
                             <tr>
@@ -247,10 +247,12 @@
                             <label>Pilih Periode Cek</label>
                         </div>
                         <div class="col-xs-9">
-                            <select class="select2" id="prd" style="width: 100%" data-placeholder="Pilih Periode" onchange="loadMolding(this)">
+                            <select class="select2" id="prd" style="width: 100%" data-placeholder="Pilih Periode"
+                                onchange="loadMolding(this)">
                                 <option value=""></option>
-                                <option value="2023-08-01">2023-08-01</option>
-                                <option value="2023-09-01">2023-09-01</option>
+                                @foreach ($period as $pr)
+                                    <option value="{{ $pr }}">{{ $pr }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -617,6 +619,7 @@
         var part_status = [];
         var part_err = [];
         var num = 1;
+        const compressedFiles = [];
 
         CKEDITOR.replace('permasalahan', {
             filebrowserImageBrowseUrl: '{{ url('kcfinder_master') }}',
@@ -710,8 +713,6 @@
             });
         })
 
-        const compressedFiles = [];
-
         function selectMolding() {
             if ($("#moldings").val() == '' || $("#pic").val() == '') {
                 openErrorGritter('Gagal', 'Pilih PIC dan Molding');
@@ -729,51 +730,61 @@
             $.each(moldings, function(index, value) {
                 if (value.id == $("#moldings").val()) {
                     type = value.molding_type;
-					mold_num = value.mold_number;
+                    mold_num = value.mold_number;
                 }
             })
 
             $("#type_molding").val(type);
-			$("#molding_number").val(mold_num);
+            $("#molding_number").val(mold_num);
 
             num = 1;
-			$("#div_part").empty();
-			var body = '';
-			body += "<tr>";
+            $("#div_part").empty();
+            var body = '';
+            body += "<tr>";
 
             $.each(parts, function(index, value) {
                 if (value.molding_id == $("#molding_id").val()) {
-					cls = "btn-danger";
+                    cls = "btn-danger";
 
-					if (value.sudah) {
-					cls = "btn-success";
-					}
-					body += "<td width='1%'><button class='btn btn-xs "+cls+"' style='width: 100%; text-align:left' onclick='add_point(\""+value.part_name+"\")'>"+num+") "+value.part_name+"</button></td>";
-                    
+                    if (value.sudah) {
+                        cls = "btn-success";
+                    }
+                    body += "<td width='1%'><button class='btn btn-xs " + cls +
+                        "' style='width: 100%; text-align:left' onclick='add_point(\"" + value.part_name + "\")'>" +
+                        num + ") " + value.part_name + "</button></td>";
 
-					if (num % 5 === 0 && num != 1) {
-						body += "</tr>";
-						body += "<tr>";
-					}
+
+                    if (num % 5 === 0 && num != 1) {
+                        body += "</tr>";
+                        body += "<tr>";
+                    }
 
                     num++;
                 }
             })
 
-			body += '</tr>';
+            body += '</tr>';
 
-			$("#div_part").append(body);
+            $("#div_part").append(body);
 
         }
 
         function add_point(nama_part) {
-			$("#body_cek").empty();
+            $("#body_cek").empty();
             var body = '';
 
             body += '<tr>';
             body += '<td>1</td>';
             body += '<td class="part">';
             body += nama_part;
+            
+            if(UrlExists('{{ url('workshop/Audit_Molding/Part_Image') }}'+ "/"+$("#molding_id").val()+"/"+nama_part+".jpg")) {
+                url = '{{ url('workshop/Audit_Molding/Part_Image') }}'+ "/"+$("#molding_id").val()+"/"+nama_part+".jpg";
+                body += "<img src='"+url+"' style='max-width: 200px'>";
+            } else {
+                console.log("gambar tidak ada");
+            }
+
             body += '</td>';
             body += '<td>';
             body +=
@@ -794,7 +805,7 @@
 
             body += '<span class="text-red">*</span> Foto Before : <br>';
             body +=
-                '<input type="file" class="before1" onchange="readURL(this,\'img_before1\');" accept="image/*" style="display: none"> <input type="file" class="before2" onchange="readURL(this,\'img_before2\');" accept="image/*" style="display: none">';
+                '<input type="file" class="before1" id="img_before1" onchange="readURL(this,\'img_before1\');" accept="image/*" style="display: none"> <input type="file" class="before2" id="img_before2" onchange="readURL(this,\'img_before2\');" accept="image/*" style="display: none">';
             body +=
                 '<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'before1\')"><i class="fa fa-camera"></i> Photo 1</button>&nbsp;<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'before2\')"><i class="fa fa-camera"></i> Photo 2</button> <br>';
             body +=
@@ -858,6 +869,7 @@
         }
 
         function cek() {
+            console.log(compressedFiles);
             $("#loading").show();
 
             var formData = new FormData();
@@ -899,8 +911,13 @@
                 if (typeof $(obj).prop('files')[0] === 'undefined') {
                     status = false;
                 }
+                // formData.append('before1_' + i, $(obj).attr('src'));
 
-                formData.append('before1_' + i, $(obj).prop('files')[0]);
+                // formData append compressedFiles                
+
+
+                formData.append('before1_' + i, compressedFiles[i]);
+
             });
 
             $('.before2').each(function(i, obj) {
@@ -944,7 +961,10 @@
             });
 
             $('.aktifitas2').each(function(i, obj) {
-                formData.append('aktifitas2_' + i, $(obj).prop('files')[0]);
+                // formData.append('aktifitas2_' + i, $(obj).prop('files')[0]);
+                // formData append compressed file
+                compressedFiles.push($(obj).prop('files')[0]);
+                formData.append('aktifitas2_' + i, compressedFiles[i]);
             });
 
             $('.judgement').each(function(i, obj) {
@@ -1082,53 +1102,103 @@
         function readURL(input, idfile) {
             const files = input.files;
 
-            const options = {
+            // const files = input.target.files;
+            const imagePreview = $('#imagePreview');
 
-                quality: 0.5,
-
-                maxWidth: 800,
-
-                maxHeight: 800
-
-            };
+            // Clear any previous previews
+            imagePreview.empty();
 
             for (let i = 0; i < files.length; i++) {
-
                 const file = files[i];
-
-                compressImage(file, options)
-
-                    .then(function(compressedFile) {
-
-                        console.log('Original file size:', file.size, 'bytes');
-
-                        console.log('Compressed file size:', compressedFile.size, 'bytes');
-
-                        // Save the compressed file to the array
-
-                        compressedFiles.push(compressedFile);
-
-                    })
-
-                    .catch(function(error) {
-
-                        console.error('Error compressing image:', error);
-
-                    });
-
-            }
-
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                    var img = $(input).closest("td").find("." + idfile);
-                    $(img).show();
-                    $(img).attr('src', e.target.result);
+                const option = {
+                    quality: 0.7,
+                    maxWidth: 800,
+                    maxHeight: 600,
                 };
-
-                reader.readAsDataURL(input.files[0]);
+                compressImage(file, option)
+                    .then(function(compressedFile) {
+                        compressedFiles.push(compressedFile);
+                        var img = $(input).closest("td").find("." + idfile);
+                        $(img).show();
+                        $(img).attr('src', compressedFile);
+                    })
+                    .catch(function(error) {
+                        console.log(error.message);
+                    });
             }
+
+
+            // if (file) {
+            //     const reader = new FileReader();
+            //     reader.onload = function(event) {
+            //         const image = new Image();
+            //         image.src = event.target.result;
+
+            //         image.onload = function() {
+            //             const canvas = document.createElement('canvas');
+            //             const ctx = canvas.getContext('2d');
+
+            //             const maxWidth = 800;
+            //             const maxHeight = 600;
+
+            //             let width = image.width;
+            //             let height = image.height;
+
+            //             if (width > height) {
+            //                 if (width > maxWidth) {
+            //                     height *= maxWidth / width;
+            //                     width = maxWidth;
+            //                 }
+            //             } else {
+            //                 if (height > maxHeight) {
+            //                     width *= maxHeight / height;
+            //                     height = maxHeight;
+            //                 }
+            //             }
+
+            //             canvas.width = width;
+            //             canvas.height = height;
+
+            //             ctx.drawImage(image, 0, 0, width, height);
+
+            //             const compressedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+            //             // Display the compressed image and size
+            //             const compressedImage = $('<img>').attr('src', compressedImageDataUrl);
+            //             const compressedSize = $('<p>').text(
+            //                 `Compressed Size: ${Math.round(compressedImageDataUrl.length / 1024)} KB`);
+            //             imagePreview.append(compressedImage);
+            //             imagePreview.append(compressedSize);
+            //             console.log(`Compressed Size: ${Math.round(compressedImageDataUrl.length / 1024)} KB`);
+
+            //             // Display the original size
+            //             const originalSize = $('<p>').text(`Original Size: ${Math.round(file.size / 1024)} KB`);
+            //             imagePreview.append(originalSize);
+            //             console.log(`Original Size: ${Math.round(file.size / 1024)} KB`);
+
+            //             const compressedImageElement = new Image();
+            //             compressedImageElement.src = compressedImageDataUrl;
+
+            //             var img = $(input).closest("td").find("." + idfile);
+            //             $(img).show();
+            //             $(img).attr('src', compressedImageDataUrl);
+            //         };
+            //     };
+            //     reader.readAsDataURL(file);
+            // }
+            // }
+
+            // if (input.files && input.files[0]) {
+            //     var reader = new FileReader();
+
+            //     reader.onload = function(e) {
+            //         var img = $(input).closest("td").find("." + idfile);
+            //         $(img).show();
+            //         $(img).attr('src', e.target.result);
+            //     };
+
+            //     reader.readAsDataURL(input.files[0]);
+            // }
         }
 
         function readURL2(input, idfile) {
@@ -1146,7 +1216,8 @@
         }
 
         function simpanTemuan() {
-            if (CKEDITOR.instances.permasalahan.getData() == '' || CKEDITOR.instances.perbaikan_sementara.getData() == '' ||
+            if (CKEDITOR.instances.permasalahan.getData() == '' || CKEDITOR.instances.perbaikan_sementara.getData() ==
+                '' ||
                 $("#status").val() == '') {
                 openErrorGritter('Gagal', 'Mohon lengkapi semua kolom');
                 return false;
@@ -1233,7 +1304,7 @@
                         body += "<td>" + (index + 1) + "</td>";
                         body += "<td>" + value.check_date + "</td>";
                         body += "<td>" + value.molding_name + "</td>";
-                        body += "<td>" + value.part_name + "</td>";
+                        body += "<td>"+value.part_name+"</td>";
                         body += "<td>" + value.problem + "<br>";
 
                         if (value.problem_att) {
@@ -1290,11 +1361,11 @@
         function loadMolding(elem) {
             var molds = <?php echo json_encode($period_cek); ?>;
             $("#moldings").empty();
-            
+
             var isi = "<option value=''></option>";
             $.each(molds, function(index, value) {
                 if (value.period == $(elem).val()) {
-                    isi += "<option value='"+value.molding_id+"'>"+value.molding_name+"</option>";
+                    isi += "<option value='" + value.molding_id + "'>" + value.molding_name + "</option>";
                 }
             })
             $("#moldings").append(isi);
@@ -1336,6 +1407,13 @@
             } else {
                 return stts;
             }
+        }
+
+        function UrlExists(url) {
+            var http = new XMLHttpRequest();
+            http.open('HEAD', url, false);
+            http.send();
+            return http.status != 404;
         }
 
         // Handle the change event for the file input

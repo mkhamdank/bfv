@@ -124,6 +124,14 @@ class workshopController extends Controller
 
 		$pic = db::table('employee_datas')->select('employee_id', db::raw('employee_name as name'))->orderBy('employee_name', 'asc')->get();
 
+		$period = [];
+
+		foreach( $period_cek as $item ) {
+			if (!in_array($item->period, $period)) {
+				array_push($period, $item->period);
+			}
+		}
+
 		return view(
 			'workshop.check_molding.index_form',
 			array(
@@ -133,6 +141,7 @@ class workshopController extends Controller
 				'moldings' => $molding,
 				'molding_parts' => $molding_part,
 				'period_cek' => $period_cek,
+				'period' => $period,
 				'pics' => $pic
 			)
 		)->with('page', 'Workshop Audit Molding');
