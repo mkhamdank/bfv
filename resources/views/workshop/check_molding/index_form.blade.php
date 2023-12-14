@@ -777,10 +777,12 @@
             body += '<td>1</td>';
             body += '<td class="part">';
             body += nama_part;
-            
-            if(UrlExists('{{ url('workshop/Audit_Molding/Part_Image') }}'+ "/"+$("#molding_id").val()+"/"+nama_part+".jpg")) {
-                url = '{{ url('workshop/Audit_Molding/Part_Image') }}'+ "/"+$("#molding_id").val()+"/"+nama_part+".jpg";
-                body += "<img src='"+url+"' style='max-width: 200px'>";
+
+            if (UrlExists('{{ url('workshop/Audit_Molding/Part_Image') }}' + "/" + $("#molding_id").val() + "/" +
+                    nama_part + ".jpg")) {
+                url = '{{ url('workshop/Audit_Molding/Part_Image') }}' + "/" + $("#molding_id").val() + "/" + nama_part +
+                    ".jpg";
+                body += "<img src='" + url + "' style='max-width: 200px'>";
             } else {
                 console.log("gambar tidak ada");
             }
@@ -1099,106 +1101,73 @@
             });
         }
 
+        // function readURL(input, idfile) {
+        //     const files = input.files;
+
+        //     // const files = input.target.files;
+        //     const imagePreview = $('#imagePreview');
+
+        //     // Clear any previous previews
+        //     imagePreview.empty();
+
+        //     for (let i = 0; i < files.length; i++) {
+        //         const file = files[i];
+        //         const option = {
+        //             quality: 0.7,
+        //             maxWidth: 800,
+        //             maxHeight: 600,
+        //         };
+        //         compressImage(file, option)
+        //             .then(function(compressedFile) {
+        //                 // compressedFiles.push(compressedFile);
+        //                 var img = $(input).closest("td").find("." + idfile);
+        //                 $(img).show();
+        //                 $(img).attr('src', compressedFile);
+        //                 console.log(compressedFile);
+        //             })
+        //             .catch(function(error) {
+        //                 console.log(error.message);
+        //             });
+        //     }
+        // }
+
         function readURL(input, idfile) {
-            const files = input.files;
+            if (input.files && input.files[0]) {
+                quality = 60;
+                var reader = new FileReader();
 
-            // const files = input.target.files;
-            const imagePreview = $('#imagePreview');
+                reader.onload = function(e) {
+                    var img = $(input).parent().find("." + idfile);
+                    $(img).show();
 
-            // Clear any previous previews
-            imagePreview.empty();
+                    // Create a new image element
+                    var tempImage = new Image();
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const option = {
-                    quality: 0.7,
-                    maxWidth: 800,
-                    maxHeight: 600,
+                    tempImage.onload = function() {
+                        // Create a canvas element
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+
+                        // Set the canvas dimensions to the image dimensions
+                        canvas.width = tempImage.width;
+                        canvas.height = tempImage.height;
+
+                        // Draw the image on the canvas
+                        ctx.drawImage(tempImage, 0, 0);
+
+                        // Get the compressed data URL
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                        // Set the source of the img element to the compressed data URL
+                        $(img).attr('src', compressedDataUrl);
+                    };
+
+                    // Set the source of the temporary image to the FileReader result
+                    tempImage.src = e.target.result;
                 };
-                compressImage(file, option)
-                    .then(function(compressedFile) {
-                        compressedFiles.push(compressedFile);
-                        var img = $(input).closest("td").find("." + idfile);
-                        $(img).show();
-                        $(img).attr('src', compressedFile);
-                    })
-                    .catch(function(error) {
-                        console.log(error.message);
-                    });
+
+                reader.readAsDataURL(input.files[0]);
             }
-
-
-            // if (file) {
-            //     const reader = new FileReader();
-            //     reader.onload = function(event) {
-            //         const image = new Image();
-            //         image.src = event.target.result;
-
-            //         image.onload = function() {
-            //             const canvas = document.createElement('canvas');
-            //             const ctx = canvas.getContext('2d');
-
-            //             const maxWidth = 800;
-            //             const maxHeight = 600;
-
-            //             let width = image.width;
-            //             let height = image.height;
-
-            //             if (width > height) {
-            //                 if (width > maxWidth) {
-            //                     height *= maxWidth / width;
-            //                     width = maxWidth;
-            //                 }
-            //             } else {
-            //                 if (height > maxHeight) {
-            //                     width *= maxHeight / height;
-            //                     height = maxHeight;
-            //                 }
-            //             }
-
-            //             canvas.width = width;
-            //             canvas.height = height;
-
-            //             ctx.drawImage(image, 0, 0, width, height);
-
-            //             const compressedImageDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-
-            //             // Display the compressed image and size
-            //             const compressedImage = $('<img>').attr('src', compressedImageDataUrl);
-            //             const compressedSize = $('<p>').text(
-            //                 `Compressed Size: ${Math.round(compressedImageDataUrl.length / 1024)} KB`);
-            //             imagePreview.append(compressedImage);
-            //             imagePreview.append(compressedSize);
-            //             console.log(`Compressed Size: ${Math.round(compressedImageDataUrl.length / 1024)} KB`);
-
-            //             // Display the original size
-            //             const originalSize = $('<p>').text(`Original Size: ${Math.round(file.size / 1024)} KB`);
-            //             imagePreview.append(originalSize);
-            //             console.log(`Original Size: ${Math.round(file.size / 1024)} KB`);
-
-            //             const compressedImageElement = new Image();
-            //             compressedImageElement.src = compressedImageDataUrl;
-
-            //             var img = $(input).closest("td").find("." + idfile);
-            //             $(img).show();
-            //             $(img).attr('src', compressedImageDataUrl);
-            //         };
-            //     };
-            //     reader.readAsDataURL(file);
-            // }
-            // }
-
-            // if (input.files && input.files[0]) {
-            //     var reader = new FileReader();
-
-            //     reader.onload = function(e) {
-            //         var img = $(input).closest("td").find("." + idfile);
-            //         $(img).show();
-            //         $(img).attr('src', e.target.result);
-            //     };
-
-            //     reader.readAsDataURL(input.files[0]);
-            // }
         }
 
         function readURL2(input, idfile) {
@@ -1304,7 +1273,7 @@
                         body += "<td>" + (index + 1) + "</td>";
                         body += "<td>" + value.check_date + "</td>";
                         body += "<td>" + value.molding_name + "</td>";
-                        body += "<td>"+value.part_name+"</td>";
+                        body += "<td>" + value.part_name + "</td>";
                         body += "<td>" + value.problem + "<br>";
 
                         if (value.problem_att) {
