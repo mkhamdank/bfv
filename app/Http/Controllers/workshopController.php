@@ -61,7 +61,7 @@ class workshopController extends Controller
 				->get();
 
 			$data_all = $data_all->select("pe_molding_findings.id", db::raw('DATE_FORMAT(check_date,"%Y-%m-%d") as check_date'), "molding_name", "part_name", "problem", "problem_att", "pic", "handling_temporary", "handling_att", "note_problem", "close_date", "status", "pe_molding_findings.remark")
-				->orderBy("pe_molding_findings.id", "ASC")
+				->orderBy("pe_molding_findings.check_date", "ASC")
 				->get();
 
 				$datas2 = $datas2->select(db::raw('DATE_FORMAT(period,"%Y %b") as check_date'),'status', db::raw('COUNT(id) as jml') )
