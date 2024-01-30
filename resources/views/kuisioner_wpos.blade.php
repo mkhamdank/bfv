@@ -5,23 +5,17 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>PT. YMPI - Work Permit With Enviromental & Safety Analysis</title>
-	<link rel="shortcut icon" type="image/x-icon" href="{{ url('logo_mirai_bundar.png')}}" />
+	<!-- <link rel="shortcut icon" type="image/x-icon" href="{{ url('logo_mirai_bundar.png')}}" /> -->
 
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/bootstrap.min.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/font-awesome.min.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/icon-font.min.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/animate.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/hamburgers.min.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/animsition.min.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/select2.min.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/daterangepicker.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/util.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/main.css')}}">
-	<link rel="stylesheet" type="text/css" href="{{ url('ympicoid/jquery.gritter.css') }}" >
-	<link rel="stylesheet" href="{{ url('ympicoid/bootstrap-datepicker.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url('bootstrap.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url('font-awesome.min.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url('css/util.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url('css/main.css')}}">
+	<link rel="stylesheet" type="text/css" href="{{ url('css/jquery.gritter.css') }}" >
+	<link rel="stylesheet" href="{{ url('bootstrap-datepicker.css')}}">
 
 	<style type="text/css">
-
+/* 
 		@font-face {
 			font-family: Raleway-SemiBold;
 			src: url('../fonts/raleway/Raleway-SemiBold.ttf'); 
@@ -35,7 +29,7 @@
 		@font-face {
 			font-family: Raleway-Black;
 			src: url('../fonts/raleway/Raleway-Black.ttf'); 
-		}
+		} */
 
 		.container-contact100 {
 			background: url('ympi.jpg') no-repeat fixed left;
@@ -173,6 +167,10 @@
 			background: white;
 		}
 
+		p{
+			color: white !important;
+		}
+
 	</style>
 </head>
 
@@ -213,10 +211,10 @@
 				</span>
 
 				<label class="label-input1002" id="labeltanggaldari">Tanggal Dari <span style="color: red">*</span></label>
-				<input type="text" class="form-control datepicker" id="date_from" name="date_from" placeholder="">
+				<input type="date" class="form-control" id="date_from" name="date_from" placeholder="">
 				
 				<label class="label-input1002" id="labeltanggalsampai">Tanggal Sampai <span style="color: red">*</span></label>
-				<input type="text" class="form-control datepicker" id="date_to" name="date_to" placeholder="">
+				<input type="date" class="form-control" id="date_to" name="date_to" placeholder="">
 
 				<!-- <label class="label-input1002" id="labelreason">Keperluan</label>
 				<input type="text" class="form-control" id="reason" name="reason" placeholder="Contoh : Perbaikan Mesin, Trial Project"> -->
@@ -789,17 +787,9 @@
 
 				<div class="validate-input" style="position: relative; width: 100%">
 					<label class="checkbox" style="margin-top: 5px;margin-left: 25px;"> 
-						<input type="checkbox" class="departemenCheckbox" name="departemen" value="Woodwind Instrument - Key Parts Process (WI-KPP) Department">
+						<input type="checkbox" class="departemenCheckbox" name="departemen" value="Woodwind Instrument - Parts Process (WI-PP) Department">
 						<span class="checkboxmark"></span>
-							Production (Key Parts Process Dept.)
-					</label>
-				</div>
-
-				<div class="validate-input" style="position: relative; width: 100%">
-					<label class="checkbox" style="margin-top: 5px;margin-left: 25px;"> 
-						<input type="checkbox" class="departemenCheckbox" name="departemen" value="Woodwind Instrument - Body Parts Process (WI-BPP) Department">
-						<span class="checkboxmark"></span>
-							Production (Body Parts Process Dept.)
+							Production (Parts Process Dept.)
 					</label>
 				</div>
 
@@ -1072,7 +1062,11 @@
 
 					<br>
 
-					<b>Penyataan Pelaksana</b><br>
+
+					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+						<span>Penyataan Pelaksana</span>
+					</span>
+
 					Dengan ini, kami yang melaksanakan pekerjaan di atas 2,5 meter akan memenuhi semua ketentuan yang  disebutkan di atas,  jika tidak memenuhi ketentuan di ataskami bersedia menghentikan proses pekerjaan sampai semua persyaratan dipenuhi dan safety untuk melaksanakan pekerjaan di atas / di bawah 2,5 meter.
 
 				</div>
@@ -1244,7 +1238,9 @@
 
 					<br>
 
-					<b>Penyataan Pelaksana</b><br>
+					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+						<span>Penyataan Pelaksana</span>
+					</span>
 					Untuk pekerjaan Hot Work ini selalu memastikan area kerja sebelum dan sesudah pelaksanaan betul-betul bebas dari resiko kebakaran dimana untuk material-material yang berpotensi menyebabkan kebakaran di-isolasi minimal 10 meter dari lokasi kerja atau di-isolasi dengan menggunakan welding curtain/blanket jika kondisi tidak memungkinkan.
 				</div>
 				<div id="space_permit" style="display:none">
@@ -1415,15 +1411,45 @@
 
 					<br>
 
-					<b>Penyataan Pelaksana</b><br>
+					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+						<span>Penyataan Pelaksana</span>
+					</span>
+
 					Pelaksanaan pekerjaan di area terbatas harus memenuhi semua ketentuan yang telah ditetapkan, dan selalu memastikan semua peralatan rescue berfungsi dengan baik, dan selalu memastikan komunikasi antara personil yang masuk area terbatas dan stand by personil
+				</div>
+
+				
+
+				<div id="vendor_permit" style="display:none">
+					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+						<span>Pernyataan Vendor</span>
+					</span>
+					Dengan di submitnya form ini, maka kami bersedia memenuhi ketentuan yang telah disebutkan di atas. Jika tidak dipenuhi ketentuan diatas kami bersedia menerima sanksi berupa penghentian hubungan kerja secara sepihak atau sanksi yang diberikan perusahaan sesuai dengan tingkat pelanggarannya.
+
+					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+						<span>Ketentuan Yang Harus Dipatuhi</span>
+					</span>
+
+					<img src="{{url('images/vendor_ympi.jpg')}}" style="width: 100%;">
+
+					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+						<span>Slogan K3 - Yamaha</span>
+					</span>
+					<img src="{{url('images/k3.jpg')}}" style="width: 100%;">
+
+					<div class="validate-input" style="position: relative; width: 100%">
+						<label class="checkbox" style="margin-top: 14px;"> 
+							<input type="checkbox" class="persetujuan_vendorCheckbox" id="persetujuan_vendor" name="persetujuan_vendor" value="Saya memahami dan setuju seluruh pernyataan di atas">
+							<span class="checkboxmark"></span>
+							Saya memahami dan setuju dengan seluruh pernyataan di atas
+						</label>
+					</div>
 				</div>
 
 				<div class="container-contact100-form-btn" style="margin-top: 20px">
 					<button class="contact100-form-btn" onclick="save()">
 						<span>
 							Submit
-							<i class="fa fa-save"></i>
 						</span>
 					</button>
 				</div>
@@ -1440,17 +1466,17 @@
 
 </body>
 
-<script src="{{ url('ympicoid/jquery-3.2.1.min.js')}}"></script>
-<script src="{{ url('ympicoid/animsition.min.js')}}"></script>
-<script src="{{ url('ympicoid/popper.js')}}"></script>
-<script src="{{ url('ympicoid/bootstrap.min.js')}}"></script>
-<script src="{{ url('ympicoid/select2.min.js')}}"></script>
-<script src="{{ url('ympicoid/moment.min.js')}}"></script>
-<script src="{{ url('ympicoid/daterangepicker.js')}}"></script>
-<script src="{{ url('ympicoid/countdowntime.js')}}"></script>
-<script src="{{ url('ympicoid/jquery.gritter.min.js') }}"></script>
-<script src="{{ url('ympicoid/main.js')}}"></script>
-<script src="{{ url('ympicoid/bootstrap-datepicker.min.js')}}"></script>
+<script src="{{ url('vendor/jquery/jquery-3.2.1.min.js')}}"></script>
+<script src="{{ url('vendor/animsition/js/animsition.min.js')}}"></script>
+<script src="{{ url('vendor/bootstrap/js/popper.js')}}"></script>
+<script src="{{ url('vendor/bootstrap/js/bootstrap.min.js')}}"></script>
+<script src="{{ url('vendor/select2/select2.min.js')}}"></script>
+<script src="{{ url('vendor/daterangepicker/moment.min.js')}}"></script>
+<script src="{{ url('vendor/daterangepicker/daterangepicker.js')}}"></script>
+<script src="{{ url('vendor/countdowntime/countdowntime.js')}}"></script>
+<script src="{{ url('js/jquery.gritter.min.js') }}"></script>
+<!-- <script src="{{ url('js/main.js')}}"></script> -->
+<script src="{{ url('bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')}}"></script>
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {
@@ -1475,31 +1501,48 @@
 			$('#height_permit').show();
 			$('#hot_work_permit').hide();
 			$('#space_permit').hide();
+			$('#vendor_permit').show();
 		}
 
 		else if (elem.value == "Hot Work Permit") {
 			$('#height_permit').hide();
 			$('#hot_work_permit').show();
 			$('#space_permit').hide();
+			$('#vendor_permit').show();
 		}
 
 		else if (elem.value == "Confined Space Permit") {
 			$('#height_permit').hide();
 			$('#hot_work_permit').hide();
 			$('#space_permit').show();
+			$('#vendor_permit').show();
 		}
 
 		else if (elem.value == "None") {
 			$('#height_permit').hide();
 			$('#hot_work_permit').hide();
 			$('#space_permit').hide();
+			$('#vendor_permit').show();
 		}
 	}
 
 	function save() {
 		$("#loading").show();
 
-		if($("#company_name").val() == "" || $("#company_address").val() == "" || $("#company_email").val() == "" || $("#date_from").val() == "" || $("#date_to").val() == "" || $('#company_pic').val() == "" || $('#no_hp').val() == "" || $('#deskripsi').val() == "" || $('#lokasi').val() == "" || $('#pic_ympi').val() == "" ||  $('#work_permit').val() == ""){
+		console.log($("#company_name").val());
+		console.log($("#company_address").val());
+		console.log($("#company_email").val());
+		console.log($("#date_from").val());
+		console.log($("#date_to").val());
+		console.log($("#company_pic").val());
+		console.log($("#no_hp").val());
+		console.log($("#deskripsi").val());
+		console.log($("#lokasi").val());
+		console.log($("#pic_ympi").val());
+		console.log($('input[id="work_permit"]:checked').val());
+		console.log($('input[id="persetujuan_vendor"]:checked').val());
+
+		if($("#company_name").val() == "" || $("#company_address").val() == "" || $("#company_email").val() == "" || $("#date_from").val() == "" || $("#date_to").val() == "" || $('#company_pic').val() == "" || $('#no_hp').val() == "" || $('#deskripsi').val() == "" || $('#lokasi').val() == "" || $('#pic_ympi').val() == "" ||  $('input[id="work_permit"]:checked').val() == ""){
 		    $("#loading").hide();
 			openErrorGritter('Error!', 'Pastikan Semua Bertanda * Sudah Diisi');
 			return false;
@@ -1582,12 +1625,10 @@
 		formData.append('ketentuan', ketentuan_all);
 		formData.append('pic_ympi', $('#pic_ympi').val());
 		formData.append('departemen', departemen_all);
-		formData.append('work_permit', $('#work_permit').val());
+		formData.append('work_permit', $('input[id="work_permit"]:checked').val());
+		// console.log($('input[id="work_permit"]:checked').val());
 
-		if ($('#work_permit').val() == "Height Permit") {
-			formData.append('type', $('#height_type').val());
-			formData.append('location', $('#height_location').val());
-			
+		if ($('input[id="work_permit"]:checked').val() == "Height Permit") {
 			var protection = [];
 			$("input[name='height_protection']:checked").each(function (i) {
 	            protection[i] = $(this).val();
@@ -1612,15 +1653,21 @@
 	        });
 			var jalan_all = jalan.join();
 
+			if($('input[id="work_permit"]:checked').val() == "Height Permit" && ($("#height_type").val() == "" || $("#height_location").val() == "" || protection_all == null || warning_all == null || alat == null || jalan_all == null)){
+			    $("#loading").hide();
+				openErrorGritter('Error!', 'Pastikan Semua Bertanda (*) Sudah Diisi 1');
+				return false;
+			}
+
+			formData.append('type', $('#height_type').val());
+			formData.append('location', $('#height_location').val());
 			formData.append('question1', protection_all);
 			formData.append('question2', warning_all);
 			formData.append('question3', alat);
 			formData.append('question4', jalan_all);
 		}
 
-		else if ($('#work_permit').val() == "Hot Work Permit") {
-			formData.append('type', $('#hot_type').val());
-			formData.append('location', $('#hot_location').val());
+		else if ($('input[id="work_permit"]:checked').val() == "Hot Work Permit") {
 
 			var sumber = [];
 			for(var i = 0;i<4; i++){
@@ -1643,15 +1690,21 @@
 			var inspeksi = [];
 			inspeksi.push($('input[id="inspeksi"]:checked').val());
 
+			if($('input[id="work_permit"]:checked').val() == "Hot Work Permit" && ($("#hot_type").val() == "" || $("#hot_location").val() == "" || sumber == null || hot_safety == null || hot_warning == null || inspeksi == null)){
+			    $("#loading").hide();
+				openErrorGritter('Error!', 'Pastikan Semua Bertanda (*) Sudah Diisi 2');
+				return false;
+			}
+
+			formData.append('type', $('#hot_type').val());
+			formData.append('location', $('#hot_location').val());
 			formData.append('question1', sumber);
 			formData.append('question2', hot_safety);
 			formData.append('question3', hot_warning);
 			formData.append('question4', inspeksi);
 		}
 
-		else if ($('#work_permit').val() == "Confined Space Permit") {
-			formData.append('type', $('#space_type').val());
-			formData.append('location', $('#space_location').val());
+		else if ($('input[id="work_permit"]:checked').val() == "Confined Space Permit") {
 
 			var komunikasi = [];
 			$("input[name='komunikasi']:checked").each(function (i) {
@@ -1671,20 +1724,28 @@
 	        });
 			var training_all = training.join();
 
-
 			var space_alat = [];
 			for(var i = 0;i<4; i++){
 				var answer = 'space_alat'+i;
 				space_alat.push($('input[id="'+answer+'"]:checked').val());
 			}
 
+
+			if($('input[id="work_permit"]:checked').val() == "Confined Space Permit" && ($("#space_type").val() == "" || $("#space_location").val() == "" || komunikasi_all == null || rescue_all == null || training_all == null || space_alat == null)){
+			    $("#loading").hide();
+				openErrorGritter('Error!', 'Pastikan Semua Bertanda (*) Sudah Diisi 3');
+				return false;
+			}
+
+			formData.append('type', $('#space_type').val());
+			formData.append('location', $('#space_location').val());
 			formData.append('question1', komunikasi_all);
 			formData.append('question2', rescue_all);
 			formData.append('question3', training_all);
 			formData.append('question4', space_alat);
 		}
 
-		else if ($('#work_permit').val() == "None") {
+		else if ($('input[id="work_permit"]:checked').val() == "None") {
 			formData.append('type', null);
 			formData.append('location', null);
 			formData.append('question1', null);
@@ -1692,6 +1753,17 @@
 			formData.append('question3', null);
 			formData.append('question4', null);
 		}
+
+
+		var vendor_accept = $('input[id="persetujuan_vendor"]:checked').val();
+
+		if (vendor_accept == null) {
+			 $("#loading").hide();
+			openErrorGritter('Error!', 'Pastikan menyetujui semua pernyataan di atas.');
+			return false;
+		}
+
+		formData.append('vendor_accept', vendor_accept);
 
 		$.ajax({
 			url:"{{ url('post/wpos') }}",

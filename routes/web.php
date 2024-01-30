@@ -24,10 +24,12 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+//WPOS
+Route::get('wpos', 'App\Http\Controllers\VendorController@wpos');
+Route::post('post/wpos', 'App\Http\Controllers\VendorController@inputWpos');
 
 Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
-
-    Route::get('/', 'DashboardController@index')->name('admin.dashboard');    
+    Route::get('/', 'DashboardController@index')->name('admin.dashboard');
 
     // route group prefix admin/role
     Route::group(['prefix' => 'role'], function () {

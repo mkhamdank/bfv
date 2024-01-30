@@ -13,8 +13,8 @@ use App\Mail\SendEmail;
 use Illuminate\Support\Facades\Mail;
 use App\Models\GuestLog;
 use App\Models\VendorLog;
-use App\Models\WposLog;
 use App\Models\CmsVendor;
+use App\Models\WposLog;
 
 class VendorController extends Controller
 {
@@ -182,8 +182,50 @@ class VendorController extends Controller
     public function inputWpos(Request $request)
     {
         try {
+            $type = null;
+            if ($request->input('type') == 'null' || $request->input('type') == '' || $request->input('type') == null) {
+                $type = null;
+            }else{
+                $type = $request->input('type');
+            }
 
-            $forms = WposLog::create([
+            $location = null;
+            if ($request->input('location') == 'null' || $request->input('location') == '' || $request->input('location') == null) {
+                $location = null;
+            }else{
+                $location = $request->input('location');
+            }
+
+            $question1 = null;
+            if ($request->input('question1') == 'null' || $request->input('question1') == '' || $request->input('question1') == null) {
+                $question1 = null;
+            }else{
+                $question1 = $request->input('question1');
+            }
+
+            $question2 = null;
+            if ($request->input('question2') == 'null' || $request->input('question2') == '' || $request->input('question2') == null) {
+                $question2 = null;
+            }else{
+                $question2 = $request->input('question2');
+            }
+
+            $question3 = null;
+            if ($request->input('question3') == 'null' || $request->input('question3') == '' || $request->input('question3') == null) {
+                $question3 = null;
+            }else{
+                $question3 = $request->input('question3');
+            }
+
+            $question4 = null;
+            if ($request->input('question4') == 'null' || $request->input('question4') == '' || $request->input('question4') == null) {
+                $question4 = null;
+            }else{
+                $question4 = $request->input('question4');
+            }
+
+
+            $forms = DB::table('wpos_logs')->insert([
                 'tanggal' => date('Y-m-d'),
                 'company_name' => $request->input('company_name'),
                 'company_address' => $request->input('company_address'),
@@ -205,18 +247,23 @@ class VendorController extends Controller
                 'pic_ympi' => $request->input('pic_ympi'),
                 'departemen' => $request->input('departemen'),
                 'work_permit' => $request->input('work_permit'),
-                'type' => $request->input('type'),
-                'location' => $request->input('location'),
-                'question1' => $request->input('question1'),
-                'question2' => $request->input('question2'),
-                'question3' => $request->input('question3'),
-                'question4' => $request->input('question4')
+                'type' => $type,
+                'location' => $location,
+                'question1' => $question1,
+                'question2' => $question2,
+                'question3' => $question3,
+                'question4' => $question4,
+                'vendor_accept' => $request->input('vendor_accept')
             ]);
 
-            $forms->save();    
+            // $forms->save();
 
-            $isimail = "select * from wpos_logs where id = ".$forms->id;
-            $mail = db::select($isimail);
+            // $isimail = "select * from wpos_logs where id = ".$forms->id;
+            // $mail = db::select($isimail);
+
+            $mail = DB::table('wpos_logs')
+            ->where('id',$forms->id)
+            ->get();
 
             // Mail::to(['widura@music.yamaha.com'])->cc('prawoto@music.yamaha.com')->bcc(['rio.irvansyah@music.yamaha.com','mokhamad.khamdan.khabibi@music.yamaha.com'])->send(new SendEmail($mail, 'guest'));
 

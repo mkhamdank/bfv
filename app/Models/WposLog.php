@@ -35,6 +35,7 @@ class WposLog extends Model
 		'question2',
 		'question3',
 		'question4',
+		'vendor_accept',
 		'deleted_at',
 		'created_at',
 		'updated_at'
