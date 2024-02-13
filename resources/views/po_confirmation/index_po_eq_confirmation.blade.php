@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PT. YMPI - CONTROL DELIVERY</title>
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('logo_mirai.png') }}">
+    <!-- <link rel="shortcut icon" type="image/x-icon" href="{{ url('logo_mirai.png') }}"> -->
     <link rel="stylesheet" type="text/css" href="{{ url('vendor/bootstrap/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('fonts/font-awesome-4.7.0/css/font-awesome.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url('fonts/Linearicons-Free-v1.0.0/icon-font.min.css') }}">
@@ -32,9 +32,9 @@
             src: url('../fonts/raleway/Raleway-Black.ttf');
         }
 
-        .container-contact100 {
+        /*.container-contact100 {
             background: url('ympi2.jpg') no-repeat fixed top;
-        }
+        }*/
 
         .contact100-form-title {
             padding-top: 20px;
