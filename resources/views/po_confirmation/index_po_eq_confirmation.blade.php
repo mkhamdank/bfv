@@ -238,7 +238,7 @@
                         tableData += '<td style="width:5%; padding:0px 5px 0px 5px; text-align:right;">' +
                             result.data[i].quantity + ' ' + result.data[i].uom + '</td>';
                         tableData += '<td style="width:5%; padding:0px 5px 0px 5px; text-align:right;">' +
-                            result.data[i].price.toLocaleString('de-DE') + '</td>';
+                            parseInt(result.data[i].price).toLocaleString('de-DE') + '</td>';
 
                         var amount = result.data[i].price * result.data[i].quantity;
 
