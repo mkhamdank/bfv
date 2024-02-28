@@ -39,11 +39,27 @@ class PoConfirmationController extends Controller
         try{
             $po = $request->get('po');
 
-            return view('po_confirmation.index_po_eq_confirmation',
-                array(
-                    'check_po' => $po,
-                )
-            );
+
+            $data = db::table('equipment_plan_deliveries')
+            ->where('equipment_plan_deliveries.no_po', $po)
+            ->where('equipment_plan_deliveries.po_confirm', 0)
+            ->get();
+
+            if (count($data) > 0) {
+                return view('po_confirmation.index_po_eq_confirmation',
+                    array(
+                        'check_po' => $po,
+                    )
+                );
+            }else{
+                return view('po_confirmation.confirmed_po_eq',
+                    array(
+                        'check_po' => $po,
+                    )
+                );
+            }
+
+            
         } catch (\Exception $e){
             return view('404');
         }
