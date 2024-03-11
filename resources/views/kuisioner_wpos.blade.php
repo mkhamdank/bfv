@@ -1529,19 +1529,6 @@
 	function save() {
 		$("#loading").show();
 
-		console.log($("#company_name").val());
-		console.log($("#company_address").val());
-		console.log($("#company_email").val());
-		console.log($("#date_from").val());
-		console.log($("#date_to").val());
-		console.log($("#company_pic").val());
-		console.log($("#no_hp").val());
-		console.log($("#deskripsi").val());
-		console.log($("#lokasi").val());
-		console.log($("#pic_ympi").val());
-		console.log($('input[id="work_permit"]:checked').val());
-		console.log($('input[id="persetujuan_vendor"]:checked').val());
-
 		if($("#company_name").val() == "" || $("#company_address").val() == "" || $("#company_email").val() == "" || $("#date_from").val() == "" || $("#date_to").val() == "" || $('#company_pic').val() == "" || $('#no_hp').val() == "" || $('#deskripsi').val() == "" || $('#lokasi').val() == "" || $('#pic_ympi').val() == "" ||  $('input[id="work_permit"]:checked').val() == ""){
 		    $("#loading").hide();
 			openErrorGritter('Error!', 'Pastikan Semua Bertanda * Sudah Diisi');
@@ -1626,7 +1613,6 @@
 		formData.append('pic_ympi', $('#pic_ympi').val());
 		formData.append('departemen', departemen_all);
 		formData.append('work_permit', $('input[id="work_permit"]:checked').val());
-		// console.log($('input[id="work_permit"]:checked').val());
 
 		if ($('input[id="work_permit"]:checked').val() == "Height Permit") {
 			var protection = [];
@@ -1665,6 +1651,13 @@
 			formData.append('question2', warning_all);
 			formData.append('question3', alat);
 			formData.append('question4', jalan_all);
+
+			console.log($('#height_type').val());
+			console.log($('#height_location').val());
+			console.log(protection_all);
+			console.log(warning_all);
+			console.log(alat);
+			console.log(jalan_all);
 		}
 
 		else if ($('input[id="work_permit"]:checked').val() == "Hot Work Permit") {
@@ -1702,6 +1695,14 @@
 			formData.append('question2', hot_safety);
 			formData.append('question3', hot_warning);
 			formData.append('question4', inspeksi);
+
+
+			console.log($('#hot_type').val());
+			console.log($('#hot_location').val());
+			console.log(sumber);
+			console.log(hot_safety);
+			console.log(hot_warning);
+			console.log(inspeksi);
 		}
 
 		else if ($('input[id="work_permit"]:checked').val() == "Confined Space Permit") {
@@ -1743,6 +1744,13 @@
 			formData.append('question2', rescue_all);
 			formData.append('question3', training_all);
 			formData.append('question4', space_alat);
+			
+			console.log($('#space_type').val());
+			console.log($('#space_location').val());
+			console.log(komunikasi_all);
+			console.log(rescue_all);
+			console.log(training_all);
+			console.log(space_alat);
 		}
 
 		else if ($('input[id="work_permit"]:checked').val() == "None") {
