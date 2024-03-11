@@ -253,7 +253,9 @@ class VendorController extends Controller
                 'question2' => $question2,
                 'question3' => $question3,
                 'question4' => $question4,
-                'vendor_accept' => $request->input('vendor_accept')
+                'vendor_accept' => $request->input('vendor_accept'),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
             // $forms->save();
@@ -261,9 +263,9 @@ class VendorController extends Controller
             // $isimail = "select * from wpos_logs where id = ".$forms->id;
             // $mail = db::select($isimail);
 
-            $mail = DB::table('wpos_logs')
-            ->where('id',$forms->id)
-            ->get();
+            // $mail = DB::table('wpos_logs')
+            // ->where('id',$forms->id)
+            // ->get();
 
             // Mail::to(['widura@music.yamaha.com'])->cc('prawoto@music.yamaha.com')->bcc(['rio.irvansyah@music.yamaha.com','mokhamad.khamdan.khabibi@music.yamaha.com'])->send(new SendEmail($mail, 'guest'));
 
