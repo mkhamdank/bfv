@@ -1591,28 +1591,13 @@
 			peringatan.push($('input[id="'+answer+'"]:checked').val());
 		}
 
-		var formData = new FormData();
 
-		formData.append('company_name', $('#company_name').val());				
-		formData.append('company_address', $('#company_address').val());
-		formData.append('company_email', $('#company_email').val());
-		formData.append('date_from', $('#date_from').val());
-		formData.append('date_to', $('#date_to').val());
-		formData.append('company_pic', $('#company_pic').val());
-		formData.append('jabatan', $('#jabatan').val());
-		formData.append('no_hp', $('#no_hp').val());
-		formData.append('jenis_pekerjaan', jenis_pekerjaan_all);
-		formData.append('deskripsi', $('#deskripsi').val());
-		formData.append('lokasi', $('#lokasi').val());
-		formData.append('bahaya', bahaya_all);
-		formData.append('lingkungan', lingkungan_all);
-		formData.append('prosedur',prosedur_all);
-		formData.append('safety', safety);
-		formData.append('peringatan', peringatan);
-		formData.append('ketentuan', ketentuan_all);
-		formData.append('pic_ympi', $('#pic_ympi').val());
-		formData.append('departemen', departemen_all);
-		formData.append('work_permit', $('input[id="work_permit"]:checked').val());
+		var type;
+		var location;
+		var question1;
+		var question2;
+		var question3;
+		var question4;
 
 		if ($('input[id="work_permit"]:checked').val() == "Height Permit") {
 			var protection = [];
@@ -1645,19 +1630,28 @@
 				return false;
 			}
 
-			formData.append('type', $('#height_type').val());
-			formData.append('location', $('#height_location').val());
-			formData.append('question1', protection_all);
-			formData.append('question2', warning_all);
-			formData.append('question3', alat);
-			formData.append('question4', jalan_all);
 
-			console.log($('#height_type').val());
-			console.log($('#height_location').val());
-			console.log(protection_all);
-			console.log(warning_all);
-			console.log(alat);
-			console.log(jalan_all);
+			type = $('#height_type').val();
+			location = $('#height_location').val();
+			question1 = protection_all;
+			question2 = warning_all;
+			question3 = alat;
+			question4 = jalan_all;
+
+
+			// formData.append('type', $('#height_type').val());
+			// formData.append('location', $('#height_location').val());
+			// formData.append('question1', protection_all);
+			// formData.append('question2', warning_all);
+			// formData.append('question3', alat);
+			// formData.append('question4', jalan_all);
+
+			// console.log($('#height_type').val());
+			// console.log($('#height_location').val());
+			// console.log(protection_all);
+			// console.log(warning_all);
+			// console.log(alat);
+			// console.log(jalan_all);
 		}
 
 		else if ($('input[id="work_permit"]:checked').val() == "Hot Work Permit") {
@@ -1689,20 +1683,27 @@
 				return false;
 			}
 
-			formData.append('type', $('#hot_type').val());
-			formData.append('location', $('#hot_location').val());
-			formData.append('question1', sumber);
-			formData.append('question2', hot_safety);
-			formData.append('question3', hot_warning);
-			formData.append('question4', inspeksi);
 
+			type = $('#hot_type').val();
+			location = $('#hot_location').val();
+			question1 = sumber;
+			question2 = hot_safety;
+			question3 = hot_warning;
+			question4 = inspeksi;
 
-			console.log($('#hot_type').val());
-			console.log($('#hot_location').val());
-			console.log(sumber);
-			console.log(hot_safety);
-			console.log(hot_warning);
-			console.log(inspeksi);
+			// formData.append('type', $('#hot_type').val());
+			// formData.append('location', $('#hot_location').val());
+			// formData.append('question1', sumber);
+			// formData.append('question2', hot_safety);
+			// formData.append('question3', hot_warning);
+			// formData.append('question4', inspeksi);
+
+			// console.log($('#hot_type').val());
+			// console.log($('#hot_location').val());
+			// console.log(sumber);
+			// console.log(hot_safety);
+			// console.log(hot_warning);
+			// console.log(inspeksi);
 		}
 
 		else if ($('input[id="work_permit"]:checked').val() == "Confined Space Permit") {
@@ -1731,37 +1732,81 @@
 				space_alat.push($('input[id="'+answer+'"]:checked').val());
 			}
 
-
 			if($('input[id="work_permit"]:checked').val() == "Confined Space Permit" && ($("#space_type").val() == "" || $("#space_location").val() == "" || komunikasi_all == null || rescue_all == null || training_all == null || space_alat == null)){
 			    $("#loading").hide();
 				openErrorGritter('Error!', 'Pastikan Semua Bertanda (*) Sudah Diisi 3');
 				return false;
 			}
 
-			formData.append('type', $('#space_type').val());
-			formData.append('location', $('#space_location').val());
-			formData.append('question1', komunikasi_all);
-			formData.append('question2', rescue_all);
-			formData.append('question3', training_all);
-			formData.append('question4', space_alat);
-			
-			console.log($('#space_type').val());
-			console.log($('#space_location').val());
-			console.log(komunikasi_all);
-			console.log(rescue_all);
-			console.log(training_all);
-			console.log(space_alat);
+
+			type = $('#space_type').val();
+			location = $('#space_location').val();
+			question1 = komunikasi_all;
+			question2 = rescue_all;
+			question3 = training_all;
+			question4 = space_alat;
+
+			// formData.append('type', $('#space_type').val());
+			// formData.append('location', $('#space_location').val());
+			// formData.append('question1', komunikasi_all);
+			// formData.append('question2', rescue_all);
+			// formData.append('question3', training_all);
+			// formData.append('question4', space_alat);
+
+			// console.log($('#space_type').val());
+			// console.log($('#space_location').val());
+			// console.log(komunikasi_all);
+			// console.log(rescue_all);
+			// console.log(training_all);
+			// console.log(space_alat);
 		}
 
 		else if ($('input[id="work_permit"]:checked').val() == "None") {
-			formData.append('type', null);
+			/*formData.append('type', null);
 			formData.append('location', null);
 			formData.append('question1', null);
 			formData.append('question2', null);
 			formData.append('question3', null);
-			formData.append('question4', null);
+			formData.append('question4', null);*/
+
+
+			type = null;
+			location = null;
+			question1 = null;
+			question2 = null;
+			question3 = null;
+			question4 = null;
 		}
 
+
+		var formData = new FormData();
+
+		formData.append('company_name', $('#company_name').val());				
+		formData.append('company_address', $('#company_address').val());
+		formData.append('company_email', $('#company_email').val());
+		formData.append('date_from', $('#date_from').val());
+		formData.append('date_to', $('#date_to').val());
+		formData.append('company_pic', $('#company_pic').val());
+		formData.append('jabatan', $('#jabatan').val());
+		formData.append('no_hp', $('#no_hp').val());
+		formData.append('jenis_pekerjaan', jenis_pekerjaan_all);
+		formData.append('deskripsi', $('#deskripsi').val());
+		formData.append('lokasi', $('#lokasi').val());
+		formData.append('bahaya', bahaya_all);
+		formData.append('lingkungan', lingkungan_all);
+		formData.append('prosedur',prosedur_all);
+		formData.append('safety', safety);
+		formData.append('peringatan', peringatan);
+		formData.append('ketentuan', ketentuan_all);
+		formData.append('pic_ympi', $('#pic_ympi').val());
+		formData.append('departemen', departemen_all);
+		formData.append('work_permit', $('input[id="work_permit"]:checked').val());
+		formData.append('type', type);
+		formData.append('location', location);
+		formData.append('question1', question1);
+		formData.append('question2', question2);
+		formData.append('question3', question3);
+		formData.append('question4', question4);
 
 		var vendor_accept = $('input[id="persetujuan_vendor"]:checked').val();
 
