@@ -1834,7 +1834,8 @@
 				$('#sudah_mengisi').show();
 			},
 			error: function (response) {
-				console.log(response.datas);
+				openErrorGritter("Error",response.datas);
+				console.log(response);
 			},
 		})
 	}
