@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmail;
 use Response;
 
 class TrialController extends Controller
@@ -12,25 +13,23 @@ class TrialController extends Controller
     public function testmail()
     {
         try {
+
+            $bodyHtml = "MIS Test Mail";
+
             $to = [
                 'rio.irvansyah@music.yamaha.com',
                 'mokhamad.khamdan.khabibi@music.yamaha.com',
                 'nasiqul.ibat@music.yamaha.com',
-                'muhammad.ikhlas@music.yamaha.com',
-                'lukmannul.arif@music.yamaha.com',
-                'lukman.hakim.saputra@music.yamaha.com',
-                'fakhrizal.ihza.mahendra@music.yamaha.com',
+                'muhammad.ikhlas@music.yamaha.com'
             ];
-
-            $bodyHtml = "MIS NEW Test Mail From Bridgeforvendor";
-
-            Mail::raw([], function ($message) use ($bodyHtml, $to) {
-                $message->from('bridgeforvendor@ympi.co.id', 'Bridge For Vendor');
-                $message->to($to);
-                $message->subject('Trial Mail Bridgeforvendor');
-                $message->setBody($bodyHtml, 'text/html');
-            });
-
+            // Mail::html($bodyHtml, function ($message) use ($to, $bodyHtml) {
+            //     $message->from('bridgeforvendor@ympi.co.id', 'BFV');
+            //     $message->to($to);
+            //     $message->subject('Trial');
+            // });
+            $data = 'Test';
+            Mail::to($to)
+            ->send(new SendEmail($data, 'test_mail'));
         } catch (\Exception$e) {
             echo $e->getMessage();
         }

@@ -28,6 +28,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::get('wpos', 'App\Http\Controllers\VendorController@wpos');
 Route::post('post/wpos', 'App\Http\Controllers\VendorController@inputWpos');
 
+Route::get('testmail', 'App\Http\Controllers\TrialController@testmail');
+
 Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
     Route::get('/', 'DashboardController@index')->name('admin.dashboard');
 
