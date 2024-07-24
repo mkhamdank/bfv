@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Response;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
+// use DataTables;
 
 class RecruitmentHrController extends Controller
 {

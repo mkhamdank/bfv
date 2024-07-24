@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 use Response;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
+// use DataTables;
 
 class RecruitmentController extends Controller
 {
