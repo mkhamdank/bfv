@@ -2,6 +2,10 @@
     <div class="scroll-sidebar">
         <nav class="sidebar-nav">
             <ul id="sidebarnav">
+                @php
+                    $userPermission = DB::table('permissions as p')->leftJoin('user_permission as up', 'p.id', '=', 'up.permission_id')
+                        ->select('p.*')->where('up.user_id', Auth::user()->id)->get()->pluck('name')->all();
+                @endphp
 
                 @foreach (Auth::user()->role->permissions as $perm)
                     @php
@@ -273,6 +277,14 @@
                     </li>
                 @endif
 
+                @if(in_array('view_recruitment', $userPermission))
+                    <li class="sidebar-item">
+                        <a href="{{ url('/index/ympi_recruitment_monitoring') }}" class="nav-link">
+                            <i class="nav-icon fas fa-user-circle"></i>
+                            <span class="hide-menu">Recruitment</span></a>
+                        </a>
+                    </li> 
+                @endif
 
             </ul>
 
