@@ -150,7 +150,7 @@ class RecruitmentHrController extends Controller
             $participant->age = Carbon::parse($participant->birth_date)->age;
             $participant->test_date = $testDate;
 
-            $getQuestion = DB::table('recruitment_kraepelin_test')->orderBy('coordinate')->get();
+            $getQuestion = DB::table('recruitment_kraepelin_tests')->orderBy('coordinate')->get();
             $listQuestions = [];
             $columnQuestions = [];
             foreach ($getQuestion as $key => $val) {
@@ -158,7 +158,7 @@ class RecruitmentHrController extends Controller
                 $columnQuestions[$val->coordinate] = $val->column_number;
             }
 
-            $question = DB::table('recruitment_kraepelin_test')->get();
+            $question = DB::table('recruitment_kraepelin_tests')->get();
             $answerByCoordinate = $question->pluck('answer', 'coordinate')->all();
             $answer = DB::table('recruitment_kraepelin_answers')
                 ->where('date', $testDate)
