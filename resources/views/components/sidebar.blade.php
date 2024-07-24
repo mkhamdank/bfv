@@ -75,6 +75,17 @@
                             </li>
                             @endcan
                             
+                            @can('view recruitment')
+                            <li class="nav-item">
+                                <a href="{{ url('/index/ympi_recruitment_monitoring') }}" class="nav-link">
+                                    <i class="nav-icon fas fa-user-circle"></i>
+                                    <p>
+                                        Recruitment
+                                    </p>
+                                </a>
+                            </li>                                
+                            @endcan
+                            
                             @can('view logistic')
                             <li class="nav-item">
                                 <a href="#" class="nav-link">

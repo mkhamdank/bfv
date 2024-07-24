@@ -514,7 +514,26 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     // Route::get('fetch/po_eq_confirmation', 'PoConfirmationController@fetchPoEquipment');
     // Route::post('input/po_eq_confirmation', 'PoConfirmationController@inputPoConfirmationEquipment');
     // Route::get('send/po_eq_confirmation/{po_number}', 'PoConfirmationController@sendPoNotificationEquipment');
+
+
+    // RECRUITMENT MONITORING
+    Route::post('input/ympi_recruitment_monitoring/change_setting', 'App\Http\Controllers\RecruitmentHrController@changeRecruitmentSetting');
+    Route::get('index/ympi_recruitment_monitoring', 'App\Http\Controllers\RecruitmentHrController@monitoring');
+    Route::get('fetch/ympi_recruitment_monitoring', 'App\Http\Controllers\RecruitmentHrController@fetchMonitoring');
+    Route::get('fetch/ympi_recruitment_monitoring/kraepelin_result', 'App\Http\Controllers\RecruitmentHrController@kraepelinResult');
+    Route::post('download/ympi_recruitment_monitoring/kraepelin_result', 'App\Http\Controllers\RecruitmentHrController@kraepelinResult');
+
 });
+
+// RECRUITMENT
+Route::get('index/ympi_recruitment', 'App\Http\Controllers\RecruitmentController@index');
+Route::post('fetch/ympi_recruitment/participant', 'App\Http\Controllers\RecruitmentController@checkParticipant');
+Route::post('input/ympi_recruitment/participant', 'App\Http\Controllers\RecruitmentController@inputParticipant');
+Route::get('index/ympi_recruitment/kraepelin', 'App\Http\Controllers\RecruitmentController@kraepelinTest');
+Route::post('input/ympi_recruitment/kraepelin_participant', 'App\Http\Controllers\RecruitmentController@kraepelinParticipantStore');
+Route::post('input/ympi_recruitment/kraepelin_answer', 'App\Http\Controllers\RecruitmentController@kraepelinAnswerStore');
+Route::get('fetch/ympi_recruitment/check_opening_test', 'App\Http\Controllers\RecruitmentController@checkOpeningTest');
+
 // START PO MATERIAL
 Route::get('po_confirmation', 'App\Http\Controllers\RawMaterialController@indexPoConfirmation');
 Route::get('fetch/po', 'App\Http\Controllers\RawMaterialController@fetchPo');

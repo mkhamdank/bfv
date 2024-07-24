@@ -38,7 +38,9 @@
     <link href="{{ url('adminlte/plugins/toastr/toastr.min.css') }}" rel="stylesheet">
     <link href="{{ url('adminlte/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ url('adminlte/plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
-
+    <link rel="stylesheet" href="{{ url('adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ url('adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ url('adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
 
     @yield('styles')
 
@@ -51,6 +53,20 @@
     <script src="{{ url('adminlte/plugins/jszip/jszip.js') }}"></script>
     <script src="{{ url('adminlte/plugins/select2/js/select2.min.js') }}"></script>
     <script src="{{ url('adminlte/plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/moment/moment.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/daterangepicker/daterangepicker.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/jszip/jszip.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/pdfmake/pdfmake.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/pdfmake/vfs_fonts.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
     <style>
     .main-sidebar {
