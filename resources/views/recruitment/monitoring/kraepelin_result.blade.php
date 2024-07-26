@@ -183,10 +183,7 @@ tr {
 @if($type=='view')
 <table>
 @php
-    $column = ['aa','ab','ba','bb','ca','cb','da','db','ea','eb','fa','fb','ga','gb','ha','hb','ia','ib','ja','jb','ka','kb','la','lb','ma','mb','na','nb','oa','ob','pa','pb','qa','qb','ra','rb','sa','sb','ta','tb','ua','ub','va','vb','wa','wb','xa','xb','ya','yb'];
-    $row = [35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
     $count_row = count($row);
-
     $list_questions = [];
     $column_questions = [];
     foreach($listQuestions as $i => $item){
@@ -209,11 +206,12 @@ tr {
                         if($i==0){
                             $legendBaris.= '<td style="padding-right:25px;"><table>';
                             foreach ($row as $k => $val) {
-                                $legendBaris.= '<tr><td><b style="font-size:15px;color:red;">'.$val.'</b></td><td></td></tr>';
+                                $legendBaris.= '<tr><td><div style="height: 26px;color:white;"></div></td><td></td></tr>';
                                 if($val > 1){
-                                    $legendBaris.= '<tr><td></td><td><div style="height: 26px;color:white;">-</div</td></tr>';
+                                    $nomorBaris = $val-1;
+                                    $legendBaris.= '<tr><td></td><td><b style="font-size:15px;color:red;">'.$nomorBaris.'</b></td></tr>';
                                 } else {
-                                    $legendBaris.= '<tr><td></td><td><div style="height: 26px;color:white;">-</div</td></tr>';
+                                    $legendBaris.= '<tr><td></td><td><b style="font-size:15px;color:white;">'.$val.'</b></td></tr>';
                                 }
                             }
                             $legendBaris.= '</table><td>';

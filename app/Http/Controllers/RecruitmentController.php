@@ -73,13 +73,13 @@ class RecruitmentController extends Controller
     public function kraepelinTest(Request $request)
     {
         if(!session('session_ympi_recruitment')){
-            return redirect(url('index/recruitment'));
+            return redirect(url('index/ympi_recruitment'));
         }
 
         $title = "Tes Kraepelin";
         $title_jp = $title;
 
-        $getQuestion = DB::table('recruitment_kraepelin_tests')->orderBy('coordinate')->get();
+        $getQuestion = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
         $listQuestions = [];
         foreach ($getQuestion as $key => $val) {
             $listQuestions[$val->coordinate] = $val->coordinate_value;

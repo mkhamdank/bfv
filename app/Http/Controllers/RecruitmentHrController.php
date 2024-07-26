@@ -31,7 +31,8 @@ class RecruitmentHrController extends Controller
         }
         $this->middleware('auth');
         $this->column = ['aa','ab','ba','bb','ca','cb','da','db','ea','eb','fa','fb','ga','gb','ha','hb','ia','ib','ja','jb','ka','kb','la','lb','ma','mb','na','nb','oa','ob','pa','pb','qa','qb','ra','rb','sa','sb','ta','tb','ua','ub','va','vb','wa','wb','xa','xb','ya','yb'];
-        $this->row = [35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+        $this->row = [28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+        // $this->row = [35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
     }
 
     public function changeRecruitmentSetting(Request $request)
@@ -134,6 +135,8 @@ class RecruitmentHrController extends Controller
             $testType = $request->test_type;
             $type = $request->type;
 
+            $row = $this->row;
+            $column = $this->column;
             $dilewati = 0;
             $salah = [];
             $benar = [];
@@ -150,7 +153,7 @@ class RecruitmentHrController extends Controller
             $participant->age = Carbon::parse($participant->birth_date)->age;
             $participant->test_date = $testDate;
 
-            $getQuestion = DB::table('recruitment_kraepelin_tests')->orderBy('coordinate')->get();
+            $getQuestion = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
             $listQuestions = [];
             $columnQuestions = [];
             foreach ($getQuestion as $key => $val) {
@@ -158,7 +161,7 @@ class RecruitmentHrController extends Controller
                 $columnQuestions[$val->coordinate] = $val->column_number;
             }
 
-            $question = DB::table('recruitment_kraepelin_tests')->get();
+            $question = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->get();
             $answerByCoordinate = $question->pluck('answer', 'coordinate')->all();
             $answer = DB::table('recruitment_kraepelin_answers')
                 ->where('date', $testDate)
@@ -243,10 +246,11 @@ class RecruitmentHrController extends Controller
 
                 for ($i=1; $i <= count($this->column); $i++) { 
                     $jumlah_Sx += $i;
-                    $Y = count($benarByColumn[$i]);
+                    $Y = 0;
                     $chartLabel[] = $i;
 
                     if(array_key_exists($i, $benarByColumn)){
+                        $Y = count($benarByColumn[$i]);
                         $jumlah_Sy += $Y;
                     }
                     if(array_key_exists($i, $countByColumn)){
@@ -264,10 +268,13 @@ class RecruitmentHrController extends Controller
                 $x50 = $a + ($b * 50);
                 $x0 = $a + ($b * 0);
 
+                $hankerAvDev = round($jumlah_Sfd / $jumlah_Sf, 2);
+                $hankerRange = (max($allJumlahBenar) - min($allJumlahBenar));
+
                 $valuePanker = $mean;
                 $valueTianker = count($salah);
                 $valueHanker = $x50 - $x0;
-                $valueJanker = round($jumlah_Sfd / $jumlah_Sf, 2);
+                $valueJanker = $hankerRange;
 
                 $reqKecepatan = new Request();
                 $reqKecepatan->merge(['parameter' => 'kecepatan']);
@@ -297,8 +304,8 @@ class RecruitmentHrController extends Controller
                 $parameter['tianker'] = ['nilai' => $valueTianker, 'category' => ($resKetelitian) ? $resKetelitian->category : ''];
                 $parameter['hanker'] = ['nilai' => $valueHanker, 'category' => ($resKetahanan) ? $resKetahanan->category : ''];
                 $parameter['janker'] = [
-                    'range' => (max($allJumlahBenar) - min($allJumlahBenar)),
-                    'av_dev' => $valueJanker,
+                    'range' => $hankerRange,
+                    'av_dev' => $hankerAvDev,
                     'nilai' => $valueJanker, 
                     'category' => ($resKeajegan) ? $resKeajegan->category : ''
                 ];
@@ -325,7 +332,9 @@ class RecruitmentHrController extends Controller
                 $statusKurang[] = 1;
             }
 
-            $result['summary']['hasil_tes'] = (count($statusKurang)>=2 || count($statusKurangSekali)>=2 || count($statusKurangSekaliKetelitian)>=1) ? 'Tidak Lolos' : 'Lolos';
+            //Tidak lolos adalah yg memiliki status :
+            //Kurang lebih dari 2 || Kurang Sekali lebih dari 2 || kurang sekali dari ketelitian lebih dari = 1 || kurang sekali 1 dan kurang 1
+            $result['summary']['hasil_tes'] = (count($statusKurang)>=2 || count($statusKurangSekali)>=2 || count($statusKurangSekaliKetelitian)>=1 || (count($statusKurangSekali)>=1 && count($statusKurang)>=1) ) ? 'Tidak Lolos' : 'Lolos';
             $result['summary']['benar'] = count($benar);
             $result['summary']['salah'] = count($salah);
             $result['summary']['lewat'] = $dilewati;
@@ -337,7 +346,7 @@ class RecruitmentHrController extends Controller
             $result['chart'] = $this->configChartKraepelin($dataChart);
 
             DB::commit();
-            $html = view('recruitment.monitoring.kraepelin_result', compact('result', 'listQuestions', 'columnQuestions', 'resultAnswer', 'type'))->render();
+            $html = view('recruitment.monitoring.kraepelin_result', compact('result', 'listQuestions', 'columnQuestions', 'resultAnswer', 'type','row','column'))->render();
 
             if($type=='view'){
                 $response = ['status' => true, 'message' => 'Berhasil', 'data' => $html];
@@ -382,7 +391,7 @@ class RecruitmentHrController extends Controller
                         ticks: {
                             stepSize: 1,
                             suggestedMin: 1,
-                            suggestedMax: 35
+                            suggestedMax: 27
                         }
                     }],
                     xAxes: [{
