@@ -196,6 +196,8 @@
     let groupIdentity = [];
     let arrSoal = [];
     let arrJawab = [];
+    let finishTraining = '';
+
     for (let i = 2; i <= count_row; i++) {
         let soalTo = [];
         let jawabTo = [];
@@ -371,9 +373,19 @@
 
                     if(currentColumnTrain == jumlah_kolom){
                         //jika sudah mencapai kolom terakhir maka detik berhenti dan semua inputan jadi readonly
+                        finishTraining = 'yes';
                         second_barTrain = 0;
                         let input_answer = $("input.answer_train").attr('readonly', true).css({'background-color':'#aba6a6'});
                         $(".button_test").show().focus();
+                        $.each(row, function(i, item){
+                            if(item > 11){
+                                $(`.table_training tr.soal_${item}`).hide();
+                                $(`.table_training tr.jawab_${item}`).hide();
+                            } else {
+                                $(`.table_training tr.soal_${item}`).show();
+                                $(`.table_training tr.jawab_${item}`).show();
+                            }
+                        });
                     }
 
                     if(currentColumnTrain < jumlah_kolom){
@@ -426,7 +438,7 @@
 
                 if(parseInt(currentCol) < currentColumn){
                     //jika kolom yg sedang dikerjkan berbeda dgn kolom yg seharusnya dikerjakan maka pindah paksa ke kolom yg seharusnya dikerjakan
-                    $(`#${column[currentColumn]}2`).focus().prop('readonly', false).css('background-color','#ffffff');;
+                    $(`#${column[currentColumn]}2`).focus().prop('readonly', false).css('background-color','#ffffff');
                 }
 
                 if(second_bar == detik && currentColumn < jumlah_kolom){
@@ -495,13 +507,13 @@
             if(thiscoordinate == thisClass){
                 $.each(row, function(k, val){
                     if(parseInt(thisrow) >= val){
-                        $(`input.${answerName}[thiscolumn=${thiscoordinate}][thisrow=${thisrow}]`).prop('readonly', false).css('background-color','#ffffff');
+                        $(`input.${answerName}[thiscolumn=${thiscoordinate}][thisrow=${thisrow}]`).attr('readonly', false).css({'background-color':'#ffffff'});
                     } else {
-                        $(`input.${answerName}[thiscolumn=${thiscoordinate}][thisrow=${thisrow}]`).prop('readonly', true).css('background-color','#aba6a6');
+                        $(`input.${answerName}[thiscolumn=${thiscoordinate}][thisrow=${thisrow}]`).attr('readonly', true).css({'background-color':'#aba6a6'});
                     }
                 });
             } else {
-                $(`input.${answerName}[thiscolumn=${thisClass}]`).attr('readonly', true).css('background-color','#aba6a6');
+                $(`input.${answerName}[thiscolumn=${thisClass}]`).attr('readonly', true).css({'background-color':'#aba6a6'});
             }
         });
     }
@@ -649,12 +661,13 @@
             }
             
             $(this).keyup(function (e) {    
-                lock_column('table_training', 'answer_train', thiscolumn, thisrow)
                 if(parseInt(thisrow) == count_row){
                     showingRow()
                 } else {
                     showingRow(parseInt(thisrow) + 1);
                 }
+                lock_column('table_training', 'answer_train', thiscolumn, thisrow)
+                $(`input.answer_train[thisrow="${thisrow}"]`).attr('readonly', true).css({'background-color':'#aba6a6'});
                 $(`input.${next}`).focus();
             });   
         } 
@@ -682,13 +695,26 @@
                 showingColumn(currentCol);
 
                 saveAnswer(answer_coordinate, answer_value, answer_column)
-                lock_column('table_test', 'answer', thiscolumn, thisrow)
                 if(parseInt(thisrow) == count_row){
                     showingRow()
                 } else {
                     showingRow(parseInt(thisrow) + 1);
                 }
+                lock_column('table_test', 'answer', thiscolumn, thisrow);
+                $(`input.answer[thisrow="${thisrow}"]`).attr('readonly', true).css({'background-color':'#aba6a6'});
                 $(`input#${next}`).focus();
+
+                if(finishTraining == 'yes'){
+                    $.each(row, function(i, item){
+                        if(item > 11){
+                            $(`.table_training tr.soal_${item}`).hide();
+                            $(`.table_training tr.jawab_${item}`).hide();
+                        } else {
+                            $(`.table_training tr.soal_${item}`).show();
+                            $(`.table_training tr.jawab_${item}`).show();
+                        }
+                    });
+                }
             });   
         } 
     });   
