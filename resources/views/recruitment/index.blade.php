@@ -77,7 +77,7 @@
 
             <div class="col-xs-12 col-md-12 col-lg-12 mb-2 identity_full" style="display:none;">
                 <label>Asal Sekolah/Universitas</label>
-                <input type="text" class="form-control" autocomplete="off" placeholder="Asal Sekolah/Kampus" name="school" id="school">
+                <input type="text" class="form-control" autocomplete="off" placeholder="Asal Sekolah/Universitas" name="school" id="school">
                 <div class="text-danger fw-bold invalid school"></div>
             </div>
 
