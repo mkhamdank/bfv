@@ -92,8 +92,8 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <main class="py-3 wrap-login100">
-        <div class="progress" style="margin-top:-25px;display:none;">
-            <div class="progress-bar bg-primary progress-bar-striped" role="progressbar" style="width: 40%">
+        <div class="progress" style="margin-top:-25px;display:none;height:25px;">
+            <div class="progress-bar bg-danger progress-bar-striped" role="progressbar" style="width: 40%;">
             </div>
         </div>
         <div class="overlay-wrapper" id="loading" style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%;display: none; z-index: 30001;">

@@ -101,7 +101,7 @@ class RecruitmentHrController extends Controller
 
             $getAnswer = DB::table('recruitment_participant_tests as rpt')
                 ->leftJoin('recruitment_participants as rp', 'rpt.participant_id', '=', 'rp.id')
-                ->select('rpt.participant_id', 'rpt.test_type', 'rpt.test_date', 'rp.card_id', 'rp.name', 'rp.education', 'rp.birth_date')
+                ->select('rpt.participant_id', 'rpt.test_type', 'rpt.test_date', 'rp.card_id', 'rp.name', 'rp.education', 'rp.birth_date', 'rp.school')
                 ->whereBetween('rpt.test_date', [$start, $end])
                 ->orderByDesc('rpt.test_date')
                 ->get();
