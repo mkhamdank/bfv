@@ -274,7 +274,6 @@
             let thisWidth = $(this).width();
             if ($(this).hasClass('myFilter')) {
                 if(thisWidth < 60){ thisWidth = 60; } 
-                // else if(thisWidth > 250){ thisWidth = 250; }
                 $(this).html(title+`<br> <input type="text" style="width:${thisWidth}px;" class="col-search-input form-control form-control-sm" placeholder="Cari" />`);
             }
         });
