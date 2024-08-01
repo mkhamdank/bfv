@@ -30,6 +30,11 @@ class RecruitmentController extends Controller
         }
         $this->column = ['aa','ab','ba','bb','ca','cb','da','db','ea','eb','fa','fb','ga','gb','ha','hb','ia','ib','ja','jb','ka','kb','la','lb','ma','mb','na','nb','oa','ob','pa','pb','qa','qb','ra','rb','sa','sb','ta','tb','ua','ub','va','vb','wa','wb','xa','xb','ya','yb'];
         $this->row = [35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+        $this->penilaianKraepelin = [
+            'sma' => [
+                'kecepatan' => []
+            ]
+        ];
     }
 
     public function index()
@@ -152,7 +157,6 @@ class RecruitmentController extends Controller
         $validatorRules['address'] = 'required';
         $validatorRules['phone'] = 'required';
         $validatorRules['education'] = 'required';
-        $validatorRules['school'] = 'required';
 
         $validatorMessages['card_id.required'] = 'Mohon diisi';
         $validatorMessages['name.required'] = 'Mohon diisi';
@@ -161,7 +165,6 @@ class RecruitmentController extends Controller
         $validatorMessages['address.required'] = 'Mohon diisi';
         $validatorMessages['phone.required'] = 'Mohon diisi';
         $validatorMessages['education.required'] = 'Mohon diisi';
-        $validatorMessages['school.required'] = 'Mohon diisi';
 
         $validator = Validator::make($request->all(), $validatorRules, $validatorMessages);
         if ($validator->fails()) {
@@ -178,7 +181,6 @@ class RecruitmentController extends Controller
             $address = $request->address;
             $phone = $request->phone;
             $education = $request->education;
-            $school = $request->school;
             $testDate = $request->test_date;
 
             $dataParticipant = [
@@ -189,7 +191,6 @@ class RecruitmentController extends Controller
                 'address' => $address,
                 'phone' => $phone,
                 'education' => $education,
-                'school' => $school,
             ];
 
             $checkParticipant = DB::table('recruitment_participants')->where('card_id', $cardId)->first();
@@ -211,7 +212,6 @@ class RecruitmentController extends Controller
                 'address' => $address,
                 'phone' => $phone,
                 'education' => $education,
-                'school' => $school,
             ];
             session(['session_ympi_recruitment' => $sessionRecruitment]);
             $response = ['status' => true, 'message' => 'Berhasil', 'data' => $cardId];

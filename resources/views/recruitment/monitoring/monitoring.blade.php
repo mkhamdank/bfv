@@ -192,7 +192,7 @@
         let myTableName = 'tableKraepelin';
         let myTable = $(`#${myTableName}`).DataTable({
             processing: true,
-            serverSide: true,
+            serverSide: false,
             ordering: true,
             destroy: true,
             searching: true,
@@ -218,13 +218,12 @@
             },
             columns: [
                 { data: 'DT_RowIndex', title: 'No', orderable: false, searchable: false },
-                { data: 'card_id', title: 'Nomor KTP', className: "myFilter"},
-                { data: 'name', title: 'Nama Peserta', orderable: true, className: "myFilter"},
-                { data: 'age', title: 'Usia', orderable: true, className: "myFilter"},
-                { data: 'test_date', title: 'Tanggal Tes', orderable: true, className: "myFilter"},
-                { data: 'school', title: 'Asal Sekolah/Universitas', orderable: true, className: "myFilter"},
-                { data: 'education', title: 'Pendidikan', orderable: true, className: "myFilter"},
-                { data: 'test_done', title: 'Status Tes', orderable: true, render : function ( data, type, row ) {
+                { data: 'card_id', title: 'No. KTP', className: "myFilter"},
+                { data: 'name', title: 'Nama', className: "myFilter"},
+                { data: 'age', title: 'Usia', className: "myFilter"},
+                { data: 'test_date', title: 'Tanggal Tes', className: "myFilter"},
+                { data: 'education', title: 'Pendidikan', className: "myFilter"},
+                { data: 'test_done', title: 'Status Tes', render : function ( data, type, row ) {
                         let action_ = ``;
                         if(row.test_done == true){
                             action_ = `<center><span class="btn-sm rounded btn-success">Selesai</span></center>`;
@@ -273,7 +272,7 @@
             let title = $(this).text();
             let thisWidth = $(this).width();
             if ($(this).hasClass('myFilter')) {
-                if(thisWidth < 60){ thisWidth = 60; } 
+                if(thisWidth < 60){ thisWidth = 60; }
                 $(this).html(title+`<br> <input type="text" style="width:${thisWidth}px;" class="col-search-input form-control form-control-sm" placeholder="Cari" />`);
             }
         });
