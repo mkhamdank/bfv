@@ -1,4 +1,5 @@
-<aside class="main-sidebar sidebar-light-primary elevation-2 control-sidebar-push">
+{{-- <aside class="main-sidebar sidebar-light-primary elevation-2 control-sidebar-push"> --}}
+<aside class="main-sidebar sidebar-light-primary elevation-2 control-sidebar-push" style="position: fixed;">
 
     <a href="#" class="brand-link bg-primary" style="text-decoration:none;">
 
@@ -97,6 +98,39 @@
                             </li>                                
                             @endcan                            
 
+                            @can('view fixed asset')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-cubes"></i>
+                                    <p>
+                                        Fixed Asset
+                                        <i class="fas fa-angle-left right"></i>
+                                        <span class="badge badge-info right"></span>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview" style="display: none;">
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.fixed_asset') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-tasks"></i>
+                                            <p>Fixed Asset Check</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.fixed_asset_audit') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-clipboard-check"></i>
+                                            <p>Fixed Asset Audit</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.fixed_asset_report') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-chart-bar"></i>
+                                            <p>Fixed Asset Report</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            @endcan
+
                             @can('view users')
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
@@ -123,7 +157,6 @@
                                 </ul>
                             </li>
                             @endcan
-
 
 
                             {{-- end of sidebar menu --}}

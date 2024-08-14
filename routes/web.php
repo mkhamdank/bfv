@@ -480,21 +480,33 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::get('pdf', 'TrialController@trialPdf');
 
     Route::group(['nav' => 'S5', 'middleware' => 'permission'], function () {
-        //ALL - FIXED ASSET
-        Route::get('index/fixed_asset', 'AccountingController@indexFixedAsset');
-        Route::get('fetch/fixed_asset/list', 'AccountingController@fetchFixedAsset');
-        Route::get('fetch/fixed_asset/audit/list', 'AccountingController@fetchAssetAuditList');
-        Route::get('index/check/fixed_asset/{check_num}/{section}/{location}/{period}', 'AccountingController@indexAssetCheck');
-        Route::get('fetch/fixed_asset/location/list', 'AccountingController@fetchAssetbyLocation');
-        Route::post('input/fixed_asset/check/temp', 'AccountingController@inputAssetCheckTemp');
-        Route::post('input/fixed_asset/check', 'AccountingController@inputAssetCheck');
-        Route::get('index/fixed_asset/auditor_audit/list', 'AccountingController@indexAssetAuditListAuditor');
-        Route::post('approval/fixed_asset/check', 'AccountingController@approvalFixedAsset');
-        Route::post('upload/fixed_asset/map', 'AccountingController@postAssetMap');
-        Route::get('pdf/fixed_asset_check/{location}/{period}', 'AccountingController@pdfFixedAsset');
     });
 
+    //ALL - FIXED ASSET
+    Route::get('index/fixed_asset', 'AccountingController@indexFixedAsset')->name("user.fixed_asset");
+    Route::get('index/fixed_asset/audit', 'AccountingController@indexFixedAssetAudit')->name("user.fixed_asset_audit");
+    Route::get('fetch/fixed_asset/list', 'AccountingController@fetchFixedAsset');
+    Route::get('fetch/fixed_asset/audit/list', 'AccountingController@fetchAssetAuditList');
+    Route::get('fetch/fixed_asset/audit/audit/list', 'AccountingController@fetchAssetMasterAuditList');
+    Route::get('index/check/fixed_asset/{check_num}/{location}/{period}', 'AccountingController@indexAssetCheck');
+    Route::get('fetch/fixed_asset/location/list', 'AccountingController@fetchAssetbyLocation');
+    Route::post('input/fixed_asset/check/temp', 'AccountingController@inputAssetCheckTemp');
+    Route::post('input/fixed_asset/check', 'AccountingController@inputAssetCheck');
+    Route::get('index/fixed_asset/auditor_audit/list', 'AccountingController@indexAssetAuditListAuditor');
+    Route::post('approval/fixed_asset/check', 'AccountingController@approvalFixedAsset');
+    Route::post('upload/fixed_asset/map', 'AccountingController@postAssetMap');
+    Route::get('pdf/fixed_asset_check/{location}/{period}', 'AccountingController@pdfFixedAsset');
+    Route::get('index/audit/fixed_asset/{check_num}/{location}/{period}', 'AccountingController@indexAssetAudit');
+    Route::post('input/fixed_asset/audit/temp', 'AccountingController@inputAssetAuditTemp');
+    Route::post('input/fixed_asset/audit', 'AccountingController@inputAssetAudit');
+    Route::post('confirm/fixed_asset/audit', 'AccountingController@saveAssetAudit');
+
     Route::get('approval/fixed_asset/audit/approval/{location}/{period}/{stat}/{position}', 'GeneralController@approvalFixedAssetCheck');
+    Route::get('generate/fixed_asset/report', 'AccountingController@generateAssetPDF');
+
+    Route::get('index/fixed_asset/report', 'AccountingController@indexFixedAssetReport')->name("user.fixed_asset_report");
+    Route::get('check/fixed_asset/report', 'AccountingController@checkFixedAssetReport');
+    Route::get('fetch/fixed_asset/report', 'AccountingController@fetchFixedAssetReport');
 
     Route::get('reminder_invoice', function () {
 
