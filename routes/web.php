@@ -500,6 +500,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::post('input/fixed_asset/audit/temp', 'AccountingController@inputAssetAuditTemp');
     Route::post('input/fixed_asset/audit', 'AccountingController@inputAssetAudit');
     Route::post('confirm/fixed_asset/audit', 'AccountingController@saveAssetAudit');
+    Route::post('confirm/fixed_asset/check', 'AccountingController@saveAssetCheck');
 
     Route::get('approval/fixed_asset/audit/approval/{location}/{period}/{stat}/{position}', 'GeneralController@approvalFixedAssetCheck');
     Route::get('generate/fixed_asset/report', 'AccountingController@generateAssetPDF');

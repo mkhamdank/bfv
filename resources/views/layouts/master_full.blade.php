@@ -1,117 +1,83 @@
-<!DOCTYPE html>
-<html>
-
+<!doctype html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url('images/bridgesmall.png') }}" />
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta content="width=device-width, user-scalable=yes, initial-scale=1.0" name="viewport">
-    <title>Bridge For Vendor</title>
-    <link rel="stylesheet" href="{{ url('css/bootstrap4.min.css') }}">
-    <link rel="stylesheet" href="{{ url('css/dashboard/style.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('bower_components/font-awesome/css/font-awesome.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ url('bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
-    <link rel="stylesheet" href="{{ url('bower_components/select2/dist/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('bower_components/Ionicons/css/ionicons.min.css') }}">
-    @yield('stylesheets')
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <!-- Icon -->
+    <link rel="icon" href="{{ url('img/bridgesmall.png') }}">
+
+    <!-- Title -->
+    <title>
+        @if (isset($title))
+            {{ $title }}
+        @else
+            Bridge for Vendor
+        @endif
+    </title>
+
+    <!-- Fonts -->
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+
+    <!-- Styles -->
+    <link href="{{ url('adminlte/plugins/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/dist/css/adminlte.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/summernote/summernote-bs4.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/toastr/toastr.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
+    <link href="{{ url('adminlte/plugins/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+
+
+    @yield('styles')
+
+    <!-- Scripts -->
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <script src="{{ url('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url('adminlte/dist/js/adminlte.min.js') }}"></script>    
+    <script src="{{ url('adminlte/plugins/jszip/jszip.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/select2/js/select2.min.js') }}"></script>
+    <script src="{{ url('adminlte/plugins/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
+
     <style>
-        aside {
-            font-size: 12px;
-        }
-
-        .text-red {
-            color: red;
-        }
-
-        .crop {
-            overflow: hidden;
-        }
-
-        .crop img {
-            margin: -10% 0 -10% 0;
-        }
-
-        .sidebar-menu>li>a {
-            padding: 7px 5px 7px 15px;
-            display: block;
-        }
-
-        .treeview-menu>li>a {
-            padding: 3px 5px 3px 15px;
-            display: block;
-            font-size: 12px;
-        }
-
-        @media (min-width:576px) {
-            #logo-bridge {
-                height: 8px;
-                /*content:url("{{ url('images/bridgesmall.png') }}");*/
-            }
-
-            #logo-icon {
-                padding-left: 0px !important;
-            }
-        }
-
-        @media (min-width:767px) {
-            #logo-bridge {
-                height: 8px !important;
-                /*content:url("{{ url('images/bridgesmall.png') }}");*/
-            }
-
-            #logo-icon {
-                padding-left: 0px !important;
-            }
-        }
-
-        @media (min-width:768px) {
-            #logo-bridge {
-                height: 8px !important;
-                /*content:url("{{ url('images/bridgesmall.png') }}");*/
-            }
-
-            #logo-icon {
-                padding-left: 0px !important;
-            }
-        }
-
-        @media (min-width:1200px) {
-            #logo-bridge {
-                height: 30px !important;
-                /*content:url("{{ url('images/bridge.png') }}");*/
-            }
-
-            #logo-icon {
-                padding-left: 10px !important;
-            }
-        }
+    .main-sidebar {
+        height: 100% !important;
+    }
     </style>
-</head>
+    
 
-<body class="hold-transition skin-purple sidebar-mini">
-    <div id="main-wrapper">
-        @include('layouts.header')
-        <div class="page-wrapper">
-            @yield('header')
+</head>
+<body class="sidebar-mini">
+    <div id="app">
+
+        @include('../layouts/navbar_full')
+        @include('../components/sidebar')
+
+
+        <div class="content-wrapper">
             @yield('content')
-            @include('layouts.footer')
         </div>
+
     </div>
-    <script src="{{ url('bower_components/jquery/dist/jquery.min.js') }}"></script>
-    <script src="{{ url('bower_components/bootstrap/dist/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('js/app-style-switcher.js') }}"></script>
-    <script src="{{ asset('js/waves.js') }}"></script>
-    <script src="{{ asset('js/sidebarmenu.js') }}"></script>
-    <script src="{{ asset('js/custom.js') }}"></script>
-    <script src="{{ asset('js/jquery.flot.js') }}"></script>
-    <script src="{{ asset('js/dashboard1.js') }}"></script>
-    <script src="{{ url('bower_components/select2/dist/js/select2.full.min.js') }}"></script>
-    <script src="{{ url('bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
-    <script type="text/javascript"></script>
+
+    <!-- Scripts -->
+    <script>
+        $("#toggle-sidebar").ControlSidebar('toggle');
+    </script>
+
+    <script src="{{ url('js/notifications.js') }}" defer></script>    
+    <script>        
+
+
+    </script>
+    
     @yield('scripts')
 </body>
-
 </html>

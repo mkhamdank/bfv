@@ -3228,6 +3228,7 @@ class AccountingController extends Controller
                 ->where('location', $request->get('location'))->where('period', $request->get('period'))
                 ->update([
                     'status' => 'Close',
+                    'sync_at' => null,
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
@@ -3423,5 +3424,30 @@ class AccountingController extends Controller
     function inputAssetAudit(Request $request)
     {
 
+    }
+
+    function saveAssetCheck(Request $request)
+    {
+        try {
+            DB::table('fixed_asset_checks')
+                ->where('location', $request->get('location'))->where('period', $request->get('period'))
+                ->update([
+                    'remark' => null,
+                    'status' => 'Check 2',
+                    'sync_at' => null,
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+            $response = array(
+                'status' => true,
+            );
+            return Response::json($response);
+        } catch (\Throwable $th) {
+            $response = array(
+                'status' => false,
+                'message' => $th->getMessage() . ' on Line' . $th->getLine()
+            );
+            return Response::json($response);
+        }
     }
 }

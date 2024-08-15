@@ -22,14 +22,16 @@
 
                     <nav class="mt-2">
                         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                            <li class="nav-item" id="side_dashboard">
-                                <a href="{{ route('admin.dashboard') }}" class="nav-link">
-                                    <i class="nav-icon fas fa-tachometer-alt"></i>
-                                    <p>
-                                        Dashboard
-                                    </p>
-                                </a>
-                            </li>
+                            <?php if (ISSET(Auth::user()->username)) { ?>
+                                <li class="nav-item" id="side_dashboard">
+                                    <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                                        <p>
+                                            Dashboard
+                                        </p>
+                                    </a>
+                                </li>
+                            <?php } ?>
 
                             {{-- @ spatie permission view_vfi --}}
                             @can('view vfi')
@@ -38,20 +40,40 @@
                                     <i class="nav-icon fas fa-copy"></i>
                                     <p>
                                         VFI
-                                        {{-- <i class="fas fa-angle-left right"></i> --}}
+                                        <!-- {{-- <i class="fas fa-angle-left right"></i> --}} -->
                                         <span class="badge badge-info right"></span>
                                     </p>
                                 </a>
-                                {{-- <ul class="nav nav-treeview" style="display: none;">
+                                <!-- {{-- <ul class="nav nav-treeview" style="display: none;">
                                     <li class="nav-item">
                                         <a href="{{ route('admin.vfi.index') }}" class="nav-link">
                                             <i class="fa fa-list nav-icon"></i>
                                             <p>Menu</p>
                                         </a>
                                     </li>
-                                </ul> --}}
+                                </ul> --}} -->
                             </li>
-                            @endcan                            
+                            @endcan
+
+                            @can('view driver')                                
+                            <li class="nav-item" id="side_driver_job">
+                                <a href="{{url('index/driver/job')}}" class="nav-link">
+                                    <i class="nav-icon fas fa-cubes"></i>
+                                    <p>
+                                        Tugas Driver
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item" id="side_driver_attendance">
+                                <a href="{{url('index/driver/attendance/report')}}" class="nav-link">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>
+                                        Rekam Kehadiran
+                                    </p>
+                                </a>
+                            </li>
+                            @endcan                         
 
 
                             @can('view stock')                                
@@ -95,8 +117,8 @@
                                         Logistic
                                     </p>
                                 </a>
-                            </li>                                
-                            @endcan                            
+                            </li>       
+                            @endcan      
 
                             @can('view fixed asset')
                             <li class="nav-item">

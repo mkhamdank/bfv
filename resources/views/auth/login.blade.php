@@ -35,7 +35,7 @@
                     </span>
 
                     @if ($errors->has('email'))
-                        <div class="alert alert-danger alert-dismissible">
+                        <div class="alert alert-danger alert-dismissible" style="margin-top: 10px;">
                             <h4 style="font-size: 15px;font-weight: bold;"> Error!</h4>
                             <span style="font-size: 12px">These credentials do not match our records.</span>
                         </div>
@@ -47,13 +47,28 @@
                         </div>
                     @endif
 
-                    <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz" style="margin-top:20px">
+                    <div class="wrap-input100 validate-input" style="margin-top:20px">
+                        <!-- <input autocomplete="off" type="text" class="input100" placeholder="Email" id="email" name="email" value="{{ old('email') }}" required autofocus a> -->
+                        <input id="username" type="text" class="input100 @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autofocus>
+                        <span class="focus-input100"></span>
+                        @error('username')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                        <span class="symbol-input100">
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                                        
+
+                    <!-- <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz" style="margin-top:20px">
                         <input autocomplete="off" type="text" class="input100" placeholder="Email" id="email" name="email" value="{{ old('email') }}" required autofocus a>
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
                         </span>
-                    </div>
+                    </div> -->
 
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
                         <input class="input100" type="password" placeholder="Password" id="password" name="password" required>
