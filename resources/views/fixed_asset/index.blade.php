@@ -106,8 +106,9 @@
                             <div class="col-6">
                                 <button type="button" class="btn btn-danger float-right" onclick="generateReport()">
                                     <i class="fas fa-sync fa-spin"></i> Generate Report</button>
-                                {{-- <button type="button" style="margin-right: 1%" class="btn btn-primary float-right" onclick="openModal()"><i
+                                    {{-- <button type="button" style="margin-right: 1%" class="btn btn-primary float-right" onclick="openModal()"><i
                                         class="fa fa-upload"></i> <i class="fa fa-map"></i> Upload Map</button> --}}
+                                        <a type="button" class="btn btn-secondary float-right" style="margin-right: 2px" href="{{ url('data_file/fixed_asset/Panduan Cek Fixed Asset YMPI.mp4') }}" target="_blank"><i class="fas fa-video"></i> Panduan Pengisian</a>
                             </div>
                         </div>
 
@@ -279,10 +280,15 @@
                 $('#AuditAssetTable').DataTable().destroy();
                 $("#AuditAssetBody").empty();
                 body = "";
+                var total_cek2 = 0;
 
                 $.each(result.assets, function(index, value) {
                     period = value.period;
                     loc = value.location;
+
+                    if (value.remark == "temporary save 2") {
+                        total_cek2 += 1;
+                    }
 
                     body += "<tr>";
                     body += "<td>" + value.period + "</td>";
@@ -316,9 +322,9 @@
                         }
                     }
                     body += "</td>";
-                    body += "<td style='vertical-align: middle'>";
+                    body += "<td style='vertical-align: middle' class='btn_act'>";
 
-                    if ((value.status == 'Check 1' || value.remark == 'temporary save 1') &&
+                    if (((value.status == 'Check 1' && !value.remark) || value.remark == 'temporary save 1') &&
                         '{{ $permiss->permission }}'.indexOf("Check 2") >= 0) {
                         body +=
                             "<a class='btn btn-block btn-info btn-sm' href='{{ url('index/check/fixed_asset/check2') }}/" +
@@ -348,6 +354,12 @@
                 })
 
                 $("#AuditAssetBody").append(body);
+
+                console.log(total_cek2, result.assets.length);
+
+                if (total_cek2 == result.assets.length) {
+                    $(".btn_act").append("<button class='btn btn-success btn-xs' onclick='save_check()'><i class='fas fa-check-double'></i> Save Check</button>");
+                }
 
                 var table = $('#AuditAssetTable').DataTable({
                     'dom': 'Bfrtip',
@@ -384,6 +396,7 @@
                     $("#loading").hide();
                     if (result.status) {
                         toastr.success('Approval berhasil terkirim', 'Success!');
+                        getData();
                     } else {
                         toastr.error(result.message, 'Error!');
                     }
@@ -476,6 +489,20 @@
                 } else {
                     toastr.error(result.message, 'Error!');
                 }
+            })
+        }
+
+        function save_check() {
+            var data = {
+                period : period,
+                location : loc,
+                category : "Check"
+            }
+
+            $.post('{{ url('confirm/fixed_asset/check') }}', data, function(result, status, xhr) {
+                $("#loading").hide();
+                toastr.success('Hasil Cek Berhasil Disimpan', 'Success!');
+                getData();
             })
         }
 

@@ -2320,45 +2320,59 @@ class AccountingController extends Controller
 
     public function fetchAssetAuditList(Request $request)
     {
-        if (Auth::user()->username == 'PT. ARISA' || Auth::user()->username == 'arisa2') {
-            $loc = 'Arisa';
-        } else if (Auth::user()->username == 'peace1' || Auth::user()->username == 'peace2') {
-            $loc = 'Peace';
-        } else if (Auth::user()->username == 'continental1' || Auth::user()->username == 'continental2') {
-            $loc = 'Continental';
-        }
+        $fa_permiss = db::table('fixed_asset_permissions')->where('user_id', Auth::user()->id)->first();
 
-        if ($request->get('period')) {
-            $date = \DateTime::createFromFormat('Y F d', $request->get('period') . " 01");
-            $period = $date->format('Y-m-d');
+        if($fa_permiss) {
+            // if (Auth::user()->username == 'PT. ARISA' || Auth::user()->username == 'arisa2') {
+            //     $loc = 'Arisa';
+            // } else if (Auth::user()->username == 'peace1' || Auth::user()->username == 'peace2') {
+            //     $loc = 'Peace';
+            // } else if (Auth::user()->username == 'continental1' || Auth::user()->username == 'continental2') {
+            //     $loc = 'Continental';
+            // }
+
+            $loc = $fa_permiss->vendor_name;
+    
+            if ($request->get('period')) {
+                $date = \DateTime::createFromFormat('Y F d', $request->get('period') . " 01");
+                $period = $date->format('Y-m-d');
+            } else {
+                $prd = FixedAssetAudit::select('period')->where('fixed_asset_audits.category', 'Vendor')
+                    ->orderBy('id', 'desc')
+                    ->limit(1)
+                    ->first();
+    
+                $period = $prd->period;
+            }
+    
+            $assets = FixedAssetAudit::where('fixed_asset_checks.period', '=', $period)
+                ->leftJoin('fixed_asset_checks', function ($join) {
+                    $join->on('fixed_asset_checks.period', '=', 'fixed_asset_audits.period');
+                    $join->on('fixed_asset_checks.sap_number', '=', 'fixed_asset_audits.sap_number');
+                });
+    
+            if (Auth::user()->username != 'ympimis') {
+                $assets = $assets->where('fixed_asset_audits.category', 'Vendor')
+                    ->where('fixed_asset_audits.location', $loc);
+            }
+    
+            $assets = $assets->select('fixed_asset_audits.period', 'fixed_asset_audits.sap_number', 'fixed_asset_audits.asset_name', 'fixed_asset_audits.location', 'fixed_asset_audits.asset_section', 'fixed_asset_checks.asset_images', 'fixed_asset_checks.status', 'fixed_asset_checks.category', 'fixed_asset_checks.appr_manager_at', 'fixed_asset_checks.remark', 'fixed_asset_checks.appr_status', 'fixed_asset_audits.checked_by')
+                ->get();
+    
+            $response = array(
+                'status' => true,
+                'assets' => $assets
+            );
+            return Response::json($response);
         } else {
-            $prd = FixedAssetAudit::select('period')->where('fixed_asset_audits.category', 'Vendor')
-                ->orderBy('id', 'desc')
-                ->limit(1)
-                ->first();
-
-            $period = $prd->period;
+            $response = array(
+                'status' => false,
+                'message' => 'Anda Tidak Memiliki Akses'
+            );
+            return Response::json($response);
         }
 
-        $assets = FixedAssetAudit::where('fixed_asset_checks.period', '=', $period)
-            ->leftJoin('fixed_asset_checks', function ($join) {
-                $join->on('fixed_asset_checks.period', '=', 'fixed_asset_audits.period');
-                $join->on('fixed_asset_checks.sap_number', '=', 'fixed_asset_audits.sap_number');
-            });
-
-        if (Auth::user()->username != 'PI0905001' && Auth::user()->username != 'PI2002021') {
-            $assets = $assets->where('fixed_asset_audits.category', 'Vendor')
-                ->where('fixed_asset_audits.location', $loc);
-        }
-
-        $assets = $assets->select('fixed_asset_audits.period', 'fixed_asset_audits.sap_number', 'fixed_asset_audits.asset_name', 'fixed_asset_audits.location', 'fixed_asset_audits.asset_section', 'fixed_asset_checks.asset_images', 'fixed_asset_checks.status', 'fixed_asset_checks.category', 'fixed_asset_checks.appr_manager_at', 'fixed_asset_checks.remark', 'fixed_asset_checks.appr_status', 'fixed_asset_audits.checked_by')
-            ->get();
-
-        $response = array(
-            'status' => true,
-            'assets' => $assets
-        );
-        return Response::json($response);
+       
     }
 
     public function indexAssetCheck($cek_num, $location, $period)
@@ -2396,7 +2410,7 @@ class AccountingController extends Controller
             }
 
             if ($request->get('status') == 'check2') {
-                $asset = $asset->whereRaw('fixed_asset_checks.status = "Check 1" OR fixed_asset_checks.remark = "temporary save 1"');
+                $asset = $asset->whereRaw('(fixed_asset_checks.status = "Check 1" AND fixed_asset_checks.remark is null) OR fixed_asset_checks.remark = "temporary save 1"');
             }
 
             if ($request->get('status') == 'audit') {
@@ -2697,12 +2711,12 @@ class AccountingController extends Controller
                                 'remark' => null
                             ]);
 
-                        $update_mirai = db::select("UPDATE ympimis.fixed_asset_checks
-                        LEFT JOIN ympimis_online.fixed_asset_checks on ympimis.fixed_asset_checks.location = ympimis_online.fixed_asset_checks.location AND ympimis.fixed_asset_checks.period = ympimis_online.fixed_asset_checks.period
-                        SET ympimis.fixed_asset_checks.status = ympimis_online.fixed_asset_checks.status,
-                        ympimis.fixed_asset_checks.remark = ympimis_online.fixed_asset_checks.remark,
-                        ympimis.fixed_asset_checks.result_images = ympimis_online.fixed_asset_checks.result_images
-                        WHERE ympimis_online.fixed_asset_checks.period = '" . $request->get('period') . "' AND ympimis_online.fixed_asset_checks.location = '" . $request->get('location') . "'");
+                        // $update_mirai = db::select("UPDATE ympimis.fixed_asset_checks
+                        // LEFT JOIN ympimis_online.fixed_asset_checks on ympimis.fixed_asset_checks.location = ympimis_online.fixed_asset_checks.location AND ympimis.fixed_asset_checks.period = ympimis_online.fixed_asset_checks.period
+                        // SET ympimis.fixed_asset_checks.status = ympimis_online.fixed_asset_checks.status,
+                        // ympimis.fixed_asset_checks.remark = ympimis_online.fixed_asset_checks.remark,
+                        // ympimis.fixed_asset_checks.result_images = ympimis_online.fixed_asset_checks.result_images
+                        // WHERE ympimis_online.fixed_asset_checks.period = '" . $request->get('period') . "' AND ympimis_online.fixed_asset_checks.location = '" . $request->get('location') . "'");
 
                         $z = 'ck1';
 

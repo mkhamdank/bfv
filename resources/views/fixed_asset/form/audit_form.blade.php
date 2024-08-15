@@ -572,7 +572,7 @@
                             body += '<td rowspan="4" style="font-size:15px;background-color:' + color +
                                 ';border:2px solid rgb(60, 60, 60);border-top:3px solid #af45ff;padding:5px;"><img style="width:150px;cursor:pointer" src="' +
                                 url2 + '" class="user-image" alt="image not found" onclick="modalImage(\'' +
-                                url + '\')"></td>';
+                                url2 + '\')"></td>';
 
                             body +=
                                 '<th style="border:2px solid black;border-top:3px solid #af45ff;background-color: ' +
