@@ -2321,17 +2321,6 @@ class AccountingController extends Controller
     public function fetchAssetAuditList(Request $request)
     {
         $fa_permiss = db::table('fixed_asset_permissions')->where('user_id', Auth::user()->id)->first();
-
-        if($fa_permiss) {
-            // if (Auth::user()->username == 'PT. ARISA' || Auth::user()->username == 'arisa2') {
-            //     $loc = 'Arisa';
-            // } else if (Auth::user()->username == 'peace1' || Auth::user()->username == 'peace2') {
-            //     $loc = 'Peace';
-            // } else if (Auth::user()->username == 'continental1' || Auth::user()->username == 'continental2') {
-            //     $loc = 'Continental';
-            // }
-
-            $loc = $fa_permiss->vendor_name;
     
             if ($request->get('period')) {
                 $date = \DateTime::createFromFormat('Y F d', $request->get('period') . " 01");
@@ -2344,6 +2333,21 @@ class AccountingController extends Controller
     
                 $period = $prd->period;
             }
+
+            if($fa_permiss) {
+                $loc[] = $fa_permiss->vendor_name;
+    
+            if($fa_permiss->vendor_name == "YMPI") {
+                $audited_loc = db::table('fixed_asset_audits')->where('period', $period)
+                ->where('checked_by', 'LIKE', Auth::user()->username."%")
+                ->select('location')
+                ->groupBy('location')
+                ->get();
+
+                foreach ($audited_loc as $key => $value) {
+                    $loc[] = $value->location;
+                }
+            }
     
             $assets = FixedAssetAudit::where('fixed_asset_checks.period', '=', $period)
                 ->leftJoin('fixed_asset_checks', function ($join) {
@@ -2353,7 +2357,7 @@ class AccountingController extends Controller
     
             if (Auth::user()->username != 'ympimis') {
                 $assets = $assets->where('fixed_asset_audits.category', 'Vendor')
-                    ->where('fixed_asset_audits.location', $loc);
+                    ->whereIn('fixed_asset_audits.location', $loc);
             }
     
             $assets = $assets->select('fixed_asset_audits.period', 'fixed_asset_audits.sap_number', 'fixed_asset_audits.asset_name', 'fixed_asset_audits.location', 'fixed_asset_audits.asset_section', 'fixed_asset_checks.asset_images', 'fixed_asset_checks.status', 'fixed_asset_checks.category', 'fixed_asset_checks.appr_manager_at', 'fixed_asset_checks.remark', 'fixed_asset_checks.appr_status', 'fixed_asset_audits.checked_by')
@@ -3153,7 +3157,7 @@ class AccountingController extends Controller
         }
 
         $assets = db::select('SELECT DATE_FORMAT(audit.period, "%Y %M") period, audit.period as period2, audit.pic, users.name, audit.asset_section, audit.location, audit.audit_type, audit.checked_by, asset_stat.jml_asset, asset_stat.status, appr_manager_at, audit.status as status_audit, audit.audited from
-        (select period, asset_section, location, pic,  GROUP_CONCAT(checked_by) checked_by, status, audit_type, SUM(IF(remark is not null, 1, 0)) as audited from fixed_asset_audits
+        (select period, asset_section, location, pic,  GROUP_CONCAT(DISTINCT checked_by) checked_by, status, audit_type, SUM(IF(remark is not null, 1, 0)) as audited from fixed_asset_audits
             where DATE_FORMAT(period, "%Y %M") = "' . $period . '" AND category = "Vendor"
             ' . $where . '
             group by period, asset_section, pic, location, status, audit_type) as audit
