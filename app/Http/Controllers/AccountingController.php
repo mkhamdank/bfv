@@ -3135,11 +3135,11 @@ class AccountingController extends Controller
     }
 
     function fetchAssetMasterAuditList(Request $request)
-    {
+    {   
         if (Auth::user()->username == 'ympimis') {
             $where = '';
         } else {
-            $where = 'AND checked_by LIKE "' . Auth::user()->name . '%"';
+            $where = 'AND checked_by LIKE "' . Auth::user()->username . '%"';
         }
 
         $last_period = db::table('fixed_asset_checks')->select('period')->orderBy('period', 'desc')->first();
