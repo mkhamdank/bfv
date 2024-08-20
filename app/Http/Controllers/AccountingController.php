@@ -3149,7 +3149,7 @@ class AccountingController extends Controller
 
     function fetchAssetMasterAuditList(Request $request)
     {   
-        if (Auth::user()->username == 'ympimis') {
+        if (Auth::user()->username == 'ympimis' || Auth::user()->username != 'PI0902001') {
             $where = '';
         } else {
             $where = 'AND checked_by LIKE "' . Auth::user()->username . '%"';
