@@ -2476,7 +2476,8 @@ class AccountingController extends Controller
                     'note' => $request->get('note'),
                     'result_images' => $filename,
                     'remark' => 'temporary save',
-                    'updated_at' => date('Y-m-d H:i:s')
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'sync_at' => null
                 ];
 
                 // db::table('fixed_asset_checks')->where('sap_number', $request->get('asset_id'))->where('period', $request->get('period'))->update([
@@ -2535,7 +2536,8 @@ class AccountingController extends Controller
                     'asset_image_condition' => $request->get('image_condition'),
                     'note' => $request->get('note'),
                     'remark' => 'temporary save',
-                    'updated_at' => date('Y-m-d H:i:s')
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'sync_at' => null
                 ];
 
                 // $check = db::table('fixed_asset_checks')::where('sap_number', $request->get('asset_id'))->where('period', $request->get('period'))->first();
@@ -2637,6 +2639,7 @@ class AccountingController extends Controller
                             'check_one_by' => Auth::user()->username . '/' . Auth::user()->name,
                             'check_one_at' => date('Y-m-d H:i:s'),
                             'status' => 'Check 1',
+                            'sync_at' => null,
                         ]));
                 } elseif ($request->get('category') == 'check2') {
                     DB::table('fixed_asset_checks')
@@ -2645,6 +2648,7 @@ class AccountingController extends Controller
                             'check_two_by' => Auth::user()->username . '/' . Auth::user()->name,
                             'check_two_at' => date('Y-m-d H:i:s'),
                             'status' => 'Check 2',
+                            'sync_at' => null,
                         ]));
                 }
 
@@ -2712,7 +2716,8 @@ class AccountingController extends Controller
                             ->where('location', '=', $request->get('location'))
                             ->update([
                                 'status' => 'Check 1',
-                                'remark' => null
+                                'remark' => null,
+                                'sync_at' => null
                             ]);
 
                         // $update_mirai = db::select("UPDATE ympimis.fixed_asset_checks
@@ -2729,7 +2734,8 @@ class AccountingController extends Controller
                             ->where('location', '=', $request->get('location'))
                             ->update([
                                 'status' => 'Check 2',
-                                'remark' => null
+                                'remark' => null,
+                                'sync_at' => null
                             ]);
 
                         // $update_mirai = db::select("UPDATE ympimis.fixed_asset_checks
@@ -2764,7 +2770,8 @@ class AccountingController extends Controller
                     'asset_image_condition' => $request->get('image_condition'),
                     'note' => $request->get('note'),
                     'updated_at' => date('Y-m-d H:i:s'),
-                    'remark' => null
+                    'remark' => null,
+                    'sync_at' => null
                 ];
 
                 if ($request->get('category') == 'check1') {
@@ -2854,7 +2861,8 @@ class AccountingController extends Controller
                             ->where('location', '=', $request->get('location'))
                             ->update([
                                 'status' => 'Check 1',
-                                'remark' => null
+                                'remark' => null,
+                                'sync_at' => null
                             ]);
 
                         // $update_mirai = db::select("UPDATE ympimis.fixed_asset_checks
@@ -2871,7 +2879,8 @@ class AccountingController extends Controller
                             ->where('location', '=', $request->get('location'))
                             ->update([
                                 'status' => 'Check 2',
-                                'remark' => null
+                                'remark' => null,
+                                'sync_at' => null
                             ]);
 
                         // $update_mirai = db::select("UPDATE ympimis.fixed_asset_checks
