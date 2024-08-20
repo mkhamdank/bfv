@@ -210,7 +210,7 @@
                         var total_asset = 0;
                         $.each(result.checked_data, function(index3, value3) {
                             if (value == value3.location && value2 == value3.real_stat) {
-                                total_asset = value3.total_asset;
+                                total_asset = parseInt(value3.total_asset);
                             }
                         })
 
