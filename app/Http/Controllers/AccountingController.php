@@ -2355,7 +2355,7 @@ class AccountingController extends Controller
                     $join->on('fixed_asset_checks.sap_number', '=', 'fixed_asset_audits.sap_number');
                 });
     
-            if (Auth::user()->username != 'ympimis') {
+            if (Auth::user()->username != 'ympimis' && Auth::user()->username != 'PI0902001') {
                 $assets = $assets->where('fixed_asset_audits.category', 'Vendor')
                     ->whereIn('fixed_asset_audits.location', $loc);
             }

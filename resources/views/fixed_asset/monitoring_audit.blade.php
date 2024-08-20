@@ -300,7 +300,7 @@
 
                 $.each(result.audited_data, function(index, value) {
                     ctg2.push(value.location);
-                    total_asset.push(value.total_asset);
+                    total_asset.push(parseInt(value.total_asset));
                     audited.push(parseInt(value.audited));
                     finder.push(parseInt(value.finding));
                     var must_audit = Math.round(parseInt(value.total_asset) / 100 * 10);
@@ -312,7 +312,6 @@
                 })
 
                 Highcharts.chart('chart_audit', {
-
                     chart: {
                         type: 'column'
                     },
