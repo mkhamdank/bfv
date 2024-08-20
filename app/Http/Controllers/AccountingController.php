@@ -3358,11 +3358,12 @@ class AccountingController extends Controller
                 $period_name = date('M Y', strtotime($request->get('period')));
             }
 
-            $details_check_data = db::select("SELECT sap_number, asset_name, asset_images, location, IF(appr_stat != '', appr_stat, stat) real_stat, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, note FROM
+            $details_check_data = db::select("SELECT sap_number, asset_name, asset_images, result_images, location, IF(appr_stat != '', appr_stat, stat) real_stat, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, note FROM
             (SELECT
             sap_number,
             asset_name,
             asset_images,
+            result_images,
             location,
             IF
             (
@@ -3416,10 +3417,10 @@ class AccountingController extends Controller
             (SELECT period, category, location, sap_number, asset_name, asset_section, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, 'Ada' as std_availability, 'Tidak Rusak' as std_cond, 'Tidak Rusak' as label, 'Digunakan' as usable, 'Sesuai' as map, 'Sesuai' as image, remark FROM fixed_asset_audits where period = '" . $period . "') as mstr) mstr2
             group by location");
 
-            $details_audited_data = db::select("SELECT period, category, location, sap_number, asset_name, asset_section, asset_images, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, 'Ada' as std_availability, 'Tidak Rusak' as std_cond, 'Tidak Rusak' as label, 'Digunakan' as usable, 'Sesuai' as map, 'Sesuai' as image, note,
+            $details_audited_data = db::select("SELECT period, category, location, sap_number, asset_name, asset_section, asset_images, result_images, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, 'Ada' as std_availability, 'Tidak Rusak' as std_cond, 'Tidak Rusak' as label, 'Digunakan' as usable, 'Sesuai' as map, 'Sesuai' as image, note,
             IF(`remark` = 'audited', IF(availability <> std_availability OR asset_condition <> std_cond OR label_condition <> label OR usable_condition <> usable OR map_condition <> map OR asset_image_condition <> image, 'Finding', 'Audited'),IF(`status` = 'Open', 'Must Audit', 'Audited')) as `status`
             FROM
-            (SELECT period, category, location, sap_number, asset_name, asset_section, asset_images, `status`, note, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, 'Ada' as std_availability, 'Tidak Rusak' as std_cond, 'Tidak Rusak' as label, 'Digunakan' as usable, 'Sesuai' as map, 'Sesuai' as image, remark FROM fixed_asset_audits where period = '" . $period . "') as mstr");
+            (SELECT period, category, location, sap_number, asset_name, asset_section, asset_images, result_images, `status`, note, availability, asset_condition, label_condition, usable_condition, map_condition, asset_image_condition, 'Ada' as std_availability, 'Tidak Rusak' as std_cond, 'Tidak Rusak' as label, 'Digunakan' as usable, 'Sesuai' as map, 'Sesuai' as image, remark FROM fixed_asset_audits where period = '" . $period . "') as mstr");
 
             $response = array(
                 'status' => true,

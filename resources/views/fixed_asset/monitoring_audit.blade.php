@@ -241,7 +241,7 @@
                         type: 'column'
                     },
                     title: {
-                        text: 'Monitoring Progress Check '+result.period,
+                        text: 'Monitoring Progress Check ' + result.period,
                     },
                     xAxis: {
                         categories: ctg
@@ -317,7 +317,7 @@
                     },
 
                     title: {
-                        text: 'Monitoring Progress Audit '+result.period,
+                        text: 'Monitoring Progress Audit ' + result.period,
                     },
 
                     xAxis: {
@@ -412,6 +412,14 @@
                         body += "Map            : " + (value.map_condition || '') + "<br>";
                         body += "Note           : " + (value.note || '') + "<br>";
                         body += "</pre></td>";
+                        body += "<td style='vertical-align: middle'>";
+
+                        if (value.result_images) {
+                            body += "<img src='{{ url('data_file/fixed_asset/check_picture') }}/" +
+                                value.result_images + "' alt='' style='max-width: 100px'>";
+                        }
+
+                        body += "</td>";
                         body += "<td style='vertical-align: middle'>" + value.real_stat + "</td>";
 
                         body += "</tr>";
@@ -425,7 +433,7 @@
                     // "buttons": ["copy", "excel", "print"],
                     "paging": true,
                     "lengthChange": true,
-                    "searching": false,
+                    "searching": true,
                     "ordering": true,
                     "info": true,
                     "autoWidth": false,
@@ -454,6 +462,14 @@
                         body += "Map            : " + (value.map_condition || '') + "<br>";
                         body += "Note           : " + (value.note || '') + "<br>";
                         body += "</pre></td>";
+                        body += "<td style='vertical-align: middle'>";
+
+                        if (value.result_images) {
+                            body += "<img src='{{ url('data_file/fixed_asset/audit_picture') }}/" +
+                                value.result_images + "' alt='' style='max-width: 100px'>";
+                        }
+
+                        body += "</td>";
                         if (status == 'Must Audit') {
                             body += "<td style='vertical-align: middle'>Not Audited Yet</td>";
                         } else {
@@ -478,6 +494,14 @@
                         body += "Map            : " + (value.map_condition || '') + "<br>";
                         body += "Note           : " + (value.note || '') + "<br>";
                         body += "</pre></td>";
+                        body += "<td style='vertical-align: middle'>";
+
+                        if (value.result_images) {
+                            body += "<img src='{{ url('data_file/fixed_asset/audit_picture') }}/" +
+                                value.result_images + "' alt='' style='max-width: 100px'>";
+                        }
+
+                        body += "</td>";
                         if (value.status == 'Must Audit') {
                             body += "<td style='vertical-align: middle'>Not Audited Yet</td>";
                         } else {
@@ -494,7 +518,7 @@
                     // "buttons": ["copy", "excel", "print"],
                     "paging": true,
                     "lengthChange": true,
-                    "searching": false,
+                    "searching": true,
                     "ordering": true,
                     "info": true,
                     "autoWidth": false,
@@ -516,6 +540,7 @@
             table += "<th>Asset Name</th>";
             table += "<th>Location</th>";
             table += "<th>Check Point</th>";
+            table += "<th>Eviden</th>";
             table += "<th>Status</th>";
             table += "</tr></thead>";
             table += "<tbody id='body_details'></tbody>";
