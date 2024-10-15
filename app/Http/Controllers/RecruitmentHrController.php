@@ -266,7 +266,7 @@ class RecruitmentHrController extends Controller
                 $b = (($N * $jumlah_Sxy) - ($jumlah_Sx * $jumlah_Sy)) / (($N * $jumlah_Sx2) - pow($jumlah_Sx, 2));
                 $a = (($jumlah_Sy / $N) - ($b * ($jumlah_Sx / $N)) );
                 $x50 = $a + ($b * 50);
-                $x0 = $a + ($b * 0);
+                $x0 = $a + ($b * 1);
 
                 $hankerAvDev = round($jumlah_Sfd / $jumlah_Sf, 2);
                 $hankerRange = (max($allJumlahBenar) - min($allJumlahBenar));
