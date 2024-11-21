@@ -157,6 +157,7 @@ class GeneralAffairController extends Controller
             //         ->orwhere('duty_status', null);
             // })
             ->where('driver_id',Auth::user()->username)
+            ->orderby('times')
             ->get();
             $response = array(
                 'status' => true,
