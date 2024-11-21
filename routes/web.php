@@ -559,3 +559,22 @@ Route::get('po_eq_confirmation', 'App\Http\Controllers\PoConfirmationController@
 Route::get('fetch/po_eq_confirmation', 'App\Http\Controllers\PoConfirmationController@fetchPoEquipment');
 Route::post('input/po_eq_confirmation', 'App\Http\Controllers\PoConfirmationController@inputPoConfirmationEquipment');
 Route::get('send/po_eq_confirmation/{po_number}', 'App\Http\Controllers\PoConfirmationController@sendPoNotificationEquipment');
+
+Route::get('index/scan/qr_code/driver/{qr_code}', 'App\Http\Controllers\GeneralAffairController@indexScanQrCodeDriver');
+Route::post('input/qr_code/driver/{qr_code}', 'App\Http\Controllers\GeneralAffairController@inputScanQrCodeDriver');
+Route::get('fetch/qr_code/vehicle', 'App\Http\Controllers\GeneralAffairController@fetchVehicle');
+
+Route::get('index/driver/job', 'App\Http\Controllers\GeneralAffairController@indexDriverJob');
+Route::get('fetch/driver/job', 'App\Http\Controllers\GeneralAffairController@fetchDriverJob');
+
+Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexInputDriverJob');
+Route::post('input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
+
+Route::get('index/driver/job/urgent', 'App\Http\Controllers\GeneralAffairController@indexDriverJobUrgent');
+// Route::post('input/driver/job/urgent', 'App\Http\Controllers\GeneralAffairController@inputDriverJobUrgent');
+
+Route::get('index/driver/attendance/report', 'App\Http\Controllers\GeneralAffairController@indexDriverAttendanceReport');
+Route::get('fetch/driver/attendance/report', 'App\Http\Controllers\GeneralAffairController@fetchDriverAttendanceReport');
+
+Route::get('index/driver/attendance', 'App\Http\Controllers\GeneralAffairController@indexDriverAttendance');
+Route::post('input/driver/attendance', 'App\Http\Controllers\GeneralAffairController@inputDriverAttendance');
