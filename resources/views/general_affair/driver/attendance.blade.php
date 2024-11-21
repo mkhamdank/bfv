@@ -131,9 +131,17 @@
             <input type="hidden" name="name" id="name" value="{{Auth::user()->name}}">
             <input type="hidden" id="department" name="department" placeholder="Department" readonly="" value="General Affairs Department">
             <label>Karyawan</label>
-            <input type="text" class="form-control"  placeholder="NIK Karyawan" readonly="" value="{{Auth::user()->username}} - {{Auth::user()->name}}" style="scroll-margin-bottom: 10px;">
+            <input type="text" class="form-control"  placeholder="NIK Karyawan" readonly="" value="{{Auth::user()->username}} - {{Auth::user()->name}}" style="margin-bottom: 10px;">
             <input type="hidden" class="form-control" id="latitude" name="latitude">
             <input type="hidden" class="form-control" id="longitude" name="longitude">
+
+            <label>Kendaraan</label>
+            <select class="form-control" style="width: 100%; height: 200px;" data-placeholder="Pilih Kendaraan" id="vehicle">
+                <option value="-">Pilih Kendaraan</option>
+                <?php for ($i = 0; $i < count($vehicle); ++$i) { ?>
+                    <option value="{{$vehicle[$i]->plat_no}}_{{$vehicle[$i]->car}}">{{$vehicle[$i]->plat_no}} - {{$vehicle[$i]->car}}</option>
+                <?php } ?>
+            </select>
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12" >
             <div id="map"></div>
@@ -180,6 +188,9 @@ crossorigin=""></script>
             $('body').toggleClass("sidebar-collapse");
             $('#side_driver_attendance').addClass('menu-open');
             getLocation();
+            $("#vehicle").select2({
+                allowClear:true
+            });
         });
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
@@ -287,6 +298,13 @@ crossorigin=""></script>
             return false;
         }
 
+        if ($('#vehicle').val() == '-') {
+            $("#loading").hide();
+            openErrorGritter('Error!', 'Isi Kendaraan');
+            $(window).scrollTop(0);
+            return false;
+        }
+
         if ($('#longitude').val() == null || $('#longitude').val() == "") {
             $("#loading").hide();
             openErrorGritter('Error!', 'Izinkan sistem mengakses lokasi Anda');
@@ -308,6 +326,8 @@ crossorigin=""></script>
         formData.append('department',  $('#department').val());
         formData.append('latitude',  $('#latitude').val());
         formData.append('longitude',  $('#longitude').val());
+        formData.append('plat_no',  $('#vehicle').val().split('_')[0]);
+        formData.append('car',  $('#vehicle').val().split('_')[1]);
         formData.append('file_foto[]', $('#file_foto').prop('files')[0]);
         formData.append('file_foto_odometer[]', $('#file_foto_odometer').prop('files')[0]);
 

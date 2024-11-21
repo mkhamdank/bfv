@@ -601,10 +601,13 @@ class GeneralAffairController extends Controller
 
         // $empsync = DB::select('select * from employee_syncs where employee_id = "'.Auth::user()->username.'" and end_date is null LIMIT 1');
         // $empsync = DB::table('employee_syncs')->where('employee_id',Auth::user()->username)->where('end_date',null)->limit(1)->get();
+        $vehicle = DB::table('driver_lists')
+        ->get();
 
         return view('general_affair.driver.attendance', array(
             'title' => $title,
             'title_jp' => $title_jp,
+            'vehicle' => $vehicle,
             // 'empsync' => $empsync
         ))->with('page', 'Attendance');
     }
@@ -617,6 +620,8 @@ class GeneralAffairController extends Controller
             $department = $request->input('department');
             $latitude = $request->input('latitude');
             $longitude = $request->input('longitude');
+            $plat_no = $request->input('plat_no');
+            $car = $request->input('car');
             $tanggal = date('Y-m-d-H-i-s');
 
             $_IP_ADDRESS = $_SERVER['REMOTE_ADDR'];
@@ -733,6 +738,8 @@ class GeneralAffairController extends Controller
                 'images_odometer' => $file_upload_foto_odometer,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
+                'plat_no' => $plat_no,
+                'car' => $car,
                 'state' => $province,
                 'state_district' => $city,
                 'village' => $village,
