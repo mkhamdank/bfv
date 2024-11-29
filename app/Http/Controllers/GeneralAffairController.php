@@ -613,6 +613,87 @@ class GeneralAffairController extends Controller
         ))->with('page', 'Attendance');
     }
 
+    function fetchDriverOdometer(Request $request)
+    {
+        try {
+            $nopol = $request->get('nopol');
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles',
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    'Accept: application/json',
+                    'Content-Type: application/x-www-form-urlencoded',
+                    'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+                ),
+            ));
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            $datas = json_decode($response)->data;
+
+            $id_vehicle = '';
+
+            for ($i=0; $i < count($datas); $i++) { 
+                if ($datas[$i]->licensePlate == $nopol) {
+                    $id_vehicle = $datas[$i]->id;
+                }
+            }
+
+            $data_vehicle = null;
+            if ($id_vehicle != '') {
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'',
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                    CURLOPT_HTTPHEADER => array(
+                        'Accept: application/json',
+                        'Content-Type: application/x-www-form-urlencoded',
+                        'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+                    ),
+                ));
+                $response = curl_exec($curl);
+
+                curl_close($curl);
+
+                $data_vehicle = json_decode($response)->data;
+            }
+
+            
+
+            $response = array(
+                'status' => true,
+                'data_vehicle' => $data_vehicle
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
     public function inputDriverAttendance(Request $request)
     {
         try {
@@ -623,6 +704,7 @@ class GeneralAffairController extends Controller
             $longitude = $request->input('longitude');
             $plat_no = $request->input('plat_no');
             $car = $request->input('car');
+            $odometer = $request->input('odometer');
             $tanggal = date('Y-m-d-H-i-s');
 
             $_IP_ADDRESS = $_SERVER['REMOTE_ADDR'];
@@ -741,6 +823,7 @@ class GeneralAffairController extends Controller
                 'longitude' => $longitude,
                 'plat_no' => $plat_no,
                 'car' => $car,
+                'odometer' => $odometer,
                 'state' => $province,
                 'state_district' => $city,
                 'village' => $village,

@@ -578,3 +578,5 @@ Route::get('fetch/driver/attendance/report', 'App\Http\Controllers\GeneralAffair
 
 Route::get('index/driver/attendance', 'App\Http\Controllers\GeneralAffairController@indexDriverAttendance');
 Route::post('input/driver/attendance', 'App\Http\Controllers\GeneralAffairController@inputDriverAttendance');
+
+Route::get('fetch/driver/odometer', 'App\Http\Controllers\GeneralAffairController@fetchDriverOdometer');

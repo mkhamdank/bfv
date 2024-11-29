@@ -136,12 +136,15 @@
             <input type="hidden" class="form-control" id="longitude" name="longitude">
 
             <label>Kendaraan</label>
-            <select class="form-control" style="width: 100%; height: 200px;" data-placeholder="Pilih Kendaraan" id="vehicle">
+            <select class="form-control" style="width: 100%; height: 200px;" data-placeholder="Pilih Kendaraan" id="vehicle" onchange="changeVehicle(this.value)">
                 <option value="-">Pilih Kendaraan</option>
                 <?php for ($i = 0; $i < count($vehicle); ++$i) { ?>
                     <option value="{{$vehicle[$i]->plat_no}}_{{$vehicle[$i]->car}}">{{$vehicle[$i]->plat_no}} - {{$vehicle[$i]->car}}</option>
                 <?php } ?>
             </select>
+
+            <label>Odometer (KM) <span style="color: red;">*</span></label>
+            <input type="text" name="odometer" id="odometer" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="" >
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12" >
             <div id="map"></div>
@@ -178,6 +181,68 @@ crossorigin=""></script>
             }
         });
 
+        if (screen.width < 400) {
+            $.fn.numpad.defaults.gridTpl = '<table class="table modal-content" style="width: 80%; left: 20.225px;background-color:white;"></table>';
+            $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in" style="opacity:.4"></div>';
+            $.fn.numpad.defaults.displayTpl = '<input type="text" class="form-control" style="font-size:6vw; height: 50px;"/>';
+            $.fn.numpad.defaults.buttonNumberTpl =  '<button type="button" class="btn btn-info" style="font-size:5vw; width:50px;"></button>';
+            $.fn.numpad.defaults.buttonFunctionTpl = '<button type="button" class="btn btn-success" style="font-size:5vw; width: 100%;color:white;background-color:green;border-color:green"></button>';
+            $.fn.numpad.defaults.onKeypadCreate = function(){
+                $(this).find('.done').css('background-color','white');
+                $(this).find('.done').css('color','rgb(72,156,78)');
+                $(this).find('.done').css('border-color','rgb(72,156,78)');
+
+                $(this).find('.sep').css('background-color','white');
+                $(this).find('.sep').css('color','black');
+                $(this).find('.sep').css('border-color','#0dcaf0');
+                $(this).find('.sep').css('width','50px');
+
+                $(this).find('.cancel').css('background-color','white');
+                $(this).find('.cancel').css('color','rgb(219,103,115)');
+                $(this).find('.cancel').css('border-color','rgb(219,103,115)');
+                $(this).find('.cancel').html('<i class="fas fa-times"></i>');
+
+                $(this).find('.clear').css('background-color','white');
+                $(this).find('.clear').css('color','black');
+                $(this).find('.clear').css('border-color','black');
+                $(this).find('.clear').html('<i class="fas fa-trash"></i>');
+
+                $(this).find('.del').css('background-color','white');
+                $(this).find('.del').css('color','black');
+                $(this).find('.del').css('border-color','black');
+                $(this).find('.del').css('font-size','4vw');
+                $(this).find('.del').html('<i class="fas fa-backspace"></i>');
+            };
+        }else{
+            $.fn.numpad.defaults.gridTpl = '<table class="table modal-content" style="width: 25%;background-color:white;"></table>';
+            $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in" style="opacity:.4"></div>';
+            $.fn.numpad.defaults.displayTpl = '<input type="text" class="form-control" style="font-size:2vw; height: 50px;"/>';
+            $.fn.numpad.defaults.buttonNumberTpl =  '<button type="button" class="btn btn-info" style="font-size:2vw; width:50px;"></button>';
+            $.fn.numpad.defaults.buttonFunctionTpl = '<button type="button" class="btn btn-success" style="font-size:2vw; width: 100%;color:white;background-color:green;border-color:green"></button>';
+            $.fn.numpad.defaults.onKeypadCreate = function(){
+                $(this).find('.done').css('background-color','white');
+                $(this).find('.done').css('color','rgb(72,156,78)');
+                $(this).find('.done').css('border-color','rgb(72,156,78)');
+
+                $(this).find('.sep').css('background-color','white');
+                $(this).find('.sep').css('color','black');
+                $(this).find('.sep').css('border-color','#0dcaf0');
+                $(this).find('.sep').css('width','50px');
+
+                $(this).find('.cancel').css('background-color','white');
+                $(this).find('.cancel').css('color','rgb(219,103,115)');
+                $(this).find('.cancel').css('border-color','rgb(219,103,115)');
+
+                $(this).find('.clear').css('background-color','white');
+                $(this).find('.clear').css('color','black');
+                $(this).find('.clear').css('border-color','black');
+
+                $(this).find('.del').css('background-color','white');
+                $(this).find('.del').css('color','black');
+                $(this).find('.del').css('border-color','black');
+            };
+        }
+
         
         var hour;
         var minute;
@@ -185,11 +250,18 @@ crossorigin=""></script>
         var intervalTime;
         var intervalUpdate;
         $(document).ready(function() {
+            $('#odometer').val('');
+            $('#vehicle').val('').trigger('change');
             $('body').toggleClass("sidebar-collapse");
             $('#side_driver_attendance').addClass('menu-open');
             getLocation();
             $("#vehicle").select2({
                 allowClear:true
+            });
+
+            $('.numpad').numpad({
+                hidePlusMinusButton : true,
+                decimalSeparator : '.'
             });
         });
 
@@ -225,6 +297,24 @@ crossorigin=""></script>
                 image: '{{ url("images/image-stop.png") }}',
                 sticky: false,
                 time: '3000'
+            });
+        }
+
+        function changeVehicle(nopol) {
+            var data = {
+                nopol:nopol.split('_')[0]
+            }
+
+            $.get('{{ url("fetch/driver/odometer") }}', data, function(result, status, xhr){
+                if(result.status){
+                    $('#odometer').val('');
+                    if (result.data_vehicle != null) {
+                        $('#odometer').val(result.data_vehicle.odometer);
+                    }
+                }else{
+                    audio_error.play();
+                    openErrorGritter('Error', result.message);
+                }
             });
         }
 
@@ -326,6 +416,7 @@ crossorigin=""></script>
         formData.append('department',  $('#department').val());
         formData.append('latitude',  $('#latitude').val());
         formData.append('longitude',  $('#longitude').val());
+        formData.append('odometer',  $('#odometer').val());
         formData.append('plat_no',  $('#vehicle').val().split('_')[0]);
         formData.append('car',  $('#vehicle').val().split('_')[1]);
         formData.append('file_foto[]', $('#file_foto').prop('files')[0]);
