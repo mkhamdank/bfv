@@ -175,6 +175,16 @@
                     </tr>
                     <tr>
                         <td style="display: inline-block;">
+                            <label>Odometer (KM) <span style="color: red;">*</span></label>
+                            <?php if ($data_vehicle != null) { ?>
+                                <input type="text" name="odometer" id="odometer" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="{{$data_vehicle->odometer}}" readonly>
+                            <?php }else{ ?>
+                                <input type="number" name="odometer" id="odometer" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="">
+                            <?php } ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="display: inline-block;">
                             <label>Jenis BBM <span style="color: red;">*</span></label>
                             <select class="form-control" style="width: 100%;" data-placeholder="Pilih Jenis BBM" id="fuel_type">
                                 <option value="-">Pilih BBM</option>
@@ -185,27 +195,12 @@
                             </select>
                         </td>
                     </tr>
-                    <tr>
-                        <td style="display: inline-block;">
-                            <label>Odometer (KM) <span style="color: red;">*</span></label>
-                            <?php if ($data_vehicle != null) { ?>
-                                <input type="text" name="odometer" id="odometer" class="form-control" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="{{$data_vehicle->odometer}}" readonly>
-                            <?php }else{ ?>
-                                <input type="number" name="odometer" id="odometer" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="">
-                            <?php } ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="display: inline-block;">
-                            <label>Pengisian BBM (Liter) <span style="color: red;">*</span></label>
-                            <input type="number" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Pengisian BBM" value="">
-                        </td>
-                    </tr>
-                    <?php if ($data_vehicle != null): ?>
-                        <tr>
+
+                    <?php if ($data_vehicle != null && $data_vehicle_fuel != null): ?>
+                        <tr style="">
                             <td style="display: inline-block;">
-                                <label>Kondisi BBM Setelah Isi (Liter)</label>
-                                <?php if ($data_vehicle != null) { ?>
+                                <label>Kondisi BBM Sebelum Isi (Liter)</label>
+                                <?php if ($data_vehicle != null && $data_vehicle_fuel != null) { ?>
                                     <input type="text" name="fuel_actual" id="fuel_actual" class="form-control" style="width: 100%; background-color: white; text-align: center;" placeholder="Kondisi BBM" value="{{($data_vehicle_fuel->fuelFiltered/100)*$data_vehicle_fuel->fuelCapacity}}" readonly>
                                 <?php }else{ ?>
                                     <input type="number" name="fuel_actual" id="fuel_actual" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Kondisi BBM" value="">
@@ -213,6 +208,13 @@
                             </td>
                         </tr>
                     <?php endif ?>
+                    
+                    <tr>
+                        <td style="display: inline-block;">
+                            <label>Pengisian BBM (Liter) <span style="color: red;">*</span></label>
+                            <input type="number" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Pengisian BBM" value="">
+                        </td>
+                    </tr>
 
                     <tr>
                         <td style="display: inline-block; padding-left: 20px; padding-right: 20px;">

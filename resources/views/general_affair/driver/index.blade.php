@@ -232,11 +232,11 @@
                     var divDriver = '';
                     for(var i = 0; i < result.driver_job.length;i++){
                         if (result.driver_job[i].times == null) {
-                            divDriver += '<div class="col-md-3" style="padding: 5px; cursor: pointer; background-color: #fff1c2;" onclick="startJob(\''+result.driver_job[i].id+'\')">';
+                            divDriver += '<div class="col-md-3" style="padding: 5px; cursor: pointer; background-color: #fff1c2; margin-bottom: 10px;" onclick="startJob(\''+result.driver_job[i].id+'\')">';
                             divDriver += '<span style="font-weight: bold; font-size: 12px;">';
                             divDriver += 'TUGAS BARU';
                         }else{
-                            divDriver += '<div class="col-md-3" style="padding: 5px; cursor: pointer; background-color: lightgreen;">';
+                            divDriver += '<div class="col-md-3" style="padding: 5px; cursor: pointer; background-color: lightgreen; margin-bottom: 10px;">';
                             divDriver += '<span style="font-weight: bold; font-size: 12px;">';
                             divDriver += 'SUDAH DIKERJAKAN';
                         }
