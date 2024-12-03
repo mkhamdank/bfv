@@ -145,6 +145,9 @@
 
             <label>Odometer (KM) <span style="color: red;">*</span></label>
             <input type="text" name="odometer" id="odometer" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="" >
+
+            <label>Fuel (Liter) <span style="color: red;">*</span></label>
+            <input type="text" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Fuel" value="" >
         </div>
         <div class="col-lg-12 col-md-12 col-sm-12" >
             <div id="map"></div>
@@ -251,6 +254,7 @@ crossorigin=""></script>
         var intervalUpdate;
         $(document).ready(function() {
             $('#odometer').val('');
+            $('#fuel').val('');
             $('#vehicle').val('').trigger('change');
             $('body').toggleClass("sidebar-collapse");
             $('#side_driver_attendance').addClass('menu-open');
@@ -310,6 +314,11 @@ crossorigin=""></script>
                     $('#odometer').val('');
                     if (result.data_vehicle != null) {
                         $('#odometer').val(result.data_vehicle.odometer);
+                    }
+
+                    $('#fuel').val('');
+                    if (result.data_vehicle_fuel != null) {
+                        $('#fuel').val((result.data_vehicle_fuel.fuelFiltered/100)*result.data_vehicle_fuel.fuelCapacity);
                     }
                 }else{
                     audio_error.play();
@@ -417,6 +426,7 @@ crossorigin=""></script>
         formData.append('latitude',  $('#latitude').val());
         formData.append('longitude',  $('#longitude').val());
         formData.append('odometer',  $('#odometer').val());
+        formData.append('fuel',  $('#fuel').val());
         formData.append('plat_no',  $('#vehicle').val().split('_')[0]);
         formData.append('car',  $('#vehicle').val().split('_')[1]);
         formData.append('file_foto[]', $('#file_foto').prop('files')[0]);
