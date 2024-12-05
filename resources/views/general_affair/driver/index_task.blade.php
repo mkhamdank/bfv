@@ -235,7 +235,7 @@
                     <tr>
                         <td style="display: inline-block;">
                             <label>Foto Pengisian <span style="color: red;">*</span></label>
-                            <input type="file" name="fileData" id="fileData" class="form-control" style="width: 100%" placeholder="File" onchange="readURL(this);" accept="image/*;capture=camera">
+                            <input type="file" name="fileData" id="fileData" class="form-control" style="width: 100%" placeholder="File" onchange="readURL(this);">
                             <br>
                             <img width="200px" id="blah" src="" style="display: none" alt="your image" />
                         </td>
@@ -244,7 +244,7 @@
                     <tr>
                         <td style="display: inline-block;">
                             <label>Foto Odometer Sebelum Pengisian <span style="color: red;">*</span></label>
-                            <input type="file" name="fileDataOdoBefore" id="fileDataOdoBefore" class="form-control" style="width: 100%" placeholder="File" onchange="readURLOdoBefore(this);" accept="image/*;capture=camera">
+                            <input type="file" name="fileDataOdoBefore" id="fileDataOdoBefore" class="form-control" style="width: 100%" placeholder="File" onchange="readURLOdoBefore(this);">
                             <br>
                             <img width="200px" id="blahOdoBefore" src="" style="display: none" alt="your image" />
                         </td>
@@ -253,7 +253,7 @@
                     <tr>
                         <td style="display: inline-block;">
                             <label>Foto Odometer Setelah Pengisian <span style="color: red;">*</span></label>
-                            <input type="file" name="fileDataOdoAfter" id="fileDataOdoAfter" class="form-control" style="width: 100%" placeholder="File" onchange="readURLOdoAfter(this);" accept="image/*;capture=camera">
+                            <input type="file" name="fileDataOdoAfter" id="fileDataOdoAfter" class="form-control" style="width: 100%" placeholder="File" onchange="readURLOdoAfter(this);">
                             <br>
                             <img width="200px" id="blahOdoAfter" src="" style="display: none" alt="your image" />
                         </td>
@@ -445,7 +445,7 @@
         }
 
         function submitDriver() {
-            $('#loading').show();
+            // $('#loading').show();
             if ($('#latitude').val() == null || $('#latitude').val() == "") {
                 $("#loading").hide();
                 openErrorGritter('Error!', 'Izinkan sistem mengakses lokasi Anda');

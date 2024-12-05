@@ -155,12 +155,12 @@
         <div class="col-lg-12 col-md-12 col-sm-12" >
             <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
                 <label style="font-size: 14px;font-weight: bold;">Foto Absensi<span style="color:red">*</span></label>
-                <input type="file" onchange="readURL(this);" id="file_foto" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" accept="image/*" capture="environment" class="file">
+                <input type="file" onchange="readURL(this);" id="file_foto" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" class="file">
                 <button class="btn btn-primary btn-lg" id="btnImageSim" value="Photo" onclick="buttonImage(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Selfie</button>
                 <img id="blahsim" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
             </div>
             <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
-                <input type="file" onchange="readURL2(this);" id="file_foto_odometer" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" accept="image/*" capture="environment" class="file">
+                <input type="file" onchange="readURL2(this);" id="file_foto_odometer" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" class="file">
                 <button class="btn btn-primary btn-lg" id="btnImageOdo" value="Photo" onclick="buttonImageOdo(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Odometer</button>
                 <img id="blahOdo" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
             </div>
@@ -388,7 +388,7 @@ crossorigin=""></script>
         }
 
     function save() {
-        $("#loading").show();
+        // $("#loading").show();
 
         if ($('#latitude').val() == null || $('#latitude').val() == "") {
             $("#loading").hide();
