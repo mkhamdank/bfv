@@ -1149,7 +1149,7 @@ class GeneralAffairController extends Controller
 
             //END GET FUEL NOW
 
-            $fuel_actual_after = $fuel_actual;
+            $fuel_actual_after = 0;
 
             if ($data_vehicle_fuel) {
                 $fuel_actual_after = ($data_vehicle_fuel->fuelFiltered/100)*$data_vehicle_fuel->fuelCapacity;
