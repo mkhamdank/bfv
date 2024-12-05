@@ -508,7 +508,7 @@
                 openErrorGritter('Error!','Isikan Foto Odometer dan Indikator Setelah Pengisian');
                 return false;
             }
-            fileDataOdoAfter = $('#fileDataOdoBefore').prop('files')[0];
+            fileDataOdoAfter = $('#fileDataOdoAfter').prop('files')[0];
 
             var formData = new FormData();
             formData.append('fileData', fileData);

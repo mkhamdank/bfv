@@ -1028,7 +1028,7 @@ class GeneralAffairController extends Controller
 
                 $path = public_path('images/driver_task/').'/'.$fileData_name;
                 $filebase64 = 'data:image/' . $fileData_ext . ';base64,' .base64_encode(file_get_contents($path));
-                $unlink = unlink('images/driver_task'.'/'.$fileData_name);
+                // $unlink = unlink('images/driver_task'.'/'.$fileData_name);
             }
 
             if ($request->file('fileDataOdoBefore') != null) {
@@ -1041,7 +1041,7 @@ class GeneralAffairController extends Controller
 
                 $path = public_path('images/driver_task/').'/'.$fileDataOdoBefore_name;
                 $filebase64OdoBefore = 'data:image/' . $fileDataOdoBefore_ext . ';base64,' .base64_encode(file_get_contents($path));
-                $unlink = unlink('images/driver_task'.'/'.$fileDataOdoBefore_name);
+                // $unlink = unlink('images/driver_task'.'/'.$fileDataOdoBefore_name);
             }
 
             if ($request->file('fileDataOdoAfter') != null) {
@@ -1054,7 +1054,7 @@ class GeneralAffairController extends Controller
 
                 $path = public_path('images/driver_task/').'/'.$fileDataOdoAfter_name;
                 $filebase64OdoAfter = 'data:image/' . $fileDataOdoAfter_ext . ';base64,' .base64_encode(file_get_contents($path));
-                $unlink = unlink('images/driver_task'.'/'.$fileDataOdoAfter_name);
+                // $unlink = unlink('images/driver_task'.'/'.$fileDataOdoAfter_name);
             }
 
             //GET FUEL NOW
@@ -1176,9 +1176,9 @@ class GeneralAffairController extends Controller
                 'location' => $location,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
-                'fuel_in_evidence' => $filebase64,
-                'odometer_before_evidence' => $filebase64OdoBefore,
-                'odometer_after_evidence' => $filebase64OdoAfter,
+                'fuel_in_evidence' => $fileData_name,
+                'odometer_before_evidence' => $fileDataOdoBefore_name,
+                'odometer_after_evidence' => $fileDataOdoAfter_name,
             ]);
             $response = array(
                 'status' => true,
