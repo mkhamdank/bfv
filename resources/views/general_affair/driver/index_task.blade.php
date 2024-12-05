@@ -186,12 +186,11 @@
                     <tr>
                         <td style="display: inline-block;">
                             <label>Jenis BBM <span style="color: red;">*</span></label>
-                            <select class="form-control" style="width: 100%;" data-placeholder="Pilih Jenis BBM" id="fuel_type">
+                            <select class="form-control" style="width: 100%;" data-placeholder="Pilih Jenis BBM" id="fuel_type" onchange="changeFuelType(this.value)">
                                 <option value="-">Pilih BBM</option>
-                                <option value="Pertamax">Pertamax</option>
-                                <option value="Pertamina Dex">Pertamina Dex</option>
-                                <option value="Pertalite">Pertalite</option>
-                                <option value="Dex Lite">Dex Lite</option>
+                                @foreach($bbm as $bbms)
+                                <option value="{{explode('_',$bbms)[0]}}">{{explode('_',$bbms)[0]}}</option>
+                                @endforeach
                             </select>
                         </td>
                     </tr>
@@ -327,6 +326,21 @@
           }
         }
 
+        function changeFuelType(fuel_type) {
+            if ($("#fuel").val() == '') {
+                openErrorGritter('Error!','Isi Jumlah Liter');
+                return false;
+            }
+            var harga = 0;
+            for(var i = 0; i < bbm.length;i++){
+                if (fuel_type == bbm[i].split('_')[0]) {
+                    harga = bbm[i].split('_')[1];
+                }
+            }
+            $('#fuel_amount_liter').val(harga);
+            $('#fuel_amount').val(parseFloat(harga)*parseFloat($("#fuel").val()));
+        }
+
         function changeLiter(amountLiter) {
             if ($('#fuel').val() == '') {
                 openErrorGritter('Isikan Pengisian BBM (Liter)');
@@ -443,6 +457,8 @@
              $("#latitude").val(position.coords.latitude);
              $("#longitude").val(position.coords.longitude);
         }
+
+        var bbm = <?php echo json_encode($bbm2); ?>;
 
         function submitDriver() {
             // $('#loading').show();

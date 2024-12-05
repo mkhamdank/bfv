@@ -977,6 +977,11 @@ class GeneralAffairController extends Controller
 
             // $ada_data = 'Ada';
         }
+
+        $bbm = [
+            'Pertamax_12100',
+            'Pertamina Dex_14100'
+        ];
         return view('general_affair.driver.index_task',
             array(
                 'title' => $title,
@@ -985,6 +990,8 @@ class GeneralAffairController extends Controller
                 'data_vehicle' => $data_vehicle,
                 'driver_task' => $driver_task,
                 'data_vehicle_fuel' => $data_vehicle_fuel,
+                'bbm' => $bbm,
+                'bbm2' => $bbm,
             )
         )->with('page', 'Driver Report');
     }
