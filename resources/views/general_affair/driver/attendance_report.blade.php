@@ -127,6 +127,7 @@
             </div>
         </div>
         <div class="row" style="padding-top: 20px; padding-left: 20px; padding-right: 20px; margin-bottom: 10px;">
+            <a style="margin-bottom: 10px;" class="btn btn-danger" href="{{url('')}}"><i class="fa fa-arrow-left"></i>Kembali</a>
             <a class="btn btn-success" href="{{url('index/driver/attendance')}}">Input Kehadiran</a>
         </div>
         <div class="row" id="divDriver" style="padding-bottom: 20px; padding-left: 20px; padding-right: 20px; overflow-y: scroll;">

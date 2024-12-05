@@ -121,6 +121,9 @@
                 </h1>
             </div>
         </div>
+        <div class="row" style="padding-bottom: 5px; padding-left: 20px; padding-right: 20px; overflow-y: scroll;">
+            <a class="btn btn-danger" href="{{url('')}}"><i class="fa fa-arrow-left"></i>Kembali</a>
+        </div>
         <div class="row" id="divDriver" style="padding-bottom: 20px; padding-left: 20px; padding-right: 20px; overflow-y: scroll;">
         </div>
 
