@@ -200,7 +200,9 @@
                     <tr>
                         <td style="display: inline-block;">
                             <label>Pengisian BBM (Liter) <span style="color: red;">*</span></label>
-                            <input type="number" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Pengisian BBM" value="">
+                            <br>
+                            <label>Koma <span style="color: red;">(,)</span> menggunakan titik <span style="color: red;">(.)</span></label>
+                            <input type="number" name="fuel" id="fuel" class="form-control" style="width: 100%; background-color: white; text-align: center;" placeholder="Pengisian BBM" value="">
                         </td>
                     </tr>
 
