@@ -233,7 +233,7 @@
 
                     <tr>
                         <td style="display: inline-block;">
-                            <label>Foto Pengisian <span style="color: red;">*</span></label>
+                            <label>Foto Nota Pengisian <span style="color: red;">*</span></label>
                             <input type="file" name="fileData" id="fileData" class="form-control" style="width: 100%" placeholder="File" onchange="readURL(this);">
                             <br>
                             <img width="200px" id="blah" src="" style="display: none" alt="your image" />
@@ -487,7 +487,7 @@
 
             if ($('#fileData').prop('files')[0] == undefined) {
                 $('#loading').hide();
-                openErrorGritter('Error!','Isikan Foto Saat Pengisian');
+                openErrorGritter('Error!','Isikan Foto Nota Pengisian');
                 return false;
             }
             fileData = $('#fileData').prop('files')[0];
