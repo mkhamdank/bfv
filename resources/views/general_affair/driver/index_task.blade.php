@@ -183,17 +183,6 @@
                             <?php } ?>
                         </td>
                     </tr>
-                    <tr>
-                        <td style="display: inline-block;">
-                            <label>Jenis BBM <span style="color: red;">*</span></label>
-                            <select class="form-control" style="width: 100%;" data-placeholder="Pilih Jenis BBM" id="fuel_type" onchange="changeFuelType(this.value)">
-                                <option value="-">Pilih BBM</option>
-                                @foreach($bbm as $bbms)
-                                <option value="{{explode('_',$bbms)[0]}}">{{explode('_',$bbms)[0]}}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                    </tr>
 
                     <?php if ($data_vehicle != null && $data_vehicle_fuel != null): ?>
                         <tr style="">
@@ -212,6 +201,18 @@
                         <td style="display: inline-block;">
                             <label>Pengisian BBM (Liter) <span style="color: red;">*</span></label>
                             <input type="number" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Pengisian BBM" value="">
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="display: inline-block;">
+                            <label>Jenis BBM <span style="color: red;">*</span></label>
+                            <select class="form-control" style="width: 100%;" data-placeholder="Pilih Jenis BBM" id="fuel_type" onchange="changeFuelType(this.value)">
+                                <option value="-">Pilih BBM</option>
+                                @foreach($bbm as $bbms)
+                                <option value="{{explode('_',$bbms)[0]}}">{{explode('_',$bbms)[0]}}</option>
+                                @endforeach
+                            </select>
                         </td>
                     </tr>
 
@@ -328,6 +329,7 @@
 
         function changeFuelType(fuel_type) {
             if ($("#fuel").val() == '') {
+                $("#fuel_type").val('').trigger('change');
                 openErrorGritter('Error!','Isi Jumlah Liter');
                 return false;
             }
