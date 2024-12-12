@@ -27,6 +27,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //WPOS
 Route::get('wpos', 'App\Http\Controllers\VendorController@wpos');
 Route::post('post/wpos', 'App\Http\Controllers\VendorController@inputWpos');
+Route::get('approve/wpos', 'App\Http\Controllers\VendorController@approveWpos');
+Route::get('reject/wpos', 'App\Http\Controllers\VendorController@rejectWpos');
 
 Route::get('testmail', 'App\Http\Controllers\TrialController@testmail');
 
