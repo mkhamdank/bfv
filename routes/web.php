@@ -530,7 +530,6 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     // Route::post('input/po_eq_confirmation', 'PoConfirmationController@inputPoConfirmationEquipment');
     // Route::get('send/po_eq_confirmation/{po_number}', 'PoConfirmationController@sendPoNotificationEquipment');
 
-
     // RECRUITMENT MONITORING
     Route::post('input/ympi_recruitment_monitoring/change_setting', 'App\Http\Controllers\RecruitmentHrController@changeRecruitmentSetting');
     Route::get('index/ympi_recruitment_monitoring', 'App\Http\Controllers\RecruitmentHrController@monitoring');
@@ -556,7 +555,7 @@ Route::post('input/po_confirmation', 'App\Http\Controllers\RawMaterialController
 Route::get('send/po_notification/{po_number}', 'App\Http\Controllers\RawMaterialController@sendPoNotification');
 // END PO MATERIAL
 
- // Equipment PO Confirmation
+// Equipment PO Confirmation
 Route::get('po_eq_confirmation', 'App\Http\Controllers\PoConfirmationController@indexPoConfirmationEquipment');
 Route::get('fetch/po_eq_confirmation', 'App\Http\Controllers\PoConfirmationController@fetchPoEquipment');
 Route::post('input/po_eq_confirmation', 'App\Http\Controllers\PoConfirmationController@inputPoConfirmationEquipment');
