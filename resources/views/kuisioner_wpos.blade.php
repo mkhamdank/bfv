@@ -178,7 +178,7 @@
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<div id="loading" style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display: none">
 		<p style="position: absolute; color: White; top: 45%; left: 35%;">
-			<span style="font-size: 20px">Loading, mohon tunggu . . . <i class="fa fa-spin fa-refresh"></i></span>
+			<span style="font-size: 20px">Loading, mohon tunggu . . .</span>
 		</p>
 	</div>
 
@@ -189,12 +189,13 @@
 					<span><b>PT. Yamaha Musical Products Indonesia</b></span><br>
 					<span style="font-size: 16px">Work Permit With Enviromental & Safety Analysis</span>
 				</span>
+				
+				<input type="hidden" value="{{csrf_token()}}" name="_token" />
 
 				<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
 					<span>Informasi Vendor</span><br>
 				</span>
 
-				<input type="hidden" value="{{csrf_token()}}" name="_token" />
 				<input type="hidden" id="jml_pertanyaan" value="5">
 				<label class="label-input1002" id="labelnama">Nama Perusahaan <span style="color: red">*</span></label>
 				<input type="text" class="form-control" id="company_name" name="company_name" placeholder="">
@@ -478,7 +479,7 @@
 						</label>
 					</div>
 
-					
+
 					<br>
 
 					<b>Alat Safety yang harus dipakai dan tersedia di lokasi </b><br><br>
@@ -731,7 +732,7 @@
 
 					<div class="validate-input" style="position: relative; width: 100%">
 						<label class="checkbox" style="margin-top: 5px;margin-left: 25px;"> 
-							<input type="checkbox" class="departemenCheckbox" name="departemen" value="Quality Assurance Department">
+							<input type="checkbox" class="departemenCheckbox" name="departemen" value="Standardization Department">
 							<span class="checkboxmark"></span>
 							Quality Assurance (QA)
 						</label>
@@ -1201,7 +1202,7 @@
 						</div>
 
 						<br>
-						
+
 						<b>Warning Sign <span style="color: red">*</span></b>
 						<br>
 						Papan peringatan yang diperlukan : 
@@ -1221,7 +1222,7 @@
 
 						<div class="validate-input" style="position: relative; width: 100%">
 							<label class="radio" style="margin-top: 5px;margin-left: 25px;"> 
-								<input type="radio" id="inspeksi" name="inspeksi" value="iya">
+								<input type="radio" id="inspeksi" name="inspeksi" value="Iya">
 								<span class="checkmark"></span>
 								Ya
 							</label>
@@ -1418,7 +1419,7 @@
 						Pelaksanaan pekerjaan di area terbatas harus memenuhi semua ketentuan yang telah ditetapkan, dan selalu memastikan semua peralatan rescue berfungsi dengan baik, dan selalu memastikan komunikasi antara personil yang masuk area terbatas dan stand by personil
 					</div>
 
-					
+
 
 					<div id="vendor_permit" style="display:none">
 						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
@@ -1458,7 +1459,7 @@
 				</div>
 				<div id="sudah_mengisi" style="width: 100%;padding: 170px 20px">
 					<div class="col-xs-12 col-md-12">
-						<center style="font-size:16px">Terimakasih Bapak / Ibu <span class="name_assessment"></span> telah Mengisi Assessment ini.</i></u></center>
+						<center style="font-size:24px">Terimakasih Bapak / Ibu <span class="name_assessment"></span> telah Mengisi Assessment ini.</i></u></center>
 					</div>
 				</div>
 			</div>
@@ -1488,12 +1489,12 @@
 				todayHighlight: true,
 			});
 		});
-		
+
 		$.ajaxSetup({
-			headers: {
-				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-			}
-		}); 
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
 		function ChangePermit(elem){
 
@@ -1727,7 +1728,7 @@
 				var training_all = training.join();
 
 				var space_alat = [];
-				for(var i = 0;i<4; i++){
+				for(var i = 0;i<3; i++){
 					var answer = 'space_alat'+i;
 					space_alat.push($('input[id="'+answer+'"]:checked').val());
 				}
@@ -1819,6 +1820,7 @@
 			formData.append('vendor_accept', vendor_accept);
 
 			$.ajax({
+				_token: "{{ csrf_token() }}",
 				url:"{{ url('post/wpos') }}",
 				method:"POST",
 				data:formData,
@@ -1838,11 +1840,11 @@
 						openErrorGritter('Error!',data.message);
 						$('#loading').hide();
 					}
-					
+
 				},
 				error: function (data) {
-					openErrorGritter("Error",response.message);
-					console.log(response);
+					openErrorGritter("Error",data.message);
+					console.log(data);
 				},
 			})
 		}

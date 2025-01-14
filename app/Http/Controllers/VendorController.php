@@ -225,7 +225,7 @@ class VendorController extends Controller
             }
 
 
-            $forms = DB::table('wpos_logs')->insert([
+            $forms = DB::table('wpos_logs')->insertGetId([
                 'tanggal' => date('Y-m-d'),
                 'company_name' => $request->input('company_name'),
                 'company_address' => $request->input('company_address'),
@@ -254,24 +254,65 @@ class VendorController extends Controller
                 'question3' => $question3,
                 'question4' => $question4,
                 'vendor_accept' => $request->input('vendor_accept'),
+                'status_approval' => 'Waiting',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
-            // $forms->save();
+            $data_mail = DB::table('wpos_logs')
+            ->where('id',$forms)
+            ->first();
 
-            // $isimail = "select * from wpos_logs where id = ".$forms->id;
-            // $mail = db::select($isimail);
+            $dept = explode(',', $request->input('departemen'));
 
-            // $mail = DB::table('wpos_logs')
-            // ->where('id',$forms->id)
-            // ->get();
+            for ($i=0; $i < count($dept); $i++) { 
+                $manager = db::table('approvers')->where('remark', '=', 'Manager')
+                    ->where('department', '=', $dept[$i])
+                    ->first();
+
+                db::table('wpos_approvals')->insert([
+                    'wpos_id' => $forms,
+                    'approver_id' => $manager->approver_id,
+                    'approver_name' => $manager->approver_name,
+                    'approver_email' => $manager->approver_email,
+                    'department' => $manager->department,
+                    'status' => 'Waiting',
+                    'position' => 'Manager',
+                    'remark' => 'Approved By',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+
+                
+                $data = [
+                    'dept' => $manager->department,
+                    'wpos_data' => $data_mail
+                ];
+
+
+                Mail::to($manager->approver_email)
+                ->bcc(['ympi-mis-ML@music.yamaha.com'])
+                ->send(new SendEmail($data, 'wpos'));
+            }
+
+            db::table('wpos_approvals')->insert([
+                'wpos_id' => $forms,
+                'approver_id' => '',
+                'approver_name' => '',
+                'approver_email' => '',
+                'department' => 'Standardization Department',
+                'status' => 'Waiting',
+                'position' => 'STD',
+                'remark' => 'Checked By',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
 
             // Mail::to(['widura@music.yamaha.com'])->cc('prawoto@music.yamaha.com')->bcc(['rio.irvansyah@music.yamaha.com','mokhamad.khamdan.khabibi@music.yamaha.com'])->send(new SendEmail($mail, 'guest'));
 
             // Mail::to(['rio.irvansyah@music.yamaha.com'])
-            // ->bcc(['mokhamad.khamdan.khabibi@music.yamaha.com'])
-            // ->send(new SendEmail($mail, 'wpos'));
+            // ->cc(['mokhamad.khamdan.khabibi@music.yamaha.com'])
+            // ->send(new SendEmail($data_mail, 'wpos'));
 
             $response = array(
                 'status' => true,
@@ -296,6 +337,207 @@ class VendorController extends Controller
                 return Response::json($response);
             }
         }
+    }
+
+
+    public function approveWpos(Request $request)
+    {
+        try {
+
+            $wpos = db::table('wpos_logs')
+                ->where('id', '=', $request->get('wpos_id'))
+                ->first();
+
+            $approvers = db::table('wpos_approvals')
+                ->where('wpos_id', '=', $request->get('wpos_id'))
+                ->get();
+
+            if ($request->get('status') == null) {
+                
+                $data = [
+                    'dept' => $code,
+                    'wpos_data' => $wpos
+                ];
+
+                // return view('about_mis.wpos.mail_approval_new', array(
+                //     'data' => $data,
+                // ));
+
+            } else {
+
+                $approvers = db::table('wpos_approvals')
+                    ->where('wpos_id', '=', $request->get('wpos_id'))
+                    ->get();
+
+                $approver = db::table('wpos_approvals')
+                    ->where('wpos_id', '=', $request->get('wpos_id'))
+                    ->where('department', '=', $request->get('code'))
+                    ->first();
+
+                for ($i = 0; $i < count($approvers); $i++) {
+                    if ($approvers[$i]->approver_id == $approver->approver_id) {
+                        if ($i > 0) {
+                            if ($approvers[$i - 1]->status != 'Approved') {
+                                return view('notification', array(
+                                    'title' => 'WPOS Approval',
+                                    'title_jp' => '',
+                                    'wpos' => $wpos,
+                                    'status' => false,
+                                    'message' => 'Previous approver has not approved or already rejected',
+                                ));
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                if (strtoupper(strtoupper(Auth::user()->username)) != $approver->approver_id) {
+                    return view('notification', array(
+                        'title' => 'WPOS Approval',
+                        'title_jp' => '',
+                        'wpos' => $wpos,
+                        'status' => false,
+                        'message' => 'You dont have authorization to approve WPOS',
+                    ));
+                }
+
+                if ($approver->status != 'Waiting') {
+                    return view('notification', array(
+                        'title' => 'WPOS Approval',
+                        'title_jp' => '',
+                        'wpos' => $wpos,
+                        'status' => false,
+                        'message' => 'WPOS already approved/rejected',
+                    ));
+                }
+
+                db::table('wpos_approvals')
+                    ->where('wpos_id', '=', $request->get('wpos_id'))
+                    ->where('approver_id', '=', $approver->approver_id)
+                    ->update([
+                        'status' => $request->get('status'),
+                        'approved_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+
+                if ($request->get('status') == 'Approved') {
+
+                    $wpos = db::table('wpos_logs')
+                        ->where('id', '=', $request->get('wpos_id'))
+                        ->first();
+
+                    $approvers = db::table('wpos_approvals')
+                        ->where('wpos_id', '=', $request->get('wpos_id'))
+                        ->get();
+
+                    $next_approver = db::table('wpos_approvals')
+                        ->where('wpos_id', '=', $request->get('wpos_id'))
+                        ->whereNull('approved_at')
+                        ->orderBy('id', 'ASC')
+                        ->first();
+
+                    if ($next_approver) {
+
+                        $data = [
+                            'code' => $next_approver->position,
+                            'wpos' => $wpos,
+                            'approver' => $approvers
+                        ];
+
+                        Mail::to($next_approver->approver_email)
+                            ->bcc(['ympi-mis-ML@music.yamaha.com'])
+                            ->send(new SendEmail($data, 'wpos'));
+
+                    } else {
+                        db::table('wpos_logs')
+                            ->where('wpos_id', '=', $request->get('wpos_id'))
+                            ->update([
+                                'status_approval' => 'Fully Approved',
+                                'updated_at' => date('Y-m-d H:i:s'),
+                            ]);
+                    }
+                }
+
+                if ($request->get('status') == 'Rejected') {
+
+                    db::table('wpos_logs')
+                        ->where('id', '=', $request->get('wpos_id'))
+                        ->update([
+                            'status_approval' => 'Rejected',
+                            'reason_reject' => $request->get('reject_reason'),
+                            'updated_at' => date('Y-m-d H:i:s'),
+                        ]);
+
+                    $ticket = db::table('wpos_logs')
+                        ->where('wpos_id', '=', $request->get('wpos_id'))
+                        ->first();
+
+                    $cd = array();
+                    if (count($costdowns) > 0) {
+                        foreach ($costdowns as $costdown) {
+                            array_push($cd, [
+                                'category' => $costdown->category,
+                                'description' => $costdown->description,
+                                'quantity' => $costdown->quantity,
+                                'uom' => $costdown->uom,
+                            ]);
+                        }
+                    }
+
+                    $approvers = db::table('wpos_approvals')
+                        ->where('ticket_id', '=', $request->get('ticket_id'))
+                        ->get();
+
+                    $user = db::table('users')->where('username', '=', $ticket->created_by)
+                        ->first();
+
+                    $data = [
+                        'code' => 'rejected',
+                        'ticket' => $ticket,
+                        'costdown' => $cd,
+                        'approver' => $approvers,
+                        'filename' => $ticket->case_attachment,
+                    ];
+
+                    Mail::to($user->email)
+                        ->cc('ympi-mis-ML@music.yamaha.com')
+                        ->send(new SendEmail($data, 'mis_ticket_approval_new'));
+                }
+
+                return view('about_mis.ticket.notification', array(
+                    'title' => 'MIS Ticket Approval.',
+                    'title_jp' => '',
+                    'ticket' => $ticket,
+                    'status' => true,
+                    'message' => 'Ticket successfully confirmed',
+                ));
+            }
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage() . ' ' . $e->getLine(),
+            );
+            return Response::json($response);
+        }
+    }
+
+    public function rejectWpos(Request $request)
+    {
+
+        $ticket = db::table('wpos_logs')
+            ->where('wpos_id', '=', $request->get('wpos_id'))
+            ->first();
+
+        $data = [
+            'code' => $request->get('code'),
+            'ticket' => $ticket,
+            'costdown' => $cd,
+            'approver' => $approver,
+        ];
+
+        return view('about_mis.ticket.mail_approval_reject_new', array(
+            'data' => $data,
+        ));
     }
 
     public function indexCms(){
