@@ -339,7 +339,7 @@
 						</tr>
 
 
-					<?php } } ?>
+					<?php } ?>
 
 					<tr>
 						<td colspan="2">&nbsp;</td>
