@@ -260,7 +260,7 @@
 
 						<?php } else { ?>
 							<td style="width:8%;text-align:left;padding:5px"><?= $data['wpos_data']->question1 ?></td>
-							?php } ?>
+						<?php } ?>
 						</tr>
 
 						<tr>
