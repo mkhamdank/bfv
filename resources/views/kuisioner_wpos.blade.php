@@ -817,6 +817,14 @@
 							Production (Final Assembly Dept.)
 						</label>
 					</div>
+					
+					<div class="validate-input" style="position: relative; width: 100%">
+						<label class="checkbox" style="margin-top: 5px;margin-left: 25px;"> 
+							<input type="checkbox" class="departemenCheckbox" name="departemen" value="Educational Instrument (EI) Department">
+							<span class="checkboxmark"></span>
+							Production (Educational Instrument Dept.)
+						</label>
+					</div>
 
 
 					<label class="label-input1002" id="labelnama">Pihak Penanggung Jawab dari YMPI <span style="color: red">*</span></label>
