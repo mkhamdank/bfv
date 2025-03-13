@@ -109,6 +109,7 @@ class workshopController extends Controller
 
 		$period_cek = db::table('pe_molding_schedules')
 		->select('period', 'molding_id','molding_name')
+		->orderBy('period', 'DESC')
 		->get();
 
 		$molding_part = db::table('pe_molding_part_masters')
