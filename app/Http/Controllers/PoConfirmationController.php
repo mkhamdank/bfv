@@ -282,5 +282,42 @@ class PoConfirmationController extends Controller
         }
     }
 
+    public function indexVendorHoliday(Request $request)
+    {
+        try{
+            $code = $request->get('code');
+
+            $data = db::table('vendor_gifts')
+            ->where('vendor_gifts.unique_code', $code)
+            ->first();
+
+            if ($data) {
+                if($data->confirmation_holiday == null){
+                    $update_data = db::table('vendor_gifts')
+                    ->where('vendor_gifts.unique_code', $code)
+                    ->update([
+                        'confirmation_holiday' => 'Confirmed',
+                        'confirmed_at_holiday' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+                return view('vendor.vendor_holiday',
+                    array(
+                        'data' => $data,
+                    )
+                );
+            }else{
+                return view('vendor.confirmed_po_eq',
+                    array(
+                        'data' => $data,
+                    )
+                );
+            }
+
+            
+        } catch (\Exception $e){
+            return view('404');
+        }
+    }
+
 
 }

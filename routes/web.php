@@ -586,3 +586,4 @@ Route::get('fetch/driver/odometer', 'App\Http\Controllers\GeneralAffairControlle
 
 // Persetujuan Vendor
 Route::get('vendor_confirmation', 'App\Http\Controllers\PoConfirmationController@indexVendorConfirmation');
+Route::get('vendor_holiday', 'App\Http\Controllers\PoConfirmationController@indexVendorHoliday');
