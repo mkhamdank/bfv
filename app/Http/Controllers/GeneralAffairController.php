@@ -981,7 +981,7 @@ class GeneralAffairController extends Controller
 
         $bbm = [
             'Pertamax_12500',
-            'Pertamina Dex_14600'
+            'Pertamina Dex_13900'
         ];
         return view('general_affair.driver.index_task',
             array(
