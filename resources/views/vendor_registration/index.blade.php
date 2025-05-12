@@ -258,6 +258,11 @@
   </div>   
   @endif
   
+	<div id="loading" style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display: none">
+		<p style="position: absolute; color: White; top: 45%; left: 35%;">
+			<span style="font-size: 20px">Loading, mohon tunggu . . .</span>
+		</p>
+	</div>
     <div class="content-wrapper" style="background-color: #ecf0f5; padding-top: 10px;">
         <div class="container">
             <div class="row">
