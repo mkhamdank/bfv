@@ -30,6 +30,31 @@ Route::post('post/wpos', 'App\Http\Controllers\VendorController@inputWpos');
 Route::get('approve/wpos', 'App\Http\Controllers\VendorController@approveWpos');
 Route::get('reject/wpos', 'App\Http\Controllers\VendorController@rejectWpos');
 
+
+Route::get('vendor_registration', 'App\Http\Controllers\RioController@index_vendor_registration');
+Route::post('post/vendor_registration', 'App\Http\Controllers\RioController@post_vendor_registration');
+
+Route::get('/wilayah-proxy/{level}/{code?}', function ($level, $code = null) {
+    $allowedLevels = ['provinces', 'regencies', 'districts', 'villages'];
+
+    if (!in_array($level, $allowedLevels)) {
+        return response()->json(['error' => 'Invalid level'], 400);
+    }
+
+    $url = "https://wilayah.id/api/{$level}";
+    if ($code) {
+        $url .= "/$code";
+    }
+    $url .= ".json";
+
+    try {
+        $response = Http::get($url);
+        return response($response->body(), $response->status())->header('Content-Type', 'application/json');
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to fetch data'], 500);
+    }
+});
+
 Route::get('testmail', 'App\Http\Controllers\TrialController@testmail');
 
 Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
