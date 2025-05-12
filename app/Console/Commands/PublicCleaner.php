@@ -18,7 +18,9 @@ class PublicCleaner extends Command
         //     'images/driver_task',
         // ];
 
-        $path_lists = DB::table('public_cleaners')->pluck('path')->toArray();
+        $path_lists = DB::table('public_cleaners')
+        ->where('remark', 'on')
+        ->pluck('path')->toArray();
 
         if (empty($path_lists)) {
             $this->warn('No paths found in the database.');
