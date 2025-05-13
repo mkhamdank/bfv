@@ -28,7 +28,7 @@ class RioController extends Controller
         return view('vendor_registration.index', array(
             'title' => $title,
             'title_jp' => $title_jp,
-            'kbli' => $kbli,
+            'kbli' => $kbli
         ))->with('page', 'Vendor Registration');
     }
 
@@ -47,6 +47,7 @@ class RioController extends Controller
             }
 
             $data = [
+                'unique_code' => $request->input('unique_code'),
                 'nama_perusahaan' => $namaPerusahaan,
                 'pimpinan_perusahaan' => $request->input('pimpinan_perusahaan'),
                 'file_profil_perusahaan' => storeFile($request, 'file_profil_perusahaan', 'company_profile', $namaPerusahaan),

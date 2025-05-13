@@ -701,6 +701,9 @@
 	<script src="{{ url('bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')}}"></script>
 
     <script>        
+
+        code = "";
+
         jQuery(document).ready(function() {
 			    $('.sudah_mengisi').hide();
             
@@ -715,6 +718,7 @@
                 todayHighlight: true,
             });
             clearForm();
+            code = "{{ isset($_GET['code']) ? $_GET['code'] : null }}";
         });
         
 		    $.ajaxSetup({
@@ -1152,6 +1156,7 @@
       
 
 			var formData = new FormData();
+      formData.append('unique_code', code);
       formData.append('nama_perusahaan', $('#nama_perusahaan').val());
       formData.append('pimpinan_perusahaan', $('#pimpinan_perusahaan').val());
       formData.append('file_profil_perusahaan', $('#file_profil_perusahaan')[0].files[0]);
