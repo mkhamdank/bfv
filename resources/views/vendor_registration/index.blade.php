@@ -340,12 +340,12 @@
                     </div>
 
                       <!-- Copy Akte Pendirian -->
-                      <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px" id="akta_div">
+                      <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="akta_div">
                         <label for="file_akta_pendirian">Copy Akta Pendirian</label>
                         <input type="file" accept="application/pdf,image/*" class="form-control" id="file_akta_pendirian" name="file_akta_pendirian">
                       </div>
                     
-                    <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px" id="alasan_akta_div">
+                    <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="alasan_akta_div">
                       <label for="alasan_akta_pendirian">Masukkan alasan belum memiliki Akta Pendirian <span style="color:red">*</span></label>
                       <textarea class="form-control" id="alasan_akta_pendirian" name="alasan_akta_pendirian" required></textarea>
                     </div>
@@ -515,7 +515,7 @@
                     
                     <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
                       <div class="validate-input" style="position: relative; width: 100%">
-                        <label for="pertanyaan">Apakah Anda Memiliki NIB ? <span style="color:red">*</span></label>
+                        <label for="pertanyaan">Apakah Anda Memiliki Nomor Induk Berusaha (NIB) ? <span style="color:red">*</span></label>
                         <div style="width: 100%">
                           <label class="radio" style="margin-top: 5px;float: left;">Iya
                             <input type="radio"  id="pertanyaan_nib" name="pertanyaan_nib" value="Iya" onchange="nib_question(this.value)">
@@ -530,18 +530,36 @@
                     </div>
                   
                     <!-- NIB -->
-                    <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px" id="nib_div">
+                    <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="nib_div">
                       <label for="nib">Nomor Induk Berusaha (NIB) <span style="color:red">*</span></label>
                       <input type="text" class="form-control" id="nib" name="nib" required>
                     </div>
                   
                     <!-- Copy File NIB -->
-                    <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px" id="file_nib_div">
+                    <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="file_nib_div">
                       <label for="file_nib">Copy File NIB <span style="color:red">*</span></label>
                       <input type="file" accept="application/pdf,image/*" class="form-control" id="file_nib" name="file_nib" required>
                     </div>
                     
 
+                    
+                    <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="alasan_nib_div">
+                      <label for="alasan_nib">Masukkan alasan belum memiliki NIB <span style="color:red">*</span></label>
+                      <textarea class="form-control" id="alasan_nib" name="alasan_nib" required></textarea>
+                    </div>
+
+                    <!-- Copy SIUP -->
+                    <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="siup_div">
+                      <label for="file_siup">Copy SIUP (Surat Izin Usaha Perdagangan)</label>
+                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_siup" name="file_siup" required>
+                    </div>
+                  
+                    <!-- Copy TDP -->
+                    <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="tdp_div">
+                      <label for="tdp">Copy TDP (Tanda Daftar Perusahaan)</label>
+                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_tdp" name="file_tdp" required>
+                    </div>
+                    
                     <!-- KBLI -->
                     <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px" id="kbli_div">
                       <label for="kbli">KBLI (Jenis Usaha) <span style="color:red">*</span></label>
@@ -554,23 +572,6 @@
                       </select>
                     </div>
 
-                    
-                    <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px" id="alasan_nib_div">
-                      <label for="alasan_nib">Masukkan alasan belum memiliki NIB <span style="color:red">*</span></label>
-                      <textarea class="form-control" id="alasan_nib" name="alasan_nib" required></textarea>
-                    </div>
-
-                    <!-- Copy SIUP -->
-                    <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px" id="siup_div">
-                      <label for="file_siup">Copy SIUP (Surat Izin Usaha Perdagangan)</label>
-                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_siup" name="file_siup" required>
-                    </div>
-                  
-                    <!-- Copy TDP -->
-                    <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px" id="tdp_div">
-                      <label for="tdp">Copy TDP (Tanda Daftar Perusahaan)</label>
-                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_tdp" name="file_tdp" required>
-                    </div>
 
                     
                     <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
@@ -589,13 +590,13 @@
                       </div>
                     </div>
                       <!-- Copy SPPKP -->
-                      <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px" id="sppkp_div">
+                      <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="sppkp_div">
                         <label for="file_sppkp">Copy SPPKP <span style="color:red">*</span></label>
                         <input type="file" accept="application/pdf,image/*" class="form-control" id="file_sppkp" name="file_sppkp" required>
                       </div>
                       
                       <!-- Copy SPPKP -->
-                      <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px" id="non_pkp_div">
+                      <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="non_pkp_div">
                         Download <a href="{{ url('YMPI Surat Pernyataan Non PKP.docx') }}" style="color:blue">Form Pernyataaan Non PKP</a>
                         <label for="file_non_pkp">Form Pernyataan Non PKP <span style="color:red">*</span></label>
                         <input type="file" accept="application/pdf,image/*" class="form-control" id="file_non_pkp" name="file_non_pkp" required>
