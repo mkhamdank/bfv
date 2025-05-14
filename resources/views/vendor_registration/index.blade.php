@@ -501,7 +501,7 @@
                     
                       <!-- Copy SPT -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
-                        <label for="spt">Copy SPT Terakhir <span style="color:red">*</span></label>
+                        <label for="spt">Copy SPT Terakhir (Pajak PPH Badan) <span style="color:red">*</span></label>
                         <input type="file" accept="application/pdf,image/*" class="form-control" id="copy_spt" name="copy_spt" required>
                         (Detail Nilai Boleh Diburamkan)
                       </div>
