@@ -109,14 +109,14 @@ class RioController extends Controller
             if($error_code == 1062){
                 $response = array(
                     'status' => false,
-                    'datas' => 'Anda Sudah Mengisi Ini'
+                    'message' => 'Anda Sudah Mengisi Ini'
                 );
                 return Response::json($response);
             }
             else{
                 $response = array(
                     'status' => false,
-                    'datas' => $e->getMessage()
+                    'message' => $e->getMessage()
                 );
                 return Response::json($response);
             }
