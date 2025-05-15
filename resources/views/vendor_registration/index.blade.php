@@ -280,6 +280,7 @@
                     <ul>
 									    <li>Tanda <span style="color:red">*</span> Harus Diisi </li>
 									    <li>Mohon Upload File PDF / Gambar</li>
+                                        <li>Selain Company Profile, Ukuran Maksimum Upload File adalah 2 Mb. Apabila melebihi, harap di compress terlebih dahulu.</li>
       								<li>Batas Waktu Pengisian Survei adalah <span style="color:blue"><b>Selasa, 27 Mei 2025</b></span></li>
                     </ul>
                 </div>
@@ -342,7 +343,7 @@
                       <!-- Copy Akte Pendirian -->
                       <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="akta_div">
                         <label for="file_akta_pendirian">Copy Akta Pendirian</label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_akta_pendirian" name="file_akta_pendirian">
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_akta_pendirian" name="file_akta_pendirian">
                       </div>
                     
                     <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="alasan_akta_div">
@@ -396,7 +397,7 @@
                     <!-- Surat Keterangan Domisili -->
                     <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                       <label for="domisili">Surat Keterangan Domisili <span style="color:red">*</span></label>
-                      <input type="file" accept="application/pdf,image/*" class="form-control" id="domisili" name="domisili" required>
+                      <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="domisili" name="domisili" required>
                     </div>
                     
                     <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
@@ -477,7 +478,7 @@
                       <!-- Form Bank Account -->
                       <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
                         <label for="form_bank">Form Pernyataaan Rekening Bank Perusahaan <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="form_bank" name="form_bank" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="form_bank" name="form_bank" required>
                         Download <a href="{{ url('YMPI Vendor Account Bank.doc') }}" style="color:blue">Form Pernyataaan Rekening Bank Perusahaan</a>
                       </div>
                     
@@ -496,13 +497,13 @@
                       <!-- Copy NPWP -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="copy_npwp">Copy NPWP <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="copy_npwp" name="copy_npwp" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="copy_npwp" name="copy_npwp" required>
                       </div>
                     
                       <!-- Copy SPT -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="spt">Copy SPT Terakhir (Pajak PPH Badan) <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="copy_spt" name="copy_spt" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="copy_spt" name="copy_spt" required>
                         (Detail Nilai Boleh Diburamkan)
                       </div>
                       
@@ -538,7 +539,7 @@
                     <!-- Copy File NIB -->
                     <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="file_nib_div">
                       <label for="file_nib">Copy File NIB <span style="color:red">*</span></label>
-                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_nib" name="file_nib" required>
+                      <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_nib" name="file_nib" required>
                     </div>
                     
 
@@ -551,13 +552,13 @@
                     <!-- Copy SIUP -->
                     <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="siup_div">
                       <label for="file_siup">Copy SIUP (Surat Izin Usaha Perdagangan)</label>
-                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_siup" name="file_siup" required>
+                      <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_siup" name="file_siup" required>
                     </div>
                   
                     <!-- Copy TDP -->
                     <div class="col-xs-12 col-md-6 col-lg-6" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="tdp_div">
                       <label for="tdp">Copy TDP (Tanda Daftar Perusahaan)</label>
-                      <input type="file" accept="application/pdf,image/*" class="form-control" id="file_tdp" name="file_tdp" required>
+                      <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_tdp" name="file_tdp" required>
                     </div>
                     
                     <!-- KBLI -->
@@ -592,69 +593,69 @@
                       <!-- Copy SPPKP -->
                       <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="sppkp_div">
                         <label for="file_sppkp">Copy SPPKP <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_sppkp" name="file_sppkp" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_sppkp" name="file_sppkp" required>
                       </div>
                       
                       <!-- Copy SPPKP -->
                       <div class="col-xs-12 col-md-12 col-lg-12" style="padding-top:10px;padding-bottom:10px;background-color:#ecff7b" id="non_pkp_div">
                         Download <a href="{{ url('YMPI Surat Pernyataan Non PKP.docx') }}" style="color:blue">Form Pernyataaan Non PKP</a>
                         <label for="file_non_pkp">Form Pernyataan Non PKP <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_non_pkp" name="file_non_pkp" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_non_pkp" name="file_non_pkp" required>
                       </div>
                     
                       <!-- Copy Sertifikat Authorized -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="sertifikat">Copy Sertifikat Authorized </label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_sertifikat" name="file_sertifikat" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_sertifikat" name="file_sertifikat" required>
                       </div>
 
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="iso">Upload Sertifikat ISO 9001</label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_iso_9001" name="file_iso_9001" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_iso_9001" name="file_iso_9001" required>
                       </div>
 
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="iso">Upload Sertifikat ISO 14001</label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_iso_14001" name="file_iso_14001">
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_iso_14001" name="file_iso_14001">
                       </div>
                       
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="iso">Upload Sertifikat ISO 45001</label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_iso_45001" name="file_iso_45001">
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_iso_45001" name="file_iso_45001">
                       </div>
                       
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="iso">SVLK (Sistem Verifikasi Legalitas Kayu) - (Khusus Vendor Kayu)</label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_svlk" name="file_svlk">
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_svlk" name="file_svlk">
                       </div>
                       
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="iso">Sertifikat AEO</label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_aeo" name="file_aeo">
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_aeo" name="file_aeo">
                       </div>
                     
                       <!-- MTA -->
                       {{-- <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="mta">MTA (Master Trade Agreement) <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_mta" name="file_mta" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_mta" name="file_mta" required>
                       </div>
                     
                       <!-- CSR -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="csr">CSR <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_csr" name="file_csr" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_csr" name="file_csr" required>
                       </div>
                     
                       <!-- Green Procurement -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="file_green_procurement">Green Procurement <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_green_procurement" name="file_green_procurement" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_green_procurement" name="file_green_procurement" required>
                       </div>
                     
                       <!-- ROH -->
                       <div class="col-xs-12 col-md-6 col-lg-6" style="margin-top:10px">
                         <label for="roh">ROH <span style="color:red">*</span></label>
-                        <input type="file" accept="application/pdf,image/*" class="form-control" id="file_roh" name="file_roh" required>
+                        <input type="file" accept="application/pdf,image/*" class="form-control fileInput" id="file_roh" name="file_roh" required>
                       </div> --}}
                       
                       <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
@@ -719,6 +720,23 @@
             });
             clearForm();
             code = "{{ isset($_GET['code']) ? $_GET['code'] : null }}";
+
+            const maxSize = 2 * 1024 * 1024; // 2 MB
+
+            $(".fileInput").on("change", function () {
+                let isValid = true;
+
+                $.each(this.files, function (index, file) {
+                    if (file.size > maxSize) {
+                        openErrorGritter('Error!', 'File yang diupload terlalu besar! Maksimal 2 MB.<br>');
+                        isValid = false;
+                    }
+                });
+
+                if (!isValid) {
+                    $(this).val(""); // Kosongkan input jika ada file yang tidak valid
+                } 
+            });
         });
         
 		    $.ajaxSetup({
