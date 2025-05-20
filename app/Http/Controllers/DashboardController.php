@@ -37,7 +37,9 @@ class DashboardController extends Controller
             'PI2304053',
             'PI2404023',
             'PI9803004',
-            'OS0112'
+            'OS0112',
+            'OS0114',
+            'OS0113'
         ];
         return view('dashboard')->with('username',strtoupper(Auth::user()->username))->with('all_username',$this->username);
     }

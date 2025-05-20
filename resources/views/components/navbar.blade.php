@@ -28,16 +28,16 @@
         <li class="nav-item dropdown">
             <a class="nav-link text-light" data-toggle="dropdown" href="#">
                 <i class="far fa-user-circle"></i>
-                <span>{{ Auth::user()->name }}</span>
+                <span>
+                    <?php if(Auth::user()){
+                        echo Auth::user()->name;
+                    } ?>
+                </span>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-header"><i class="far fa-user-circle"></i> {{ Auth::user()->name }}</span>
-                {{-- @foreach (Auth::user()->getAllPermissions() as $permission)
-                    <div class="dropdown-divider"></div>
-                    <span class="ms-1">
-                        - {{ $permission->name }}
-                    </span>
-                @endforeach --}}
+                <span class="dropdown-header"><i class="far fa-user-circle"></i> <?php if(Auth::user()){
+                        echo Auth::user()->name;
+                    } ?></span>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item dropdown-footer"><i class="fas fa-cog"></i> Setting</a>                
                 <!-- <a href="#" class="">Log Out</a> -->                
