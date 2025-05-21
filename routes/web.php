@@ -595,11 +595,11 @@ Route::get('fetch/driver/job', 'App\Http\Controllers\GeneralAffairController@fet
 
 Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexInputDriverJob');
 Route::post('input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
-Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@closureDriverJob');
-Route::get('index/confirmation/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexConfirmationDriverJob');
-Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralAffairController@inputConfirmationDriverJob');
-Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexAdditionalDriverJob');
-Route::post('input/additional/driver/job', 'App\Http\Controllers\GeneralAffairController@inputAdditionalDriverJob');
+Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralController@closureDriverJob');
+Route::get('index/confirmation/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
+Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
+Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverJob');
+Route::post('input/additional/driver/job', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJob');
 
 Route::get('index/driver/job/urgent', 'App\Http\Controllers\GeneralAffairController@indexDriverJobUrgent');
 // Route::post('input/driver/job/urgent', 'App\Http\Controllers\GeneralAffairController@inputDriverJobUrgent');
