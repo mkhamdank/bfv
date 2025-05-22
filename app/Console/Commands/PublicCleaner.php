@@ -12,38 +12,40 @@ class PublicCleaner extends Command
 
     public function handle()
     {
-        // $path_lists = [
-        //     'images/absensi',
-        //     'images/driver',
-        //     'images/driver_task',
-        // ];
+        $get_path_lists = DB::table('public_cleaners')
+        ->where('remark', 1)
+        ->get();
 
-        $path_lists = DB::table('public_cleaners')
-        ->where('remark', 'on')
-        ->pluck('path')->toArray();
+        $path_lists = $get_path_lists->pluck('path')->toArray();
 
         if (empty($path_lists)) {
             $this->warn('No paths found in the database.');
             return 1;
         }
 
-        foreach ($path_lists as $path) {
+        foreach ($get_path_lists as $row) {
+            $path = $row->path;
+            $dayDiff = $row->day_diff ?? 30; // Default to 30 if null
             $fullPath = public_path($path);
-            $this->info("Scanning: {$fullPath}");
+            $this->info("Scanning: {$fullPath} (older than {$dayDiff} days)");
 
             if (!file_exists($fullPath)) {
-                $this->warn("Directory not found: {$fullPath}");
-                continue;
+            $this->warn("Directory not found: {$fullPath}");
+            continue;
             }
 
             $files = glob($fullPath . '/*');
             foreach ($files as $file) {
-                if (is_file($file) && filemtime($file) < now()->subDays(30)->timestamp) {
+                if (is_file($file) && filemtime($file) < now()->subDays($dayDiff)->timestamp) {
                     unlink($file);
                     $this->info('Deleted: ' . $file);
                 }
-            }
+            }                        
         }
+        
+        DB::table('public_cleaners')
+            ->where('remark', 1)
+            ->update(['updated_at' => date('Y-m-d H:i:s')]);
 
         return 0;
     }
