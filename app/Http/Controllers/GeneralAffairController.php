@@ -21,7 +21,7 @@ class GeneralAffairController extends Controller
     public function indexDriverJob()
     {
         $title = 'Tugas Driver';
-        $title_jp = '??';
+        $title_jp = 'ドライバーの任務';
         return view('general_affair.driver.index',
             array(
                 'title' => $title,
@@ -33,7 +33,7 @@ class GeneralAffairController extends Controller
     public function indexDriverAttendanceReport()
     {
         $title = 'Kehadiran Driver';
-        $title_jp = '??';
+        $title_jp = 'ドライバーの出席';
         return view('general_affair.driver.attendance_report',
             array(
                 'title' => $title,
@@ -610,7 +610,7 @@ class GeneralAffairController extends Controller
     public function indexDriverAttendance()
     {
         $title = 'Rekam Kehadiran';
-        $title_jp = '';
+        $title_jp = '出席記録';
 
         // $empsync = DB::select('select * from employee_syncs where employee_id = "'.Auth::user()->username.'" and end_date is null LIMIT 1');
         // $empsync = DB::table('employee_syncs')->where('employee_id',Auth::user()->username)->where('end_date',null)->limit(1)->get();
@@ -888,7 +888,7 @@ class GeneralAffairController extends Controller
     function indexInputDriverJob($id)
     {
         $title = 'Kerjakan Tugas Driver';
-        $title_jp = '??';
+        $title_jp = 'ドライバーのタスクを実行する';
         $driver_task = DB::table('driver_tasks')
         ->where('id',$id)
         ->first();
@@ -1281,6 +1281,196 @@ class GeneralAffairController extends Controller
         }
     }
 
-    
+    function indexPassengerAttendance() {
+        $reguler = [
+            'OS0005_Malang',
+            'OS0113_Surabaya',
+        ];
+        $title = 'Absensi Penumpang';
+        $title_jp = '乗客の出席';
+        $check_attendance = DB::SELECT("SELECT
+            GROUP_CONCAT(a.datang) AS datang,
+            GROUP_CONCAT(a.status_datang) AS status_datang,
+            GROUP_CONCAT(a.pulang) AS pulang,
+            GROUP_CONCAT(a.status_pulang) AS status_pulang
+            FROM
+            (
+                (
+                SELECT
+                    id AS datang,
+                    IF(
+                    NOW() >= CONCAT('".date('Y-m-d')."', ' ', '04:00:00')
+                    AND NOW() <= CONCAT('".date('Y-m-d')."', ' ', '17:00:00'),
+                    'ON',
+                    'OFF'
+                    ) AS `status_datang`,
+                    NULL AS pulang,
+                    NULL AS status_pulang
+                FROM
+                    attendances
+                WHERE
+                    DATE(created_at) = '".date('Y-m-d')."'
+                    AND employee_id = '".Auth::user()->username."'
+                    AND created_at <= CONCAT('".date('Y-m-d')."', ' ', '05:30:00')
+                ) UNION ALL
+                (
+                SELECT NULL AS
+                    datang,
+                    NULL AS status_datang,
+                    id AS pulang,
+                    IF(
+                    NOW() >= CONCAT('".date('Y-m-d')."', ' ', '15:55:00')
+                    AND NOW() <= CONCAT('".date('Y-m-d')."', ' ', '17:30:00'),
+                    'ON',
+                    'OFF'
+                    ) AS `status_pulang`
+                FROM
+                    attendances
+                WHERE
+                    DATE(created_at) = '".date('Y-m-d')."'
+                    AND employee_id = '".Auth::user()->username."'
+                    AND created_at >= CONCAT('".date('Y-m-d')."', ' ', '15:55:00')
+                )
+            ) a");
+        
+        $destination = '';
+        for ($i=0; $i < count($reguler); $i++) { 
+            if(explode('_',$reguler[$i])[0] == Auth::user()->username){
+                $destination = explode('_',$reguler[$i])[1];
+            }
+        }
+        $status_check = 'OFF';
+        $id = '';
+        $timing = '';
+        if($check_attendance[0]->datang != null){
+            if($check_attendance[0]->status_datang != 'OFF'){
+                $status_check = 'ON';
+                $id = $check_attendance[0]->datang;
+                $timing = 'datang';
+            }
+        }
 
+        if($check_attendance[0]->pulang != null){
+            if($check_attendance[0]->status_pulang != 'OFF'){
+                $status_check = 'ON';
+                $id = $check_attendance[0]->pulang;
+                $timing = 'pulang';
+            }
+        }
+        
+        if($destination != '' && $status_check == 'ON'){
+            $passenger = DB::table('driver_passengers')
+            ->where('destination',$destination)
+            ->get();
+
+            $detail_attendance = DB::table('attendances')
+            ->where('id',$id)
+            ->first();
+            return view('general_affair.driver.passenger.attendance',
+                array(
+                    'title' => $title,
+                    'title_jp' => $title_jp,
+                    'attendance' => $check_attendance,
+                    'destination' => $destination,
+                    'detail_attendance' => $detail_attendance,
+                    'driver_id' => Auth::user()->username,
+                    'driver_name' => Auth::user()->name,
+                    'id' => $id,
+                    'passenger' => $passenger,
+                    'timing' => $timing,
+                    'message' => '',
+                )
+            )->with('page', 'Driver Report');
+        }else{
+            return view('general_affair.driver.passenger.attendance',
+                array(
+                    'title' => $title,
+                    'title_jp' => $title_jp,
+                    'attendance' => $check_attendance,
+                    'destination' => $destination,
+                    'driver_id' => Auth::user()->username,
+                    'driver_name' => Auth::user()->name,
+                    'passenger' => null,
+                    'timing' => null,
+                    'id' => $id,
+                    'message' => 'Sesi Absensi Sudah Berakhir',
+                )
+            )->with('page', 'Driver Report');
+        }
+    }
+
+    function fetchPassengerAttendance(Request $request) {
+        try {
+            $id = $request->get('id');
+            $destination = $request->get('destination');
+            $passenger = DB::table('driver_passenger_attendances')
+            ->select('*',DB::RAW('DATE_FORMAT(timestamps, "%H:%i:%s") as times'))
+            ->where('destination',$destination)
+            ->where('id_attendance',$id)
+            ->orderby('timestamps','desc')
+            ->get();
+            $response = array(
+                'status' => true,
+                'passenger' => $passenger,
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputPassengerAttendance(Request $request) {
+        try {
+            $id = $request->get('id');
+            $destination = $request->get('destination');
+            $passengers = $request->get('passengers');
+            $timing = $request->get('timing');
+            $timestamps = $request->get('timestamps');
+            $driver_id = $request->get('driver_id');
+            $car = $request->get('car');
+            $plat_no = $request->get('plat_no');
+            $driver_name = $request->get('driver_name');
+            $driver_time = $request->get('driver_time');
+
+            DB::table('driver_passenger_attendances')
+            ->insert([
+                'id_attendance' => $id,
+                'destination' => $destination,
+                'timing' => $timing,
+                'employee_id' => $passengers['employee_id'],
+                'name' => $passengers['name'],
+                'department' => $passengers['department'],
+                'hire_date' => $passengers['hire_date'],
+                'grade_code' => $passengers['grade_code'],
+                'employment_status' => $passengers['employment_status'],
+                'tag' => $passengers['tag'],
+                'driver_id' => $driver_id,
+                'driver_name' => $driver_name,
+                'driver_timestamps' => $driver_time,
+                'car' => $car,
+                'plat_no' => $plat_no,
+                'timestamps' => $timestamps,
+                'created_by' => Auth::user()->id,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $response = array(
+                'status' => true,
+                'message' => 'Berhasil Melakukan Absensi Penumpang'
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+        
+    }
 }

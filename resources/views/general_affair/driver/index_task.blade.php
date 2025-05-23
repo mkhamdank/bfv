@@ -122,8 +122,8 @@
 
         <div class="row">
             <div class="col-md-12" style="text-align: center;">
-                <h1>
-                    {{ $title }}
+                <h1 style="font-size: 18px; font-weight: bold;">
+                    {{ $title }}<br><span style="color: #605ca8; font-size: 15px;">{{$title_jp}}</span>
                 </h1>
             </div>
         </div>
@@ -556,6 +556,12 @@
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
 
+        function addZero(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
+        }
 
         function getActualFullDate() {
             var d = new Date();

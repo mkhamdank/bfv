@@ -41,7 +41,15 @@ class DashboardController extends Controller
             'OS0114',
             'OS0113'
         ];
-        return view('dashboard')->with('username',strtoupper(Auth::user()->username))->with('all_username',$this->username);
+
+        $this->driver_reguler = [
+            'OS0005',
+            'OS0113',
+        ];
+        return view('dashboard')
+        ->with('username',strtoupper(Auth::user()->username))
+        ->with('all_username',$this->username)
+        ->with('driver_reguler',$this->driver_reguler);
     }
 
     /**

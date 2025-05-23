@@ -612,8 +612,10 @@ Route::post('input/driver/attendance', 'App\Http\Controllers\GeneralAffairContro
 
 Route::get('fetch/driver/odometer', 'App\Http\Controllers\GeneralAffairController@fetchDriverOdometer');
 
-
-
 // Persetujuan Vendor
 Route::get('vendor_confirmation', 'App\Http\Controllers\PoConfirmationController@indexVendorConfirmation');
 Route::get('vendor_holiday', 'App\Http\Controllers\PoConfirmationController@indexVendorHoliday');
+
+Route::get('index/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@indexPassengerAttendance');
+Route::get('fetch/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@fetchPassengerAttendance');
+Route::post('input/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@inputPassengerAttendance');
