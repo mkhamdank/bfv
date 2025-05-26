@@ -295,10 +295,21 @@
                       <label class="header-tab">1. Identitas Perusahaan</label>
                     </div>
                   </div>
+
+                      
+                  <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
+                    <label for="badan_usaha">Badan Usaha <span style="color:red">*</span></label>
+                    <select class="form-control select2" id="badan_usaha" name="badan_usaha" required data-placeholder="Pilih Badan Usaha" style="width: 100%; font-size: 20px;">
+                      <option value=""></option>
+                      <option value="PT">PT (Perseroan Terbatas)</option>
+                      <option value="CV">CV (Commanditaire Vennootschap)</option>
+                      <option value="UD">UD (Usaha Dagang)</option>
+                    </select>
+                  </div>
                   
                   <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
                       <label for="select_nik">Nama Perusahaan <span style="color:red">*</span></label>
-                      <input type="text" class="form-control" id="nama_perusahaan" name="nama_perusahaan" value="" required>
+                      <input type="text" class="form-control" id="nama_perusahaan" name="nama_perusahaan" value="" required placeholder="Contoh : Yamaha Musical Products Indonesia, PT">
                   </div>
                   
                     <!-- Nama Pimpinan Perusahaan -->
@@ -313,7 +324,7 @@
                         <label for="file_profil_perusahaan">Profil Perusahaan <span style="color:red">*</span></label>
                         <input type="file" accept="application/pdf,image/*" class="form-control" id="file_profil_perusahaan" name="file_profil_perusahaan" required>
                       </div>
-                    
+
                       <div class="col-xs-12 col-md-12 col-lg-12" style="margin-top:10px">
                         <label for="aktivitas_bisnis">Aktivitas Bisnis <span style="color:red">*</span></label>
                         <select class="form-control select2" id="aktivitas_bisnis" name="aktivitas_bisnis" required data-placeholder="Pilih Aktivitas Bisnis" style="width: 100%; font-size: 20px;">
@@ -821,6 +832,7 @@
           
           $('#akta_div, #alasan_akta_div, #nib_div, #file_nib_div, #siup_div, #tdp_div, #sppkp_div, #non_pkp_div, #alasan_nib_div, #alasan_rekening_div').hide();
           
+            $('#badan_usaha').prop('selectedIndex', 0).change();
             $('#nama_perusahaan').val('');
             $('#pimpinan_perusahaan').val('');
             $('#file_profil_perusahaan').val('');
@@ -967,6 +979,12 @@
 		function save() {
       $("#loading").show();
 
+      if ($("#badan_usaha").val() == "") {
+          $("#loading").hide();
+          openErrorGritter('Error!', 'Badan Usaha tidak boleh kosong');
+          $("#badan_usaha").focus();
+          return false;
+      }
       if ($("#nama_perusahaan").val() == "") {
           $("#loading").hide();
           openErrorGritter('Error!', 'Nama Perusahaan tidak boleh kosong');
@@ -1175,6 +1193,7 @@
 
 			var formData = new FormData();
       formData.append('unique_code', code);
+      formData.append('badan_usaha', $('#badan_usaha').val());
       formData.append('nama_perusahaan', $('#nama_perusahaan').val());
       formData.append('pimpinan_perusahaan', $('#pimpinan_perusahaan').val());
       formData.append('file_profil_perusahaan', $('#file_profil_perusahaan')[0].files[0]);

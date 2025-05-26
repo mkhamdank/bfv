@@ -48,6 +48,7 @@ class RioController extends Controller
 
             $data = [
                 'unique_code' => $request->input('unique_code'),
+                'badan_usaha' => $request->input('badan_usaha'),
                 'nama_perusahaan' => $namaPerusahaan,
                 'pimpinan_perusahaan' => $request->input('pimpinan_perusahaan'),
                 'file_profil_perusahaan' => storeFile($request, 'file_profil_perusahaan', 'company_profile', $namaPerusahaan),
