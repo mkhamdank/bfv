@@ -274,14 +274,14 @@
                 </div>
             </div>
 
-            <div class="row question-box belum_mengisi" style="padding: 0% 1% 1% 1%">
+            <div class="row question-box belum_mengisi" style="padding: 0% 1% 1% 1%;">
                 <div class="col-xs-12 col-md-12 col-lg-12" style="color: black;margin-top:10px;">
                     {{-- <label class="header-tab">Formulir Pendaftaran Vendor</label> --}}
                     <ul>
 									    <li>Tanda <span style="color:red">*</span> Harus Diisi </li>
 									    <li>Mohon Upload File PDF / Gambar</li>
                                         <li>Selain Company Profile, Ukuran Maksimum Upload File adalah 2 Mb. Apabila melebihi, harap di compress terlebih dahulu.</li>
-      								<li>Batas Waktu Pengisian Survei adalah <span style="color:blue"><b>Selasa, 27 Mei 2025</b></span></li>
+      								<!-- <li>Batas Waktu Pengisian Survei adalah <span style="color:blue"><b>Selasa, 27 Mei 2025</b></span></li> -->
                     </ul>
                 </div>
             </div>
@@ -690,8 +690,9 @@
 
             
             <div class="row question-box sudah_mengisi">
-                <div class="col-xs-12 col-md-12 col-lg-12" style="color: black;margin-top:10px;">
-                    <span style="font-size:24px">Terimakasih Bapak / Ibu telah survey vendor kami.</span>
+                <div class="col-xs-12 col-md-12 col-lg-12" style="color: black;margin-top:10px;text-align: center;">
+                    <!-- <span style="font-size:24px">Terimakasih Bapak / Ibu telah survey vendor kami.</span> -->
+                    <span style="font-size:24px">Mohon maaf, proses pendataan kelengkapan data vendor telah ditutup. <br>Harap menantikan informasi selanjutnya dari kami.</span>
                 </div>
             </div>
 
@@ -717,7 +718,7 @@
         code = "";
 
         jQuery(document).ready(function() {
-			    $('.sudah_mengisi').hide();
+			    $('.belum_mengisi').hide();
             
           $('.select2').prop('selectedIndex', 0).change();
           $('.select2').select2({
