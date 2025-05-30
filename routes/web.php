@@ -31,6 +31,7 @@ Route::get('approve/wpos', 'App\Http\Controllers\VendorController@approveWpos');
 Route::get('reject/wpos', 'App\Http\Controllers\VendorController@rejectWpos');
 
 
+Route::get('ympi_vendor_registration', 'App\Http\Controllers\RioController@ympi_vendor_registration');
 Route::get('vendor_registration', 'App\Http\Controllers\RioController@index_vendor_registration');
 Route::post('post/vendor_registration', 'App\Http\Controllers\RioController@post_vendor_registration');
 

@@ -32,6 +32,21 @@ class RioController extends Controller
         ))->with('page', 'Vendor Registration');
     }
 
+
+    public function ympi_vendor_registration()
+    {
+        $title = "Registrasi Data Vendor PT. YMPI";
+        $title_jp = "";
+
+        $kbli = DB::table('vendor_registration_kblis')->get();
+
+        return view('vendor_registration.index_registration', array(
+            'title' => $title,
+            'title_jp' => $title_jp,
+            'kbli' => $kbli
+        ))->with('page', 'Vendor Registration');
+    }
+
     public function post_vendor_registration(Request $request)
     {
         try {
