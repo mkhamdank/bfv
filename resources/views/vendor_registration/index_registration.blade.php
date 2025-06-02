@@ -691,8 +691,8 @@
             
             <div class="row question-box sudah_mengisi">
                 <div class="col-xs-12 col-md-12 col-lg-12" style="color: black;margin-top:10px;text-align: center;">
-                    <!-- <span style="font-size:24px">Terimakasih Bapak / Ibu telah survey vendor kami.</span> -->
-                    <span style="font-size:24px">Mohon maaf, proses pendataan kelengkapan data vendor telah ditutup. <br>Harap menantikan informasi selanjutnya dari kami.</span>
+                    <span style="font-size:24px">Terimakasih Bapak / Ibu telah survey vendor kami.</span>
+                    <!-- <span style="font-size:24px">Mohon maaf, proses pendataan kelengkapan data vendor telah ditutup. <br>Harap menantikan informasi selanjutnya dari kami.</span> -->
                 </div>
             </div>
 
