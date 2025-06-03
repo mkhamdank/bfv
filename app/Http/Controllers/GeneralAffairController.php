@@ -158,7 +158,7 @@ class GeneralAffairController extends Controller
             // })
             ->where('driver_id',Auth::user()->username)
             ->where('deleted_at',null)
-            ->where('closure_status',null)
+            ->where('closure_status','driver')
             ->orderby('times')
             ->get();
 

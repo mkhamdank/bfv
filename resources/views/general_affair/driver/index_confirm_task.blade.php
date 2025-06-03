@@ -131,8 +131,23 @@
             </div>
             <?php } ?>
             <?php if($status == 'success'){ ?>
-            <input type="hidden" id="id" value="{{$driver_task->id}}">
-            <input type="hidden" id="task_id" value="{{$id}}">
+                <input type="hidden" id="id" value="{{$driver_task->id}}">
+                <input type="hidden" id="task_id" value="{{$id}}">
+                <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
+                    <tr>
+                        <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>Masukkan OTP <small style="color: #605ca8;">(OTPを入力してください)</small></label>
+                            <input type="text" name="otp" id="otp" class="form-control" style="width: 100%; text-align: center;" placeholder="OTPを入力してください">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top: 10px;">
+                            <button class="btn btn-success btn-sm" style="width: 90%; font-weight: bold; font-size: 20px;" onclick="submitOtp();">
+                                確認 Konfirmasi
+                            </button>
+                        </td>
+                    </tr>
+                </table>
                 <table id="div_driver_1" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
@@ -268,6 +283,14 @@
             $('body').toggleClass("sidebar-collapse");
             $('#side_vfi').addClass('menu-open');
 
+            $('#div_driver_1').hide();
+            $('#div_driver_2').hide();
+            $('#div_driver_3').hide();
+            $('#div_driver_0').show();
+
+            $('#otp').val('');
+            $('#otp').focus();
+
             $('.numpad').numpad({
                 hidePlusMinusButton : true,
                 decimalSeparator : '.'
@@ -316,6 +339,33 @@
 
                 }
             });
+        }
+
+        function submitOtp() {
+            $('#loading').show();
+            var real_otp = '{{ $japanese->driver_otp }}';
+            var otp = $('#otp').val();
+            if (otp == '') {
+                $('#loading').hide();
+                openErrorGritter('Error!', '(OTPは空にできません)');
+                $('#otp').val('');
+                $('#otp').focus();
+                audio_error.play();
+                return false;
+            }
+            if (otp != real_otp) {
+                $('#loading').hide();
+                openErrorGritter('Error!', '(OTPは一致しません)');
+                $('#otp').val('');
+                $('#otp').focus();
+                audio_error.play();
+                return false;
+            }
+            $('#div_driver_0').hide();
+            $('#div_driver_1').show();
+            $('#div_driver_2').show();
+            $('#div_driver_3').hide();
+            $('#loading').hide();
         }
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');

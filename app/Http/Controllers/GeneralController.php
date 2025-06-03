@@ -380,10 +380,15 @@ class GeneralController extends Controller
         ->where('closure_status','driver')
         ->first();
 
+        $japanese = DB::table('japaneses')
+        ->where('employee_id',$driver_task->requested_id)
+        ->first();
+
         if($driver_task){
             return view('general_affair.driver.index_confirm_task')
             ->with('driver_task',$driver_task)
             ->with('id',$id)
+            ->with('japanese',$japanese)
             ->with('status','success')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')

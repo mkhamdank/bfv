@@ -259,6 +259,7 @@
                         divDriver += '<span>From : '+result.driver_job[i].froms+'</span><br>';
                         divDriver += '<span>To : '+result.driver_job[i].tos+'</span><br>';
                         if(result.driver_job[i].remark == 'japanese'){
+                            divDriver += '<span>By : '+(result.driver_job[i].requested_name || '')+'</span><br>';
                             divDriver += '<span>Purpose : '+(result.driver_job[i].purpose || '')+'</span><br>';
                             divDriver += '<span>Pick Up : '+(result.driver_job[i].pick_up || '')+'</span><br>';
                         }
@@ -295,7 +296,8 @@
 
         function closureJob(id,base64id) {
             $('#loading').show();
-            location.replace('{{url("closure/driver/job")}}/'+base64id);
+            // location.replace('{{url("closure/driver/job")}}/'+base64id);
+            location.replace('{{url("index/confirmation/driver/job")}}/'+base64id);
             // $.get('{{ url("closure/driver/job") }}/'+base64id, function(result, status, xhr){
             //     if(result.status){
             //         openSuccessGritter('Success!', 'Success Closure Job');
