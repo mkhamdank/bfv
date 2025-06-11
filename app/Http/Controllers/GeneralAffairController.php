@@ -1328,7 +1328,7 @@ class GeneralAffairController extends Controller
                 WHERE
                     DATE(created_at) = '".date('Y-m-d')."'
                     AND employee_id = '".Auth::user()->username."'
-                    AND created_at <= CONCAT('".date('Y-m-d')."', ' ', '05:30:00')
+                    AND created_at <= CONCAT('".date('Y-m-d')."', ' ', '06:30:00')
                 ) UNION ALL
                 (
                 SELECT NULL AS
@@ -1336,7 +1336,7 @@ class GeneralAffairController extends Controller
                     NULL AS status_datang,
                     id AS pulang,
                     IF(
-                    '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '15:55:00')
+                    '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '15:30:00')
                     AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '17:30:00'),
                     'ON',
                     'OFF'
@@ -1346,7 +1346,7 @@ class GeneralAffairController extends Controller
                 WHERE
                     DATE(created_at) = '".date('Y-m-d')."'
                     AND employee_id = '".Auth::user()->username."'
-                    AND created_at >= CONCAT('".date('Y-m-d')."', ' ', '15:55:00')
+                    AND created_at >= CONCAT('".date('Y-m-d')."', ' ', '15:30:00')
                 )
             ) a");
         
