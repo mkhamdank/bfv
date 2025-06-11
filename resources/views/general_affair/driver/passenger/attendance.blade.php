@@ -125,7 +125,9 @@
         <?php if($message != ''){ ?>
         <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
             <p style="font-size: 20px; font-weight: bold; color: red;">Error!</p>
-            <span style="font-size: 18px; color: red;">{{$message}}</span>
+            <span style="font-size: 18px; color: red;">@php
+                echo $message;
+            @endphp</span>
         </div>
         <?php } ?>
         <?php if($message == ''){ ?>
@@ -163,7 +165,7 @@
                     </tr>
                     <tr>
                         <td colspan="2" style="padding-left: 20px; padding-right: 20px;">
-                            <button class="btn btn-danger" onclick="window.location.href='{{ url('') }}'" style="width: 100%;">Kembali</button>
+                            <button class="btn btn-danger" onclick="window.location.href='{{ url('index/driver/attendance/report') }}'" style="width: 100%;">Kembali</button>
                         </td>
                     </tr>
                 </table>

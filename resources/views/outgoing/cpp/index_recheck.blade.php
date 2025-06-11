@@ -100,16 +100,6 @@
 						<td style="background-color: #14213d; color: #fff; text-align: center; font-size:15px;" id="op">{{$inspector}}</td>
 						<td style="background-color: #fca311; color: #14213d; text-align: center; font-size:15px;" id="serial_number">{{$outgoing[0]->serial_number}}</td>
 					</tr>
-					<!-- <tr>
-						<th style=" background-color: #d1d1d1; text-align: center; color: #14213d; padding:0;font-size: 15px;">Loc</th>
-						<th colspan="2" style="background-color: #d1d1d1; text-align: center; color: #14213d; padding:0;font-size: 15px;">Urutan Lot Dalam Satu Kedatangan (Bukan Qty Recieve)</th>
-					</tr> -->
-					<!-- <tr>
-						
-						<td colspan="2">
-							<input type="text" class="pull-right numpad2" name="lot_number" style="height: 50px;font-size: 2vw;width: 100%;text-align: center;vertical-align: middle;color: #14213d" id="lot_number" placeholder="Urutan Lot Dalam Satu Kedatangan">
-						</td>
-					</tr> -->
 					
 				</tbody>
 			</table>

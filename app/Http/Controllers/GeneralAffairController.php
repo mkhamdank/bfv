@@ -66,8 +66,11 @@ class GeneralAffairController extends Controller
                     END,
                     ', ',
                 DATE_FORMAT( datetime, '%d %b %Y' )) AS date,
+                DATE( datetime ) AS dates,
                 DATE_FORMAT( startss.datetimes, '%H:%i' ) AS startss,
                 DATE_FORMAT( endss.datetimes, '%H:%i' ) AS endss,
+                startss.datetimes as start_asli,
+                endss.datetimes as end_asli,
                 startss.latitude AS latitude_start,
                 startss.longitude AS longitude_start,
                 endss.latitude AS latitude_end,
@@ -105,6 +108,7 @@ class GeneralAffairController extends Controller
             WHERE
                 employee_id = '".strtoupper(Auth::user()->username)."' 
             GROUP BY
+            dates,
                 CONCAT(
                 CASE
                         DAYOFWEEK( datetime ) 
@@ -787,6 +791,18 @@ class GeneralAffairController extends Controller
             }
             $file_upload_foto_odometer = json_encode($data_foto_odometer);
 
+            $tujuan_upload = 'images/absensi/location';
+
+            for ($i=0; $i < count($request->file('file_location')); $i++) { 
+              $file_foto_location = $request->file('file_location')[$i];
+              $nama_foto_location = $file_foto_location->getClientOriginalName();
+              $extension_foto_location = pathinfo($nama_foto_location, PATHINFO_EXTENSION);
+              $filename_foto_location = 'Foto Location '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto_location;
+              $file_foto_location->move($tujuan_upload,$filename_foto_location);
+              $data_foto_location[]=$filename_foto_location;      
+            }
+            $file_upload_foto_location = json_encode($data_foto_location);
+
             $url = "https://locationiq.org/v1/reverse.php?key=pk.456ed0d079b6f646ad4db592aa541ba0&lat=".$latitude."&lon=".$longitude."&format=json";
             $curlHandle = curl_init();
             curl_setopt($curlHandle, CURLOPT_URL, $url);
@@ -859,6 +875,7 @@ class GeneralAffairController extends Controller
                 'datetime' => $tanggal,
                 'images' => $file_upload_foto,
                 'images_odometer' => $file_upload_foto_odometer,
+                'images_location' => $file_upload_foto_location,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'plat_no' => $plat_no,
@@ -1299,8 +1316,8 @@ class GeneralAffairController extends Controller
                 SELECT
                     id AS datang,
                     IF(
-                    NOW() >= CONCAT('".date('Y-m-d')."', ' ', '04:00:00')
-                    AND NOW() <= CONCAT('".date('Y-m-d')."', ' ', '17:00:00'),
+                    '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '04:00:00')
+                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '17:00:00'),
                     'ON',
                     'OFF'
                     ) AS `status_datang`,
@@ -1319,8 +1336,8 @@ class GeneralAffairController extends Controller
                     NULL AS status_datang,
                     id AS pulang,
                     IF(
-                    NOW() >= CONCAT('".date('Y-m-d')."', ' ', '15:55:00')
-                    AND NOW() <= CONCAT('".date('Y-m-d')."', ' ', '17:30:00'),
+                    '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '15:55:00')
+                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '17:30:00'),
                     'ON',
                     'OFF'
                     ) AS `status_pulang`
@@ -1393,7 +1410,7 @@ class GeneralAffairController extends Controller
                     'passenger' => null,
                     'timing' => null,
                     'id' => $id,
-                    'message' => 'Sesi Absensi Sudah Berakhir',
+                    'message' => 'Sesi Absensi Sudah Berakhir / Rekam Kehadiran belum diisi.<br>Isi rekam kehadiran terlebih dahulu sebelum melakukan absensi penumpang.',
                 )
             )->with('page', 'Driver Report');
         }

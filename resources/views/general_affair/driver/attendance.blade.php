@@ -164,6 +164,11 @@
                 <button class="btn btn-primary btn-lg" id="btnImageOdo" value="Photo" onclick="buttonImageOdo(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Odometer</button>
                 <img id="blahOdo" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
             </div>
+            <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
+                <input type="file" onchange="readURL3(this);" id="file_location" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" class="file">
+                <button class="btn btn-primary btn-lg" id="btnImageLoc" value="Photo" onclick="buttonImageLoc(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Lokasi</button>
+                <img id="blahLoc" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
+            </div>
             <button class="btn btn-success" style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 20px;" onclick="save()">SUBMIT</button>
         </div>
 
@@ -430,7 +435,7 @@ crossorigin=""></script>
             return false;
         }
 
-        if ($('#file_foto').prop('files')[0] == null || $('#file_foto_odometer').prop('files')[0] == null) {
+        if ($('#file_foto').prop('files')[0] == null || $('#file_foto_odometer').prop('files')[0] == null || $('#file_location').prop('files')[0] == null) {
             $("#loading").hide();
             openErrorGritter('Error!', 'Foto Harus Diisi');
             $(window).scrollTop(0);
@@ -450,6 +455,7 @@ crossorigin=""></script>
         formData.append('car',  $('#vehicle').val().split('_')[1]);
         formData.append('file_foto[]', $('#file_foto').prop('files')[0]);
         formData.append('file_foto_odometer[]', $('#file_foto_odometer').prop('files')[0]);
+        formData.append('file_location[]', $('#file_location').prop('files')[0]);
 
         $.ajax({
             url:"{{ url('input/driver/attendance') }}",

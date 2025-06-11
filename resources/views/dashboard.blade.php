@@ -11,7 +11,7 @@
 
 <div class="row">
 	<div class="col-md-12" style="text-align: center;">
-		<h1>
+		<h1 style="font-size: 18px; font-weight: bold;">
 			Dashboard
 		</h1>
 	</div>
@@ -23,8 +23,13 @@
 		<a href="{{url('index/driver/attendance/report')}}" class="btn btn-info" style="width: 100%; font-weight: bold; font-size: 20px; margin-bottom: 10px;">
 			Rekam Kehadiran
 		</a>
-		<a href="{{url('index/driver/job')}}" class="btn btn-warning" style="width: 100%; font-weight: bold; font-size: 20px;">
+		<a href="{{url('index/driver/job')}}" class="btn btn-warning" style="width: 100%; font-weight: bold; font-size: 20px; margin-bottom: 10px;">
 			Tugas Driver
+		</a>
+		<?php } ?>
+		<?php if (in_array($username, $driver_reguler)) { ?>
+		<a href="{{url('index/passenger/attendance')}}" class="btn btn-primary" style="width: 100%; font-weight: bold; font-size: 18px;">
+			Absensi Penumpang Reguler
 		</a>
 		<?php } ?>
 	</div>

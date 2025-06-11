@@ -56,7 +56,7 @@
                             @endcan
 
                             @can('view driver')                                
-                            <li class="nav-item" id="side_driver_job">
+                            <li class="nav-item">
                                 <a href="{{url('index/driver/job')}}" class="nav-link">
                                     <i class="nav-icon fas fa-cubes"></i>
                                     <p>
@@ -65,11 +65,20 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item" id="side_driver_attendance">
+                            <li class="nav-item">
                                 <a href="{{url('index/driver/attendance/report')}}" class="nav-link">
                                     <i class="nav-icon fas fa-users"></i>
                                     <p>
                                         Rekam Kehadiran
+                                    </p>
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a href="{{url('index/passenger/attendance')}}" class="nav-link">
+                                    <i class="nav-icon fas fa-users"></i>
+                                    <p>
+                                        Absensi Penumpang Reguler
                                     </p>
                                 </a>
                             </li>

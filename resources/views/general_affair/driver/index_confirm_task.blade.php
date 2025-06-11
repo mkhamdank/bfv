@@ -136,8 +136,8 @@
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
-                            <label>Masukkan OTP <small style="color: #605ca8;">(OTPを入力してください)</small></label>
-                            <input type="text" name="otp" id="otp" class="form-control" style="width: 100%; text-align: center;" placeholder="OTPを入力してください">
+                            <label>Masukkan PIN <small style="color: #605ca8;">(PINを入力してください)</small></label>
+                            <input type="text" name="otp" id="otp" class="form-control" style="width: 100%; text-align: center;" placeholder="PINを入力してください">
                         </td>
                     </tr>
                     <tr>
@@ -347,7 +347,7 @@
             var otp = $('#otp').val();
             if (otp == '') {
                 $('#loading').hide();
-                openErrorGritter('Error!', '(OTPは空にできません)');
+                openErrorGritter('Error!', '(PINは空にできません)');
                 $('#otp').val('');
                 $('#otp').focus();
                 audio_error.play();
@@ -355,7 +355,7 @@
             }
             if (otp != real_otp) {
                 $('#loading').hide();
-                openErrorGritter('Error!', '(OTPは一致しません)');
+                openErrorGritter('Error!', '(PINは一致しません)');
                 $('#otp').val('');
                 $('#otp').focus();
                 audio_error.play();
