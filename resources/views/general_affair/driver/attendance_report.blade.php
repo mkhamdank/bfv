@@ -210,7 +210,7 @@
                         attendance +=
                             '<td style="border: 1px solid black;padding-left:4px;font-weight: bold;font-size: 20px;color: #149600">' +
                             result.attendance[i].startss;
-                        if(result.attendance[i].start_asli >= '{{date("Y-m-d")}} 04:00:00' && result.attendance[i].start_asli <= '{{date("Y-m-d")}} 07:00:00' && '{{date("Y-m-d H:i:s")}}' <= '{{date("Y-m-d")}} 17:00:00'){
+                        if(result.attendance[i].start_asli >= '{{date("Y-m-d")}} 04:00:00' && result.attendance[i].start_asli <= '{{date("Y-m-d")}} 07:00:00' && '{{date("Y-m-d H:i:s")}}' <= '{{date("Y-m-d")}} 07:00:00'){
                             var url_penumpang = '{{ url("index/passenger/attendance") }}';
                             attendance += '<a class="pull-right" style="color: coral; float: right;" href="'+url_penumpang+'"><i class="fa fa-users"></i></a>';
                         }else{
