@@ -229,12 +229,12 @@
             if (event.keyCode == 13 || event.keyCode == 9) {
                 $('#loading').show();
                 passenger_save = null;
-                if($("#tag").val().length == 10){
+                if($("#tag").val().length >= 9){
                     var tag = $("#tag").val();
                     if(passenger != null){
                         var passengers = null;
                         for(var i = 0; i < passenger.length;i++){
-                            if (passenger[i].tag == tag) {
+                            if (passenger[i].tag == tag || passenger[i].employee_id == tag) {
                                 passengers = passenger[i];
                                 break;
                             }
