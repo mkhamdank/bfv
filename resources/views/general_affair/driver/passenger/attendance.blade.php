@@ -241,6 +241,8 @@
                         }
                         if(passengers != null && passenger_attend.indexOf(passengers.employee_id) == -1){
                             $('#loading').show();
+
+                            passenger_save = passengers;
                             saveAttendance();
 
                             count_pass++;
@@ -254,7 +256,6 @@
 
                             passenger_attend.push(passengers.employee_id);
 
-                            passenger_save = passengers;
                             $('#loading').hide();
                             
                             $('#tag').val('');
