@@ -234,13 +234,14 @@
                     if(passenger != null){
                         var passengers = null;
                         for(var i = 0; i < passenger.length;i++){
-                            if (passenger[i].tag == tag || passenger[i].employee_id == tag) {
+                            if (passenger[i].tag == tag || passenger[i].employee_id.toUpperCase() == tag.toUpperCase()) {
                                 passengers = passenger[i];
                                 break;
                             }
                         }
                         if(passengers != null && passenger_attend.indexOf(passengers.employee_id) == -1){
-                            $('#loading').hide();
+                            $('#loading').show();
+                            saveAttendance();
 
                             count_pass++;
 
@@ -254,8 +255,7 @@
                             passenger_attend.push(passengers.employee_id);
 
                             passenger_save = passengers;
-
-                            saveAttendance();
+                            $('#loading').hide();
                             
                             $('#tag').val('');
                             $('#tag').focus();
@@ -287,6 +287,7 @@
         });
         
         function saveAttendance() {
+            $('#loading').show();
             var data = {
                 destination: $('#destination').val(),
                 id: $('#id').val(),
