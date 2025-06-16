@@ -244,22 +244,6 @@
 
                             passenger_save = passengers;
                             saveAttendance();
-
-                            count_pass++;
-
-                            var table = "<tr>";
-                            table += "<td style='width: 1%; border: 1px solid black;'>" + count_pass + "</td>";
-                            table += "<td style='width: 5%; border: 1px solid black; text-align: left; padding-left: 4px;'>" + passengers.name + "</td>";
-                            table += "<td style='width: 5%; border: 1px solid black;'>"+getActualFullTime()+"</td>";
-                            table += "</tr>";
-                            $("#bodyAttendance").append(table);
-
-                            passenger_attend.push(passengers.employee_id);
-
-                            $('#loading').hide();
-                            
-                            $('#tag').val('');
-                            $('#tag').focus();
                         }else{
                             $('#loading').hide();
                             audio_error.play();
@@ -305,6 +289,22 @@
                 if(result.status){
                     $('#loading').hide();
                     openSuccessGritter('Success!','Attendance Saved');
+
+                    count_pass++;
+
+                    var table = "<tr>";
+                    table += "<td style='width: 1%; border: 1px solid black;'>" + count_pass + "</td>";
+                    table += "<td style='width: 5%; border: 1px solid black; text-align: left; padding-left: 4px;'>" + passenger_save.name + "</td>";
+                    table += "<td style='width: 5%; border: 1px solid black;'>"+getActualFullTime()+"</td>";
+                    table += "</tr>";
+                    $("#bodyAttendance").append(table);
+
+                    passenger_attend.push(passenger_save.employee_id);
+
+                    $('#loading').hide();
+                    
+                    $('#tag').val('');
+                    $('#tag').focus();
                 }else{
                     $('#loading').hide();
                     audio_error.play();
