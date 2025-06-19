@@ -188,68 +188,177 @@ class workshopController extends Controller
 
 				$tujuan_upload = 'workshop/Audit_Molding/Check_Molding/check_att';
 
-				// before
 				if ($request->file('before1_' . $i) != null) {
 					$before1 = $request->file('before1_' . $i);
 					$before1_file = $before1->getClientOriginalName();
-					// $before1_filename = pathinfo($before1_file, PATHINFO_FILENAME);
 					$before1_ext = pathinfo($before1_file, PATHINFO_EXTENSION);
 
+					// Compress image before upload
+					$image = imagecreatefromstring(file_get_contents($before1->getRealPath()));
 					$before1_name = md5('Before1_' . date('YmdHis')) . '.' . $before1_ext;
-					$before1->move($tujuan_upload, $before1_name);
+					$save_path = $tujuan_upload . '/' . $before1_name;
+					if (in_array(strtolower($before1_ext), ['jpg', 'jpeg'])) {
+						imagejpeg($image, $save_path, 75); // 75% quality
+					} elseif (strtolower($before1_ext) == 'png') {
+						imagepng($image, $save_path, 6); // Compression level 6
+					} else {
+						$before1->move($tujuan_upload, $before1_name); // fallback
+					}
+					imagedestroy($image);
 				}
 
 				if ($request->file('before2_' . $i) != null) {
 					$before2 = $request->file('before2_' . $i);
 					$before2_file = $before2->getClientOriginalName();
-					// $before2_filename = pathinfo($before2_file, PATHINFO_FILENAME);
 					$before2_ext = pathinfo($before2_file, PATHINFO_EXTENSION);
 
+					$image = imagecreatefromstring(file_get_contents($before2->getRealPath()));
 					$before2_name = md5('Before2_' . date('YmdHis')) . '.' . $before2_ext;
-					$before2->move($tujuan_upload, $before2_name);
+					$save_path = $tujuan_upload . '/' . $before2_name;
+					if (in_array(strtolower($before2_ext), ['jpg', 'jpeg'])) {
+						imagejpeg($image, $save_path, 75);
+					} elseif (strtolower($before2_ext) == 'png') {
+						imagepng($image, $save_path, 6);
+					} else {
+						$before2->move($tujuan_upload, $before2_name);
+					}
+					imagedestroy($image);
 				}
 
-				// After
 				if ($request->file('after1_' . $i) != null) {
 					$after1 = $request->file('after1_' . $i);
 					$after1_file = $after1->getClientOriginalName();
-					// $after1_filename = pathinfo($after1_file, PATHINFO_FILENAME);
 					$after1_ext = pathinfo($after1_file, PATHINFO_EXTENSION);
 
+					$image = imagecreatefromstring(file_get_contents($after1->getRealPath()));
 					$after1_name = md5('after1_' . date('YmdHis')) . '.' . $after1_ext;
-					$after1->move($tujuan_upload, $after1_name);
+					$save_path = $tujuan_upload . '/' . $after1_name;
+					if (in_array(strtolower($after1_ext), ['jpg', 'jpeg'])) {
+						imagejpeg($image, $save_path, 75);
+					} elseif (strtolower($after1_ext) == 'png') {
+						imagepng($image, $save_path, 6);
+					} else {
+						$after1->move($tujuan_upload, $after1_name);
+					}
+					imagedestroy($image);
 				}
 
 				if ($request->file('after2_' . $i) != null) {
 					$after2 = $request->file('after2_' . $i);
 					$after2_file = $after2->getClientOriginalName();
-					// $after2_filename = pathinfo($after2_file, PATHINFO_FILENAME);
 					$after2_ext = pathinfo($after2_file, PATHINFO_EXTENSION);
 
+					$image = imagecreatefromstring(file_get_contents($after2->getRealPath()));
 					$after2_name = md5('after2_' . date('YmdHis')) . '.' . $after2_ext;
-					$after2->move($tujuan_upload, $after2_name);
+					$save_path = $tujuan_upload . '/' . $after2_name;
+					if (in_array(strtolower($after2_ext), ['jpg', 'jpeg'])) {
+						imagejpeg($image, $save_path, 75);
+					} elseif (strtolower($after2_ext) == 'png') {
+						imagepng($image, $save_path, 6);
+					} else {
+						$after2->move($tujuan_upload, $after2_name);
+					}
+					imagedestroy($image);
 				}
 
-				// Activity
 				if ($request->file('aktifitas1_' . $i) != null) {
 					$aktifitas1 = $request->file('aktifitas1_' . $i);
 					$aktifitas1_file = $aktifitas1->getClientOriginalName();
-					// $aktifitas1_filename = pathinfo($aktifitas1_file, PATHINFO_FILENAME);
 					$aktifitas1_ext = pathinfo($aktifitas1_file, PATHINFO_EXTENSION);
 
+					$image = imagecreatefromstring(file_get_contents($aktifitas1->getRealPath()));
 					$aktifitas1_name = md5('aktifitas1_' . date('YmdHis')) . '.' . $aktifitas1_ext;
-					$aktifitas1->move($tujuan_upload, $aktifitas1_name);
+					$save_path = $tujuan_upload . '/' . $aktifitas1_name;
+					if (in_array(strtolower($aktifitas1_ext), ['jpg', 'jpeg'])) {
+						imagejpeg($image, $save_path, 75);
+					} elseif (strtolower($aktifitas1_ext) == 'png') {
+						imagepng($image, $save_path, 6);
+					} else {
+						$aktifitas1->move($tujuan_upload, $aktifitas1_name);
+					}
+					imagedestroy($image);
 				}
 
 				if ($request->file('aktifitas2_' . $i) != null) {
 					$aktifitas2 = $request->file('aktifitas2_' . $i);
 					$aktifitas2_file = $aktifitas2->getClientOriginalName();
-					// $aktifitas2_filename = pathinfo($aktifitas2_file, PATHINFO_FILENAME);
 					$aktifitas2_ext = pathinfo($aktifitas2_file, PATHINFO_EXTENSION);
 
+					$image = imagecreatefromstring(file_get_contents($aktifitas2->getRealPath()));
 					$aktifitas2_name = md5('aktifitas2_' . date('YmdHis')) . '.' . $aktifitas2_ext;
-					$aktifitas2->move($tujuan_upload, $aktifitas2_name);
+					$save_path = $tujuan_upload . '/' . $aktifitas2_name;
+					if (in_array(strtolower($aktifitas2_ext), ['jpg', 'jpeg'])) {
+						imagejpeg($image, $save_path, 75);
+					} elseif (strtolower($aktifitas2_ext) == 'png') {
+						imagepng($image, $save_path, 6);
+					} else {
+						$aktifitas2->move($tujuan_upload, $aktifitas2_name);
+					}
+					imagedestroy($image);
 				}
+
+				// // before
+				// if ($request->file('before1_' . $i) != null) {
+				// 	$before1 = $request->file('before1_' . $i);
+				// 	$before1_file = $before1->getClientOriginalName();
+				// 	// $before1_filename = pathinfo($before1_file, PATHINFO_FILENAME);
+				// 	$before1_ext = pathinfo($before1_file, PATHINFO_EXTENSION);
+
+				// 	$before1_name = md5('Before1_' . date('YmdHis')) . '.' . $before1_ext;
+				// 	$before1->move($tujuan_upload, $before1_name);
+				// }
+
+				// if ($request->file('before2_' . $i) != null) {
+				// 	$before2 = $request->file('before2_' . $i);
+				// 	$before2_file = $before2->getClientOriginalName();
+				// 	// $before2_filename = pathinfo($before2_file, PATHINFO_FILENAME);
+				// 	$before2_ext = pathinfo($before2_file, PATHINFO_EXTENSION);
+
+				// 	$before2_name = md5('Before2_' . date('YmdHis')) . '.' . $before2_ext;
+				// 	$before2->move($tujuan_upload, $before2_name);
+				// }
+
+				// // After
+				// if ($request->file('after1_' . $i) != null) {
+				// 	$after1 = $request->file('after1_' . $i);
+				// 	$after1_file = $after1->getClientOriginalName();
+				// 	// $after1_filename = pathinfo($after1_file, PATHINFO_FILENAME);
+				// 	$after1_ext = pathinfo($after1_file, PATHINFO_EXTENSION);
+
+				// 	$after1_name = md5('after1_' . date('YmdHis')) . '.' . $after1_ext;
+				// 	$after1->move($tujuan_upload, $after1_name);
+				// }
+
+				// if ($request->file('after2_' . $i) != null) {
+				// 	$after2 = $request->file('after2_' . $i);
+				// 	$after2_file = $after2->getClientOriginalName();
+				// 	// $after2_filename = pathinfo($after2_file, PATHINFO_FILENAME);
+				// 	$after2_ext = pathinfo($after2_file, PATHINFO_EXTENSION);
+
+				// 	$after2_name = md5('after2_' . date('YmdHis')) . '.' . $after2_ext;
+				// 	$after2->move($tujuan_upload, $after2_name);
+				// }
+
+				// // Activity
+				// if ($request->file('aktifitas1_' . $i) != null) {
+				// 	$aktifitas1 = $request->file('aktifitas1_' . $i);
+				// 	$aktifitas1_file = $aktifitas1->getClientOriginalName();
+				// 	// $aktifitas1_filename = pathinfo($aktifitas1_file, PATHINFO_FILENAME);
+				// 	$aktifitas1_ext = pathinfo($aktifitas1_file, PATHINFO_EXTENSION);
+
+				// 	$aktifitas1_name = md5('aktifitas1_' . date('YmdHis')) . '.' . $aktifitas1_ext;
+				// 	$aktifitas1->move($tujuan_upload, $aktifitas1_name);
+				// }
+
+				// if ($request->file('aktifitas2_' . $i) != null) {
+				// 	$aktifitas2 = $request->file('aktifitas2_' . $i);
+				// 	$aktifitas2_file = $aktifitas2->getClientOriginalName();
+				// 	// $aktifitas2_filename = pathinfo($aktifitas2_file, PATHINFO_FILENAME);
+				// 	$aktifitas2_ext = pathinfo($aktifitas2_file, PATHINFO_EXTENSION);
+
+				// 	$aktifitas2_name = md5('aktifitas2_' . date('YmdHis')) . '.' . $aktifitas2_ext;
+				// 	$aktifitas2->move($tujuan_upload, $aktifitas2_name);
+				// }
 
 				$insert_detail = DB::table('pe_molding_check_details')->insert([
 					'check_id' => $cek_id,
