@@ -158,6 +158,22 @@
                         </td>
                     </tr>
                     <tr>
+                        <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>Total</label>
+                            <input type="text" name="total" id="total" class="form-control" style="width: 100%; text-align: center;" placeholder="Total" readonly="" value="">
+                        </td>
+                        <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>Hadir</label>
+                            <input type="text" name="hadir" id="hadir" class="form-control" style="width: 100%; text-align: center;" placeholder="Hadir" readonly="" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding-left: 20px; padding-right: 20px;">
+                            <label>Belum Hadir</label>
+                            <input type="text" name="belum_hadir" id="belum_hadir" class="form-control" style="width: 100%; text-align: center;" placeholder="Belum Hadir" readonly="" value="">
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan="2" style="padding-left: 20px; padding-right: 20px;">
                             <label>Scan ID Card Penumpang</label>
                             <input type="text" name="tag" id="tag" class="form-control" style="width: 100%; text-align: center;" placeholder="Scan ID Card Penumpang" value="">
@@ -179,6 +195,9 @@
                             </th>
                             <th style="background-color: #605ca8; color: white; width: 5%; border: 1px solid white;">
                                 Emp
+                            </th>
+                            <th style="background-color: #605ca8; color: white; width: 5%; border: 1px solid white;">
+                                Status
                             </th>
                             <th style="background-color: #605ca8; color: white; width: 5%; border: 1px solid white;">
                                 Time
@@ -292,14 +311,16 @@
 
                     count_pass++;
 
-                    var table = "<tr>";
-                    table += "<td style='width: 1%; border: 1px solid black;'>" + count_pass + "</td>";
-                    table += "<td style='width: 5%; border: 1px solid black; text-align: left; padding-left: 4px;'>" + passenger_save.name + "</td>";
-                    table += "<td style='width: 5%; border: 1px solid black;'>"+getActualFullTime()+"</td>";
-                    table += "</tr>";
-                    $("#bodyAttendance").append(table);
+                    fetchAttendance();
 
-                    passenger_attend.push(passenger_save.employee_id);
+                    // var table = "<tr>";
+                    // table += "<td style='width: 1%; border: 1px solid black;'>" + count_pass + "</td>";
+                    // table += "<td style='width: 5%; border: 1px solid black; text-align: left; padding-left: 4px;'>" + passenger_save.name + "</td>";
+                    // table += "<td style='width: 5%; border: 1px solid black;'>"+getActualFullTime()+"</td>";
+                    // table += "</tr>";
+                    // $("#bodyAttendance").append(table);
+
+                    // passenger_attend.push(passenger_save.employee_id);
 
                     $('#loading').hide();
                     
@@ -325,15 +346,47 @@
                     passenger_attend = [];
                     count_pass = 0;
                     var table = "";
-                    for(var i = 0; i < result.passenger.length; i++){
+                    var total = 0;
+                    var hadir = 0;
+                    var belum_hadir = 0;
+                    // for(var i = 0; i < result.passenger.length; i++){
+                    //     table += "<tr>";
+                    //     table += "<td style='width: 1%; border: 1px solid black;'>" + (i+1) + "</td>";
+                    //     table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + result.passenger[i].name + "</td>";
+                    //     table += "<td style='width: 5%; border: 1px solid black; text-align: center;'>" + result.passenger[i].times + "</td>";
+                    //     table += "</tr>";
+                    //     count_pass++;
+                    //     passenger_attend.push(result.passenger[i].employee_id);
+                    // }
+                    for(var i = 0; i < result.passenger_all.length; i++){
                         table += "<tr>";
                         table += "<td style='width: 1%; border: 1px solid black;'>" + (i+1) + "</td>";
-                        table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + result.passenger[i].name + "</td>";
-                        table += "<td style='width: 5%; border: 1px solid black; text-align: center;'>" + result.passenger[i].times + "</td>";
+                        table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + result.passenger_all[i].name + "</td>";
+                        var times = '-';
+                        for(var j = 0; j < result.passenger.length; j++){
+                            if(result.passenger_all[i].employee_id == result.passenger[j].employee_id){
+                                times = result.passenger[j].times;
+                                passenger_attend.push(result.passenger_all[i].employee_id);
+                                hadir++;
+                                // count_pass++;
+                                break;
+                            }
+                        }
+                        if(times == '-'){
+                            table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: lightpink;'>Belum Hadir</td>";
+                        }else{
+                            table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: lightgreen;'>Hadir</td>";
+                        }
+                        table += "<td style='width: 5%; border: 1px solid black; text-align: center;'>" + times + "</td>";
                         table += "</tr>";
-                        count_pass++;
-                        passenger_attend.push(result.passenger[i].employee_id);
+                        total++;
+                        // count_pass++;
                     }
+                    belum_hadir = total - hadir;
+
+                    $('#total').val(total);
+                    $('#hadir').val(hadir);
+                    $('#belum_hadir').val(belum_hadir);
                     $("#bodyAttendance").append(table);
                 }else{
                     $('#loading').hide();

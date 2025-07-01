@@ -1317,7 +1317,7 @@ class GeneralAffairController extends Controller
                     id AS datang,
                     IF(
                     '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '04:00:00')
-                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '07:00:00'),
+                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '17:00:00'),
                     'ON',
                     'OFF'
                     ) AS `status_datang`,
@@ -1420,6 +1420,15 @@ class GeneralAffairController extends Controller
         try {
             $id = $request->get('id');
             $destination = $request->get('destination');
+            $passenger_all = DB::table('driver_passengers')
+            ->select('driver_passengers.*',DB::RAW('DATE_FORMAT(timestamps, "%H:%i:%s") as times'))
+            ->leftJoin('driver_passenger_attendances', function($join) use ($id) {
+                $join->on('driver_passenger_attendances.employee_id','=','driver_passengers.employee_id')
+                     ->where('driver_passenger_attendances.id_attendance', '=', $id);
+            })
+            ->where('driver_passengers.destination',$destination)
+            ->orderby('driver_passenger_attendances.timestamps','desc')
+            ->get();
             $passenger = DB::table('driver_passenger_attendances')
             ->select('*',DB::RAW('DATE_FORMAT(timestamps, "%H:%i:%s") as times'))
             ->where('destination',$destination)
@@ -1429,6 +1438,7 @@ class GeneralAffairController extends Controller
             $response = array(
                 'status' => true,
                 'passenger' => $passenger,
+                'passenger_all' => $passenger_all,
             );
             return Response::json($response);
         } catch (\Exception $e) {
