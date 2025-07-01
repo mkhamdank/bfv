@@ -89,7 +89,9 @@ class GeneralAffairController extends Controller
                 WHERE
                     employee_id = '".strtoupper(Auth::user()->username)."' 
                 GROUP BY
-                    DATE( attendances.datetime )
+                    DATE( attendances.datetime ),
+                    latlong.latitude,
+                    latlong.longitude
                 ) AS startss ON startss.dates = DATE( datetime )
                 LEFT JOIN (
                 SELECT
@@ -103,7 +105,9 @@ class GeneralAffairController extends Controller
                 WHERE
                     employee_id = '".strtoupper(Auth::user()->username)."' 
                 GROUP BY
-                    DATE( attendances.datetime )
+                    DATE( attendances.datetime ),
+                    latlong.latitude,
+                    latlong.longitude
                 ) AS endss ON endss.dates = DATE( datetime ) 
             WHERE
                 employee_id = '".strtoupper(Auth::user()->username)."' 
