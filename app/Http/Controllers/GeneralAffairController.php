@@ -45,7 +45,7 @@ class GeneralAffairController extends Controller
     public function fetchDriverAttendanceReport(Request $request)
     {
         try {
-            $attendance = DB::select("SELECT
+            $datas = DB::SELECT("SELECT
                 CONCAT(
                 CASE
                         DAYOFWEEK( datetime ) 
@@ -65,54 +65,14 @@ class GeneralAffairController extends Controller
                         'Sabtu' 
                     END,
                     ', ',
-                DATE_FORMAT( datetime, '%d %b %Y' )) AS date,
-                DATE( datetime ) AS dates,
-                DATE_FORMAT( startss.datetimes, '%H:%i' ) AS startss,
-                DATE_FORMAT( endss.datetimes, '%H:%i' ) AS endss,
-                startss.datetimes as start_asli,
-                endss.datetimes as end_asli,
-                startss.latitude AS latitude_start,
-                startss.longitude AS longitude_start,
-                endss.latitude AS latitude_end,
-                endss.longitude AS longitude_end 
+                DATE_FORMAT( datetime, '%d %b %Y' )) AS `date`,
+                DATE( datetime ) AS dates
             FROM
                 `attendances`
-                LEFT JOIN (
-                SELECT
-                    DATE( attendances.datetime ) AS dates,
-                    min( attendances.datetime ) datetimes,
-                    latlong.latitude,
-                    latlong.longitude
-                FROM
-                    `attendances` 
-                    left join (select latitude, longitude,datetime from attendances where employee_id = '".strtoupper(Auth::user()->username)."' ) as latlong on latlong.datetime = attendances.datetime
-                WHERE
-                    employee_id = '".strtoupper(Auth::user()->username)."' 
-                GROUP BY
-                    DATE( attendances.datetime ),
-                    latlong.latitude,
-                    latlong.longitude
-                ) AS startss ON startss.dates = DATE( datetime )
-                LEFT JOIN (
-                SELECT
-                    DATE( attendances.datetime ) AS dates,
-                    max( attendances.datetime ) datetimes,
-                    latlong.latitude,
-                    latlong.longitude
-                FROM
-                    `attendances` 
-                    left join (select latitude, longitude,datetime from attendances where employee_id = '".strtoupper(Auth::user()->username)."' ) as latlong on latlong.datetime = attendances.datetime
-                WHERE
-                    employee_id = '".strtoupper(Auth::user()->username)."' 
-                GROUP BY
-                    DATE( attendances.datetime ),
-                    latlong.latitude,
-                    latlong.longitude
-                ) AS endss ON endss.dates = DATE( datetime ) 
             WHERE
-                employee_id = '".strtoupper(Auth::user()->username)."' 
+                employee_id = 'OS0005' 
             GROUP BY
-            dates,
+            DATE( datetime ),
                 CONCAT(
                 CASE
                         DAYOFWEEK( datetime ) 
@@ -132,18 +92,184 @@ class GeneralAffairController extends Controller
                         'Sabtu' 
                     END,
                     ', ',
-                DATE_FORMAT( datetime, '%d %b %Y' )),
-                startss.datetimes,
-                endss.datetimes,
-                startss.latitude,
-                startss.longitude,
-                endss.latitude,
-                endss.longitude 
+                DATE_FORMAT( datetime, '%d %b %Y' ))
             ORDER BY
                 datetime DESC");
+
+            $min = DB::SELECT("(SELECT
+                    'start' as `status`,
+                    DATE(attendances.`datetime`) AS dates,
+                    min(attendances.`datetime`) datetimes,
+                    latlong.latitude,
+                    latlong.longitude
+                FROM
+                    `attendances`
+                    LEFT JOIN (SELECT latitude, longitude, `datetime` FROM attendances WHERE employee_id = '".strtoupper(Auth::user()->username)."') AS latlong ON latlong.`datetime` = attendances.`datetime`
+                WHERE
+                    employee_id = '".strtoupper(Auth::user()->username)."'
+                GROUP BY
+                DATE(attendances.`datetime`)
+                )");
+            $max = DB::SELECT("(
+                SELECT
+                    'end' as `status`,
+                    DATE(attendances.`datetime`) AS dates,
+                    max(attendances.`datetime`) datetimes,
+                    latlong.latitude,
+                    latlong.longitude
+                FROM
+                    `attendances`
+                    LEFT JOIN (SELECT latitude, longitude, `datetime` FROM attendances WHERE employee_id = '".strtoupper(Auth::user()->username)."') AS latlong ON latlong.`datetime` = attendances.`datetime`
+                WHERE
+                    employee_id = '".strtoupper(Auth::user()->username)."'
+                GROUP BY
+                DATE(attendances.`datetime`),
+                latlong.latitude,
+                latlong.longitude
+                )");
+            $attendance = [];
+            for ($i=0; $i < count($datas); $i++) { 
+                $startss = null;
+                $endss = null;
+                $start_asli = null;
+                $end_asli = null;
+                $latitude_start = null;
+                $longitude_start = null;
+                $latitude_end = null;
+                $longitude_end = null;
+
+                for ($j=0; $j < count($min); $j++) { 
+                    if ($datas[$i]->dates == $min[$j]->dates) {
+                        if ($min[$j]->status == 'start') {
+                            $startss = date('H:i', strtotime($min[$j]->datetimes));
+                            $start_asli = $min[$j]->datetimes;
+                            $latitude_start = $min[$j]->latitude;
+                            $longitude_start = $min[$j]->longitude;
+                        }
+                    }
+                }
+
+                for ($k=0; $k < count($max); $k++) { 
+                    if ($datas[$i]->dates == $max[$k]->dates) {
+                        if ($max[$k]->status == 'end') {
+                            $endss = date('H:i', strtotime($max[$k]->datetimes));
+                            $end_asli = $max[$k]->datetimes;
+                            $latitude_end = $max[$k]->latitude;
+                            $longitude_end = $max[$k]->longitude;
+                        }
+                    }
+                }
+
+                $attendance[] = array(
+                    'date' => $datas[$i]->date,
+                    'dates' => $datas[$i]->dates,
+                    'startss' => $startss,
+                    'endss' => $endss,
+                    'start_asli' => $start_asli,
+                    'end_asli' => $end_asli,
+                    'latitude_start' => $latitude_start,
+                    'longitude_start' => $longitude_start,
+                    'latitude_end' => $latitude_end,
+                    'longitude_end' => $longitude_end
+                );
+            }
+            // $attendance = DB::select("SELECT
+            //     CONCAT(
+            //     CASE
+            //             DAYOFWEEK( datetime ) 
+            //             WHEN 1 THEN
+            //             'Minggu' 
+            //             WHEN 2 THEN
+            //             'Senin' 
+            //             WHEN 3 THEN
+            //             'Selasa' 
+            //             WHEN 4 THEN
+            //             'Rabu' 
+            //             WHEN 5 THEN
+            //             'Kamis' 
+            //             WHEN 6 THEN
+            //             'Jumat' 
+            //             WHEN 7 THEN
+            //             'Sabtu' 
+            //         END,
+            //         ', ',
+            //     DATE_FORMAT( datetime, '%d %b %Y' )) AS date,
+            //     DATE( datetime ) AS dates,
+            //     DATE_FORMAT( startss.datetimes, '%H:%i' ) AS startss,
+            //     DATE_FORMAT( endss.datetimes, '%H:%i' ) AS endss,
+            //     startss.datetimes as start_asli,
+            //     endss.datetimes as end_asli,
+            //     startss.latitude AS latitude_start,
+            //     startss.longitude AS longitude_start,
+            //     endss.latitude AS latitude_end,
+            //     endss.longitude AS longitude_end 
+            // FROM
+            //     `attendances`
+            //     LEFT JOIN (
+            //     SELECT
+            //         DATE( attendances.datetime ) AS dates,
+            //         min( attendances.datetime ) datetimes,
+            //         latlong.latitude,
+            //         latlong.longitude
+            //     FROM
+            //         `attendances` 
+            //         left join (select latitude, longitude,datetime from attendances where employee_id = '".strtoupper(Auth::user()->username)."' ) as latlong on latlong.datetime = attendances.datetime
+            //     WHERE
+            //         employee_id = '".strtoupper(Auth::user()->username)."' 
+            //     GROUP BY
+            //         DATE( attendances.datetime )
+            //     ) AS startss ON startss.dates = DATE( datetime )
+            //     LEFT JOIN (
+            //     SELECT
+            //         DATE( attendances.datetime ) AS dates,
+            //         max( attendances.datetime ) datetimes,
+            //         latlong.latitude,
+            //         latlong.longitude
+            //     FROM
+            //         `attendances` 
+            //         left join (select latitude, longitude,datetime from attendances where employee_id = '".strtoupper(Auth::user()->username)."' ) as latlong on latlong.datetime = attendances.datetime
+            //     WHERE
+            //         employee_id = '".strtoupper(Auth::user()->username)."' 
+            //     GROUP BY
+            //         DATE( attendances.datetime )
+            //     ) AS endss ON endss.dates = DATE( datetime ) 
+            // WHERE
+            //     employee_id = '".strtoupper(Auth::user()->username)."' 
+            // GROUP BY
+            // dates,
+            //     CONCAT(
+            //     CASE
+            //             DAYOFWEEK( datetime ) 
+            //             WHEN 1 THEN
+            //             'Minggu' 
+            //             WHEN 2 THEN
+            //             'Senin' 
+            //             WHEN 3 THEN
+            //             'Selasa' 
+            //             WHEN 4 THEN
+            //             'Rabu' 
+            //             WHEN 5 THEN
+            //             'Kamis' 
+            //             WHEN 6 THEN
+            //             'Jumat' 
+            //             WHEN 7 THEN
+            //             'Sabtu' 
+            //         END,
+            //         ', ',
+            //     DATE_FORMAT( datetime, '%d %b %Y' )),
+            //     startss.datetimes,
+            //     endss.datetimes,
+            //     startss.latitude,
+            //     startss.longitude,
+            //     endss.latitude,
+            //     endss.longitude 
+            // ORDER BY
+            //     datetime DESC");
             $response = array(
                 'status' => true,
-                'attendance' => $attendance
+                'attendance' => $attendance,
+                'min' => $min,
+                'max' => $max
             );
             return Response::json($response);
         } catch (\Exception $e) {
