@@ -108,7 +108,9 @@ class GeneralAffairController extends Controller
                 WHERE
                     employee_id = '".strtoupper(Auth::user()->username)."'
                 GROUP BY
-                DATE(attendances.`datetime`)
+                DATE(attendances.`datetime`),
+                latlong.latitude,
+                latlong.longitude
                 )");
             $max = DB::SELECT("(
                 SELECT
