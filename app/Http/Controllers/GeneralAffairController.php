@@ -94,7 +94,7 @@ class GeneralAffairController extends Controller
                     ', ',
                 DATE_FORMAT( datetime, '%d %b %Y' ))
             ORDER BY
-                datetime DESC");
+                DATE( datetime ) DESC");
 
             $min = DB::SELECT("(SELECT
                     'start' as `status`,
