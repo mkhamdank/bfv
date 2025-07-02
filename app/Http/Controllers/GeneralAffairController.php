@@ -96,39 +96,38 @@ class GeneralAffairController extends Controller
             ORDER BY
                 DATE( datetime ) DESC");
 
-            $min = DB::SELECT("(SELECT
-                    'start' as `status`,
-                    DATE(attendances.`datetime`) AS dates,
-                    min(attendances.`datetime`) datetimes,
-                    latlong.latitude,
-                    latlong.longitude
+            $min = DB::SELECT("SELECT
+                *
                 FROM
-                    `attendances`
-                    LEFT JOIN (SELECT latitude, longitude, `datetime` FROM attendances WHERE employee_id = '".strtoupper(Auth::user()->username)."') AS latlong ON latlong.`datetime` = attendances.`datetime`
-                WHERE
-                    employee_id = '".strtoupper(Auth::user()->username)."'
-                GROUP BY
-                DATE(attendances.`datetime`),
-                latlong.latitude,
-                latlong.longitude
-                )");
-            $max = DB::SELECT("(
-                SELECT
-                    'end' as `status`,
+                (
+                    SELECT
+                    'start' AS `status`,
                     DATE(attendances.`datetime`) AS dates,
-                    max(attendances.`datetime`) datetimes,
-                    latlong.latitude,
-                    latlong.longitude
-                FROM
+                    min(attendances.`datetime`) datetimes
+                    FROM
                     `attendances`
-                    LEFT JOIN (SELECT latitude, longitude, `datetime` FROM attendances WHERE employee_id = '".strtoupper(Auth::user()->username)."') AS latlong ON latlong.`datetime` = attendances.`datetime`
-                WHERE
+                    WHERE
                     employee_id = '".strtoupper(Auth::user()->username)."'
-                GROUP BY
-                DATE(attendances.`datetime`),
-                latlong.latitude,
-                latlong.longitude
-                )");
+                    GROUP BY
+                    DATE(attendances.`datetime`)
+                ) min
+                LEFT JOIN (SELECT latitude, longitude, `datetime` FROM attendances WHERE employee_id = '".strtoupper(Auth::user()->username)."') AS latlong ON latlong.`datetime` = min.`datetimes`");
+                $max = DB::SELECT("SELECT
+                *
+                FROM
+                (
+                    SELECT
+                    'end' AS `status`,
+                    DATE(attendances.`datetime`) AS dates,
+                    max(attendances.`datetime`) datetimes
+                    FROM
+                    `attendances`
+                    WHERE
+                    employee_id = '".strtoupper(Auth::user()->username)."'
+                    GROUP BY
+                    DATE(attendances.`datetime`)
+                ) max
+                LEFT JOIN (SELECT latitude, longitude, `datetime` FROM attendances WHERE employee_id = '".strtoupper(Auth::user()->username)."') AS latlong ON latlong.`datetime` = max.`datetimes`");
             $attendance = [];
             for ($i=0; $i < count($datas); $i++) { 
                 $startss = null;
