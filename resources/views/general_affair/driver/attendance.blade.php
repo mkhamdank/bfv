@@ -412,7 +412,7 @@ crossorigin=""></script>
         }
 
     function save() {
-        // $("#loading").show();
+        $("#loading").show();
 
         if ($('#latitude').val() == null || $('#latitude').val() == "") {
             $("#loading").hide();
