@@ -70,7 +70,7 @@ class GeneralAffairController extends Controller
             FROM
                 `attendances`
             WHERE
-                employee_id = 'OS0005' 
+                employee_id = '".strtoupper(Auth::user()->username)."' 
             GROUP BY
             DATE( datetime ),
                 CONCAT(
@@ -1448,7 +1448,7 @@ class GeneralAffairController extends Controller
                     id AS datang,
                     IF(
                     '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '04:00:00')
-                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '17:00:00'),
+                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '07:00:00'),
                     'ON',
                     'OFF'
                     ) AS `status_datang`,
