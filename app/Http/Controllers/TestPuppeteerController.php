@@ -56,7 +56,6 @@ class TestPuppeteerController extends Controller
         //     // It's crucial to examine this message.
         //     dd('Browsershot Error:', $e->getMessage(), 'Full command:', $e->getCommand());
         // }
-        
         // 1. Prepare the data for the view
         $data = [
             'title' => 'Puppeteer Test PDF',
