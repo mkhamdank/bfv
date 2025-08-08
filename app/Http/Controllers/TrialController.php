@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use App\Mail\SendEmail;
 use Response;
 
@@ -57,5 +58,16 @@ class TrialController extends Controller
             'Content-Disposition' => 'inline; filename="' . $fileNameFromDb . '"',
         ]);
         // return new Response($createdPdf, 200, array('Content-Type' => 'application/pdf'));
+    }
+
+    public function check_ftp()
+    {
+        try {
+            $disk = Storage::disk('bfv_public');
+            $files = $disk->files('/');
+            return response()->json(['status' => 'success', 'files' => $files]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
     }
 }
