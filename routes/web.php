@@ -613,6 +613,9 @@ Route::post('input/driver/attendance', 'App\Http\Controllers\GeneralAffairContro
 
 Route::get('fetch/driver/odometer', 'App\Http\Controllers\GeneralAffairController@fetchDriverOdometer');
 
+// Route to generate and download the test PDF
+Route::get('/test-puppeteer-pdf', [TestPuppeteerController::class, 'generatePdfFromView'])->name('puppeteer.pdf');
+
 // Persetujuan Vendor
 Route::get('vendor_confirmation', 'App\Http\Controllers\PoConfirmationController@indexVendorConfirmation');
 Route::get('vendor_holiday', 'App\Http\Controllers\PoConfirmationController@indexVendorHoliday');
