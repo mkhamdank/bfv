@@ -25,6 +25,11 @@ if (!function_exists('generatePdfFromHtml')) {
         // Set default Browsershot options
         $browsershot = Browsershot::html($html);
 
+        // // Pass the path from the .env file to the Browsershot process
+        // if (env('BROWSERSHOT_PATH')) {
+        //     $browsershot->setEnv(['PATH' => env('BROWSERSHOT_PATH') . ':' . getenv('PATH')]);
+        // }
+
         // Apply any custom settings from the input array
         if (!empty($settings)) {
             foreach ($settings as $method => $args) {
@@ -35,6 +40,8 @@ if (!function_exists('generatePdfFromHtml')) {
                 }
             }
         }
+        
+        $browsershot->setChromePath(env('PUPPETEER_CHROME_PATH'));
         
         $browsershot->save($filePath);
 
