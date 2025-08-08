@@ -26,9 +26,10 @@ if (!function_exists('generatePdfFromHtml')) {
         $browsershot = Browsershot::html($html);
 
         // // Pass the path from the .env file to the Browsershot process
-        // if (env('BROWSERSHOT_PATH')) {
-        //     $browsershot->setEnv(['PATH' => env('BROWSERSHOT_PATH') . ':' . getenv('PATH')]);
-        // }
+        if (env('BROWSERSHOT_PATH')) {
+            $browsershot->setNodeBinary(env('BROWSERSHOT_PATH') . '/node');
+            $browsershot->setNpmBinary(env('BROWSERSHOT_PATH') . '/npm');
+        }
 
         // Apply any custom settings from the input array
         if (!empty($settings)) {
