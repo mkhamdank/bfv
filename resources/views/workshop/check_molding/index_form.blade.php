@@ -728,7 +728,7 @@
             var mold_num = '';
 
             $.each(moldings, function(index, value) {
-                if (value.id == $("#moldings").val()) {
+                if (value.molding_type + "_" + value.molding_category == $("#moldings").val()) {
                     type = value.molding_type;
                     mold_num = value.mold_number;
                 }
@@ -743,13 +743,13 @@
             body += "<tr>";
 
             $.each(parts, function(index, value) {
-                if (value.molding_id == $("#molding_id").val()) {
+                if (value.molding_type + "_" + value.molding_category == $("#molding_id").val()) {
                     cls = "btn-danger";
 
                     if (value.sudah) {
                         cls = "btn-success";
                     }
-                    body += "<td width='1%'><button class='btn btn-xs " + cls +
+                    body += "<td width='1%' style='vertical-align: top'><button class='btn btn-xs " + cls +
                         "' style='width: 100%; text-align:left' onclick='add_point(\"" + value.part_name + "\")'>" +
                         num + ") " + value.part_name + "</button></td>";
 
@@ -1329,12 +1329,14 @@
 
         function loadMolding(elem) {
             var molds = <?php echo json_encode($period_cek); ?>;
+            console.table(molds);
+            
             $("#moldings").empty();
 
             var isi = "<option value=''></option>";
             $.each(molds, function(index, value) {
                 if (value.period == $(elem).val()) {
-                    isi += "<option value='" + value.molding_id + "'>" + value.molding_name + "</option>";
+                    isi += "<option value='" + value.molding_type + "_" + value.molding_category + "'>" + value.molding_name + "</option>";
                 }
             })
             $("#moldings").append(isi);

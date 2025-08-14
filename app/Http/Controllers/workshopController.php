@@ -104,26 +104,28 @@ class workshopController extends Controller
 			});
 
 		$molding = db::table('pe_molding_masters')
-			->select('id', 'molding_name', 'mold_number', 'molding_type')
+			->select('id', 'molding_name', 'mold_number', 'molding_type', 'molding_category')
 			->get();
 
 		$period_cek = db::table('pe_molding_schedules')
-		->select(db::raw('DATE_FORMAT(period,"%Y %b") AS period'), 'molding_id','molding_name')
+		->leftJoin('pe_molding_masters', 'pe_molding_schedules.molding_id', '=', 'pe_molding_masters.id')
+		->select(db::raw('DATE_FORMAT(period,"%Y %b") AS period'), 'pe_molding_schedules.molding_id','pe_molding_schedules.molding_name', 'pe_molding_masters.molding_type', 'pe_molding_masters.molding_category')
 		->orderBy('period', 'DESC')
 		->get();
 
 		$molding_part = db::table('pe_molding_part_masters')
-		->leftJoin(db::raw("(SELECT check_date, molding_name, molding_type, molding_number, part_name from pe_molding_checks
+		->leftJoin(db::raw("(SELECT check_date, molding_name, molding_type, molding_category, molding_number, part_name from pe_molding_checks
 		LEFT JOIN pe_molding_check_details on pe_molding_checks.id = pe_molding_check_details.check_id) as cek"), function($q) {
-			$q->on('cek.molding_name', '=', 'pe_molding_part_masters.molding_name')
-			   ->on('cek.molding_type', '=', 'pe_molding_part_masters.molding_type')
-			   ->on('cek.molding_number', '=', 'pe_molding_part_masters.molding_number')
+			$q->on('cek.molding_type', '=', 'pe_molding_part_masters.molding_type')
+			   ->on('cek.molding_category', '=', 'pe_molding_part_masters.molding_category')
 			   ->on('cek.part_name', '=', 'pe_molding_part_masters.part_name');
 		})
-			->select('molding_id', 'pe_molding_part_masters.molding_name', 'pe_molding_part_masters.molding_type', 'pe_molding_part_masters.molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('cek.part_name as sudah'))
+			->select('molding_id', 'pe_molding_part_masters.molding_name', 'pe_molding_part_masters.molding_type', 'pe_molding_part_masters.molding_category', 'pe_molding_part_masters.molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('cek.part_name as sudah'))
 			->get();
 
 		$pic = db::table('employee_datas')->select('employee_id', db::raw('employee_name as name'))->orderBy('employee_name', 'asc')->get();
+
+		// dd($molding_part);
 
 		$period = [];
 
