@@ -141,7 +141,7 @@
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Masukkan PIN <small style="color: #605ca8;">(PINを入力してください)</small></label>
-                            <input type="text" name="otp" id="otp" class="form-control" style="width: 100%; text-align: center;" placeholder="PINを入力してください">
+                            <input type="text" name="otp" id="otp" class="form-control" style="width: 100%; text-align: center;" placeholder="PINを入力してください" inputmode="numeric" pattern="[0-9]*">
                         </td>
                     </tr>
                     <tr>
@@ -181,13 +181,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><input type="number" name="hour_start" id="hour_start" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($driver_task->date_from))}}"></td>
-                                    <td><input type="number" name="minute_start" id="minute_start" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($driver_task->date_from))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($driver_task->date_from))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($driver_task->date_from))}}"></td>
                                     <td style="padding-left: 5px; padding-right: 5px; font-weight: bold;">
                                         -
                                     </td>
-                                    <td><input type="number" name="hour_end" id="hour_end" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value=""></td>
-                                    <td><input type="number" name="minute_end" id="minute_end" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value=""></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_end" id="hour_end" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value=""></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_end" id="minute_end" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value=""></td>
                                 </tr>
                             </table>
                         </td>
