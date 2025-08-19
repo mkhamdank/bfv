@@ -597,7 +597,8 @@ Route::get('fetch/driver/job', 'App\Http\Controllers\GeneralAffairController@fet
 
 Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexInputDriverJob');
 Route::post('input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
-Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralController@closureDriverJob');
+// Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralController@closureDriverJob');
+Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@searchDriverJob');
 Route::get('index/confirmation/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
 Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
 Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverJob');

@@ -181,6 +181,35 @@ class GeneralController extends Controller
   ))->with('page', 'Fixed Asset Approval');
 }
 
+    function searchDriverJob($id)
+    {
+        $plat_no = base64_decode($id);
+        $driver_task = DB::table('driver_tasks')
+        ->where('plat_no',$plat_no)
+        ->where('remark','japanese')
+        ->where('closure_status','driver')
+        ->orderby('id','desc')
+        ->first();
+
+        if($driver_task){
+            return view('general_affair.driver.index_search_driver_job')
+            ->with('driver_task',$driver_task)
+            ->with('id',$id)
+            ->with('status','success')
+            ->with('title','Konfirmasi Driver Order')
+            ->with('title_jp','ドライバー注文の確認')
+            ->with('message','Konfirmasi Driver Order')
+            ->with('message_jp','ドライバー注文の確認');
+        }else{
+            return view('general_affair.driver.index_search_driver_job')
+            ->with('status','error')
+            ->with('title','Konfirmasi Driver Order')
+            ->with('title_jp','ドライバー注文の確認')
+            ->with('message','Driver Order telah Anda dikonfirmasi')
+            ->with('message_jp','車両のリクエストが確認されました');
+        }
+    }
+
     function closureDriverJob($id)
     {
         $task_id = base64_decode($id);
@@ -380,9 +409,12 @@ class GeneralController extends Controller
         ->where('closure_status','driver')
         ->first();
 
-        $japanese = DB::table('japaneses')
-        ->where('employee_id',$driver_task->requested_id)
-        ->first();
+        $japanese = null;
+        if($driver_task){
+            $japanese = DB::table('japaneses')
+            ->where('employee_id',$driver_task->requested_id)
+            ->first();
+        }
 
         if($driver_task){
             return view('general_affair.driver.index_confirm_task')
@@ -399,8 +431,8 @@ class GeneralController extends Controller
             ->with('status','error')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')
-            ->with('message','Driver Order telah Anda dikonfirmasi')
-            ->with('message_jp','車両のリクエストが確認されました');
+            ->with('message','Driver Order Anda telah dikonfirmasi')
+            ->with('message_jp','ドライバー注文が確認されました');
         }
     }
 

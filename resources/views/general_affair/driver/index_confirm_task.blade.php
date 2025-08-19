@@ -126,13 +126,17 @@
         <div class="row">
             <?php if($status == 'error'){ ?>
             <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
-                <p style="font-size: 20px; font-weight: bold; color: red;">Error!</p>
-                <span style="font-size: 18px; color: red;">{{$message}}<br>{{$message_jp}}</span>
+                {{-- <p style="font-size: 20px; font-weight: bold; color: green;">Success!</p> --}}
+                <br>
+                <span style="font-size: 18px; color: #000;">{{$message}}</span>
+                <br>
+                <span style="font-size: 18px; color: #605ca8;">{{$message_jp}}</span>
             </div>
             <?php } ?>
             <?php if($status == 'success'){ ?>
                 <input type="hidden" id="id" value="{{$driver_task->id}}">
                 <input type="hidden" id="task_id" value="{{$id}}">
+                <input type="hidden" id="real_otp" value="{{ $japanese->driver_otp }}">
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
@@ -198,7 +202,9 @@
                 </table>
                 <div class="col-xs-12" id="div_driver_3" style="text-align: center; padding-left: 15px; padding-right: 15px; display: none;">
                     <p style="font-size: 20px; font-weight: bold; color: green;">Success!</p>
-                    <span style="font-size: 18px; color: green;">Success Input Data<br>データの入力に成功しました</span>
+                    <span style="font-size: 18px; color: black;">Success Input Data</span>
+                    <br>
+                    <span style="font-size: 18px; color: #605ca8;">データの入力に成功しました</span>
                 </div>
             <?php } ?>
         </div>
@@ -343,7 +349,7 @@
 
         function submitOtp() {
             $('#loading').show();
-            var real_otp = '{{ $japanese->driver_otp }}';
+            var real_otp = $('#real_otp').val();
             var otp = $('#otp').val();
             if (otp == '') {
                 $('#loading').hide();
