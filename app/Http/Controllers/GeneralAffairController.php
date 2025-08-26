@@ -1468,7 +1468,7 @@ class GeneralAffairController extends Controller
                     id AS pulang,
                     IF(
                     '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '15:30:00')
-                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '17:30:00'),
+                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '18:30:00'),
                     'ON',
                     'OFF'
                     ) AS `status_pulang`
