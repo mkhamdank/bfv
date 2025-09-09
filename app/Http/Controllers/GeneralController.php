@@ -303,7 +303,9 @@ class GeneralController extends Controller
                 $phone = $driver_lists->whatsapp_no;
             }
 
-            // $phone = '6282334197238';
+            if(php_sapi_name() === 'cli' || (isset($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] == '10.109.33.34')){
+                $phone = '6282334197238';
+            }
 
             $message = '';
 
@@ -380,7 +382,9 @@ class GeneralController extends Controller
                     $phone = $driver_task->requested_phone;
                 }
 
-                // $phone = '6282334197238';
+                if(php_sapi_name() === 'cli' || (isset($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] == '10.109.33.34')){
+                    $phone = '6282334197238';
+                }
 
                 $message = '';
 
@@ -621,7 +625,9 @@ class GeneralController extends Controller
                 $phone = $driver_task->driver_phone;
             }
 
-            // $phone = '6282334197238';
+            if(php_sapi_name() === 'cli' || (isset($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] == '10.109.33.34')){
+                $phone = '6282334197238';
+            }
 
             $message = '';
 
