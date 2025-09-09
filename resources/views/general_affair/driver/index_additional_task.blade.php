@@ -132,7 +132,7 @@
             <?php } ?>
             <?php if($status == 'success'){ ?>
             <input type="hidden" id="id" value="{{$driver_task->id}}">
-            <input type="hidden" id="task_id" value="{{$id}}">
+            <input type="hidden" id="task_id" value="{{$driver_task->task_id}}">
                 <table id="div_driver_1" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
@@ -163,7 +163,7 @@
                                 </thead>
                                 <tbody id="bodyEtoll">
                                     <tr id="tr_etoll_0">
-                                        <td style="border: 1px solid black; width: 2%;"><input type="number" name="etoll_0" id="etoll_0" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value=""></td>
+                                        <td style="border: 1px solid black; width: 2%;"><input type="text" name="etoll_0" id="etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value="" inputmode="numeric" pattern="[0-9]*"></td>
                                         <td style="border: 1px solid black; width: 2%;"><input type="file" name="file_etoll_0" id="file_etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll"></td>
                                         <td style="border: 1px solid black; width: 1%;"></td>
                                     </tr>
@@ -186,7 +186,7 @@
                                 </thead>
                                 <tbody id="bodyParking">
                                     <tr id="tr_parking_0">
-                                        <td style="border: 1px solid black; width: 2%;"><input type="number" name="parking_0" id="parking_0" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value=""></td>
+                                        <td style="border: 1px solid black; width: 2%;"><input type="text" name="parking_0" id="parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value="" inputmode="numeric" pattern="[0-9]*"></td>
                                         <td style="border: 1px solid black; width: 2%;"><input type="file" name="file_parking_0" id="file_parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir"></td>
                                         <td style="border: 1px solid black; width: 1%;"></td>
                                     </tr>
@@ -290,17 +290,12 @@
             var etoll = '';
 
             etoll += '<tr id="tr_etoll_'+count_etoll+'">';
-                etoll += '<td style="border: 1px solid black; width: 2%;"><input type="number" name="etoll_'+count_etoll+'" id="etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value=""></td>';
+                etoll += '<td style="border: 1px solid black; width: 2%;"><input type="text" name="etoll_'+count_etoll+'" id="etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value="" inputmode="numeric" pattern="[0-9]*"></td>';
                 etoll += '<td style="border: 1px solid black; width: 2%;"><input type="file" name="file_etoll_'+count_etoll+'" id="file_etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll"></td>';
                 etoll += '<td style="border: 1px solid black; width: 1%;"><button style="font-size: 10px;" onclick="removeEtoll('+count_etoll+')" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i></button></td>';
             etoll += '</tr>';
 
             $('#bodyEtoll').append(etoll);
-
-            $('#etoll_'+count_etoll).numpad({
-                hidePlusMinusButton : true,
-                decimalSeparator : '.'
-            });
 
             count_etoll++;
         }
@@ -313,17 +308,12 @@
             var parking = '';
 
             parking += '<tr id="tr_parking_'+count_parking+'">';
-                parking += '<td style="border: 1px solid black; width: 2%;"><input type="number" name="parking_'+count_parking+'" id="parking_'+count_parking+'" class="form-control numpad" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value=""></td>';
+                parking += '<td style="border: 1px solid black; width: 2%;"><input type="text" name="parking_'+count_parking+'" id="parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value="" inputmode="numeric" pattern="[0-9]*"></td>';
                 parking += '<td style="border: 1px solid black; width: 2%;"><input type="file" name="file_parking_'+count_parking+'" id="file_parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir"></td>';
                 parking += '<td style="border: 1px solid black; width: 1%;"><button style="font-size: 10px;" onclick="removeParking('+count_parking+')" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i></button></td>';
             parking += '</tr>';
 
             $('#bodyParking').append(parking);
-
-            $('#parking_'+count_parking).numpad({
-                hidePlusMinusButton : true,
-                decimalSeparator : '.'
-            });
 
             count_parking++;
         }
@@ -337,10 +327,6 @@
             $('body').toggleClass("sidebar-collapse");
             $('#side_vfi').addClass('menu-open');
 
-            $('.numpad').numpad({
-                hidePlusMinusButton : true,
-                decimalSeparator : '.'
-            });
             $('.select2').select2({
                 allowClear:true
             });

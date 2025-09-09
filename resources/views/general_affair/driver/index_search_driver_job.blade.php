@@ -25,8 +25,27 @@
             <span style="font-size: 18px; color: #605ca8;">{{$message_jp}}</span>
 		<?php } ?>
 
-        <?php if ($status == 'success') {
-            $redirect_link = "https://new.bridgeforvendor.com/public/index/confirmation/driver/job/".base64_encode($driver_task->task_id) ?>
+        <?php if ($status == 'success_found') {
+            $redirect_link = url('')."/index/confirmation/driver/job/".base64_encode($driver_task->task_id) ?>
+            <div id="redirect-loading" style="margin-top: 30px;">
+                <span style="font-size: 32px; color: #605ca8;">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </span>
+                <p style="font-size: 18px; color: black; font-weight: bold;">
+                Redirecting, please wait...
+                </p>
+                <p style="font-size: 18px; color: #605ca8; font-weight: bold;">
+                    リダイレクト中です。お待ちください...
+                </p>
+            </div>
+            <script>
+                setTimeout(function() {
+                    window.location.href = "{{ $redirect_link }}";
+                }, 1500);
+            </script>
+		<?php } ?>
+        <?php if ($status == 'success_not_found') {
+            $redirect_link = url('')."/index/confirmation/driver/daily_job/".$id ?>
             <div id="redirect-loading" style="margin-top: 30px;">
                 <span style="font-size: 32px; color: #605ca8;">
                     <i class="fa fa-spinner fa-spin"></i>

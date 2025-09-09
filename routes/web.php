@@ -19,6 +19,7 @@ Route::get('/', function () {
     // return('Hello World');
     return redirect()->route('login');
 });
+Route::get('cek_nas', 'App\Http\Controllers\TrialController@check_ftp');
 
 // tes
 
@@ -599,10 +600,18 @@ Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairCon
 Route::post('input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
 // Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralController@closureDriverJob');
 Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@searchDriverJob');
+
 Route::get('index/confirmation/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
 Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
+
 Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverJob');
 Route::post('input/additional/driver/job', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJob');
+
+Route::get('index/confirmation/driver/daily_job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverDailyJob');
+Route::post('input/confirmation/driver/daily_job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverDailyJob');
+
+Route::get('index/additional/driver/daily_job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverDailyJob');
+Route::post('input/additional/driver/daily_job', 'App\Http\Controllers\GeneralController@inputAdditionalDriverDailyJob');
 
 Route::get('index/driver/job/urgent', 'App\Http\Controllers\GeneralAffairController@indexDriverJobUrgent');
 // Route::post('input/driver/job/urgent', 'App\Http\Controllers\GeneralAffairController@inputDriverJobUrgent');
@@ -625,3 +634,32 @@ Route::get('vendor_holiday', 'App\Http\Controllers\PoConfirmationController@inde
 Route::get('index/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@indexPassengerAttendance');
 Route::get('fetch/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@fetchPassengerAttendance');
 Route::post('input/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@inputPassengerAttendance');
+
+// Form Diagnosa Molding
+Route::get('index/diagnose_molding/molding_list', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseList')->name('user.molding_list');
+Route::get('fetch/diagnose_molding/molding_list', 'App\Http\Controllers\MoldingController@fetchMoldingDiagnoseList');
+Route::get('index/diagnose_molding/molding_form/{asset_number?}', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseFormList')->name('user.molding_form');
+Route::get('generate/diagnose_molding/mold_product_check/new', 'App\Http\Controllers\MoldingController@generateMoldProductCheckNew');
+Route::get('fetch/diagnose_molding/molding_form', 'App\Http\Controllers\MoldingController@fetchMoldingDiagnoseFormList');
+Route::get('index/diagnose_molding/mold_product_check/create/{form_number?}', 'App\Http\Controllers\MoldingController@indexMoldProductCheckCreate');
+Route::post('upload/diagnose_molding/product_image', 'App\Http\Controllers\MoldingController@uploadProductImage');  
+Route::get('fetch/diagnose_molding/product/check_list', 'App\Http\Controllers\MoldingController@fetchProductCheckList');
+Route::post('upload/diagnose_molding/photo_ng', 'App\Http\Controllers\MoldingController@uploadPhotoNg');
+Route::get('fetch/diagnose_molding/product_details', 'App\Http\Controllers\MoldingController@fetchProductNg');
+Route::post('delete/diagnose_molding/product_ng', 'App\Http\Controllers\MoldingController@deleteProductNg');
+Route::post('save/diagnose_molding/product_check', 'App\Http\Controllers\MoldingController@saveProductCheck');
+Route::get('index/diagnose_molding/mold_molding_check/create/{form_number?}', 'App\Http\Controllers\MoldingController@indexMoldMoldingCheckCreate');
+Route::post('save/diagnose_molding/mold_molding_check', 'App\Http\Controllers\MoldingController@saveMoldMoldingCheck');
+Route::post('save/diagnose_molding/product_check_real', 'App\Http\Controllers\MoldingController@saveProductCheckReal');
+Route::get('index/diagnose_molding/evaluation/edit/{form_number}', 'App\Http\Controllers\MoldingController@indexEvaluationEdit');
+Route::post('save/diagnose_molding/evaluation', 'App\Http\Controllers\MoldingController@saveEvaluation');
+
+Route::get('index/diagnose_molding/mold_product_check/report/{form_number}', 'App\Http\Controllers\MoldingController@indexMoldProductReport');
+// Route::get('index/diagnose_molding/mold_product_check/report/{form_number}', 'App\Http\Controllers\MoldingController@MoldProductReport');
+Route::get('index/diagnose_molding/mold_product_check/report_ng/{form_number}', 'App\Http\Controllers\MoldingController@indexMoldProductReportNg');
+Route::get('index/diagnose_molding/mold_molding_check/report/{form_number}', 'App\Http\Controllers\MoldingController@indexMoldMoldingReport');
+Route::get('index/diagnose_molding/mold_molding_check/report_ng/{form_number}', 'App\Http\Controllers\MoldingController@indexMoldMoldingReportNg');
+Route::get('index/diagnose_molding/evaluation/report/{form_number}', 'App\Http\Controllers\MoldingController@indexEvaluationReport');
+
+Route::post('update/diagnose_molding/shot', 'App\Http\Controllers\MoldingController@updateShot');
+Route::get('fetch/diagnose_molding/shot_list', 'App\Http\Controllers\MoldingController@fetchShotList');

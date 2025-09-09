@@ -188,25 +188,174 @@ class GeneralController extends Controller
         ->where('plat_no',$plat_no)
         ->where('remark','japanese')
         ->where('closure_status','driver')
-        ->orderby('id','desc')
+        ->whereDate('date_from','<=',date('Y-m-d'))
+        ->orderby('id','asc')
         ->first();
 
         if($driver_task){
             return view('general_affair.driver.index_search_driver_job')
             ->with('driver_task',$driver_task)
             ->with('id',$id)
-            ->with('status','success')
+            ->with('plat_no',$plat_no)
+            ->with('status','success_found')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')
             ->with('message','Konfirmasi Driver Order')
             ->with('message_jp','ドライバー注文の確認');
         }else{
             return view('general_affair.driver.index_search_driver_job')
-            ->with('status','error')
-            ->with('title','Konfirmasi Driver Order')
-            ->with('title_jp','ドライバー注文の確認')
-            ->with('message','Driver Order telah Anda dikonfirmasi')
-            ->with('message_jp','車両のリクエストが確認されました');
+            ->with('status','success_not_found')
+            ->with('id',$id)
+            ->with('plat_no',$plat_no)
+            ->with('title','Konfirmasi Daily Driver Task')
+            ->with('title_jp','日次ドライバータスクの確認')
+            ->with('message','Konfirmasi Daily Driver Task')
+            ->with('message_jp','日次ドライバータスクの確認');
+        }
+    }
+
+    function indexConfirmationDriverDailyJob($id) {
+        $plat_no = base64_decode($id);
+
+        $driver_lists = DB::table('driver_lists')
+        ->where('plat_no',$plat_no)
+        ->first();
+
+        $japanese = null;
+
+        if($driver_lists){
+            $japanese = DB::table('japaneses')
+            ->where('employee_id',$driver_lists->passenger_id)
+            ->first();
+        }
+
+        $attendance = null;
+        if($driver_lists){
+            $attendance = DB::table('attendances')
+            ->where('employee_id',$driver_lists->driver_id)
+            ->whereDate('datetime',date('Y-m-d'))
+            ->first();
+        }
+
+        return view('general_affair.driver.index_confirm_daily_task')
+        ->with('id',$id)
+        ->with('plat_no',$plat_no)
+        ->with('driver_lists',$driver_lists)
+        ->with('japanese',$japanese)
+        ->with('attendance',$attendance)
+        ->with('status','success')
+        ->with('title','Konfirmasi Daily Driver Task')
+        ->with('title_jp','日次ドライバータスクの確認')
+        ->with('message','Konfirmasi Daily Driver Task')
+        ->with('message_jp','日次ドライバータスクの確認');
+    }
+
+    function inputConfirmationDriverDailyJob(Request $request)
+    {
+        try {
+            $hour_start = $request->get('hour_start');
+            $hour_end = $request->get('hour_end');
+            $date = $request->get('date');
+            $id = $request->get('id');
+            $plat_no = $request->get('plat_no');
+            $driver_list_id = $request->get('driver_list_id');
+            $japanese_id = $request->get('japanese_id');
+
+            $driver_lists = DB::table('driver_lists')
+            ->where('id',$driver_list_id)
+            ->first();
+
+            $japanese = DB::table('japaneses')
+            ->where('id',$japanese_id)
+            ->first();
+
+            $task_id = 'Daily_' . date('Ymd');
+            $insert_driver_task = DB::table('driver_tasks')
+            ->insertGetId([
+                'task_id' => $task_id,
+                'created_by_id' => $japanese->employee_id,
+                'created_by_name' => $japanese->employee_name,
+                'driver_id' => $driver_lists->driver_id,
+                'driver_name' => $driver_lists->driver_name,
+                'driver_phone' => $driver_lists->whatsapp_no,
+                'plat_no' => $plat_no,
+                'car' => $driver_lists->car,
+                'date_from' => $date.' '.$hour_start.':00',
+                'date_to' => $date.' '.$hour_end.':00',
+                'purpose' => 'Pekerjaan',
+                'remark' => 'daily_japanese',
+                'requested_id' => $japanese->employee_id,
+                'requested_name' => $japanese->employee_name,
+                'closure_status' => 'daily_japanese',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            if(substr($driver_lists->whatsapp_no, 0, 1) == '+' ){
+                $phone = substr($driver_lists->whatsapp_no, 1, 15);
+            }
+            else if(substr($driver_lists->whatsapp_no, 0, 1) == '0'){
+                $phone = "62".substr($driver_lists->whatsapp_no, 1, 15);
+            }
+            else{
+                $phone = $driver_lists->whatsapp_no;
+            }
+
+            $phone = '6282334197238';
+
+            $message = '';
+
+            $message .= "_*DRIVER ORDER*_\\n";
+            $message .= "\\nTugas Anda telah dikonfirmasi.\\n";
+            $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
+            $link = url('') . '/index/additional/driver/daily_job/'.$insert_driver_task;
+            $message .= $link . "\\n";
+            $message .= "\\nAbaikan jika tidak ada biaya tambahan.\\n";
+            $message .= "\\n-YMPI GA Dept.-";
+
+            $fuel_actual_after = 0;
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.whatspie.com/messages',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => '{
+                "device": "6281130561777",
+                "receiver": "' . $phone . '",
+                "type": "chat",
+                "message": "' . $message . '",
+                "simulate_typing": 1
+            }',
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
+                ),
+            ));
+            curl_exec($curl);
+
+            curl_close($curl);
+
+            $response = array(
+                'status' => true,
+                'message' => 'Success Input Data (データの入力に成功しました)'
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
         }
     }
 
@@ -239,7 +388,7 @@ class GeneralController extends Controller
                 $message .= "運転手がタスクを完了しました。\\n";
                 $message .= "\\nKlik tautan di bawah untuk input data.\\n";
                 $message .= "以下のリンクをクリックしてデータを入力してください。\\n\\n";
-                $link = 'https://new.bridgeforvendor.com/public/index/confirmation/driver/job/'.$id;
+                $link = url('').'/index/confirmation/driver/job/'.$id;
                 $message .= $link . "\\n";
                 $message .= "\\n-YMPI GA Dept.-";
 
@@ -475,7 +624,7 @@ class GeneralController extends Controller
             $message .= "_*DRIVER ORDER*_\\n";
             $message .= "\\nTugas Anda telah dikonfirmasi.\\n";
             $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
-            $link = 'https://new.bridgeforvendor.com/public/index/additional/driver/job/'.$task_id;
+            $link = url('') . '/index/additional/driver/job/'.$task_id;
             $message .= $link . "\\n";
             $message .= "\\nAbaikan jika tidak ada biaya tambahan.\\n";
             $message .= "\\n-YMPI GA Dept.-";
@@ -651,6 +800,32 @@ class GeneralController extends Controller
                 'message' => $e->getMessage()
             );
             return Response::json($response);
+        }
+    }
+
+    function indexAdditionalDriverDailyJob($id)
+    {
+        $driver_task = DB::table('driver_tasks')
+        ->where('id',$id)
+        ->where('closure_status','daily_japanese')
+        ->first();
+
+        if($driver_task){
+            return view('general_affair.driver.index_additional_task')
+            ->with('driver_task',$driver_task)
+            ->with('id',$id)
+            ->with('status','success')
+            ->with('title','Tambahan Biaya Driver')
+            ->with('title_jp','')
+            ->with('message','Tambahan Biaya Driver')
+            ->with('message_jp','');
+        }else{
+            return view('general_affair.driver.index_additional_task')
+            ->with('status','error')
+            ->with('title','Tambahan Biaya Driver')
+            ->with('title_jp','')
+            ->with('message','Tambahan biaya sudah diinput.')
+            ->with('message_jp','');
         }
     }
 }

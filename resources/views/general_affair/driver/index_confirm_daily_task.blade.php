@@ -134,10 +134,18 @@
             </div>
             <?php } ?>
             <?php if($status == 'success'){ ?>
-                <input type="hidden" id="id" value="{{$driver_task->id}}">
-                <input type="hidden" id="task_id" value="{{$id}}">
-                <input type="hidden" id="real_otp" value="{{ $japanese->driver_otp }}">
+                <input type="hidden" id="id" value="{{$id}}">
+                <input type="hidden" id="plat_no" value="{{$plat_no}}">
+                <input type="hidden" id="driver_list_id" value="{{$driver_lists->id}}">
+                <input type="hidden" id="japanese_id" value="{{$japanese->id}}">
+                <input type="hidden" id="real_otp" value="{{$japanese->driver_otp}}">
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
+                    <tr>
+                        <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>User <small style="color: #605ca8;">(ユーザー)</small></label>
+                            <input type="text" name="user" id="user" class="form-control" style="width: 100%; text-align: center;" placeholder="User" readonly="" value="{{ $driver_lists->passenger_category }}">
+                        </td>
+                    </tr>
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Masukkan PIN <small style="color: #605ca8;">(PINを入力してください)</small></label>
@@ -156,13 +164,13 @@
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Driver <small style="color: #605ca8;">(運転手の名前)</small></label>
-                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_task->driver_name}}">
+                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_lists->driver_name}}">
                         </td>
                     </tr>
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Tanggal <small style="color: #605ca8;">(日付 )</small></label>
-                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Destination" readonly="" value="{{date('Y-m-d',strtotime($driver_task->date_from))}}">
+                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Tanggal" readonly="" value="{{ date('Y-m-d') }}">
                         </td>
                     </tr>
                 </table>
@@ -181,8 +189,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($driver_task->date_from))}}"></td>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($driver_task->date_from))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($attendance->datetime))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($attendance->datetime))}}"></td>
                                     <td style="padding-left: 5px; padding-right: 5px; font-weight: bold;">
                                         -
                                     </td>
@@ -320,10 +328,12 @@
             formData.append('hour_end',$('#hour_end').val());
             formData.append('date',$('#date').val());
             formData.append('id',$('#id').val());
-            formData.append('task_id',$('#task_id').val());
+            formData.append('plat_no',$('#plat_no').val());
+            formData.append('driver_list_id',$('#driver_list_id').val());
+            formData.append('japanese_id',$('#japanese_id').val());
 
             $.ajax({
-                url:"{{ url('input/confirmation/driver/job') }}",
+                url:"{{ url('input/confirmation/driver/daily_job') }}",
                 method:"POST",
                 data:formData,
                 dataType:'JSON',
