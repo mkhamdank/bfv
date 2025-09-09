@@ -25,7 +25,7 @@ Route::get('cek_nas', 'App\Http\Controllers\TrialController@check_ftp');
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 //WPOS
 Route::get('wpos', 'App\Http\Controllers\VendorController@wpos');
 Route::post('post/wpos', 'App\Http\Controllers\VendorController@inputWpos');
@@ -62,11 +62,13 @@ Route::get('testmail', 'App\Http\Controllers\TrialController@testmail');
 
 Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
     Route::get('/', 'DashboardController@index')->name('admin.dashboard');
+    Route::get('/home', 'DashboardController@index')->name('admin.dashboard');
 
     // route group prefix admin/role
     Route::group(['prefix' => 'role'], function () {
 
         Route::get('/', 'RoleController@index')->name('admin.role.index');
+        Route::get('/home', 'RoleController@index')->name('admin.role.index');
         Route::get('/create', 'RoleController@create')->name('admin.role.create');
         Route::post('/store', 'RoleController@store')->name('admin.role.store');
         Route::get('/show/{id}', 'RoleController@show')->name('admin.role.show');
@@ -80,6 +82,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::group(['prefix' => 'permission'], function () {
 
         Route::get('/', 'PermissionController@index')->name('admin.permission.index');
+        Route::get('/home', 'PermissionController@index')->name('admin.permission.index');
         Route::get('/create', 'PermissionController@create')->name('admin.permission.create');
         Route::post('/store', 'PermissionController@store')->name('admin.permission.store');
         Route::get('/show/{id}', 'PermissionController@show')->name('admin.permission.show');
@@ -93,6 +96,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::group(['prefix' => 'user', 'middleware' => ['can:view users']], function () {
 
         Route::get('/', 'UserController@index')->name('admin.user.index');
+        Route::get('/home', 'UserController@index')->name('admin.user.index');
         Route::get('/create', 'UserController@create')->name('admin.user.create');
         Route::post('/store', 'UserController@store')->name('admin.user.store');
         Route::get('/show/{id}', 'UserController@show')->name('admin.user.show');
@@ -110,6 +114,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::group(['prefix' => 'vfi'], function () {
 
         Route::get('/', 'VFIController@index')->name('admin.vfi.index');
+        Route::get('/home', 'VFIController@index')->name('admin.vfi.index');
 
         Route::get('index/true', 'VFIController@indexVFITrue');
         Route::post('input/true', 'VFIController@inputVFITrue')->name('admin.vfi.input_true');
@@ -505,7 +510,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
         Route::get('index/warehouse', 'AccountingController@indexWarehouse');
     });
 
-    Route::get('/home', ['middleware' => 'permission', 'nav' => 'Dashboard', 'uses' => 'HomeController@index'])->name('home');
+    // Route::get('/home', ['middleware' => 'permission', 'nav' => 'Dashboard', 'uses' => 'HomeController@index'])->name('home');
 
     Route::get('pdf', 'TrialController@trialPdf');
 
