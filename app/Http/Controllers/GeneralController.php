@@ -255,6 +255,8 @@ class GeneralController extends Controller
         try {
             $hour_start = $request->get('hour_start');
             $hour_end = $request->get('hour_end');
+            $minute_start = $request->get('minute_start');
+            $minute_end = $request->get('minute_end');
             $date = $request->get('date');
             $id = $request->get('id');
             $plat_no = $request->get('plat_no');
@@ -280,8 +282,8 @@ class GeneralController extends Controller
                 'driver_phone' => $driver_lists->whatsapp_no,
                 'plat_no' => $plat_no,
                 'car' => $driver_lists->car,
-                'date_from' => $date.' '.$hour_start.':00',
-                'date_to' => $date.' '.$hour_end.':00',
+                'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
+                'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
                 'purpose' => 'Pekerjaan',
                 'remark' => 'daily_japanese',
                 'requested_id' => $japanese->employee_id,
@@ -590,6 +592,8 @@ class GeneralController extends Controller
         try {
             $hour_start = $request->get('hour_start');
             $hour_end = $request->get('hour_end');
+            $minute_start = $request->get('minute_start');
+            $minute_end = $request->get('minute_end');
             $date = $request->get('date');
             $id = $request->get('id');
             $task_id = $request->get('task_id');
@@ -601,8 +605,8 @@ class GeneralController extends Controller
             $update_driver_task = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
-                'date_from' => $date.' '.$hour_start.':00',
-                'date_to' => $date.' '.$hour_end.':00',
+                'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
+                'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
                 'closure_status' => 'japanese',
                 'updated_at' => date('Y-m-d H:i:s')
             ]);

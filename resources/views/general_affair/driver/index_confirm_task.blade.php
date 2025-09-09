@@ -318,6 +318,8 @@
             var formData = new FormData();
             formData.append('hour_start',$('#hour_start').val());
             formData.append('hour_end',$('#hour_end').val());
+            formData.append('minute_start',$('#minute_start').val());
+            formData.append('minute_end',$('#minute_end').val());
             formData.append('date',$('#date').val());
             formData.append('id',$('#id').val());
             formData.append('task_id',$('#task_id').val());
