@@ -128,7 +128,7 @@
             <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
                 {{-- <p style="font-size: 20px; font-weight: bold; color: green;">Success!</p> --}}
                 <br>
-                <span style="font-size: 18px; color: #000;">{{$message}}</span>
+                <span style="font-size: 18px; color: red;">{{$message}}</span>
                 <br>
                 <span style="font-size: 18px; color: #605ca8;">{{$message_jp}}</span>
             </div>
@@ -164,7 +164,7 @@
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Driver <small style="color: #605ca8;">(運転手の名前)</small></label>
-                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_lists->driver_name}}">
+                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{ $driver_lists->driver_name }}">
                         </td>
                     </tr>
                     <tr>
@@ -189,8 +189,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($attendance->datetime))}}"></td>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($attendance->datetime))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($timestamp_attendance))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($timestamp_attendance))}}"></td>
                                     <td style="padding-left: 5px; padding-right: 5px; font-weight: bold;">
                                         -
                                     </td>
@@ -293,6 +293,7 @@
 
         
         $(document).ready(function() {
+            $('#toggle-sidebar').hide();
 
             $('body').toggleClass("sidebar-collapse");
             $('#side_vfi').addClass('menu-open');

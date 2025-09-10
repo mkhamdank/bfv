@@ -222,7 +222,6 @@ class GeneralController extends Controller
         ->first();
 
         $japanese = null;
-
         if($driver_lists){
             $japanese = DB::table('japaneses')
             ->where('employee_id',$driver_lists->passenger_id)
@@ -230,11 +229,32 @@ class GeneralController extends Controller
         }
 
         $attendance = null;
+        $timestamp_attendance = date('Y-m-d').' 05:00:00';
         if($driver_lists){
             $attendance = DB::table('attendances')
             ->where('employee_id',$driver_lists->driver_id)
             ->whereDate('datetime',date('Y-m-d'))
             ->first();
+            if($attendance){
+                $timestamp_attendance = $attendance->datetime;
+            }
+        }
+        if(!$japanese){
+            return view('general_affair.driver.index_confirm_daily_task')
+            ->with('status','error')
+            ->with('title','Konfirmasi Daily Driver Task')
+            ->with('title_jp','日次ドライバータスクの確認')
+            ->with('message','User Not Detected')
+            ->with('message_jp','ユーザーが検出されませんでした');
+        }
+
+        if(!$driver_lists){
+            return view('general_affair.driver.index_confirm_daily_task')
+            ->with('status','error')
+            ->with('title','Konfirmasi Daily Driver Task')
+            ->with('title_jp','日次ドライバータスクの確認')
+            ->with('message','Driver Not Detected')
+            ->with('message_jp','ドライバーが検出されませんでした');
         }
 
         return view('general_affair.driver.index_confirm_daily_task')
@@ -243,6 +263,7 @@ class GeneralController extends Controller
         ->with('driver_lists',$driver_lists)
         ->with('japanese',$japanese)
         ->with('attendance',$attendance)
+        ->with('timestamp_attendance',$timestamp_attendance)
         ->with('status','success')
         ->with('title','Konfirmasi Daily Driver Task')
         ->with('title_jp','日次ドライバータスクの確認')

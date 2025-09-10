@@ -285,6 +285,7 @@
 
         
         $(document).ready(function() {
+            $('#toggle-sidebar').hide();
 
             $('body').toggleClass("sidebar-collapse");
             $('#side_vfi').addClass('menu-open');
