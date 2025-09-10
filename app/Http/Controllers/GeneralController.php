@@ -186,7 +186,7 @@ class GeneralController extends Controller
         $plat_no = base64_decode($id);
         $driver_task = DB::table('driver_tasks')
         ->where('plat_no',$plat_no)
-        ->where('remark','japanese')
+        ->whereIn('remark',['japanese','reguler'])
         ->where('closure_status','driver')
         ->whereDate('date_from','<=',date('Y-m-d'))
         ->orderby('id','asc')
