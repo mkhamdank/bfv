@@ -136,7 +136,7 @@
             <?php if($status == 'success'){ ?>
                 <input type="hidden" id="id" value="{{$driver_task->id}}">
                 <input type="hidden" id="task_id" value="{{$id}}">
-                <input type="hidden" id="real_otp" value="{{ $japanese->driver_otp }}">
+                <input type="hidden" id="real_otp" value="{{ $driver_otp }}">
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
@@ -356,7 +356,7 @@
             var otp = $('#otp').val();
             if (otp == '') {
                 $('#loading').hide();
-                openErrorGritter('Error!', '(PINは空にできません)');
+                openErrorGritter('Error!', '(PINは空にできません) PIN Harus Diisi!');
                 $('#otp').val('');
                 $('#otp').focus();
                 audio_error.play();
@@ -364,7 +364,7 @@
             }
             if (otp != real_otp) {
                 $('#loading').hide();
-                openErrorGritter('Error!', '(PINは一致しません)');
+                openErrorGritter('Error!', '(PINは一致しません) PIN Tidak Sesuai!');
                 $('#otp').val('');
                 $('#otp').focus();
                 audio_error.play();

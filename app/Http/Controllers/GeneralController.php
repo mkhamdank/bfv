@@ -586,10 +586,16 @@ class GeneralController extends Controller
         ->first();
 
         $japanese = null;
+        $driver_otp = '123456';
         if($driver_task){
             $japanese = DB::table('japaneses')
             ->where('employee_id',$driver_task->requested_id)
             ->first();
+            if($japanese){
+                $driver_otp = $japanese->driver_otp;
+            }else{
+                $driver_otp = $driver_task->token;
+            }
         }
 
         if($driver_task){
@@ -597,6 +603,7 @@ class GeneralController extends Controller
             ->with('driver_task',$driver_task)
             ->with('id',$id)
             ->with('japanese',$japanese)
+            ->with('driver_otp',$driver_otp)
             ->with('status','success')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')
