@@ -370,6 +370,38 @@ class GeneralController extends Controller
 
             curl_close($curl);
 
+            $phone = '6282334197238';
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.whatspie.com/messages',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => '{
+                "device": "6281130561777",
+                "receiver": "' . $phone . '",
+                "type": "chat",
+                "message": "' . $message . '",
+                "simulate_typing": 1
+            }',
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
+                ),
+            ));
+            curl_exec($curl);
+
+            curl_close($curl);
+
             $response = array(
                 'status' => true,
                 'message' => 'Success Input Data (データの入力に成功しました)'
@@ -699,6 +731,38 @@ class GeneralController extends Controller
 
             curl_close($curl);
 
+            $phone = '6282334197238';
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.whatspie.com/messages',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => '{
+                "device": "6281130561777",
+                "receiver": "' . $phone . '",
+                "type": "chat",
+                "message": "' . $message . '",
+                "simulate_typing": 1
+            }',
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
+                ),
+            ));
+            curl_exec($curl);
+
+            curl_close($curl);
+
             $response = array(
                 'status' => true,
                 'message' => 'Success Input Data (データの入力に成功しました)'
@@ -754,15 +818,23 @@ class GeneralController extends Controller
 
                 $data_foto = null;
 
-                for ($i = 0; $i < count($request->file('file_etoll')); ++$i) {
+                for ($i = 0; $i < count($request->get('file_etoll')); ++$i) {
                     $tujuan_upload = 'images/driver/japanese/additional';
 
-                    $file_etoll = $request->file('file_etoll')[$i];
-                    $nama_foto = $file_etoll->getClientOriginalName();
-                    $extension_foto = pathinfo($nama_foto, PATHINFO_EXTENSION);
-                    $filename_foto = 'Foto Etoll '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto;
-                    $file_etoll->move($tujuan_upload,$filename_foto);
-                    $data_foto[]=$filename_foto;
+                    // $file_etoll = $request->file('file_etoll')[$i];
+                    // $nama_foto = $file_etoll->getClientOriginalName();
+                    // $extension_foto = pathinfo($nama_foto, PATHINFO_EXTENSION);
+                    // $filename_foto = 'Foto Etoll '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto;
+                    // $file_etoll->move($tujuan_upload,$filename_foto);
+                    // $data_foto[]=$filename_foto;
+
+                    $file_etoll = $request->get('file_etoll')[$i];
+                    $file_etoll1 = explode(',', $file_etoll)[1];
+                    $file_etoll1 = str_replace(' ', '+', $file_etoll1);
+                    $data = base64_decode($file_etoll1);
+                    $file_etoll_name = 'Foto Etoll '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].png';
+                    file_put_contents($tujuan_upload.'/'.$file_etoll_name, $data);
+                    $data_foto[]=$file_etoll_name;
                 }
                 $file_upload_foto_etoll = join(',',$data_foto);
 
@@ -790,15 +862,23 @@ class GeneralController extends Controller
 
                 $data_foto = null;
 
-                for ($i = 0; $i < count($request->file('file_parking')); ++$i) {
+                for ($i = 0; $i < count($request->get('file_parking')); ++$i) {
                     $tujuan_upload = 'images/driver/japanese/additional';
 
-                    $file_parking = $request->file('file_parking')[$i];
-                    $nama_foto = $file_parking->getClientOriginalName();
-                    $extension_foto = pathinfo($nama_foto, PATHINFO_EXTENSION);
-                    $filename_foto = 'Foto Parkir '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto;
-                    $file_parking->move($tujuan_upload,$filename_foto);
-                    $data_foto[]=$filename_foto;
+                    // $file_parking = $request->file('file_parking')[$i];
+                    // $nama_foto = $file_parking->getClientOriginalName();
+                    // $extension_foto = pathinfo($nama_foto, PATHINFO_EXTENSION);
+                    // $filename_foto = 'Foto Parkir '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto;
+                    // $file_parking->move($tujuan_upload,$filename_foto);
+                    // $data_foto[]=$filename_foto;
+
+                    $file_parking = $request->get('file_parking')[$i];
+                    $file_parking1 = explode(',', $file_parking)[1];
+                    $file_parking1 = str_replace(' ', '+', $file_parking1);
+                    $data = base64_decode($file_parking1);
+                    $file_parking_name = 'Foto Parkir '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].png';
+                    file_put_contents($tujuan_upload.'/'.$file_parking_name, $data);
+                    $data_foto[]=$file_parking_name;
                 }
                 $file_upload_foto_parking = join(',',$data_foto);
 

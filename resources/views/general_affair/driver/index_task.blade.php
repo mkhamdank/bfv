@@ -288,45 +288,69 @@
 <script src="{{ url("js/jquery.gritter.min.js") }}"></script>
     <script>
         function readURL(input) {
-          if (input.files && input.files[0]) {
+        if (input.files && input.files[0]) {
             var reader = new FileReader();
-
             reader.onload = function (e) {
-              $('#blah').show();
-              $('#blah')
-              .attr('src', e.target.result);
+                var img = new Image();
+                img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    // Kompres ke 50% kualitas
+                    var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+                    $('#blah').show();
+                    $('#blah').attr('src', compressedDataUrl);
+                };
+                img.src = e.target.result;
             };
-
             reader.readAsDataURL(input.files[0]);
-          }
+        }
         }
 
         function readURLOdoBefore(input) {
-          if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-              $('#blahOdoBefore').show();
-              $('#blahOdoBefore')
-              .attr('src', e.target.result);
-            };
-
-            reader.readAsDataURL(input.files[0]);
-          }
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        // Kompres ke 50% kualitas
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+                        $('#blahOdoBefore').show();
+                        $('#blahOdoBefore').attr('src', compressedDataUrl);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function readURLOdoAfter(input) {
-          if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-              $('#blahOdoAfter').show();
-              $('#blahOdoAfter')
-              .attr('src', e.target.result);
-            };
-
-            reader.readAsDataURL(input.files[0]);
-          }
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        var ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        // Kompres ke 50% kualitas
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+                        $('#blahOdoAfter').show();
+                        $('#blahOdoAfter').attr('src', compressedDataUrl);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
         function changeFuelType(fuel_type) {
@@ -515,9 +539,14 @@
             fileDataOdoAfter = $('#fileDataOdoAfter').prop('files')[0];
 
             var formData = new FormData();
-            formData.append('fileData', fileData);
-            formData.append('fileDataOdoBefore', fileDataOdoBefore);
-            formData.append('fileDataOdoAfter', fileDataOdoAfter);
+            // Ambil data dari hasil kompres gambar
+            var notaCompressed = $('#blah').attr('src');
+            var odoBeforeCompressed = $('#blahOdoBefore').attr('src');
+            var odoAfterCompressed = $('#blahOdoAfter').attr('src');
+
+            formData.append('fileData', notaCompressed);
+            formData.append('fileDataOdoBefore', odoBeforeCompressed);
+            formData.append('fileDataOdoAfter', odoAfterCompressed);
             formData.append('latitude',$('#latitude').val());
             formData.append('longitude',$('#longitude').val());
             formData.append('fuel',$('#fuel').val());

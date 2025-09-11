@@ -164,7 +164,10 @@
                                 <tbody id="bodyEtoll">
                                     <tr id="tr_etoll_0">
                                         <td style="border: 1px solid black; width: 2%;"><input type="text" name="etoll_0" id="etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value="" inputmode="numeric" pattern="[0-9]*"></td>
-                                        <td style="border: 1px solid black; width: 2%;"><input type="file" name="file_etoll_0" id="file_etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll"></td>
+                                        <td style="border: 1px solid black; width: 2%;">
+                                            <input type="file" name="file_etoll_0" id="file_etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll" onchange="readURLEtoll(this,0);">
+                                            <img id="blah_etoll_0" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
+                                        </td>
                                         <td style="border: 1px solid black; width: 1%;"></td>
                                     </tr>
                                 </tbody>
@@ -187,7 +190,10 @@
                                 <tbody id="bodyParking">
                                     <tr id="tr_parking_0">
                                         <td style="border: 1px solid black; width: 2%;"><input type="text" name="parking_0" id="parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value="" inputmode="numeric" pattern="[0-9]*"></td>
-                                        <td style="border: 1px solid black; width: 2%;"><input type="file" name="file_parking_0" id="file_parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir"></td>
+                                        <td style="border: 1px solid black; width: 2%;">
+                                            <input type="file" name="file_parking_0" id="file_parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir" onchange="readURLParking(this,0);">
+                                            <img id="blah_parking_0" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
+                                        </td>
                                         <td style="border: 1px solid black; width: 1%;"></td>
                                     </tr>
                                 </tbody>
@@ -283,6 +289,58 @@
             };
         }
 
+        function readURLEtoll(input,id) {
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        // Set canvas size to 50% of original
+                        canvas.width = img.width * 0.5;
+                        canvas.height = img.height * 0.5;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        // Compress to JPEG, quality 0.7 (adjust as needed)
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        $('#blah_etoll_' + id).attr('src', compressedDataUrl);
+                        $('#blah_etoll_' + id).show();
+                    };
+                    img.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function readURLParking(input,id) {
+            if (input.files && input.files[0]) {
+                var file = input.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        // Set canvas size to 50% of original
+                        canvas.width = img.width * 0.5;
+                        canvas.height = img.height * 0.5;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        // Compress to JPEG, quality 0.7 (adjust as needed)
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        $('#blah_parking_' + id).attr('src', compressedDataUrl);
+                        $('#blah_parking_' + id).show();
+                    };
+                    img.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            }
+        }
+
         var count_etoll = 1;
         var count_parking = 1;
 
@@ -291,7 +349,10 @@
 
             etoll += '<tr id="tr_etoll_'+count_etoll+'">';
                 etoll += '<td style="border: 1px solid black; width: 2%;"><input type="text" name="etoll_'+count_etoll+'" id="etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value="" inputmode="numeric" pattern="[0-9]*"></td>';
-                etoll += '<td style="border: 1px solid black; width: 2%;"><input type="file" name="file_etoll_'+count_etoll+'" id="file_etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll"></td>';
+                etoll += '<td style="border: 1px solid black; width: 2%;">';
+                etoll += '<input type="file" name="file_etoll_'+count_etoll+'" id="file_etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll" onchange="readURLEtoll(this,'+count_etoll+');">';
+                etoll += '<img id="blah_etoll_'+count_etoll+'" src="" style="display:none; width: 100%; height: auto; border: 1px solid black;">';
+                etoll += '</td>';
                 etoll += '<td style="border: 1px solid black; width: 1%;"><button style="font-size: 10px;" onclick="removeEtoll('+count_etoll+')" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i></button></td>';
             etoll += '</tr>';
 
@@ -309,7 +370,10 @@
 
             parking += '<tr id="tr_parking_'+count_parking+'">';
                 parking += '<td style="border: 1px solid black; width: 2%;"><input type="text" name="parking_'+count_parking+'" id="parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value="" inputmode="numeric" pattern="[0-9]*"></td>';
-                parking += '<td style="border: 1px solid black; width: 2%;"><input type="file" name="file_parking_'+count_parking+'" id="file_parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir"></td>';
+                parking += '<td style="border: 1px solid black; width: 2%;">';
+                parking += '<input type="file" name="file_parking_'+count_parking+'" id="file_parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir" onchange="readURLParking(this,'+count_parking+');">';
+                parking += '<img id="blah_parking_'+count_parking+'" src="" style="display:none; width: 100%; height: auto; border: 1px solid black;">';
+                parking += '</td>';
                 parking += '<td style="border: 1px solid black; width: 1%;"><button style="font-size: 10px;" onclick="removeParking('+count_parking+')" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i></button></td>';
             parking += '</tr>';
 
@@ -352,8 +416,9 @@
                         openErrorGritter('Error!','Isikan Foto Bukti E-Toll');
                         return false;
                     }
-                    // file_etoll.push($('#file_etoll_'+i).prop('files')[0]);
-                    formData.append('file_etoll[]',$('#file_etoll_'+i).prop('files')[0]);
+                    // formData.append('file_etoll[]',$('#file_etoll_'+i).prop('files')[0]);
+                    var file_etoll = $('#blah_etoll_'+i).attr('src');
+                    formData.append('file_etoll[]', file_etoll);
                 }
             }
 
@@ -367,8 +432,9 @@
                         openErrorGritter('Error!','Isikan Foto Bukti Parkir');
                         return false;
                     }
-                    // file_parking.push($('#file_parking_'+i).prop('files')[0]);
-                    formData.append('file_parking[]',$('#file_parking_'+i).prop('files')[0]);
+                    // formData.append('file_parking[]',$('#file_parking_'+i).prop('files')[0]);
+                    var file_parking = $('#blah_parking_'+i).attr('src');
+                    formData.append('file_parking[]', file_parking);
                 }
             }
 

@@ -149,9 +149,9 @@
             <label>Fuel (Liter) <span style="color: red;">*</span></label>
             <input type="text" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Fuel" value="" >
         </div>
-        <div class="col-lg-12 col-md-12 col-sm-12" >
+        {{-- <div class="col-lg-12 col-md-12 col-sm-12" >
             <div id="map"></div>
-        </div>
+        </div> --}}
         <div class="col-lg-12 col-md-12 col-sm-12" >
             <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
                 <label style="font-size: 14px;font-weight: bold;">Foto Absensi<span style="color:red">*</span></label>
@@ -350,9 +350,23 @@ crossorigin=""></script>
 
                 reader.onload = function (e) {
                     var img = $(input).closest("div").find("img");
-                    $(img).show();
-                    $(img)
-                    .attr('src', e.target.result);
+                    var image = new Image();
+                    image.src = e.target.result;
+
+                    image.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        // Resize to 50% of original dimensions
+                        canvas.width = image.width * 0.5;
+                        canvas.height = image.height * 0.5;
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                        // Compress to JPEG with quality 0.5 (50%)
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+
+                        $(img).show();
+                        $(img).attr('src', compressedDataUrl);
+                    };
                 };
 
                 reader.readAsDataURL(input.files[0]);
@@ -365,9 +379,23 @@ crossorigin=""></script>
 
                 reader.onload = function (e) {
                     var img = $(input).closest("div").find("img");
-                    $(img).show();
-                    $(img)
-                    .attr('src', e.target.result);
+                    var image = new Image();
+                    image.src = e.target.result;
+
+                    image.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        // Resize to 50% of original dimensions
+                        canvas.width = image.width * 0.5;
+                        canvas.height = image.height * 0.5;
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                        // Compress to JPEG with quality 0.5 (50%)
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+
+                        $(img).show();
+                        $(img).attr('src', compressedDataUrl);
+                    };
                 };
 
                 reader.readAsDataURL(input.files[0]);
@@ -380,9 +408,23 @@ crossorigin=""></script>
 
                 reader.onload = function (e) {
                     var img = $(input).closest("div").find("img");
-                    $(img).show();
-                    $(img)
-                    .attr('src', e.target.result);
+                    var image = new Image();
+                    image.src = e.target.result;
+
+                    image.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        // Resize to 50% of original dimensions
+                        canvas.width = image.width * 0.5;
+                        canvas.height = image.height * 0.5;
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                        // Compress to JPEG with quality 0.5 (50%)
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', 0.5);
+
+                        $(img).show();
+                        $(img).attr('src', compressedDataUrl);
+                    };
                 };
 
                 reader.readAsDataURL(input.files[0]);
@@ -399,16 +441,6 @@ crossorigin=""></script>
         function showPosition(position) {
              $("#latitude").val(position.coords.latitude);
              $("#longitude").val(position.coords.longitude);
-        
-            var map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 13);
-
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(map);
-
-            var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(map);
-
         }
 
     function save() {
@@ -453,9 +485,14 @@ crossorigin=""></script>
         formData.append('fuel',  $('#fuel').val());
         formData.append('plat_no',  $('#vehicle').val().split('_')[0]);
         formData.append('car',  $('#vehicle').val().split('_')[1]);
-        formData.append('file_foto[]', $('#file_foto').prop('files')[0]);
-        formData.append('file_foto_odometer[]', $('#file_foto_odometer').prop('files')[0]);
-        formData.append('file_location[]', $('#file_location').prop('files')[0]);
+        // Ambil foto dari hasil kompres (src img)
+        var fotoSelfie = $('#blahsim').attr('src');
+        var fotoOdometer = $('#blahOdo').attr('src');
+        var fotoLocation = $('#blahLoc').attr('src');
+
+        formData.append('file_foto', fotoSelfie);
+        formData.append('file_foto_odometer', fotoOdometer);
+        formData.append('file_location', fotoLocation);
 
         $.ajax({
             url:"{{ url('input/driver/attendance') }}",

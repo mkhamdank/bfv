@@ -287,14 +287,11 @@ class GeneralAffairController extends Controller
         try {
             $driver_job = DB::table('driver_tasks')
             ->select('*',DB::RAW("DATE_FORMAT(date_from,'%d-%b-%Y %H:%i') as froms"),DB::RAW("DATE_FORMAT(date_to,'%d-%b-%Y %H:%i') as tos"))
-            // ->where(function ($query) {
-            //     $query->where('duty_status', '!=','completed')
-            //         ->orwhere('duty_status', null);
-            // })
             ->where('driver_id',Auth::user()->username)
             ->where('deleted_at',null)
             ->where('remark',null)
             ->where('closure_status','driver')
+            ->where(DB::RAW("DATE_FORMAT(date_from,'%Y-%m')"),'=',date('Y-m'))
             ->orderby('times')
             ->get();
 
@@ -901,38 +898,35 @@ class GeneralAffairController extends Controller
 
             $tujuan_upload = 'images/absensi';
 
-            for ($i=0; $i < count($request->file('file_foto')); $i++) { 
-              $file_foto = $request->file('file_foto')[$i];
-              $nama_foto = $file_foto->getClientOriginalName();
-              $extension_foto = pathinfo($nama_foto, PATHINFO_EXTENSION);
-              $filename_foto = 'Foto Absensi '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto;
-              $file_foto->move($tujuan_upload,$filename_foto);
-              $data_foto[]=$filename_foto;
-            }
+            $file_foto = $request->get('file_foto');
+            $file_foto1 = explode(',', $file_foto)[1];
+            $file_foto1 = str_replace(' ', '+', $file_foto1);
+            $data = base64_decode($file_foto1);
+            $filename_foto = 'Foto Absensi '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
+            file_put_contents($tujuan_upload.'/'.$filename_foto, $data);
+            $data_foto[]=$filename_foto;
             $file_upload_foto = json_encode($data_foto);
 
             $tujuan_upload = 'images/absensi/odometer';
 
-            for ($i=0; $i < count($request->file('file_foto_odometer')); $i++) { 
-              $file_foto_odo = $request->file('file_foto_odometer')[$i];
-              $nama_foto_odo = $file_foto_odo->getClientOriginalName();
-              $extension_foto_odo = pathinfo($nama_foto_odo, PATHINFO_EXTENSION);
-              $filename_foto_odo = 'Foto Odometer '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto_odo;
-              $file_foto_odo->move($tujuan_upload,$filename_foto_odo);
-              $data_foto_odometer[]=$filename_foto_odo;      
-            }
+            $file_foto_odo = $request->get('file_foto_odometer');
+            $file_foto_odo1 = explode(',', $file_foto_odo)[1];
+            $file_foto_odo1 = str_replace(' ', '+', $file_foto_odo1);
+            $data_odo = base64_decode($file_foto_odo1);
+            $filename_foto_odo = 'Foto Odometer '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
+            file_put_contents($tujuan_upload.'/'.$filename_foto_odo, $data_odo);
+            $data_foto_odometer[]=$filename_foto_odo;
             $file_upload_foto_odometer = json_encode($data_foto_odometer);
 
             $tujuan_upload = 'images/absensi/location';
 
-            for ($i=0; $i < count($request->file('file_location')); $i++) { 
-              $file_foto_location = $request->file('file_location')[$i];
-              $nama_foto_location = $file_foto_location->getClientOriginalName();
-              $extension_foto_location = pathinfo($nama_foto_location, PATHINFO_EXTENSION);
-              $filename_foto_location = 'Foto Location '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')['.$i.'].'.$extension_foto_location;
-              $file_foto_location->move($tujuan_upload,$filename_foto_location);
-              $data_foto_location[]=$filename_foto_location;      
-            }
+            $file_foto_location = $request->get('file_location');
+            $file_foto_location1 = explode(',', $file_foto_location)[1];
+            $file_foto_location1 = str_replace(' ', '+', $file_foto_location1);
+            $data_location = base64_decode($file_foto_location1);
+            $filename_foto_location = 'Foto Location '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
+            file_put_contents($tujuan_upload.'/'.$filename_foto_location, $data_location);
+            $data_foto_location[]=$filename_foto_location;
             $file_upload_foto_location = json_encode($data_foto_location);
 
             $url = "https://locationiq.org/v1/reverse.php?key=pk.456ed0d079b6f646ad4db592aa541ba0&lat=".$latitude."&lon=".$longitude."&format=json";
@@ -1140,8 +1134,8 @@ class GeneralAffairController extends Controller
         }
 
         $bbm = [
-            'Pertamax_12400',
-            'Pertamina Dex_13750'
+            'Pertamax_12200',
+            'Pertamina Dex_13850'
         ];
         return view('general_affair.driver.index_task',
             array(
@@ -1179,43 +1173,31 @@ class GeneralAffairController extends Controller
             $tujuan_upload = 'images/driver_task';
             $fileData_name = '';
 
-            if ($request->file('fileData') != null) {
-                $fileData = $request->file('fileData');
-                $fileData_file = $fileData->getClientOriginalName();
-                $fileData_ext = pathinfo($fileData_file, PATHINFO_EXTENSION);
-
-                $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.' . $fileData_ext;
-                $fileData->move($tujuan_upload, $fileData_name);
-
-                $path = public_path('images/driver_task/').'/'.$fileData_name;
-                $filebase64 = 'data:image/' . $fileData_ext . ';base64,' .base64_encode(file_get_contents($path));
-                // $unlink = unlink('images/driver_task'.'/'.$fileData_name);
+            if ($request->get('fileData') != null && $request->get('fileData') != '') {
+                $fileData = $request->get('fileData');
+                $fileData1 = explode(',', $fileData)[1];
+                $fileData1 = str_replace(' ', '+', $fileData1);
+                $data = base64_decode($fileData1);
+                $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+                file_put_contents($tujuan_upload.'/'.$fileData_name, $data);
             }
 
-            if ($request->file('fileDataOdoBefore') != null) {
-                $fileDataOdoBefore = $request->file('fileDataOdoBefore');
-                $fileDataOdoBefore_file = $fileDataOdoBefore->getClientOriginalName();
-                $fileDataOdoBefore_ext = pathinfo($fileDataOdoBefore_file, PATHINFO_EXTENSION);
-
-                $fileDataOdoBefore_name = 'Bukti Odo Before '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.' . $fileDataOdoBefore_ext;
-                $fileDataOdoBefore->move($tujuan_upload, $fileDataOdoBefore_name);
-
-                $path = public_path('images/driver_task/').'/'.$fileDataOdoBefore_name;
-                $filebase64OdoBefore = 'data:image/' . $fileDataOdoBefore_ext . ';base64,' .base64_encode(file_get_contents($path));
-                // $unlink = unlink('images/driver_task'.'/'.$fileDataOdoBefore_name);
+            if ($request->get('fileDataOdoBefore') != null && $request->get('fileDataOdoBefore') != '') {
+                $fileDataOdoBefore = $request->get('fileDataOdoBefore');
+                $fileDataOdoBefore1 = explode(',', $fileDataOdoBefore)[1];
+                $fileDataOdoBefore1 = str_replace(' ', '+', $fileDataOdoBefore1);
+                $data = base64_decode($fileDataOdoBefore1);
+                $fileDataOdoBefore_name = 'Bukti Odo Before '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+                file_put_contents($tujuan_upload.'/'.$fileDataOdoBefore_name, $data);
             }
 
-            if ($request->file('fileDataOdoAfter') != null) {
-                $fileDataOdoAfter = $request->file('fileDataOdoAfter');
-                $fileDataOdoAfter_file = $fileDataOdoAfter->getClientOriginalName();
-                $fileDataOdoAfter_ext = pathinfo($fileDataOdoAfter_file, PATHINFO_EXTENSION);
-
-                $fileDataOdoAfter_name = 'Bukti Odo After '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.' . $fileDataOdoAfter_ext;
-                $fileDataOdoAfter->move($tujuan_upload, $fileDataOdoAfter_name);
-
-                $path = public_path('images/driver_task/').'/'.$fileDataOdoAfter_name;
-                $filebase64OdoAfter = 'data:image/' . $fileDataOdoAfter_ext . ';base64,' .base64_encode(file_get_contents($path));
-                // $unlink = unlink('images/driver_task'.'/'.$fileDataOdoAfter_name);
+            if ($request->get('fileDataOdoAfter') != null && $request->get('fileDataOdoAfter') != '') {
+                $fileDataOdoAfter = $request->get('fileDataOdoAfter');
+                $fileDataOdoAfter1 = explode(',', $fileDataOdoAfter)[1];
+                $fileDataOdoAfter1 = str_replace(' ', '+', $fileDataOdoAfter1);
+                $data = base64_decode($fileDataOdoAfter1);
+                $fileDataOdoAfter_name = 'Bukti Odo After '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+                file_put_contents($tujuan_upload.'/'.$fileDataOdoAfter_name, $data);
             }
 
             //GET FUEL NOW
