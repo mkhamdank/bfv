@@ -1446,24 +1446,40 @@ class GeneralAffairController extends Controller
             $id = $request->get('id');
             $destination = $request->get('destination');
             $passenger_all = DB::table('driver_passengers')
-            ->select('driver_passengers.*',DB::RAW('DATE_FORMAT(timestamps, "%H:%i:%s") as times'))
-            ->leftJoin('driver_passenger_attendances', function($join) use ($id) {
-                $join->on('driver_passenger_attendances.employee_id','=','driver_passengers.employee_id')
-                     ->where('driver_passenger_attendances.id_attendance', '=', $id);
-            })
+            ->select('driver_passengers.*')
             ->where('driver_passengers.destination',$destination)
-            ->orderby('driver_passenger_attendances.timestamps','desc')
             ->get();
-            $passenger = DB::table('driver_passenger_attendances')
-            ->select('*',DB::RAW('DATE_FORMAT(timestamps, "%H:%i:%s") as times'))
-            ->where('destination',$destination)
-            ->where('id_attendance',$id)
-            ->orderby('timestamps','desc')
-            ->get();
+
+            $time_in = DB::SELECT("SELECT
+                employee_id,
+                `name`,
+                DATE_FORMAT(MIN(`timestamps`), '%H:%i') AS time_in
+                FROM
+                `driver_passenger_attendances`
+                WHERE
+                destination = '".$destination."'
+                AND DATE(driver_timestamps) = '".date('Y-m-d')."'
+                GROUP BY
+                employee_id,
+                `name`");
+
+            $time_out = DB::SELECT("SELECT
+                employee_id,
+                `name`,
+                DATE_FORMAT(MAX(`timestamps`), '%H:%i') AS time_out
+                FROM
+                `driver_passenger_attendances`
+                WHERE
+                destination = '".$destination."'
+                AND DATE(driver_timestamps) = '".date('Y-m-d')."'
+                GROUP BY
+                employee_id,
+                `name`");
             $response = array(
                 'status' => true,
-                'passenger' => $passenger,
                 'passenger_all' => $passenger_all,
+                'time_in' => $time_in,
+                'time_out' => $time_out
             );
             return Response::json($response);
         } catch (\Exception $e) {

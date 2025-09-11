@@ -158,19 +158,29 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding-left: 20px; padding-right: 20px;">
+                        <td colspan="2" style="padding-left: 20px; padding-right: 20px;">
                             <label>Total</label>
                             <input type="text" name="total" id="total" class="form-control" style="width: 100%; text-align: center;" placeholder="Total" readonly="" value="">
                         </td>
+                    </tr>
+                    <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
-                            <label>Hadir</label>
-                            <input type="text" name="hadir" id="hadir" class="form-control" style="width: 100%; text-align: center;" placeholder="Hadir" readonly="" value="">
+                            <label>Hadir Masuk</label>
+                            <input type="text" name="hadir_masuk" id="hadir_masuk" class="form-control" style="width: 100%; text-align: center;" placeholder="Hadir" readonly="" value="">
+                        </td>
+                        <td colspan="2" style="padding-left: 20px; padding-right: 20px;">
+                            <label>Belum Hadir Masuk</label>
+                            <input type="text" name="belum_hadir_masuk" id="belum_hadir_masuk" class="form-control" style="width: 100%; text-align: center;" placeholder="Belum Hadir" readonly="" value="">
                         </td>
                     </tr>
                     <tr>
+                        <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>Hadir Pulang</label>
+                            <input type="text" name="hadir_pulang" id="hadir_pulang" class="form-control" style="width: 100%; text-align: center;" placeholder="Hadir" readonly="" value="">
+                        </td>
                         <td colspan="2" style="padding-left: 20px; padding-right: 20px;">
-                            <label>Belum Hadir</label>
-                            <input type="text" name="belum_hadir" id="belum_hadir" class="form-control" style="width: 100%; text-align: center;" placeholder="Belum Hadir" readonly="" value="">
+                            <label>Belum Hadir Pulang</label>
+                            <input type="text" name="belum_hadir_pulang" id="belum_hadir_pulang" class="form-control" style="width: 100%; text-align: center;" placeholder="Belum Hadir" readonly="" value="">
                         </td>
                     </tr>
                     <tr>
@@ -197,10 +207,10 @@
                                 Emp
                             </th>
                             <th style="background-color: #605ca8; color: white; width: 5%; border: 1px solid white;">
-                                Status
+                                Masuk
                             </th>
                             <th style="background-color: #605ca8; color: white; width: 5%; border: 1px solid white;">
-                                Time
+                                Pulang
                             </th>
                         </tr>
                     </thead>
@@ -313,15 +323,6 @@
 
                     fetchAttendance();
 
-                    // var table = "<tr>";
-                    // table += "<td style='width: 1%; border: 1px solid black;'>" + count_pass + "</td>";
-                    // table += "<td style='width: 5%; border: 1px solid black; text-align: left; padding-left: 4px;'>" + passenger_save.name + "</td>";
-                    // table += "<td style='width: 5%; border: 1px solid black;'>"+getActualFullTime()+"</td>";
-                    // table += "</tr>";
-                    // $("#bodyAttendance").append(table);
-
-                    // passenger_attend.push(passenger_save.employee_id);
-
                     $('#loading').hide();
                     
                     $('#tag').val('');
@@ -347,46 +348,57 @@
                     count_pass = 0;
                     var table = "";
                     var total = 0;
-                    var hadir = 0;
-                    var belum_hadir = 0;
-                    // for(var i = 0; i < result.passenger.length; i++){
-                    //     table += "<tr>";
-                    //     table += "<td style='width: 1%; border: 1px solid black;'>" + (i+1) + "</td>";
-                    //     table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + result.passenger[i].name + "</td>";
-                    //     table += "<td style='width: 5%; border: 1px solid black; text-align: center;'>" + result.passenger[i].times + "</td>";
-                    //     table += "</tr>";
-                    //     count_pass++;
-                    //     passenger_attend.push(result.passenger[i].employee_id);
-                    // }
+                    var hadir_masuk = 0;
+                    var belum_hadir_masuk = 0;
+                    var hadir_pulang = 0;
+                    var belum_hadir_pulang = 0;
                     for(var i = 0; i < result.passenger_all.length; i++){
                         table += "<tr>";
                         table += "<td style='width: 1%; border: 1px solid black;'>" + (i+1) + "</td>";
                         table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + result.passenger_all[i].name + "</td>";
-                        var times = '-';
-                        for(var j = 0; j < result.passenger.length; j++){
-                            if(result.passenger_all[i].employee_id == result.passenger[j].employee_id){
-                                times = result.passenger[j].times;
-                                passenger_attend.push(result.passenger_all[i].employee_id);
-                                hadir++;
-                                // count_pass++;
+                        var times_masuk = '-';
+                        var times_pulang = '-';
+                        for(var j = 0; j < result.time_in.length; j++){
+                            if(result.passenger_all[i].employee_id == result.time_in[j].employee_id){
+                                times_masuk = result.time_in[j].time_in;
+                                hadir_masuk++;
+                                if('{{$timing}}' == 'datang'){
+                                    passenger_attend.push(result.passenger_all[i].employee_id);
+                                }
                                 break;
                             }
                         }
-                        if(times == '-'){
-                            table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: lightpink;'>Belum Hadir</td>";
-                        }else{
-                            table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: lightgreen;'>Hadir</td>";
+
+                        for(var k = 0; k < result.time_out.length; k++){
+                            if(result.passenger_all[i].employee_id == result.time_out[k].employee_id){
+                                times_pulang = result.time_out[k].time_out;
+                                break;
+                            }
                         }
-                        table += "<td style='width: 5%; border: 1px solid black; text-align: center;'>" + times + "</td>";
+                        var masukColor = (times_masuk == '-') ? 'lightpink' : 'lightgreen';
+                        table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: " + masukColor + ";'>" + times_masuk + "</td>";
+                        if(times_masuk == times_pulang){
+                            times_pulang = '-';
+                        }else{
+                            if('{{$timing}}' == 'pulang'){
+                                hadir_pulang++;
+                                passenger_attend.push(result.passenger_all[i].employee_id);
+                            }
+                        }
+                        var pulangColor = (times_pulang == '-') ? 'lightpink' : 'lightgreen';
+                        table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: " + pulangColor + ";'>" + times_pulang + "</td>";
                         table += "</tr>";
                         total++;
                         // count_pass++;
                     }
-                    belum_hadir = total - hadir;
+                    belum_hadir_masuk = total - hadir_masuk;
+                    belum_hadir_pulang = total - hadir_pulang;
 
                     $('#total').val(total);
-                    $('#hadir').val(hadir);
-                    $('#belum_hadir').val(belum_hadir);
+                    $('#hadir_masuk').val(hadir_masuk);
+                    $('#belum_hadir_masuk').val(belum_hadir_masuk);
+                    $('#hadir_pulang').val(hadir_pulang);
+                    $('#belum_hadir_pulang').val(belum_hadir_pulang);
                     $("#bodyAttendance").append(table);
                 }else{
                     $('#loading').hide();
