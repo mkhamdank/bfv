@@ -1062,7 +1062,7 @@ class GeneralAffairController extends Controller
         )->with('page', 'Driver Report');
     }
 
-    function inputDriverJobImage(Request $request)
+    function inputDriverJobImage1(Request $request)
     {
         try {
             $id = $request->get('id');
@@ -1080,12 +1080,70 @@ class GeneralAffairController extends Controller
             $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
             file_put_contents($tujuan_upload.'/'.$fileData_name, $data);
 
+            $update_driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                'fuel_in_evidence' => $fileData_name,
+            ]);
+            $response = array(
+                'status' => true,
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputDriverJobImage2(Request $request)
+    {
+        try {
+            $id = $request->get('id');
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
+            $tujuan_upload = 'images/driver_task';
+            $fileData_name = '';
+
             $fileDataOdoBefore = $request->get('fileDataOdoBefore');
             $fileDataOdoBefore1 = explode(',', $fileDataOdoBefore)[1];
             $fileDataOdoBefore1 = str_replace(' ', '+', $fileDataOdoBefore1);
             $data = base64_decode($fileDataOdoBefore1);
             $fileDataOdoBefore_name = 'Bukti Odo Before '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
             file_put_contents($tujuan_upload.'/'.$fileDataOdoBefore_name, $data);
+
+            $update_driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                'odometer_before_evidence' => $fileDataOdoBefore_name,
+            ]);
+            $response = array(
+                'status' => true,
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputDriverJobImage3(Request $request)
+    {
+        try {
+            $id = $request->get('id');
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
+            $tujuan_upload = 'images/driver_task';
+            $fileData_name = '';
 
             $fileDataOdoAfter = $request->get('fileDataOdoAfter');
             $fileDataOdoAfter1 = explode(',', $fileDataOdoAfter)[1];
@@ -1097,8 +1155,6 @@ class GeneralAffairController extends Controller
             $update_driver_task = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
-                'fuel_in_evidence' => $fileData_name,
-                'odometer_before_evidence' => $fileDataOdoBefore_name,
                 'odometer_after_evidence' => $fileDataOdoAfter_name,
             ]);
             $response = array(

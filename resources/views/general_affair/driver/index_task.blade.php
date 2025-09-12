@@ -551,7 +551,9 @@
                 if (result.status) {
                     $('#loading').hide();
                     openSuccessGritter('Success','Success Kerjakan Tugas');
-                    saveImage();
+                    saveImage1();
+                    saveImage2();
+                    saveImage3();
                 }else{
                     openErrorGritter('Error!', result.message);
                     $('#loading').hide();
@@ -559,21 +561,60 @@
             });
         }
 
-        function saveImage(){
+        function saveImage1(){
             $('#loading').show();
             var formData = new FormData();
             var notaCompressed = $('#blah').attr('src');
-            var odoBeforeCompressed = $('#blahOdoBefore').attr('src');
-            var odoAfterCompressed = $('#blahOdoAfter').attr('src');
 
             var data = {
                 fileData : notaCompressed,
+                id: '{{$id}}'
+            }
+
+            $.post('{{ url("input/driver/job_image1") }}',data, function(result, status, xhr) {
+                if (result.status) {
+                    $('#loading').hide();
+                    openSuccessGritter('Success','Success Saving Image');
+                    $('#div_vehicle').hide();
+                }else{
+                    openErrorGritter('Error!', result.message);
+                    $('#loading').hide();
+                }
+            });
+        }
+
+        function saveImage2(){
+            $('#loading').show();
+            var formData = new FormData();
+            var odoBeforeCompressed = $('#blahOdoBefore').attr('src');
+
+            var data = {
                 fileDataOdoBefore : odoBeforeCompressed,
+                id: '{{$id}}'
+            }
+
+            $.post('{{ url("input/driver/job_image2") }}',data, function(result, status, xhr) {
+                if (result.status) {
+                    $('#loading').hide();
+                    openSuccessGritter('Success','Success Saving Image');
+                    $('#div_vehicle').hide();
+                }else{
+                    openErrorGritter('Error!', result.message);
+                    $('#loading').hide();
+                }
+            });
+        }
+        function saveImage3(){
+            $('#loading').show();
+            var formData = new FormData();
+            var odoAfterCompressed = $('#blahOdoAfter').attr('src');
+
+            var data = {
                 fileDataOdoAfter : odoAfterCompressed,
                 id: '{{$id}}'
             }
 
-            $.post('{{ url("input/driver/job_image") }}',data, function(result, status, xhr) {
+            $.post('{{ url("input/driver/job_image3") }}',data, function(result, status, xhr) {
                 if (result.status) {
                     $('#loading').hide();
                     openSuccessGritter('Success','Success Saving Image');
