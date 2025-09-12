@@ -474,45 +474,132 @@ crossorigin=""></script>
             return false;
         }
 
+        var data = {
+            employee_id :$('#employee_id').val(),
+            name :$('#name').val(),
+            department :$('#department').val(),
+            latitude :$('#latitude').val(),
+            longitude :$('#longitude').val(),
+            odometer :$('#odometer').val(),
+            fuel :$('#fuel').val(),
+            plat_no :$('#vehicle').val().split('_')[0],
+            car :$('#vehicle').val().split('_')[1],
+        }
 
-        var formData = new FormData();
-        formData.append('employee_id', $('#employee_id').val());
-        formData.append('name',  $('#name').val());
-        formData.append('department',  $('#department').val());
-        formData.append('latitude',  $('#latitude').val());
-        formData.append('longitude',  $('#longitude').val());
-        formData.append('odometer',  $('#odometer').val());
-        formData.append('fuel',  $('#fuel').val());
-        formData.append('plat_no',  $('#vehicle').val().split('_')[0]);
-        formData.append('car',  $('#vehicle').val().split('_')[1]);
-        // Ambil foto dari hasil kompres (src img)
+        // var fotoSelfie = $('#blahsim').attr('src');
+        // var fotoOdometer = $('#blahOdo').attr('src');
+        // var fotoLocation = $('#blahLoc').attr('src');
+
+        // formData.append('file_foto', fotoSelfie);
+        // formData.append('file_foto_odometer', fotoOdometer);
+        // formData.append('file_location', fotoLocation);
+
+        // $.ajax({
+        //     url:"{{ url('input/driver/attendance') }}",
+        //     method:"POST",
+        //     data:formData,
+        //     dataType:'JSON',
+        //     contentType: false,
+        //     cache: false,
+        //     processData: false,
+        //     success: function (response) {
+        //         $("#loading").hide();
+        //         openSuccessGritter('Success', 'Data Berhasil Disimpan');
+        //         window.location.replace("{{url('index/driver/attendance/report')}}");
+        //         // $('#myModal').modal('hide');
+
+        //     },
+        //     error: function (response) {
+        //         openErrorGritter('Error!', response.message);
+        //     },
+        // })
+        $.post('{{ url("input/driver/attendance") }}',data, function(result, status, xhr) {
+            if (result.status) {
+                $('#loading').hide();
+                openSuccessGritter('Success','Success Saving Data');
+                saveImage1(result.id);
+                saveImage2(result.id);
+                saveImage3(result.id);
+                // window.location.replace("{{url('index/driver/attendance/report')}}");
+            }else{
+                openErrorGritter('Error!', result.message);
+                $('#loading').hide();
+            }
+        });
+    }
+
+    var status_image = 0;
+
+    function saveImage1(id){
+        $('#loading').show();
         var fotoSelfie = $('#blahsim').attr('src');
+
+        var data = {
+            file_foto : fotoSelfie,
+            id: id
+        }
+
+        $.post('{{ url("input/driver/attendance_image1") }}',data, function(result, status, xhr) {
+            if (result.status) {
+                $('#loading').hide();
+                openSuccessGritter('Success','Success Saving Image');
+                status_image += 1;
+                if(status_image == 3){
+                    window.location.replace("{{url('index/driver/attendance/report')}}");
+                }
+            }else{
+                openErrorGritter('Error!', result.message);
+                $('#loading').hide();
+            }
+        });
+    }
+
+    function saveImage2(id){
+        $('#loading').show();
         var fotoOdometer = $('#blahOdo').attr('src');
+
+        var data = {
+            file_foto_odometer : fotoOdometer,
+            id: id
+        }
+
+        $.post('{{ url("input/driver/attendance_image2") }}',data, function(result, status, xhr) {
+            if (result.status) {
+                $('#loading').hide();
+                openSuccessGritter('Success','Success Saving Image');
+                status_image += 1;
+                if(status_image == 3){
+                    window.location.replace("{{url('index/driver/attendance/report')}}");
+                }
+            }else{
+                openErrorGritter('Error!', result.message);
+                $('#loading').hide();
+            }
+        });
+    }
+
+    function saveImage3(id){
+        $('#loading').show();
         var fotoLocation = $('#blahLoc').attr('src');
 
-        formData.append('file_foto', fotoSelfie);
-        formData.append('file_foto_odometer', fotoOdometer);
-        formData.append('file_location', fotoLocation);
+        var data = {
+            file_location : fotoLocation,
+            id: id
+        }
 
-        $.ajax({
-            url:"{{ url('input/driver/attendance') }}",
-            method:"POST",
-            data:formData,
-            dataType:'JSON',
-            contentType: false,
-            cache: false,
-            processData: false,
-            success: function (response) {
-                $("#loading").hide();
-                openSuccessGritter('Success', 'Data Berhasil Disimpan');
-                window.location.replace("{{url('index/driver/attendance/report')}}");
-                // $('#myModal').modal('hide');
-
-            },
-            error: function (response) {
-                openErrorGritter('Error!', response.message);
-            },
-        })  
+        $.post('{{ url("input/driver/attendance_image3") }}',data, function(result, status, xhr) {
+            if (result.status) {
+                $('#loading').hide();
+                openSuccessGritter('Success','Success Saving Image');
+                status_image += 1;
+                if(status_image == 3){
+                    window.location.replace("{{url('index/driver/attendance/report')}}");
+                }
+            }else{
+                openErrorGritter('Error!', result.message);
+                $('#loading').hide();
+            }
+        });
     }
 
     </script>

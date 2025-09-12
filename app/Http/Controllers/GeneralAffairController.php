@@ -807,39 +807,6 @@ class GeneralAffairController extends Controller
                 $_HASIL = substr($_PECAH_STRING[1], 0, 17);               
             }
 
-            $tujuan_upload = 'images/absensi';
-
-            $file_foto = $request->get('file_foto');
-            $file_foto1 = explode(',', $file_foto)[1];
-            $file_foto1 = str_replace(' ', '+', $file_foto1);
-            $data = base64_decode($file_foto1);
-            $filename_foto = 'Foto Absensi '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
-            file_put_contents($tujuan_upload.'/'.$filename_foto, $data);
-            $data_foto[]=$filename_foto;
-            $file_upload_foto = json_encode($data_foto);
-
-            $tujuan_upload = 'images/absensi/odometer';
-
-            $file_foto_odo = $request->get('file_foto_odometer');
-            $file_foto_odo1 = explode(',', $file_foto_odo)[1];
-            $file_foto_odo1 = str_replace(' ', '+', $file_foto_odo1);
-            $data_odo = base64_decode($file_foto_odo1);
-            $filename_foto_odo = 'Foto Odometer '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
-            file_put_contents($tujuan_upload.'/'.$filename_foto_odo, $data_odo);
-            $data_foto_odometer[]=$filename_foto_odo;
-            $file_upload_foto_odometer = json_encode($data_foto_odometer);
-
-            $tujuan_upload = 'images/absensi/location';
-
-            $file_foto_location = $request->get('file_location');
-            $file_foto_location1 = explode(',', $file_foto_location)[1];
-            $file_foto_location1 = str_replace(' ', '+', $file_foto_location1);
-            $data_location = base64_decode($file_foto_location1);
-            $filename_foto_location = 'Foto Location '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
-            file_put_contents($tujuan_upload.'/'.$filename_foto_location, $data_location);
-            $data_foto_location[]=$filename_foto_location;
-            $file_upload_foto_location = json_encode($data_foto_location);
-
             $url = "https://locationiq.org/v1/reverse.php?key=pk.456ed0d079b6f646ad4db592aa541ba0&lat=".$latitude."&lon=".$longitude."&format=json";
             $curlHandle = curl_init();
             curl_setopt($curlHandle, CURLOPT_URL, $url);
@@ -905,14 +872,14 @@ class GeneralAffairController extends Controller
             }
 
             $create = DB::table('attendances')
-            ->insert([
+            ->insertGetId([
                 'employee_id' => $employee_id,
                 'name' => $name,
                 'department' => $department,
                 'datetime' => $tanggal,
-                'images' => $file_upload_foto,
-                'images_odometer' => $file_upload_foto_odometer,
-                'images_location' => $file_upload_foto_location,
+                // 'images' => $file_upload_foto,
+                // 'images_odometer' => $file_upload_foto_odometer,
+                // 'images_location' => $file_upload_foto_location,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'plat_no' => $plat_no,
@@ -924,6 +891,109 @@ class GeneralAffairController extends Controller
                 'village' => $village,
                 'ip_address' => $_HASIL,
                 'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            $response = array(
+                'status' => true,
+                'id' => $create
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputDriverAttendanceImage1(Request $request) {
+        try {
+            $id = $request->get('id');
+
+            $tujuan_upload = 'images/absensi';
+
+            $file_foto = $request->get('file_foto');
+            $file_foto1 = explode(',', $file_foto)[1];
+            $file_foto1 = str_replace(' ', '+', $file_foto1);
+            $data = base64_decode($file_foto1);
+            $filename_foto = 'Foto Absensi '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
+            file_put_contents($tujuan_upload.'/'.$filename_foto, $data);
+            $data_foto[]=$filename_foto;
+            $file_upload_foto = json_encode($data_foto);
+
+            $update = DB::table('attendances')
+            ->where('id',$id)
+            ->update([
+                'images' => $file_upload_foto,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            $response = array(
+                'status' => true,
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputDriverAttendanceImage2(Request $request) {
+        try {
+            $id = $request->get('id');
+
+            $tujuan_upload = 'images/absensi/odometer';
+
+            $file_foto_odo = $request->get('file_foto_odometer');
+            $file_foto_odo1 = explode(',', $file_foto_odo)[1];
+            $file_foto_odo1 = str_replace(' ', '+', $file_foto_odo1);
+            $data_odo = base64_decode($file_foto_odo1);
+            $filename_foto_odo = 'Foto Odometer '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
+            file_put_contents($tujuan_upload.'/'.$filename_foto_odo, $data_odo);
+            $data_foto_odometer[]=$filename_foto_odo;
+            $file_upload_foto_odometer = json_encode($data_foto_odometer);
+
+            $update = DB::table('attendances')
+            ->where('id',$id)
+            ->update([
+                'images_odometer' => $file_upload_foto_odometer,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            $response = array(
+                'status' => true,
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputDriverAttendanceImage3(Request $request) {
+        try {
+            $id = $request->get('id');
+
+            $tujuan_upload = 'images/absensi/location';
+
+            $file_foto_location = $request->get('file_location');
+            $file_foto_location1 = explode(',', $file_foto_location)[1];
+            $file_foto_location1 = str_replace(' ', '+', $file_foto_location1);
+            $data_location = base64_decode($file_foto_location1);
+            $filename_foto_location = 'Foto Location '.$request->input('employee_id').' ('.date('d-M-y H-i-s').')[0].png';
+            file_put_contents($tujuan_upload.'/'.$filename_foto_location, $data_location);
+            $data_foto_location[]=$filename_foto_location;
+            $file_upload_foto_location = json_encode($data_foto_location);
+
+            $update = DB::table('attendances')
+            ->where('id',$id)
+            ->update([
+                'images_location' => $file_upload_foto_location,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
             $response = array(

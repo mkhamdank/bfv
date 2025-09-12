@@ -631,6 +631,9 @@ Route::get('fetch/driver/attendance/report', 'App\Http\Controllers\GeneralAffair
 
 Route::get('index/driver/attendance', 'App\Http\Controllers\GeneralAffairController@indexDriverAttendance');
 Route::post('input/driver/attendance', 'App\Http\Controllers\GeneralAffairController@inputDriverAttendance');
+Route::post('input/driver/attendance_image1', 'App\Http\Controllers\GeneralAffairController@inputDriverAttendanceImage1');
+Route::post('input/driver/attendance_image2', 'App\Http\Controllers\GeneralAffairController@inputDriverAttendanceImage2');
+Route::post('input/driver/attendance_image3', 'App\Http\Controllers\GeneralAffairController@inputDriverAttendanceImage3');
 
 Route::get('fetch/driver/odometer', 'App\Http\Controllers\GeneralAffairController@fetchDriverOdometer');
 
