@@ -581,7 +581,7 @@
 
             //     }
             // });
-            $.post('{{ url("input/driver/job/" . $id) }}', data,function(result, status, xhr) {
+            $.post('{{ url("input/driver/job_new/" . $id) }}', data,function(result, status, xhr) {
                 if (result.status) {
                     $('#loading').hide();
                     openSuccessGritter('Success','Success Kerjakan Tugas');
