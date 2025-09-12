@@ -537,28 +537,28 @@
                 return false;
             }
             fileDataOdoAfter = $('#fileDataOdoAfter').prop('files')[0];
-
-            var formData = new FormData();
             // Ambil data dari hasil kompres gambar
             var notaCompressed = $('#blah').attr('src');
             var odoBeforeCompressed = $('#blahOdoBefore').attr('src');
             var odoAfterCompressed = $('#blahOdoAfter').attr('src');
 
-            formData.append('fileData', notaCompressed);
-            formData.append('fileDataOdoBefore', odoBeforeCompressed);
-            formData.append('fileDataOdoAfter', odoAfterCompressed);
-            formData.append('latitude',$('#latitude').val());
-            formData.append('longitude',$('#longitude').val());
-            formData.append('fuel',$('#fuel').val());
-            formData.append('fuel_actual',$('#fuel_actual').val());
-            formData.append('fuel_type',$('#fuel_type').val());
-            formData.append('times',$('#hour').val()+':'+$('#minute').val());
-            formData.append('fuel_amount',$('#fuel_amount').val());
-            formData.append('fuel_amount_liter',$('#fuel_amount_liter').val());
-            formData.append('location',$('#location').val());
-            formData.append('odometer',$('#odometer').val());
-            formData.append('latitude',$('#latitude').val());
-            formData.append('longitude',$('#longitude').val());
+            var data = {
+                fileData : notaCompressed,
+                fileDataOdoBefore : odoBeforeCompressed,
+                fileDataOdoAfter : odoAfterCompressed,
+                latitude : $('#latitude').val(),
+                longitude : $('#longitude').val(),
+                fuel : $('#fuel').val(),
+                fuel_actual : $('#fuel_actual').val(),
+                fuel_type : $('#fuel_type').val(),
+                times : $('#hour').val()+':'+$('#minute').val(),
+                fuel_amount : $('#fuel_amount').val(),
+                fuel_amount_liter : $('#fuel_amount_liter').val(),
+                location : $('#location').val(),
+                odometer : $('#odometer').val(),
+                latitude : $('#latitude').val(),
+                longitude : $('#longitude').val(),
+            }
 
             // $.ajax({
             //     url:"{{ url('input/driver/job/' . $id) }}",
@@ -581,7 +581,7 @@
 
             //     }
             // });
-            $.post('{{ url("input/driver/job/" . $id) }}', function(result, status, xhr) {
+            $.post('{{ url("input/driver/job/" . $id) }}', data,function(result, status, xhr) {
                 if (result.status) {
                     $('#loading').hide();
                     openSuccessGritter('Success','Success Kerjakan Tugas');
