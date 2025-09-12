@@ -560,25 +560,36 @@
             formData.append('latitude',$('#latitude').val());
             formData.append('longitude',$('#longitude').val());
 
-            $.ajax({
-                url:"{{ url('input/driver/job/' . $id) }}",
-                type:"POST",
-                data:formData,
-                dataType:'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success:function(data)
-                {
-                    if (data.status) {
-                        $('#loading').hide();
-                        openSuccessGritter('Success','Success Kerjakan Tugas');
-                        $('#div_vehicle').hide();
-                    }else{
-                        openErrorGritter('Error!',data.message);
-                        $('#loading').hide();
-                    }
+            // $.ajax({
+            //     url:"{{ url('input/driver/job/' . $id) }}",
+            //     type:"POST",
+            //     data:formData,
+            //     dataType:'JSON',
+            //     contentType: false,
+            //     cache: false,
+            //     processData: false,
+            //     success:function(data)
+            //     {
+            //         if (data.status) {
+            //             $('#loading').hide();
+            //             openSuccessGritter('Success','Success Kerjakan Tugas');
+            //             $('#div_vehicle').hide();
+            //         }else{
+            //             openErrorGritter('Error!',data.message);
+            //             $('#loading').hide();
+            //         }
 
+            //     }
+            // });
+            $.post('{{ url("input/driver/job/" . $id) }}', function(result, status, xhr) {
+                if (result.status) {
+                    $('#loading').hide();
+                    openSuccessGritter('Success','Success Kerjakan Tugas');
+                    $('#div_vehicle').hide();
+                }else{
+                    openErrorGritter('Error!',result.message);
+                    $('#loading').hide();
+                    return false;
                 }
             });
         }
