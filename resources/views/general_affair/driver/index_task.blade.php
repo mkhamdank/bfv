@@ -562,24 +562,22 @@
 
             $.ajax({
                 url:"{{ url('input/driver/job_new/' . $id) }}",
-                type:"POST",
+                method:"POST",
                 data:formData,
                 dataType:'JSON',
                 contentType: false,
                 cache: false,
                 processData: false,
-                success:function(data)
-                {
-                    if (data.status) {
-                        $('#loading').hide();
-                        openSuccessGritter('Success','Success Kerjakan Tugas');
-                        $('#div_vehicle').hide();
-                    }else{
-                        openErrorGritter('Error!',data.message);
-                        $('#loading').hide();
-                    }
+                success: function (response) {
+                    $('#loading').hide();
+                    openSuccessGritter('Success','Success Kerjakan Tugas');
+                    $('#div_vehicle').hide();
 
-                }
+                },
+                error: function (response) {
+                    openErrorGritter('Error!', response.message);
+                    $('#loading').hide();
+                },
             });
         }
 
