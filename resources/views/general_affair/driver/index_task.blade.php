@@ -561,8 +561,8 @@
             formData.append('longitude',$('#longitude').val());
 
             $.ajax({
-                url:"{{ url('input/driver/job/') }}/{{$id}}",
-                method:"POST",
+                url:"{{ url('input/driver/job/' . $id) }}",
+                type:"POST",
                 data:formData,
                 dataType:'JSON',
                 contentType: false,
