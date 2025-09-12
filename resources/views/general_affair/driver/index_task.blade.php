@@ -511,73 +511,77 @@
                 return false;
             }
 
-            var fileData = null;
-
             if ($('#fileData').prop('files')[0] == undefined) {
                 $('#loading').hide();
                 openErrorGritter('Error!','Isikan Foto Nota Pengisian');
                 return false;
             }
-            fileData = $('#fileData').prop('files')[0];
-
-            var fileDataOdoBefore = null;
 
             if ($('#fileDataOdoBefore').prop('files')[0] == undefined) {
                 $('#loading').hide();
                 openErrorGritter('Error!','Isikan Foto Odometer dan Indikator Sebelum Pengisian');
                 return false;
             }
-            fileDataOdoBefore = $('#fileDataOdoBefore').prop('files')[0];
-
-            var fileDataOdoAfter = null;
 
             if ($('#fileDataOdoAfter').prop('files')[0] == undefined) {
                 $('#loading').hide();
                 openErrorGritter('Error!','Isikan Foto Odometer dan Indikator Setelah Pengisian');
                 return false;
             }
-            fileDataOdoAfter = $('#fileDataOdoAfter').prop('files')[0];
 
-            var formData = new FormData();
             // Ambil data dari hasil kompres gambar
+
+            var data = {
+                latitude : $('#latitude').val(),
+                longitude : $('#longitude').val(),
+                fuel : $('#fuel').val(),
+                fuel_actual : $('#fuel_actual').val(),
+                fuel_type : $('#fuel_type').val(),
+                times : $('#hour').val()+':'+$('#minute').val(),
+                fuel_amount : $('#fuel_amount').val(),
+                fuel_amount_liter : $('#fuel_amount_liter').val(),
+                location : $('#location').val(),
+                odometer : $('#odometer').val(),
+                latitude : $('#latitude').val(),
+                longitude : $('#longitude').val(),
+                id: '{{$id}}'
+            }
+
+            $.post('{{ url("input/driver/job_new") }}',data, function(result, status, xhr) {
+                if (result.status) {
+                    $('#loading').hide();
+                    openSuccessGritter('Success','Success Kerjakan Tugas');
+                    saveImage();
+                }else{
+                    openErrorGritter('Error!', result.message);
+                    $('#loading').hide();
+                }
+            });
+        }
+
+        function saveImage(){
+            $('#loading').show();
+            var formData = new FormData();
             var notaCompressed = $('#blah').attr('src');
             var odoBeforeCompressed = $('#blahOdoBefore').attr('src');
             var odoAfterCompressed = $('#blahOdoAfter').attr('src');
 
-            formData.append('latitude',$('#latitude').val());
-            formData.append('longitude',$('#longitude').val());
-            formData.append('fuel',$('#fuel').val());
-            formData.append('fuel_actual',$('#fuel_actual').val());
-            formData.append('fuel_type',$('#fuel_type').val());
-            formData.append('times',$('#hour').val()+':'+$('#minute').val());
-            formData.append('fuel_amount',$('#fuel_amount').val());
-            formData.append('fuel_amount_liter',$('#fuel_amount_liter').val());
-            formData.append('location',$('#location').val());
-            formData.append('odometer',$('#odometer').val());
-            formData.append('latitude',$('#latitude').val());
-            formData.append('longitude',$('#longitude').val());
-            formData.append('fileData', notaCompressed);
-            formData.append('fileDataOdoBefore', odoBeforeCompressed);
-            formData.append('fileDataOdoAfter', odoAfterCompressed);
+            var data = {
+                fileData : notaCompressed,
+                fileDataOdoBefore : odoBeforeCompressed,
+                fileDataOdoAfter : odoAfterCompressed,
+                id: '{{$id}}'
+            }
 
-            $.ajax({
-                url:"{{ url('input/driver/job_new/' . $id) }}",
-                method:"POST",
-                data:formData,
-                dataType:'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function (response) {
+            $.post('{{ url("input/driver/job_image") }}',data, function(result, status, xhr) {
+                if (result.status) {
                     $('#loading').hide();
-                    openSuccessGritter('Success','Success Kerjakan Tugas');
+                    openSuccessGritter('Success','Success Saving Image');
                     $('#div_vehicle').hide();
-
-                },
-                error: function (response) {
-                    openErrorGritter('Error!', response.message);
+                }else{
+                    openErrorGritter('Error!', result.message);
                     $('#loading').hide();
-                },
+                }
             });
         }
 

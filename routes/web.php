@@ -605,7 +605,8 @@ Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairCon
 // Route::post('input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
 // Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralController@closureDriverJob');
 
-Route::post('input/driver/job_new/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
+Route::post('input/driver/job_new', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
+Route::post('input/driver/job_image', 'App\Http\Controllers\GeneralAffairController@inputDriverJobImage');
 Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@searchDriverJob');
 
 Route::get('index/confirmation/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');

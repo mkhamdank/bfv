@@ -1062,9 +1062,62 @@ class GeneralAffairController extends Controller
         )->with('page', 'Driver Report');
     }
 
-    function inputDriverJob($id,Request $request)
+    function inputDriverJobImage(Request $request)
     {
         try {
+            $id = $request->get('id');
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
+            $tujuan_upload = 'images/driver_task';
+            $fileData_name = '';
+
+            $fileData = $request->get('fileData');
+            $fileData1 = explode(',', $fileData)[1];
+            $fileData1 = str_replace(' ', '+', $fileData1);
+            $data = base64_decode($fileData1);
+            $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+            file_put_contents($tujuan_upload.'/'.$fileData_name, $data);
+
+            $fileDataOdoBefore = $request->get('fileDataOdoBefore');
+            $fileDataOdoBefore1 = explode(',', $fileDataOdoBefore)[1];
+            $fileDataOdoBefore1 = str_replace(' ', '+', $fileDataOdoBefore1);
+            $data = base64_decode($fileDataOdoBefore1);
+            $fileDataOdoBefore_name = 'Bukti Odo Before '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+            file_put_contents($tujuan_upload.'/'.$fileDataOdoBefore_name, $data);
+
+            $fileDataOdoAfter = $request->get('fileDataOdoAfter');
+            $fileDataOdoAfter1 = explode(',', $fileDataOdoAfter)[1];
+            $fileDataOdoAfter1 = str_replace(' ', '+', $fileDataOdoAfter1);
+            $data = base64_decode($fileDataOdoAfter1);
+            $fileDataOdoAfter_name = 'Bukti Odo After '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+            file_put_contents($tujuan_upload.'/'.$fileDataOdoAfter_name, $data);
+
+            $update_driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                'fuel_in_evidence' => $fileData_name,
+                'odometer_before_evidence' => $fileDataOdoBefore_name,
+                'odometer_after_evidence' => $fileDataOdoAfter_name,
+            ]);
+            $response = array(
+                'status' => true,
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputDriverJob(Request $request)
+    {
+        try {
+            $id = $request->get('id');
             $driver_task = DB::table('driver_tasks')
             ->where('id',$id)
             ->first();
@@ -1080,34 +1133,6 @@ class GeneralAffairController extends Controller
             $odometer = $request->get('odometer');
             $latitude = $request->get('latitude');
             $longitude = $request->get('longitude');
-
-            $tujuan_upload = 'images/driver_task';
-            $fileData_name = '';
-
-            $fileData = $request->get('fileData');
-            $fileData1 = explode(',', $fileData)[1];
-            $fileData1 = str_replace(' ', '+', $fileData1);
-            $data = base64_decode($fileData1);
-            $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
-            file_put_contents($tujuan_upload.'/'.$fileData_name, $data);
-
-            // if ($request->get('fileDataOdoBefore') != null && $request->get('fileDataOdoBefore') != '') {
-                $fileDataOdoBefore = $request->get('fileDataOdoBefore');
-                $fileDataOdoBefore1 = explode(',', $fileDataOdoBefore)[1];
-                $fileDataOdoBefore1 = str_replace(' ', '+', $fileDataOdoBefore1);
-                $data = base64_decode($fileDataOdoBefore1);
-                $fileDataOdoBefore_name = 'Bukti Odo Before '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
-                file_put_contents($tujuan_upload.'/'.$fileDataOdoBefore_name, $data);
-            // }
-
-            // if ($request->get('fileDataOdoAfter') != null && $request->get('fileDataOdoAfter') != '') {
-                $fileDataOdoAfter = $request->get('fileDataOdoAfter');
-                $fileDataOdoAfter1 = explode(',', $fileDataOdoAfter)[1];
-                $fileDataOdoAfter1 = str_replace(' ', '+', $fileDataOdoAfter1);
-                $data = base64_decode($fileDataOdoAfter1);
-                $fileDataOdoAfter_name = 'Bukti Odo After '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
-                file_put_contents($tujuan_upload.'/'.$fileDataOdoAfter_name, $data);
-            // }
 
             //GET FUEL NOW
             $curl = curl_init();
@@ -1228,9 +1253,6 @@ class GeneralAffairController extends Controller
                 'location' => $location,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
-                'fuel_in_evidence' => $fileData_name,
-                'odometer_before_evidence' => $fileDataOdoBefore_name,
-                'odometer_after_evidence' => $fileDataOdoAfter_name,
             ]);
             $response = array(
                 'status' => true,
