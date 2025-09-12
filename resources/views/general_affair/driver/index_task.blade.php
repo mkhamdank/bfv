@@ -544,9 +544,6 @@
             var odoBeforeCompressed = $('#blahOdoBefore').attr('src');
             var odoAfterCompressed = $('#blahOdoAfter').attr('src');
 
-            formData.append('fileData', notaCompressed);
-            formData.append('fileDataOdoBefore', odoBeforeCompressed);
-            formData.append('fileDataOdoAfter', odoAfterCompressed);
             formData.append('latitude',$('#latitude').val());
             formData.append('longitude',$('#longitude').val());
             formData.append('fuel',$('#fuel').val());
@@ -559,6 +556,9 @@
             formData.append('odometer',$('#odometer').val());
             formData.append('latitude',$('#latitude').val());
             formData.append('longitude',$('#longitude').val());
+            formData.append('fileData', notaCompressed);
+            formData.append('fileDataOdoBefore', odoBeforeCompressed);
+            formData.append('fileDataOdoAfter', odoAfterCompressed);
 
             $.ajax({
                 url:"{{ url('input/driver/job_new/' . $id) }}",
