@@ -1084,32 +1084,30 @@ class GeneralAffairController extends Controller
             $tujuan_upload = 'images/driver_task';
             $fileData_name = '';
 
-            if ($request->get('fileData') != null && $request->get('fileData') != '') {
-                $fileData = $request->get('fileData');
-                $fileData1 = explode(',', $fileData)[1];
-                $fileData1 = str_replace(' ', '+', $fileData1);
-                $data = base64_decode($fileData1);
-                $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
-                file_put_contents($tujuan_upload.'/'.$fileData_name, $data);
-            }
+            $fileData = $request->get('fileData');
+            $fileData1 = explode(',', $fileData)[1];
+            $fileData1 = str_replace(' ', '+', $fileData1);
+            $data = base64_decode($fileData1);
+            $fileData_name = 'Bukti Pengisian '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
+            file_put_contents($tujuan_upload.'/'.$fileData_name, $data);
 
-            if ($request->get('fileDataOdoBefore') != null && $request->get('fileDataOdoBefore') != '') {
+            // if ($request->get('fileDataOdoBefore') != null && $request->get('fileDataOdoBefore') != '') {
                 $fileDataOdoBefore = $request->get('fileDataOdoBefore');
                 $fileDataOdoBefore1 = explode(',', $fileDataOdoBefore)[1];
                 $fileDataOdoBefore1 = str_replace(' ', '+', $fileDataOdoBefore1);
                 $data = base64_decode($fileDataOdoBefore1);
                 $fileDataOdoBefore_name = 'Bukti Odo Before '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
                 file_put_contents($tujuan_upload.'/'.$fileDataOdoBefore_name, $data);
-            }
+            // }
 
-            if ($request->get('fileDataOdoAfter') != null && $request->get('fileDataOdoAfter') != '') {
+            // if ($request->get('fileDataOdoAfter') != null && $request->get('fileDataOdoAfter') != '') {
                 $fileDataOdoAfter = $request->get('fileDataOdoAfter');
                 $fileDataOdoAfter1 = explode(',', $fileDataOdoAfter)[1];
                 $fileDataOdoAfter1 = str_replace(' ', '+', $fileDataOdoAfter1);
                 $data = base64_decode($fileDataOdoAfter1);
                 $fileDataOdoAfter_name = 'Bukti Odo After '.$driver_task->driver_id.' - '.$id.' - '. date('YmdHis') . '.png';
                 file_put_contents($tujuan_upload.'/'.$fileDataOdoAfter_name, $data);
-            }
+            // }
 
             //GET FUEL NOW
             $curl = curl_init();
