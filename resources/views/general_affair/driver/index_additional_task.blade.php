@@ -397,16 +397,20 @@
             });
         });
 
+        var etoll = [];
+        var parking = [];
+
+        var file_etoll = [];
+        var file_parking = [];
+
         function submitDriver() {
             $('#loading').show();
 
-            var etoll = [];
-            var parking = [];
+            etoll = [];
+            parking = [];
 
-            var file_etoll = [];
-            var file_parking = [];
-
-            var formData = new FormData();
+            file_etoll = [];
+            file_parking = [];
 
             for(var i = 0; i < count_etoll;i++){
                 if($('#etoll_'+i).val() != '' && $('#etoll_'+i).val() != undefined && $('#etoll_'+i).val() != 'undefined'){
@@ -416,13 +420,10 @@
                         openErrorGritter('Error!','Isikan Foto Bukti E-Toll');
                         return false;
                     }
-                    // formData.append('file_etoll[]',$('#file_etoll_'+i).prop('files')[0]);
-                    var file_etoll = $('#blah_etoll_'+i).attr('src');
-                    formData.append('file_etoll[]', file_etoll);
+                    var file_etolls = $('#blah_etoll_'+i).attr('src');
+                    file_etoll.push(file_etolls);
                 }
             }
-
-            formData.append('etoll',etoll);
 
             for(var i = 0; i < count_parking;i++){
                 if($('#parking_'+i).val() != '' && $('#parking_'+i).val() != undefined && $('#parking_'+i).val() != 'undefined'){
@@ -432,39 +433,94 @@
                         openErrorGritter('Error!','Isikan Foto Bukti Parkir');
                         return false;
                     }
-                    // formData.append('file_parking[]',$('#file_parking_'+i).prop('files')[0]);
-                    var file_parking = $('#blah_parking_'+i).attr('src');
-                    formData.append('file_parking[]', file_parking);
+                    var file_parkings = $('#blah_parking_'+i).attr('src');
+                    file_parking.push(file_parkings);
                 }
             }
 
-            formData.append('parking',parking);
-            formData.append('id',$('#id').val());
-            formData.append('task_id',$('#task_id').val());
-
-            $.ajax({
-                url:"{{ url('input/additional/driver/job') }}",
-                method:"POST",
-                data:formData,
-                dataType:'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success:function(data)
-                {
-                    if (data.status) {
+            if(etoll.length == 0 && parking.length == 0){
+                var data = {
+                    id : $('#id').val(),
+                    task_id : $('#task_id').val(),
+                }
+                $.post('{{ url("input/additional/driver/job") }}',data, function(result, status, xhr) {
+                    if (result.status) {
                         $('#div_driver_3').show();
                         $('#div_driver_2').hide();
                         $('#div_driver_1').hide();
                         $('#loading').hide();
                         openSuccessGritter('Success','Success Input Data (データの入力に成功しました)');
                     }else{
-                        openErrorGritter('Error!',data.message);
+                        openErrorGritter('Error!', result.message);
                         $('#loading').hide();
                     }
-
+                });
+            }else{
+                if(etoll.length > 0){
+                    saveEtoll();
                 }
-            });
+                if(parking.length > 0){
+                    saveParking();
+                }
+            }
+        }
+
+        var all_sudah = 0;
+
+        function saveEtoll(){
+            for(var i = 0; i < etoll.length;i++){
+                var data = {
+                    id : $('#id').val(),
+                    task_id : $('#task_id').val(),
+                    etoll : etoll[i],
+                    file_etoll : file_etoll[i],
+                    index : i,
+                }
+                $.post('{{ url("input/additional/driver/job/etoll") }}',data, function(result, status, xhr) {
+                    if (result.status) {
+                        all_sudah++;
+                        if(all_sudah == (etoll.length + parking.length)){
+                            $('#div_driver_3').show();
+                            $('#div_driver_2').hide();
+                            $('#div_driver_1').hide();
+                            $('#loading').hide();
+                            openSuccessGritter('Success','Success Input Data (データの入力に成功しました)');
+                        }
+                    }else{
+                        openErrorGritter('Error!', result.message);
+                        $('#loading').hide();
+                        return false;
+                    }
+                });
+            }
+        }
+
+        function saveParking(){
+            for(var i = 0; i < parking.length;i++){
+                var data = {
+                    id : $('#id').val(),
+                    task_id : $('#task_id').val(),
+                    parking : parking[i],
+                    file_parking : file_parking[i],
+                    index : i,
+                }
+                $.post('{{ url("input/additional/driver/job/parking") }}',data, function(result, status, xhr) {
+                    if (result.status) {
+                        all_sudah++;    
+                        if(all_sudah == (etoll.length + parking.length)){
+                            $('#div_driver_3').show();
+                            $('#div_driver_2').hide();
+                            $('#div_driver_1').hide();
+                            $('#loading').hide();
+                            openSuccessGritter('Success','Success Input Data (データの入力に成功しました)');
+                        }
+                    }else{
+                        openErrorGritter('Error!', result.message);
+                        $('#loading').hide();
+                        return false;
+                    }
+                });
+            }
         }
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
