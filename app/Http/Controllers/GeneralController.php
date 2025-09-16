@@ -189,6 +189,7 @@ class GeneralController extends Controller
         ->whereIn('remark',['japanese','reguler'])
         ->where('closure_status','driver')
         ->whereDate('date_from','<=',date('Y-m-d'))
+        ->whereNull('deleted_at')
         ->orderby('id','asc')
         ->first();
 
