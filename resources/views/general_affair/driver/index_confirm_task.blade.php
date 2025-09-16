@@ -140,6 +140,18 @@
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>Driver <small style="color: #605ca8;">(運転手の名前)</small></label>
+                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_task->driver_name}}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 20px; padding-right: 20px;">
+                            <label>Tanggal <small style="color: #605ca8;">(日付 )</small></label>
+                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Date" readonly="" value="{{date('Y-m-d',strtotime($driver_task->date_from))}}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Masukkan PIN <small style="color: #605ca8;">(PINを入力してください)</small></label>
                             <input type="text" name="otp" id="otp" class="form-control" style="width: 100%; text-align: center;" placeholder="PINを入力してください" inputmode="numeric" pattern="[0-9]*">
                         </td>
@@ -186,7 +198,7 @@
                                     <td style="padding-left: 5px; padding-right: 5px; font-weight: bold;">
                                         -
                                     </td>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_end" id="hour_end" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value=""></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_end" id="hour_end" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="" onkeyup="jumpToEnd()"></td>
                                     <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_end" id="minute_end" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value=""></td>
                                 </tr>
                             </table>
@@ -283,6 +295,12 @@
             };
         }
 
+        function jumpToEnd() {
+            if ($('#hour_end').val().length == 2) {
+                $('#minute_end').focus();
+            }
+        }
+
         
         $(document).ready(function() {
             $('#toggle-sidebar').hide();
@@ -374,6 +392,9 @@
             $('#div_driver_1').show();
             $('#div_driver_2').show();
             $('#div_driver_3').hide();
+            $('#hour_end').val('');
+            $('#minute_end').val('');
+            $('#hour_end').focus();
             $('#loading').hide();
         }
 
