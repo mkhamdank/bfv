@@ -408,10 +408,29 @@
             $('#div_driver_1').show();
             $('#div_driver_2').show();
             $('#div_driver_3').hide();
-            $('#hour_end').val('');
-            $('#minute_end').val('');
-            $('#hour_end').focus();
+            $('#hour_end').val(getActualHour());
+            $('#minute_end').val(getActualMinute());
+            // $('#hour_end').focus();
             $('#loading').hide();
+        }
+
+        function getActualHour() {
+            var d = new Date();
+            var h = addZero(d.getHours());
+            return h;
+        }
+
+        function getActualMinute() {
+            var d = new Date();
+            var m = addZero(d.getMinutes());
+            return m;
+        }
+
+        function addZero(i) {
+            if (i < 10) {
+                i = "0" + i;
+            }
+            return i;
         }
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
