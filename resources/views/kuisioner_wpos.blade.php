@@ -15,165 +15,253 @@
 	<link rel="stylesheet" href="{{ url('bootstrap-datepicker.css')}}">
 
 	<style type="text/css">
-/* 
-		@font-face {
-			font-family: Raleway-SemiBold;
-			src: url('../fonts/raleway/Raleway-SemiBold.ttf'); 
+		:root {
+			--primary: #605ca8;
+			--secondary: #b464f5;
+			--background: #f7f7fa;
+			--card-bg: #fff;
+			--border-radius: 12px;
+			--input-bg: #f2f2f7;
+			--input-border: #d1d1e0;
+			--checkbox-size: 22px;
+			--radio-size: 22px;
+			--shadow: 0 2px 12px rgba(0,0,0,0.07);
 		}
-
-		@font-face {
-			font-family: Raleway-Bold;
-			src: url('../fonts/raleway/Raleway-Bold.ttf'); 
+		body {
+			background: var(--background);
+			font-family: 'Segoe UI', 'Arial', sans-serif;
+			color: #222;
+			margin: 0;
+			padding: 0;
 		}
-
-		@font-face {
-			font-family: Raleway-Black;
-			src: url('../fonts/raleway/Raleway-Black.ttf'); 
-		} */
-
 		.container-contact100 {
-			background: url('ympi.jpg') no-repeat fixed left;
+			background: url('ympi.jpg') no-repeat center center fixed;
+			background-size: cover;
+			min-height: 100vh;
+			display: flex;
+			align-items: flex-start;
+			justify-content: center;
+			padding: 40px 0;
 		}
-
-
-		.form-control {
-			border-radius: 0;
+		.wrap-contact100 {
+			background: var(--card-bg);
+			border-radius: var(--border-radius);
+			box-shadow: var(--shadow);
+			padding: 32px 32px 24px 32px;
+			margin-top: 24px;
+			margin-bottom: 24px;
+			width: 100%;
+			max-width: 900px;
 		}
-
 		.contact100-form-title {
-			padding-top: 20px;
-		}
-
-		.radio {
-			display: inline-block;
-			position: relative;
-			padding-left: 35px;
-			margin-bottom: 12px;
-			cursor: pointer;
-			font-size: 16px;
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			-ms-user-select: none;
-			user-select: none;
-		}
-
-		/* Hide the browser's default radio button */
-		.radio input {
-			position: absolute;
-			opacity: 0;
-			cursor: pointer;
-		}
-
-		/* Create a custom radio button */
-		.checkmark {
-			position: absolute;
-			top: 0;
-			left: 0;
-			height: 25px;
-			width: 25px;
-			background-color: #ccc;
-			border-radius: 50%;
-		}
-
-		/* On mouse-over, add a grey background color */
-		.radio:hover input ~ .checkmark {
-			background-color: #ccc;
-		}
-
-		/* When the radio button is checked, add a blue background */
-		.radio input:checked ~ .checkmark {
-			background-color: #2196F3;
-		}
-
-		/* Create the indicator (the dot/circle - hidden when not checked) */
-		.checkmark:after {
-			content: "";
-			position: absolute;
-			display: none;
-		}
-
-		/* Show the indicator (dot/circle) when checked */
-		.radio input:checked ~ .checkmark:after {
 			display: block;
+			background: var(--primary);
+			color: #fff;
+			font-weight: 600;
+			font-size: 22px;
+			border-radius: var(--border-radius);
+			padding: 16px 20px;
+			margin-bottom: 10px;
+			margin-top: 0;
+			box-shadow: var(--shadow);
+			letter-spacing: 0.5px;
 		}
-
-		/* Style the indicator (dot/circle) */
-		.radio .checkmark:after {
-			top: 9px;
-			left: 9px;
-			width: 8px;
-			height: 8px;
-			border-radius: 50%;
-			background: white;
+		.contact100-form-title[style*="background-color: #b464f5"] {
+			background: var(--secondary) !important;
 		}
-
-		.checkbox {
-			display: inline-block;
-			position: relative;
-			padding-left: 35px;
+		label.label-input1002 {
+			font-weight: 500;
+			margin-top: 18px;
+			margin-bottom: 6px;
+			color: #333;
+			display: block;
+			font-size: 15px;
+		}
+		.form-control {
+			border-radius: var(--border-radius);
+			border: 1px solid var(--input-border);
+			background: var(--input-bg);
+			font-size: 15px;
+			padding: 10px 14px;
+			margin-bottom: 10px;
+			transition: border-color 0.2s;
+		}
+		.form-control:focus {
+			border-color: var(--primary);
+			box-shadow: 0 0 0 2px rgba(96,92,168,0.08);
+			background: #fff;
+		}
+		.validate-input {
 			margin-bottom: 12px;
-			cursor: pointer;
-			font-size: 16px;
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			-ms-user-select: none;
-			user-select: none;
+			background: none;
+			padding: 0;
 		}
-
-		/* Hide the browser's default checkbox button */
-		.checkbox input {
+		.checkbox, .radio {
+			display: inline-flex;
+			align-items: center;
+			position: relative;
+			cursor: pointer;
+			font-size: 15px;
+			font-weight: 400;
+			margin-bottom: 8px;
+			margin-right: 18px;
+			user-select: none;
+			padding-left: 0;
+		}
+		.checkbox input, .radio input {
 			position: absolute;
 			opacity: 0;
 			cursor: pointer;
 		}
-
-		/* On mouse-over, add a grey background color */
-		.checkbox:hover input ~ .checkboxmark {
-			background-color: #ccc;
+		.checkboxmark, .checkmark {
+			display: inline-block;
+			width: var(--checkbox-size);
+			height: var(--checkbox-size);
+			background: #e0e0e0;
+			border-radius: 6px;
+			margin-right: 10px;
+			transition: background 0.2s;
+			position: relative;
+			box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 		}
-
-		/* When the checkbox button is checked, add a blue background */
+		.radio .checkmark {
+			border-radius: 50%;
+			width: var(--radio-size);
+			height: var(--radio-size);
+		}
 		.checkbox input:checked ~ .checkboxmark {
-			background-color: #2196F3;
+			background: var(--primary);
 		}
-
-		.checkboxmark {
-			position: absolute;
-			top: 0;
-			left: 0;
-			height: 25px;
-			width: 25px;
-			background-color: #ccc;
+		.radio input:checked ~ .checkmark {
+			background: var(--primary);
 		}
-
-		/* Create the indicator (the dot/circle - hidden when not checked) */
-		.checkboxmark:after {
+		.checkboxmark:after, .checkmark:after {
 			content: "";
 			position: absolute;
 			display: none;
 		}
-
-		/* Show the indicator (dot/circle) when checked */
 		.checkbox input:checked ~ .checkboxmark:after {
 			display: block;
 		}
-
-		/* Style the indicator (dot/circle) */
+		.radio input:checked ~ .checkmark:after {
+			display: block;
+		}
 		.checkbox .checkboxmark:after {
-			top: 9px;
-			left: 9px;
+			left: 6px;
+			top: 6px;
 			width: 8px;
 			height: 8px;
-			background: white;
+			background: #fff;
+			border-radius: 2px;
 		}
-
-		p{
-			color: white !important;
+		.radio .checkmark:after {
+			left: 6px;
+			top: 6px;
+			width: 10px;
+			height: 10px;
+			background: #fff;
+			border-radius: 50%;
 		}
-
+		.checkbox:hover .checkboxmark, .radio:hover .checkmark {
+			background: #d1d1e0;
+		}
+		b {
+			font-weight: 600;
+			font-size: 16px;
+		}
+		.container-contact100-form-btn {
+			text-align: right;
+			margin-top: 24px;
+		}
+		.contact100-form-btn {
+			background: var(--primary);
+			color: #fff;
+			border: none;
+			border-radius: var(--border-radius);
+			padding: 12px 32px;
+			font-size: 17px;
+			font-weight: 600;
+			cursor: pointer;
+			box-shadow: var(--shadow);
+			transition: background 0.2s;
+		}
+		.contact100-form-btn:hover {
+			background: var(--secondary);
+		}
+		#loading {
+			background: rgba(0,191,255,0.8);
+			z-index: 30001;
+			position: fixed;
+			top: 0; left: 0;
+			width: 100vw; height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+		#loading p {
+			color: #fff !important;
+			font-size: 22px;
+			font-weight: 500;
+			background: rgba(0,0,0,0.15);
+			padding: 24px 40px;
+			border-radius: var(--border-radius);
+		}
+		#sudah_mengisi {
+			background: var(--card-bg);
+			border-radius: var(--border-radius);
+			box-shadow: var(--shadow);
+			padding: 80px 24px;
+			margin-top: 32px;
+			text-align: center;
+		}
+		#sudah_mengisi center {
+			color: var(--primary);
+			font-weight: 600;
+			font-size: 24px;
+		}
+		.contact100-form-title span {
+			font-size: inherit;
+		}
+		.contact100-form-title[style*="background-color: #b464f5"] span {
+			font-size: 16px;
+			font-weight: 500;
+		}
+		.contact100-form-title[style*="background-color: #b464f5"] {
+			font-size: 16px;
+			padding: 12px 18px;
+		}
+		.validate-input img {
+			border-radius: var(--border-radius);
+			box-shadow: var(--shadow);
+			margin-bottom: 18px;
+		}
+		@media (max-width: 900px) {
+			.wrap-contact100 {
+				padding: 16px 8px;
+				max-width: 100%;
+			}
+		}
+		@media (max-width: 600px) {
+			.container-contact100 {
+				padding: 12px 0;
+			}
+			.wrap-contact100 {
+				padding: 8px 2px;
+			}
+			.contact100-form-title {
+				font-size: 17px;
+				padding: 10px 8px;
+			}
+			.contact100-form-btn {
+				padding: 10px 18px;
+				font-size: 15px;
+			}
+		}
+		.gritter-item p{
+			color: white
+		}
 	</style>
 </head>
-
 <body>
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<div id="loading" style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display: none">
@@ -181,16 +269,15 @@
 			<span style="font-size: 20px">Loading, mohon tunggu . . .</span>
 		</p>
 	</div>
-
 	<div class="container-contact100" style="align-items: start">
 		<div class="wrap-contact100 col-xs-12 col-md-8" style="padding: 0 20px;margin-left: 20px">
 			<div id="belum_mengisi" style="width: 100%;">
+				<!-- FORM CONTENT TETAP -->
+				<input type="hidden" value="{{csrf_token()}}" name="_token" />
 				<span class="contact100-form-title" style="color: white;background-color: #605ca8;text-align: center;font-weight: bold;margin-top: 10px;padding-bottom: 0;padding: 10px;border-radius: 10px;font-size: 22px">
 					<span><b>PT. Yamaha Musical Products Indonesia</b></span><br>
 					<span style="font-size: 16px">Work Permit With Enviromental & Safety Analysis</span>
 				</span>
-				
-				<input type="hidden" value="{{csrf_token()}}" name="_token" />
 
 				<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
 					<span>Informasi Vendor</span><br>
@@ -685,6 +772,7 @@
 						</label>
 					</div>
 
+
 					<br>
 
 					<b>Ketentuan-Ketentuan Lain </b><br><br>
@@ -720,6 +808,33 @@
 							Dilarang Las Acetylene
 						</label>
 					</div>
+{{-- 
+					<br>
+						
+					<div class="validate-input" style="position: relative; width: 100%">
+						<span style="font-weight: bold;">Penggunaan Alat Berat</span>
+						&nbsp;&nbsp;
+						<label class="radio" style="margin-top: 5px;margin-left: 5px;float: right;"> Tidak
+							<input type="radio" id="alat_berat" name="alat_berat" value="Tidak" onchange="alat_berat(this.value)">
+							<span class="checkmark"></span>
+						</label>
+						&nbsp;&nbsp;
+						<label class="radio" style="margin-top: 5px;float: right;">Iya
+							<input type="radio"  id="alat_berat" name="alat_berat" value="Iya" onchange="alat_berat(this.value)">
+							<span class="checkmark"></span>
+						</label>
+						&nbsp;&nbsp;
+					</div>
+
+					<div class="validate-input" style="position: relative; width: 100%;display: none;" id="file_alat_berat">
+						<br>
+						<span style="font-weight: bold;">Ijin alat berat</span>
+						<input type="file" id="berat" name="berat" class="form-control">
+						<br>
+						<span style="font-weight: bold;">Lisensi operator alat berat</span>
+						<input type="file" id="berat" name="berat" class="form-control">
+					</div> --}}
+
 					<br>
 					<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
 						<span>
@@ -1430,11 +1545,23 @@
 
 
 					<div id="vendor_permit" style="display:none">
-						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
-							<span>Pernyataan Vendor</span>
-						</span>
-						Dengan di submitnya form ini, maka kami bersedia memenuhi ketentuan yang telah disebutkan di atas. Jika tidak dipenuhi ketentuan diatas kami bersedia menerima sanksi berupa penghentian hubungan kerja secara sepihak atau sanksi yang diberikan perusahaan sesuai dengan tingkat pelanggarannya.
 
+
+<!-- 
+						<br>
+						<div class="validate-input" style="position: relative; width: 100%;" id="nama_pekerja">
+							<br>
+							<span style="font-weight: bold;">Daftar Nama Pekerja</span>
+							<input type="file" id="nama_pekerja" name="nama_pekerja" class="form-control">
+						</div>
+						<div class="validate-input" style="position: relative; width: 100%;" id="nama_pekerja">
+							<br>
+							<span style="font-weight: bold;">Daftar Peralatan/ Mesin Kerja yang Digunakan</span>
+							<input type="file" id="nama_peralatan" name="nama_peralatan" class="form-control">
+						</div>
+						<br>
+
+ -->
 						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
 							<span>Ketentuan Yang Harus Dipatuhi</span>
 						</span>
@@ -1446,6 +1573,19 @@
 						</span>
 						<img src="{{url('images/k3.jpg')}}" style="width: 100%;">
 
+
+						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+							<span>Ketentuan Akses Jaringan</span>
+						</span>
+						Dilarang menggunakan atau menghubungkan perangkat langsung ke jaringan internal perusahaan tanpa persetujuan dari tim IT (misalnya memasang kabel LAN, menghubungkan ke WiFi internal/ YMPI, dan sejenisnya). Jika membutuhkan akses hubungi tim IT YMPI.
+
+
+						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
+							<span>Pernyataan Vendor</span>
+						</span>
+						Dengan di submitnya form ini, maka kami bersedia memenuhi ketentuan yang telah disebutkan di atas. Jika tidak dipenuhi ketentuan diatas kami bersedia menerima sanksi berupa penghentian hubungan kerja secara sepihak atau sanksi yang diberikan perusahaan sesuai dengan tingkat pelanggarannya.
+						
+						<hr style="border: 1px solid #000;">
 						<div class="validate-input" style="position: relative; width: 100%">
 							<label class="checkbox" style="margin-top: 14px;"> 
 								<input type="checkbox" class="persetujuan_vendorCheckbox" id="persetujuan_vendor" name="persetujuan_vendor" value="Saya memahami dan setuju seluruh pernyataan di atas">
@@ -1464,17 +1604,15 @@
 					</div>
 
 					<br><br>
-				</div>
-				<div id="sudah_mengisi" style="width: 100%;padding: 170px 20px">
-					<div class="col-xs-12 col-md-12">
-						<center style="font-size:24px">Terimakasih Bapak / Ibu <span class="name_assessment"></span> telah Mengisi Assessment ini.</i></u></center>
-					</div>
+			</div>
+			<div id="sudah_mengisi" style="width: 100%;padding: 170px 20px">
+				<div class="col-xs-12 col-md-12">
+					<center style="font-size:24px">Terimakasih Bapak / Ibu <span class="name_assessment"></span> telah Mengisi Assessment ini.</i></u></center>
 				</div>
 			</div>
 		</div>
-
-	</body>
-
+	</div>
+	<!-- SCRIPTS TETAP -->
 	<script src="{{ url('vendor/jquery/jquery-3.2.1.min.js')}}"></script>
 	<script src="{{ url('vendor/animsition/js/animsition.min.js')}}"></script>
 	<script src="{{ url('vendor/bootstrap/js/popper.js')}}"></script>
@@ -1486,24 +1624,21 @@
 	<script src="{{ url('js/jquery.gritter.min.js') }}"></script>
 	<!-- <script src="{{ url('js/main.js')}}"></script> -->
 	<script src="{{ url('bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')}}"></script>
-
 	<script type="text/javascript">
+		// JS CODE TETAP
 		jQuery(document).ready(function() {
 			$('#sudah_mengisi').hide();
-
 			$('.datepicker').datepicker({
 				autoclose: true,
 				format: "yyyy-mm-dd",
 				todayHighlight: true,
 			});
 		});
-
 		$.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
+			headers: {
+				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+			}
+		});
 		function ChangePermit(elem){
 
 			if (elem.value == "Height Permit") {
@@ -1532,6 +1667,14 @@
 				$('#hot_work_permit').hide();
 				$('#space_permit').hide();
 				$('#vendor_permit').show();
+			}
+		}
+
+		function alat_berat(elem){
+			if(elem == 'Iya'){
+				$('#file_alat_berat').show();
+			}else{
+				$('#file_alat_berat').hide();
 			}
 		}
 
@@ -1879,5 +2022,4 @@
 			});
 		}
 	</script>
-
-	</html>
+</html>
