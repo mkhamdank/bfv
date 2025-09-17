@@ -329,10 +329,24 @@ class GeneralController extends Controller
                 $phone = '6282334197238';
             }
 
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$insert_driver_task)
+            ->first();
+
             $message = '';
 
             $message .= "_*DRIVER ORDER*_\\n";
             $message .= "\\nTugas Anda telah dikonfirmasi.\\n";
+            
+            $message .= "\\nDetail Tugas:\\n";
+            $message .= "Nama Driver: " . $driver_task->driver_name . "\\n";
+            $message .= "Plat No: " . $driver_task->plat_no . "\\n";
+            $message .= "Mobil: " . $driver_task->car . "\\n";
+            $message .= "Tanggal: " . date('d-m-Y', strtotime($driver_task->date_from)) . "\\n";
+            $message .= "Jam Mulai: " . date('H:i', strtotime($driver_task->date_from)) . "\\n";
+            $message .= "Jam Selesai: " . date('H:i', strtotime($driver_task->date_to)) . "\\n";
+            $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
+
             $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
             $link = url('') . '/index/additional/driver/daily_job/'.$insert_driver_task;
             $message .= $link . "\\n";
@@ -676,6 +690,10 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
             if(substr($driver_task->driver_phone, 0, 1) == '+' ){
                 $phone = substr($driver_task->driver_phone, 1, 15);
             }
@@ -694,6 +712,16 @@ class GeneralController extends Controller
 
             $message .= "_*DRIVER ORDER*_\\n";
             $message .= "\\nTugas Anda telah dikonfirmasi.\\n";
+
+            $message .= "\\nDetail Tugas:\\n";
+            $message .= "Nama Driver: " . $driver_task->driver_name . "\\n";
+            $message .= "Plat No: " . $driver_task->plat_no . "\\n";
+            $message .= "Mobil: " . $driver_task->car . "\\n";
+            $message .= "Tanggal: " . date('d-m-Y', strtotime($driver_task->date_from)) . "\\n";
+            $message .= "Jam Mulai: " . date('H:i', strtotime($driver_task->date_from)) . "\\n";
+            $message .= "Jam Selesai: " . date('H:i', strtotime($driver_task->date_to)) . "\\n";
+            $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
+
             $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
             $link = url('') . '/index/additional/driver/job/'.$task_id;
             $message .= $link . "\\n";
