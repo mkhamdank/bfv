@@ -345,6 +345,7 @@ class GeneralController extends Controller
             $message .= "Tanggal: " . date('d-m-Y', strtotime($driver_task->date_from)) . "\\n";
             $message .= "Jam Mulai: " . date('H:i', strtotime($driver_task->date_from)) . "\\n";
             $message .= "Jam Selesai: " . date('H:i', strtotime($driver_task->date_to)) . "\\n";
+            $message .= "Diminta Oleh: " . $driver_task->requested_name . "\\n";
             $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
 
             $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
@@ -720,6 +721,7 @@ class GeneralController extends Controller
             $message .= "Tanggal: " . date('d-m-Y', strtotime($driver_task->date_from)) . "\\n";
             $message .= "Jam Mulai: " . date('H:i', strtotime($driver_task->date_from)) . "\\n";
             $message .= "Jam Selesai: " . date('H:i', strtotime($driver_task->date_to)) . "\\n";
+            $message .= "Diminta Oleh: " . $driver_task->requested_name . "\\n";
             $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
 
             $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
