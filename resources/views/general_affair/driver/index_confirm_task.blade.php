@@ -134,22 +134,11 @@
             </div>
             <?php } ?>
             <?php if($status == 'success'){ ?>
-                <input type="hidden" id="id" value="{{$driver_task->id}}">
+                <input type="hidden" id="id_fix" value="">
                 <input type="hidden" id="task_id" value="{{$id}}">
-                <input type="hidden" id="real_otp" value="{{ $driver_otp }}">
+                <input type="hidden" id="task_id_fix" value="">
+                <input type="hidden" id="real_otp" value="{{ join(',',$driver_task_id_with_otp) }}">
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
-                    <tr>
-                        <td style="padding-left: 20px; padding-right: 20px;">
-                            <label>Driver <small style="color: #605ca8;">(運転手の名前)</small></label>
-                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_task->driver_name}}">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding-left: 20px; padding-right: 20px;">
-                            <label>Tanggal <small style="color: #605ca8;">(日付 )</small></label>
-                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Date" readonly="" value="{{date('Y-m-d',strtotime($driver_task->date_from))}}">
-                        </td>
-                    </tr>
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Masukkan PIN <small style="color: #605ca8;">(PINを入力してください)</small></label>
@@ -168,13 +157,13 @@
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Driver <small style="color: #605ca8;">(運転手の名前)</small></label>
-                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_task->driver_name}}">
+                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="">
                         </td>
                     </tr>
                     <tr>
                         <td style="padding-left: 20px; padding-right: 20px;">
                             <label>Tanggal <small style="color: #605ca8;">(日付 )</small></label>
-                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Destination" readonly="" value="{{date('Y-m-d',strtotime($driver_task->date_from))}}">
+                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Destination" readonly="">
                         </td>
                     </tr>
                 </table>
@@ -193,8 +182,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時" value="{{date('H',strtotime($driver_task->date_from))}}"></td>
-                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分" value="{{date('i',strtotime($driver_task->date_from))}}"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="hour_start" id="hour_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 23時"></td>
+                                    <td><input type="number" inputmode="numeric" pattern="[0-9]*" name="minute_start" id="minute_start" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="例: 59分"></td>
                                     <td style="padding-left: 5px; padding-right: 5px; font-weight: bold;">
                                         -
                                     </td>
@@ -325,6 +314,8 @@
             });
         });
 
+        var driver_task = <?php echo json_encode($driver_task); ?>;
+
         function submitDriver() {
             $('#loading').show();
             if ($('#hour_start').val() == '' || $('#minute_start').val() == '' || $('#hour_end').val() == '' || $('#minute_end').val() == '') {
@@ -340,8 +331,8 @@
             formData.append('minute_start',$('#minute_start').val());
             formData.append('minute_end',$('#minute_end').val());
             formData.append('date',$('#date').val());
-            formData.append('id',$('#id').val());
-            formData.append('task_id',$('#task_id').val());
+            formData.append('id',$('#id_fix').val());
+            formData.append('task_id',$('#task_id_fix').val());
 
             $.ajax({
                 url:"{{ url('input/confirmation/driver/job') }}",
@@ -380,24 +371,48 @@
                 audio_error.play();
                 return false;
             }
-            if (otp != real_otp) {
+            var data = real_otp.split(',');
+            var ada = false;
+            var id_real = null;
+            for(var i = 0; i < data.length;i++){
+                if(data[i].split('_')[1] == otp){
+                    ada = true;
+                    id_real = data[i].split('_')[0];
+                }
+            }
+            if (!ada) {
                 $('#loading').hide();
-                openErrorGritter('Error!', '(PINは一致しません) PIN Tidak Sesuai!');
+                openErrorGritter('Error!', 'PINが間違っています。PIN Salah!');
                 $('#otp').val('');
                 $('#otp').focus();
                 audio_error.play();
                 return false;
+            }else{
+                $('#id_fix').val(id_real);
+                for (var i = 0; i < driver_task.length; i++) {
+                    if (driver_task[i].id == id_real) {
+                        $('#driver').val(driver_task[i].driver_name);
+                        var date = new Date(driver_task[i].date_from);
+                        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                        var day = ("0" + date.getDate()).slice(-2);
+                        $('#date').val(date.getFullYear() + '-' + month + '-' + day);
+                        $('#hour_start').val(driver_task[i].date_from.split(' ')[1].split(':')[0]);
+                        $('#minute_start').val(driver_task[i].date_from.split(' ')[1].split(':')[1]);
+                        $("#task_id_fix").val(driver_task[i].task_id);
+                        break;
+                    }
+                }
+                $('#div_driver_0').hide();
+                $('#div_driver_1').show();
+                $('#div_driver_2').show();
+                $('#div_driver_3').hide();
+                $('#hour_end').val('');
+                $('#minute_end').val('');
+                $('#hour_end').val(getActualHour());
+                $('#minute_end').val(getActualMinute());
+                // $('#hour_end').focus();
+                $('#loading').hide();
             }
-            $('#div_driver_0').hide();
-            $('#div_driver_1').show();
-            $('#div_driver_2').show();
-            $('#div_driver_3').hide();
-            $('#hour_end').val('');
-            $('#minute_end').val('');
-            $('#hour_end').val(getActualHour());
-            $('#minute_end').val(getActualMinute());
-            // $('#hour_end').focus();
-            $('#loading').hide();
         }
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');

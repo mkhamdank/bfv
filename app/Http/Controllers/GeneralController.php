@@ -191,9 +191,9 @@ class GeneralController extends Controller
         ->whereDate('date_from','<=',date('Y-m-d'))
         ->whereNull('deleted_at')
         ->orderby('id','asc')
-        ->first();
+        ->get();
 
-        if($driver_task){
+        if(count($driver_task) > 0){
             return view('general_affair.driver.index_search_driver_job')
             ->with('driver_task',$driver_task)
             ->with('id',$id)
@@ -627,31 +627,35 @@ class GeneralController extends Controller
 
     function indexConfirmationDriverJob($id)
     {
-        $task_id = base64_decode($id);
+        $task_ids = [];
+        $task_id = explode('_',$id);
+        for ($i=0; $i < count($task_id); $i++) { 
+            $task_ids[] = base64_decode($task_id[$i]);
+        }
         $driver_task = DB::table('driver_tasks')
-        ->where('task_id',$task_id)
+        ->whereIn('task_id',$task_ids)
         ->where('closure_status','driver')
-        ->first();
+        ->get();
 
         $japanese = null;
-        $driver_otp = '123456';
-        if($driver_task){
+        $driver_task_id_with_otp = [];
+        for ($i=0; $i < count($driver_task); $i++) { 
             $japanese = DB::table('japaneses')
-            ->where('employee_id',$driver_task->requested_id)
+            ->where('employee_id',$driver_task[$i]->requested_id)
             ->first();
             if($japanese){
-                $driver_otp = $japanese->driver_otp;
+                array_push($driver_task_id_with_otp,$driver_task[$i]->id.'_'.$japanese->driver_otp);
             }else{
-                $driver_otp = $driver_task->token;
+                array_push($driver_task_id_with_otp,$driver_task[$i]->id.'_'.$driver_task[$i]->token);
             }
         }
-
+        
         if($driver_task){
             return view('general_affair.driver.index_confirm_task')
             ->with('driver_task',$driver_task)
             ->with('id',$id)
-            ->with('japanese',$japanese)
-            ->with('driver_otp',$driver_otp)
+            ->with('driver_task_id_with_otp',$driver_task_id_with_otp)
+            ->with('driver_task',$driver_task)
             ->with('status','success')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')
@@ -676,7 +680,7 @@ class GeneralController extends Controller
             $minute_end = $request->get('minute_end');
             $date = $request->get('date');
             $id = $request->get('id');
-            $task_id = $request->get('task_id');
+            $task_id = base64_encode($request->get('task_id'));
 
             $driver_task = DB::table('driver_tasks')
             ->where('id',$id)

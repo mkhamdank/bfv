@@ -26,7 +26,11 @@
 		<?php } ?>
 
         <?php if ($status == 'success_found') {
-            $redirect_link = url('')."/index/confirmation/driver/job/".base64_encode($driver_task->task_id) ?>
+            $task_id = [];
+            foreach ($driver_task as $dt) {
+                $task_id[] = base64_encode($dt->task_id);
+            }
+            $redirect_link = url('')."/index/confirmation/driver/job/".join( '_',$task_id) ?>
             <div id="redirect-loading" style="margin-top: 30px;">
                 <span style="font-size: 32px; color: #605ca8;">
                     <i class="fa fa-spinner fa-spin"></i>
