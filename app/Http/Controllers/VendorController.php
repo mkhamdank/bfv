@@ -265,36 +265,96 @@ class VendorController extends Controller
 
             $dept = explode(',', $request->input('departemen'));
 
-            for ($i=0; $i < count($dept); $i++) { 
-                $manager = db::table('approvers')->where('remark', '=', 'Manager')
-                    ->where('department', '=', $dept[$i])
-                    ->first();
+            for ($i=0; $i < count($dept); $i++) {
+                if ($dept[$i] != 'Maintenance Department') {
+                    $manager = db::table('approvers')->where('remark', '=', 'Manager')
+                        ->where('department', '=', $dept[$i])
+                        ->first();
 
-                db::table('wpos_approvals')->insert([
-                    'wpos_id' => $forms,
-                    'approver_id' => $manager->approver_id,
-                    'approver_name' => $manager->approver_name,
-                    'approver_email' => $manager->approver_email,
-                    'department' => $manager->department,
-                    'status' => 'Waiting',
-                    'position' => 'Manager',
-                    'remark' => 'Approved By',
-                    'created_at' => date('Y-m-d H:i:s'),
-                    'updated_at' => date('Y-m-d H:i:s'),
-                ]);
+                    // Get chief and foreman emails in the same department, only if exist
+                    $chiefs = db::table('approvers')
+                        ->where('department', '=', $dept[$i])
+                        ->where('remark', '=', 'Chief')
+                        ->pluck('approver_email')
+                        ->filter()
+                        ->toArray();
 
-                
-                $data = [
-                    'dept' => $manager->department,
-                    'wpos_data' => $data_mail
-                ];
+                    $foreman = db::table('approvers')
+                        ->where('department', '=', $dept[$i])
+                        ->where('remark', '=', 'Foreman')
+                        ->pluck('approver_email')
+                        ->filter()
+                        ->toArray();
 
+                    // Combine all emails (manager, chiefs, foreman), only if exist
+                    $emails = [];
+                    if ($manager && !empty($manager->approver_email)) {
+                        $emails[] = $manager->approver_email;
+                    }
+                    if (!empty($chiefs)) {
+                        $emails = array_merge($emails, $chiefs);
+                    }
+                    if (!empty($foreman)) {
+                        $emails = array_merge($emails, $foreman);
+                    }
 
-                Mail::to($manager->approver_email)
-                ->bcc(['ympi-mis-ML@music.yamaha.com'])
-                ->send(new SendEmail($data, 'wpos'));
+                    db::table('wpos_approvals')->insert([
+                        'wpos_id' => $forms,
+                        'approver_id' => $manager ? $manager->approver_id : null,
+                        'approver_name' => $manager ? $manager->approver_name : null,
+                        'approver_email' => $manager ? $manager->approver_email : null,
+                        'department' => $manager ? $manager->department : $dept[$i],
+                        'status' => 'Waiting',
+                        'position' => 'Manager',
+                        'remark' => 'Approved By',
+                        'created_at' => date('Y-m-d H:i:s'),
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
+
+                    $data = [
+                        'dept' => $manager ? $manager->department : $dept[$i],
+                        'wpos_data' => $data_mail
+                    ];
+
+                    if (!empty($emails)) {
+                        Mail::to($emails)
+                            ->bcc(['ympi-mis-ML@music.yamaha.com'])
+                            ->send(new SendEmail($data, 'wpos'));
+                    }
+                }
             }
 
+
+            //Always Email To Maintenance Section
+            $manager = db::table('approvers')->where('remark', '=', 'Manager')
+                ->where('department', '=', 'Maintenance Department')
+                ->first();
+
+            db::table('wpos_approvals')->insert([
+                'wpos_id' => $forms,
+                'approver_id' => $manager->approver_id,
+                'approver_name' => $manager->approver_name,
+                'approver_email' => $manager->approver_email,
+                'department' => $manager->department,
+                'status' => 'Waiting',
+                'position' => 'Manager',
+                'remark' => 'Approved By',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            
+            $data = [
+                'dept' => $manager->department,
+                'wpos_data' => $data_mail
+            ];
+
+            Mail::to($manager->approver_email)
+            ->bcc(['ympi-mis-ML@music.yamaha.com'])
+            ->send(new SendEmail($data, 'wpos'));
+
+
+            // STD Section
             db::table('wpos_approvals')->insert([
                 'wpos_id' => $forms,
                 'approver_id' => '',
