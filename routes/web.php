@@ -611,7 +611,7 @@ Route::post('input/driver/job_image2', 'App\Http\Controllers\GeneralAffairContro
 Route::post('input/driver/job_image3', 'App\Http\Controllers\GeneralAffairController@inputDriverJobImage3');
 Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@searchDriverJob');
 
-Route::get('index/confirmation/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
+Route::get('index/confirmation/driver/job/{id}/{id_daily}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
 Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
 
 Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverJob');
@@ -678,3 +678,4 @@ Route::get('index/diagnose_molding/evaluation/report/{form_number}', 'App\Http\C
 
 Route::post('update/diagnose_molding/shot', 'App\Http\Controllers\MoldingController@updateShot');
 Route::get('fetch/diagnose_molding/shot_list', 'App\Http\Controllers\MoldingController@fetchShotList');
+Route::post('post/diagnose_molding/kerusakan', 'App\Http\Controllers\MoldingController@postKerusakan');

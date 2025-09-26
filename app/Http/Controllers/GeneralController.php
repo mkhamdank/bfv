@@ -625,7 +625,7 @@ class GeneralController extends Controller
 
     
 
-    function indexConfirmationDriverJob($id)
+    function indexConfirmationDriverJob($id,$id_daily)
     {
         $task_ids = [];
         $task_id = explode('_',$id);
@@ -649,6 +649,46 @@ class GeneralController extends Controller
                 array_push($driver_task_id_with_otp,$driver_task[$i]->id.'_'.$driver_task[$i]->token);
             }
         }
+
+        //JAPANESE
+        $plat_no = base64_decode($id_daily);
+        $driver_lists = DB::table('driver_lists')
+        ->where('plat_no',$plat_no)
+        ->first();
+
+        $calendar = DB::table('weekly_calendars')
+        ->where('week_date',date('Y-m-d'))
+        ->first();
+
+        $japanese = null;
+        $japanese_id = null;
+        if($driver_lists){
+            $japanese = DB::table('japaneses')
+            ->where('employee_id',$driver_lists->passenger_id)
+            ->first();
+            if($japanese){
+                $japanese_id = $japanese->id;
+                if($calendar->remark != 'H'){
+                    array_unshift($driver_task_id_with_otp,'daily_'.$japanese->driver_otp);
+                }
+            }
+        }
+
+        $attendance = null;
+        $driver_list_id = null;
+        $timestamp_attendance = date('Y-m-d').' 05:00:00';
+        $driver_name = null;
+        if($driver_lists){
+            $driver_name = $driver_lists->driver_name;
+            $driver_list_id = $driver_lists->id;
+            $attendance = DB::table('attendances')
+            ->where('employee_id',$driver_lists->driver_id)
+            ->whereDate('datetime',date('Y-m-d'))
+            ->first();
+            if($attendance){
+                $timestamp_attendance = $attendance->datetime;
+            }
+        }
         
         if($driver_task){
             return view('general_affair.driver.index_confirm_task')
@@ -656,6 +696,12 @@ class GeneralController extends Controller
             ->with('id',$id)
             ->with('driver_task_id_with_otp',$driver_task_id_with_otp)
             ->with('driver_task',$driver_task)
+            ->with('id_daily',$id_daily)
+            ->with('plat_no',$plat_no)
+            ->with('timestamp_attendance',$timestamp_attendance)
+            ->with('japanese_id',$japanese_id)
+            ->with('driver_list_id',$driver_list_id)
+            ->with('driver_name',$driver_name)
             ->with('status','success')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')

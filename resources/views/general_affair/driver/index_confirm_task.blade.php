@@ -134,9 +134,14 @@
             </div>
             <?php } ?>
             <?php if($status == 'success'){ ?>
+                <input type="hidden" id="status_daily" value="">
+                <input type="hidden" id="id" value="{{$id_daily}}">
+                <input type="hidden" id="plat_no" value="{{$plat_no}}">
                 <input type="hidden" id="id_fix" value="">
                 <input type="hidden" id="task_id" value="{{$id}}">
                 <input type="hidden" id="task_id_fix" value="">
+                <input type="hidden" id="japanese_id" value="{{$japanese_id}}">
+                <input type="hidden" id="driver_list_id" value="{{$driver_list_id}}">
                 <input type="hidden" id="real_otp" value="{{ join(',',$driver_task_id_with_otp) }}">
                 <table id="div_driver_0" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
                     <tr>
@@ -325,38 +330,76 @@
                 return false;
             }
 
-            var formData = new FormData();
-            formData.append('hour_start',$('#hour_start').val());
-            formData.append('hour_end',$('#hour_end').val());
-            formData.append('minute_start',$('#minute_start').val());
-            formData.append('minute_end',$('#minute_end').val());
-            formData.append('date',$('#date').val());
-            formData.append('id',$('#id_fix').val());
-            formData.append('task_id',$('#task_id_fix').val());
+            if($('#status_daily').val() == 'daily'){
 
-            $.ajax({
-                url:"{{ url('input/confirmation/driver/job') }}",
-                method:"POST",
-                data:formData,
-                dataType:'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success:function(data)
-                {
-                    if (data.status) {
-                        $('#div_driver_3').show();
-                        $('#div_driver_2').hide();
-                        $('#div_driver_1').hide();
-                        $('#loading').hide();
-                        openSuccessGritter('Success','Success Input Data (データの入力に成功しました)');
-                    }else{
-                        openErrorGritter('Error!',data.message);
-                        $('#loading').hide();
+                var formData = new FormData();
+                formData.append('hour_start',$('#hour_start').val());
+                formData.append('minute_start',$('#minute_start').val());
+                formData.append('minute_end',$('#minute_end').val());
+                formData.append('hour_end',$('#hour_end').val());
+                formData.append('date',$('#date').val());
+                formData.append('id',$('#id').val());
+                formData.append('plat_no',$('#plat_no').val());
+                formData.append('driver_list_id',$('#driver_list_id').val());
+                formData.append('japanese_id',$('#japanese_id').val());
+
+                $.ajax({
+                    url:"{{ url('input/confirmation/driver/daily_job') }}",
+                    method:"POST",
+                    data:formData,
+                    dataType:'JSON',
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success:function(data)
+                    {
+                        if (data.status) {
+                            $('#div_driver_3').show();
+                            $('#div_driver_2').hide();
+                            $('#div_driver_1').hide();
+                            $('#loading').hide();
+                            openSuccessGritter('Success','Success Input Data (データの入力に成功しました)');
+                        }else{
+                            openErrorGritter('Error!',data.message);
+                            $('#loading').hide();
+                        }
+
                     }
+                });
+            }else{
+                var formData = new FormData();
+                formData.append('hour_start',$('#hour_start').val());
+                formData.append('hour_end',$('#hour_end').val());
+                formData.append('minute_start',$('#minute_start').val());
+                formData.append('minute_end',$('#minute_end').val());
+                formData.append('date',$('#date').val());
+                formData.append('id',$('#id_fix').val());
+                formData.append('task_id',$('#task_id_fix').val());
 
-                }
-            });
+                $.ajax({
+                    url:"{{ url('input/confirmation/driver/job') }}",
+                    method:"POST",
+                    data:formData,
+                    dataType:'JSON',
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success:function(data)
+                    {
+                        if (data.status) {
+                            $('#div_driver_3').show();
+                            $('#div_driver_2').hide();
+                            $('#div_driver_1').hide();
+                            $('#loading').hide();
+                            openSuccessGritter('Success','Success Input Data (データの入力に成功しました)');
+                        }else{
+                            openErrorGritter('Error!',data.message);
+                            $('#loading').hide();
+                        }
+
+                    }
+                });
+            }
         }
 
         function submitOtp() {
@@ -388,30 +431,49 @@
                 audio_error.play();
                 return false;
             }else{
-                $('#id_fix').val(id_real);
-                for (var i = 0; i < driver_task.length; i++) {
-                    if (driver_task[i].id == id_real) {
-                        $('#driver').val(driver_task[i].driver_name);
-                        var date = new Date(driver_task[i].date_from);
-                        var month = ("0" + (date.getMonth() + 1)).slice(-2);
-                        var day = ("0" + date.getDate()).slice(-2);
-                        $('#date').val(date.getFullYear() + '-' + month + '-' + day);
-                        $('#hour_start').val(driver_task[i].date_from.split(' ')[1].split(':')[0]);
-                        $('#minute_start').val(driver_task[i].date_from.split(' ')[1].split(':')[1]);
-                        $("#task_id_fix").val(driver_task[i].task_id);
-                        break;
+                if(id_real == 'daily'){
+                    $('#div_driver_0').hide();
+                    $('#div_driver_1').show();
+                    $('#div_driver_2').show();
+                    $('#div_driver_3').hide();
+                    $('#status_daily').val('daily');
+                    $('#hour_start').val(getActualHourFromTime('{{ $timestamp_attendance }}'));
+                    $('#minute_start').val(getActualMinuteFromTime('{{ $timestamp_attendance }}'));
+                    $('#hour_end').val('');
+                    $('#minute_end').val('');
+                    $('#hour_end').val(getActualHour());
+                    $('#minute_end').val(getActualMinute());
+                    $('#driver').val('{{ $driver_name }}');
+                    $('#date').val('{{date("Y-m-d")}}');
+                    // $('#hour_end').focus();
+                    $('#loading').hide();
+                }else{
+                    $('#status_daily').val('not_daily');
+                    $('#id_fix').val(id_real);
+                    for (var i = 0; i < driver_task.length; i++) {
+                        if (driver_task[i].id == id_real) {
+                            $('#driver').val(driver_task[i].driver_name);
+                            var date = new Date(driver_task[i].date_from);
+                            var month = ("0" + (date.getMonth() + 1)).slice(-2);
+                            var day = ("0" + date.getDate()).slice(-2);
+                            $('#date').val(date.getFullYear() + '-' + month + '-' + day);
+                            $('#hour_start').val(driver_task[i].date_from.split(' ')[1].split(':')[0]);
+                            $('#minute_start').val(driver_task[i].date_from.split(' ')[1].split(':')[1]);
+                            $("#task_id_fix").val(driver_task[i].task_id);
+                            break;
+                        }
                     }
+                    $('#div_driver_0').hide();
+                    $('#div_driver_1').show();
+                    $('#div_driver_2').show();
+                    $('#div_driver_3').hide();
+                    $('#hour_end').val('');
+                    $('#minute_end').val('');
+                    $('#hour_end').val(getActualHour());
+                    $('#minute_end').val(getActualMinute());
+                    // $('#hour_end').focus();
+                    $('#loading').hide();
                 }
-                $('#div_driver_0').hide();
-                $('#div_driver_1').show();
-                $('#div_driver_2').show();
-                $('#div_driver_3').hide();
-                $('#hour_end').val('');
-                $('#minute_end').val('');
-                $('#hour_end').val(getActualHour());
-                $('#minute_end').val(getActualMinute());
-                // $('#hour_end').focus();
-                $('#loading').hide();
             }
         }
 
@@ -435,8 +497,20 @@
             return h;
         }
 
+        function getActualHourFromTime(dates) {
+            var d = new Date(dates);
+            var h = addZero(d.getHours());
+            return h;
+        }
+
         function getActualMinute() {
             var d = new Date();
+            var m = addZero(d.getMinutes());
+            return m;
+        }
+
+        function getActualMinuteFromTime(dates) {
+            var d = new Date(dates);
             var m = addZero(d.getMinutes());
             return m;
         }
