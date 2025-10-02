@@ -352,44 +352,75 @@
                     var belum_hadir_masuk = 0;
                     var hadir_pulang = 0;
                     var belum_hadir_pulang = 0;
-                    for(var i = 0; i < result.passenger_all.length; i++){
-                        table += "<tr>";
-                        table += "<td style='width: 1%; border: 1px solid black;'>" + (i+1) + "</td>";
-                        table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + result.passenger_all[i].name + "</td>";
+                    var passenger_all = result.passenger_all;
+
+                    var new_passenger_all = [];
+                    
+                    for(var i = 0; i < passenger_all.length; i++){
                         var times_masuk = '-';
                         var times_pulang = '-';
                         for(var j = 0; j < result.time_in.length; j++){
-                            if(result.passenger_all[i].employee_id == result.time_in[j].employee_id){
+                            if(passenger_all[i].employee_id == result.time_in[j].employee_id){
                                 times_masuk = result.time_in[j].time_in;
                                 hadir_masuk++;
                                 if('{{$timing}}' == 'datang'){
-                                    passenger_attend.push(result.passenger_all[i].employee_id);
+                                    passenger_attend.push(passenger_all[i].employee_id);
                                 }
                                 break;
                             }
                         }
 
                         for(var k = 0; k < result.time_out.length; k++){
-                            if(result.passenger_all[i].employee_id == result.time_out[k].employee_id){
+                            if(passenger_all[i].employee_id == result.time_out[k].employee_id){
                                 times_pulang = result.time_out[k].time_out;
                                 break;
                             }
                         }
                         var masukColor = (times_masuk == '-') ? 'lightpink' : 'lightgreen';
-                        table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: " + masukColor + ";'>" + times_masuk + "</td>";
                         if(times_masuk == times_pulang){
                             times_pulang = '-';
                         }else{
                             if('{{$timing}}' == 'pulang'){
                                 hadir_pulang++;
-                                passenger_attend.push(result.passenger_all[i].employee_id);
+                                passenger_attend.push(passenger_all[i].employee_id);
                             }
                         }
                         var pulangColor = (times_pulang == '-') ? 'lightpink' : 'lightgreen';
-                        table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: " + pulangColor + ";'>" + times_pulang + "</td>";
-                        table += "</tr>";
+                        new_passenger_all.push({
+                            employee_id: passenger_all[i].employee_id,
+                            name: passenger_all[i].name,
+                            masuk: times_masuk,
+                            pulang: times_pulang,
+                            masukColor: masukColor,
+                            pulangColor: pulangColor
+                        });
                         total++;
                         // count_pass++;
+                    }
+
+                    new_passenger_all.sort(function(a, b) {
+                        // Check if a or b has attendance
+                        var aHasAttendance = (a.masuk !== '-' || a.pulang !== '-');
+                        var bHasAttendance = (b.masuk !== '-' || b.pulang !== '-');
+                        if (aHasAttendance !== bHasAttendance) {
+                            return aHasAttendance ? -1 : 1;
+                        }
+                        // If both have attendance, sort by latest times_masuk or times_pulang
+                        // Use times_masuk first, if not available use times_pulang
+                        var aTime = a.masuk !== '-' ? a.masuk : a.pulang;
+                        var bTime = b.masuk !== '-' ? b.masuk : b.pulang;
+                        if (aTime === bTime) return 0;
+                        // Sort descending (latest first)
+                        return aTime < bTime ? 1 : -1;
+                    });
+
+                    for(var i = 0; i < new_passenger_all.length; i++){
+                        table += "<tr>";
+                        table += "<td style='width: 1%; border: 1px solid black;'>" + (i+1) + "</td>";
+                        table += "<td style='width: 5%; border: 1px solid black; padding-left: 4px; text-align: left;'>" + new_passenger_all[i].name + "</td>";
+                        table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: " + new_passenger_all[i].masukColor + ";'>" + new_passenger_all[i].masuk + "</td>";
+                        table += "<td style='width: 5%; border: 1px solid black; text-align: center; background-color: " + new_passenger_all[i].pulangColor + ";'>" + new_passenger_all[i].pulang + "</td>";
+                        table += "</tr>";
                     }
                     belum_hadir_masuk = total - hadir_masuk;
                     belum_hadir_pulang = total - hadir_pulang;

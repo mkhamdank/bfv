@@ -1116,7 +1116,7 @@ class GeneralAffairController extends Controller
 
         $bbm = [
             'Pertamax_12200',
-            'Pertamina Dex_13850'
+            'Pertamina Dex_14000'
         ];
         return view('general_affair.driver.index_task',
             array(
@@ -1488,7 +1488,7 @@ class GeneralAffairController extends Controller
                     id AS datang,
                     IF(
                     '".date('Y-m-d H:i:s')."' >= CONCAT('".date('Y-m-d')."', ' ', '04:00:00')
-                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '07:00:00'),
+                    AND '".date('Y-m-d H:i:s')."' <= CONCAT('".date('Y-m-d')."', ' ', '12:00:00'),
                     'ON',
                     'OFF'
                     ) AS `status_datang`,
