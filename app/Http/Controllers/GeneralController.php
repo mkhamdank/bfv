@@ -273,41 +273,125 @@ class GeneralController extends Controller
         ->with('message_jp','日次ドライバータスクの確認');
     }
 
-    function getIp(Request $request) {
-        $_IP_ADDRESS = $_SERVER['REMOTE_ADDR'];
+    function getVehicle($plat_no) {
+        $curl = curl_init();
 
-        $_PERINTAH = "arp -a $_IP_ADDRESS";
-        ob_start();
-        system($_PERINTAH);
-        $_HASIL = ob_get_contents();
-        ob_clean();
-        $_PECAH = strstr($_HASIL, $_IP_ADDRESS);
-        
-        if ($_PECAH == FALSE) {
-            $_HASIL = $_IP_ADDRESS;
-        }else{
-            $_PECAH_STRING = explode($_IP_ADDRESS, str_replace(" ", "", $_PECAH));
-            $_HASIL = substr($_PECAH_STRING[1], 0, 17);               
-        }
-        $position = Location::get($_HASIL);
-        $latitude = null;
-        $longitude = null;
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles',
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
+            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
+            CURLOPT_HTTPHEADER => array(
+                'Accept: application/json',
+                'Content-Type: application/x-www-form-urlencoded',
+                'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+            ),
+        ));
+        $response = curl_exec($curl);
 
-        if ($position && $position->latitude && $position->longitude) {
-            $latitude = $position->latitude;
-            $longitude = $position->longitude;
-        } else {
-            // fallback if location is not detected
-            $latitude = 'Unknown';
-            $longitude = 'Unknown';
+        curl_close($curl);
+
+        $datas = json_decode($response)->data;
+
+        $id_vehicle = '';
+
+        for ($i=0; $i < count($datas); $i++) { 
+            if ($datas[$i]->licensePlate == $plat_no) {
+                $id_vehicle = $datas[$i]->id;
+            }
         }
-        $response = array(
-            'status' => false,
-            'message' => $latitude.' , '.$longitude,
-        );
-        return Response::json($response);
-        var_dump($latitude, $longitude); // Debugging output
-        die(); // Stop execution after debugging output
+
+        $ada_data = 'Tidak';
+
+        $data_vehicle = null;
+        $data_vehicle_fuel = null;
+
+        if ($id_vehicle != '') {
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'',
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
+                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
+                CURLOPT_HTTPHEADER => array(
+                    'Accept: application/json',
+                    'Content-Type: application/x-www-form-urlencoded',
+                    'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+                ),
+            ));
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            $data_vehicle = json_decode($response)->data;
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'/status',
+                CURLOPT_SSL_VERIFYHOST => false,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
+                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
+                CURLOPT_HTTPHEADER => array(
+                    'Accept: application/json',
+                    'Content-Type: application/x-www-form-urlencoded',
+                    'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+                ),
+            ));
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+
+            $data_vehicle_fuel = json_decode($response)->data;
+
+            // $ada_data = 'Ada';
+        }
+        $odometer = 0;
+        if ($data_vehicle != null) {
+            $odometer = $data_vehicle->odometer;
+        }
+        $fuel = 0;
+        if ($data_vehicle_fuel != null) {
+            $fuel = ($data_vehicle_fuel->fuelFiltered / 100) * $data_vehicle_fuel->fuelCapacity;
+        }
+        $latitude = 0;
+        $longitude = 0;
+        if ($data_vehicle_fuel != null) {
+            $latitude = $data_vehicle_fuel->latitude;
+            $longitude = $data_vehicle_fuel->longitude;
+        }
+        $data = [
+            'odometer' => $odometer,
+            'fuel' => $fuel,
+            'latitude' => $latitude,
+            'longitude' => $longitude
+        ];
+        return $data;
     }
 
     function inputConfirmationDriverDailyJob(Request $request)
@@ -327,6 +411,11 @@ class GeneralController extends Controller
             ->where('id',$driver_list_id)
             ->first();
 
+            $odometer = $this->getVehicle($plat_no)['odometer'];
+            $fuel = round($this->getVehicle($plat_no)['fuel'],2);
+            $latitude = $this->getVehicle($plat_no)['latitude'];
+            $longitude = $this->getVehicle($plat_no)['longitude'];
+
             $japanese = DB::table('japaneses')
             ->where('id',$japanese_id)
             ->first();
@@ -342,6 +431,10 @@ class GeneralController extends Controller
                 'driver_phone' => $driver_lists->whatsapp_no,
                 'plat_no' => $plat_no,
                 'car' => $driver_lists->car,
+                'odometer' => $odometer,
+                'fuel' => $fuel,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
                 'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
                 'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
                 'purpose' => 'Pekerjaan',
@@ -770,9 +863,19 @@ class GeneralController extends Controller
             ->where('id',$id)
             ->first();
 
+            $plat_no = $driver_task->plat_no;
+            $odometer = $this->getVehicle($plat_no)['odometer'];
+            $fuel = round($this->getVehicle($plat_no)['fuel'],2);
+            $latitude = $this->getVehicle($plat_no)['latitude'];
+            $longitude = $this->getVehicle($plat_no)['longitude'];
+
             $update_driver_task = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
+                'odometer' => $odometer,
+                'fuel' => $fuel,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
                 'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
                 'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
                 'closure_status' => 'japanese',
