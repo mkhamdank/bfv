@@ -274,9 +274,22 @@ class GeneralController extends Controller
     }
 
     function getIp(Request $request) {
-        $ip = $request->ip(); // ambil IP user
-        $ip = file_get_contents("https://api.ipify.org"); 
-        $position = Location::get($ip);
+        $_IP_ADDRESS = $_SERVER['REMOTE_ADDR'];
+
+        $_PERINTAH = "arp -a $_IP_ADDRESS";
+        ob_start();
+        system($_PERINTAH);
+        $_HASIL = ob_get_contents();
+        ob_clean();
+        $_PECAH = strstr($_HASIL, $_IP_ADDRESS);
+        
+        if ($_PECAH == FALSE) {
+            $_HASIL = $_IP_ADDRESS;
+        }else{
+            $_PECAH_STRING = explode($_IP_ADDRESS, str_replace(" ", "", $_PECAH));
+            $_HASIL = substr($_PECAH_STRING[1], 0, 17);               
+        }
+        $position = Location::get($_HASIL);
         $latitude = null;
         $longitude = null;
 
