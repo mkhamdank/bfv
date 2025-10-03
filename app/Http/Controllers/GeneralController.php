@@ -273,7 +273,7 @@ class GeneralController extends Controller
         ->with('message_jp','日次ドライバータスクの確認');
     }
 
-    function getIp() {
+    function getIp(Request $request) {
         $ip = $request->ip(); // ambil IP user
         $ip = file_get_contents("https://api.ipify.org"); 
         $position = Location::get($ip);
