@@ -9,6 +9,7 @@ use App\Models\FixedAssetCheck;
 use App\Mail\SendEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use Stevebauman\Location\Facades\Location;
 
 use Response;
 
@@ -270,6 +271,30 @@ class GeneralController extends Controller
         ->with('title_jp','日次ドライバータスクの確認')
         ->with('message','Konfirmasi Daily Driver Task')
         ->with('message_jp','日次ドライバータスクの確認');
+    }
+
+    function getIp() {
+        $ip = $request->ip(); // ambil IP user
+        $ip = file_get_contents("https://api.ipify.org"); 
+        $position = Location::get($ip);
+        $latitude = null;
+        $longitude = null;
+
+        if ($position && $position->latitude && $position->longitude) {
+            $latitude = $position->latitude;
+            $longitude = $position->longitude;
+        } else {
+            // fallback if location is not detected
+            $latitude = 'Unknown';
+            $longitude = 'Unknown';
+        }
+        $response = array(
+            'status' => false,
+            'message' => $latitude.' , '.$longitude,
+        );
+        return Response::json($response);
+        var_dump($latitude, $longitude); // Debugging output
+        die(); // Stop execution after debugging output
     }
 
     function inputConfirmationDriverDailyJob(Request $request)

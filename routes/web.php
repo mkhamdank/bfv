@@ -613,6 +613,7 @@ Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@sea
 
 Route::get('index/confirmation/driver/job/{id}/{id_daily}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
 Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
+Route::get('getIp', 'App\Http\Controllers\GeneralController@getIp');
 
 Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverJob');
 Route::post('input/additional/driver/job', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJob');
