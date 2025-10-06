@@ -166,7 +166,7 @@
                     </tr>
                     <tr>
                         <td style="padding-top: 10px;">
-                            <button class="btn btn-success btn-sm" style="width: 90%; font-weight: bold; font-size: 20px;" onclick="submitOtp();">
+                            <button class="btn btn-success btn-sm" id="btn_submit_otp" style="width: 90%; font-weight: bold; font-size: 20px;" onclick="submitOtp();">
                                 確認 Konfirmasi
                             </button>
                         </td>
@@ -383,6 +383,12 @@
                 }
             });
         }
+
+        $('#otp').on('keypress', function(e) {
+            if (e.which === 13) {
+                $('#btn_submit_otp').click();
+            }
+        });
 
         function submitOtp() {
             $('#loading').show();

@@ -777,7 +777,10 @@ class GeneralController extends Controller
             if($japanese){
                 array_push($driver_task_id_with_otp,$driver_task[$i]->id.'_'.$japanese->driver_otp);
             }else{
-                array_push($driver_task_id_with_otp,$driver_task[$i]->id.'_'.$driver_task[$i]->token);
+                $pins = DB::table('driver_pins')
+                ->where('task_id',$driver_task[$i]->task_id)
+                ->first();
+                array_push($driver_task_id_with_otp,$driver_task[$i]->id.'_'.$pins->token);
             }
         }
 
