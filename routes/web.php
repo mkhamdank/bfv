@@ -108,6 +108,9 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
         Route::get('/getPermissions', 'UserController@getPermissions')->name('admin.user.getPermissions');
         // Route::get('/getPermissionsUser/{id}', 'UserController@getPermissionsUser')->name('admin.user.getPermissionsUser');
 
+        Route::get('/setting', 'SettingController@index')->name('admin.settings.index');
+        Route::post('input/change/whatsapp', 'SettingController@changeWhatsapp')->name('admin.settings.changeWhatsapp');
+
     });
 
     // route group prefix admin/vfi
