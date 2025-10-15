@@ -268,8 +268,6 @@ class GeneralAffairController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
-            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
                 'Content-Type: application/x-www-form-urlencoded',
@@ -309,8 +307,6 @@ class GeneralAffairController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -336,8 +332,6 @@ class GeneralAffairController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -428,8 +422,6 @@ class GeneralAffairController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -468,8 +460,6 @@ class GeneralAffairController extends Controller
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                     CURLOPT_HTTPHEADER => array(
                         'Accept: application/json',
                         'Content-Type: application/x-www-form-urlencoded',
@@ -495,8 +485,6 @@ class GeneralAffairController extends Controller
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                     CURLOPT_HTTPHEADER => array(
                         'Accept: application/json',
                         'Content-Type: application/x-www-form-urlencoded',
@@ -1029,8 +1017,6 @@ class GeneralAffairController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
-            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
                 'Content-Type: application/x-www-form-urlencoded',
@@ -1070,8 +1056,6 @@ class GeneralAffairController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -1097,8 +1081,6 @@ class GeneralAffairController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -1313,8 +1295,6 @@ class GeneralAffairController extends Controller
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                     CURLOPT_HTTPHEADER => array(
                         'Accept: application/json',
                         'Content-Type: application/x-www-form-urlencoded',
@@ -1340,8 +1320,6 @@ class GeneralAffairController extends Controller
                     CURLOPT_FOLLOWLOCATION => true,
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                    // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                     CURLOPT_HTTPHEADER => array(
                         'Accept: application/json',
                         'Content-Type: application/x-www-form-urlencoded',

@@ -287,8 +287,6 @@ class GeneralController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
-            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-            // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
             CURLOPT_HTTPHEADER => array(
                 'Accept: application/json',
                 'Content-Type: application/x-www-form-urlencoded',
@@ -328,8 +326,6 @@ class GeneralController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -355,8 +351,6 @@ class GeneralController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
                 CURLOPT_HTTPHEADER => array(
                     'Accept: application/json',
                     'Content-Type: application/x-www-form-urlencoded',
@@ -487,67 +481,7 @@ class GeneralController extends Controller
 
             $fuel_actual_after = 0;
 
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.whatspie.com/messages',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-                "device": "6281130561777",
-                "receiver": "' . $phone . '",
-                "type": "chat",
-                "message": "' . $message . '",
-                "simulate_typing": 1
-            }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
-                ),
-            ));
-            curl_exec($curl);
-
-            curl_close($curl);
-
-            $phone = '6282334197238';
-
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.whatspie.com/messages',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-                "device": "6281130561777",
-                "receiver": "' . $phone . '",
-                "type": "chat",
-                "message": "' . $message . '",
-                "simulate_typing": 1
-            }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
-                ),
-            ));
-            curl_exec($curl);
-
-            curl_close($curl);
+            app(WhatsappController::class)->whatspie($phone, $message);
 
             $response = array(
                 'status' => true,
@@ -600,138 +534,9 @@ class GeneralController extends Controller
 
                 $fuel_actual_after = 0;
 
-                $curl = curl_init();
+                app(WhatsappController::class)->whatspie($phone, $message);
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.whatspie.com/messages',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_SSL_VERIFYHOST => false,
-                    CURLOPT_SSL_VERIFYPEER => false,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => '{
-                    "device": "6281130561777",
-                    "receiver": "' . $phone . '",
-                    "type": "chat",
-                    "message": "' . $message . '",
-                    "simulate_typing": 1
-                }',
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                        'Accept: application/json',
-                        'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
-                    ),
-                ));
-                curl_exec($curl);
-
-                curl_close($curl);
-
-                // $curl = curl_init();
-
-                // curl_setopt_array($curl, array(
-                //     CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles',
-                //     CURLOPT_SSL_VERIFYHOST => false,
-                //     CURLOPT_SSL_VERIFYPEER => false,
-                //     CURLOPT_RETURNTRANSFER => true,
-                //     CURLOPT_ENCODING => '',
-                //     CURLOPT_MAXREDIRS => 10,
-                //     CURLOPT_TIMEOUT => 0,
-                //     CURLOPT_FOLLOWLOCATION => true,
-                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                //     CURLOPT_CUSTOMREQUEST => 'GET',
-                //     // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                //     // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
-                //     CURLOPT_HTTPHEADER => array(
-                //         'Accept: application/json',
-                //         'Content-Type: application/x-www-form-urlencoded',
-                //         'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
-                //     ),
-                // ));
-                // $response = curl_exec($curl);
-
-                // curl_close($curl);
-
-                // $datas = json_decode($response)->data;
-
-                // $id_vehicle = '';
-
-                // for ($i=0; $i < count($datas); $i++) { 
-                //     if ($datas[$i]->licensePlate == $driver_task->plat_no) {
-                //         $id_vehicle = $datas[$i]->id;
-                //     }
-                // }
-
-                // $ada_data = 'Tidak';
-
-                // $data_vehicle = null;
-                // $data_vehicle_fuel = null;
-
-                // if ($id_vehicle != '') {
-                //     $curl = curl_init();
-
-                //     curl_setopt_array($curl, array(
-                //         CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'',
-                //         CURLOPT_SSL_VERIFYHOST => false,
-                //         CURLOPT_SSL_VERIFYPEER => false,
-                //         CURLOPT_RETURNTRANSFER => true,
-                //         CURLOPT_ENCODING => '',
-                //         CURLOPT_MAXREDIRS => 10,
-                //         CURLOPT_TIMEOUT => 0,
-                //         CURLOPT_FOLLOWLOCATION => true,
-                //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                //         CURLOPT_CUSTOMREQUEST => 'GET',
-                //         // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                //         // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
-                //         CURLOPT_HTTPHEADER => array(
-                //             'Accept: application/json',
-                //             'Content-Type: application/x-www-form-urlencoded',
-                //             'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
-                //         ),
-                //     ));
-                //     $response = curl_exec($curl);
-
-                //     curl_close($curl);
-
-                //     $data_vehicle = json_decode($response)->data;
-
-                //     $curl = curl_init();
-
-                //     curl_setopt_array($curl, array(
-                //         CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'/status',
-                //         CURLOPT_SSL_VERIFYHOST => false,
-                //         CURLOPT_SSL_VERIFYPEER => false,
-                //         CURLOPT_RETURNTRANSFER => true,
-                //         CURLOPT_ENCODING => '',
-                //         CURLOPT_MAXREDIRS => 10,
-                //         CURLOPT_TIMEOUT => 0,
-                //         CURLOPT_FOLLOWLOCATION => true,
-                //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                //         CURLOPT_CUSTOMREQUEST => 'GET',
-                //         // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message='.$message.'&type=image&file_name=qrcode123.png&file_url='.$file_url,
-                //         // CURLOPT_POSTFIELDS => 'receiver=6282334197238&device=6281130561777&message=REMINDER!!!%0A%0AMembuat%20Schedule%20Chorei%20MIS%20Bulanan.&type=image&file_name=qrcode123.png&file_url=https%3A%2F%2Fwonder-day.com%2Fwp-content%2Fuploads%2F2020%2F10%2Fwonder-day-among-us-21.png',
-                //         CURLOPT_HTTPHEADER => array(
-                //             'Accept: application/json',
-                //             'Content-Type: application/x-www-form-urlencoded',
-                //             'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
-                //         ),
-                //     ));
-                //     $response = curl_exec($curl);
-
-                //     curl_close($curl);
-
-                //     $data_vehicle_fuel = json_decode($response)->data;
-
-                //     if ($data_vehicle_fuel) {
-                //         $fuel_actual_after = ($data_vehicle_fuel->fuelFiltered/100)*$data_vehicle_fuel->fuelCapacity;
-                //     }
-
-                //     // $ada_data = 'Ada';
-                // }
-
+                
                 $update_driver_task = DB::table('driver_tasks')
                 ->where('task_id',$task_id)
                 ->update([
@@ -926,67 +731,7 @@ class GeneralController extends Controller
 
             $fuel_actual_after = 0;
 
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.whatspie.com/messages',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-                "device": "6281130561777",
-                "receiver": "' . $phone . '",
-                "type": "chat",
-                "message": "' . $message . '",
-                "simulate_typing": 1
-            }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
-                ),
-            ));
-            curl_exec($curl);
-
-            curl_close($curl);
-
-            $phone = '6282334197238';
-
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.whatspie.com/messages',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-                "device": "6281130561777",
-                "receiver": "' . $phone . '",
-                "type": "chat",
-                "message": "' . $message . '",
-                "simulate_typing": 1
-            }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    'Authorization: Bearer UAqINT9e23uRiQmYttEUiFQ9qRMUXk8sADK2EiVSgLODdyOhgU',
-                ),
-            ));
-            curl_exec($curl);
-
-            curl_close($curl);
+            app(WhatsappController::class)->whatspie($phone, $message);
 
             $response = array(
                 'status' => true,
