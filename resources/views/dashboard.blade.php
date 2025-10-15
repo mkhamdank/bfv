@@ -26,6 +26,9 @@
 		<a href="{{url('index/driver/job')}}" class="btn btn-warning" style="width: 100%; font-weight: bold; font-size: 20px; margin-bottom: 10px;">
 			Tugas Driver
 		</a>
+		<a href="{{url('index/driver/toll_parking')}}" class="btn btn-primary" style="width: 100%; font-weight: bold; font-size: 20px; margin-bottom: 10px;">
+			Tol & Parkir
+		</a>
 		<?php } ?>
 		<?php if (in_array($username, $driver_reguler)) { ?>
 		<a href="{{url('index/passenger/attendance')}}" class="btn btn-primary" style="width: 100%; font-weight: bold; font-size: 18px;">

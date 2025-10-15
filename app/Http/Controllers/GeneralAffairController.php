@@ -1663,6 +1663,46 @@ class GeneralAffairController extends Controller
             );
             return Response::json($response);
         }
-        
+    }
+
+    function indexDriverTollParking() {
+        $title = 'Biaya Tol & Parkir Driver';
+        $title_jp = 'ドライバーの通行料と駐車料金';
+        return view('general_affair.driver.index_toll_parking',
+            array(
+                'title' => $title,
+                'title_jp' => $title_jp,
+                'driver_id' => Auth::user()->username,
+            )
+        )->with('page', 'Driver Report');
+    }
+
+    function fetchDriverTollParking(Request $request) {
+        try {
+            $driver_id = $request->get('driver_id');
+            $data = DB::select("SELECT
+            *
+            FROM
+            driver_tasks
+            WHERE
+            remark IS NOT NULL
+            AND closure_status != 'driver'
+            AND closure_status != 'closed'
+            AND etoll IS NULL
+            AND driver_id = '".$driver_id."'
+            ORDER BY
+            date_from DESC");
+            $response = array(
+                'status' => true,
+                'data' => $data
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
     }
 }

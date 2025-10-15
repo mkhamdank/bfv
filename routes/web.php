@@ -605,6 +605,9 @@ Route::get('index/driver/job', 'App\Http\Controllers\GeneralAffairController@ind
 Route::get('fetch/driver/job', 'App\Http\Controllers\GeneralAffairController@fetchDriverJob');
 
 Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexInputDriverJob');
+
+Route::get('index/driver/toll_parking', 'App\Http\Controllers\GeneralAffairController@indexDriverTollParking');
+Route::get('fetch/driver/toll_parking', 'App\Http\Controllers\GeneralAffairController@fetchDriverTollParking');
 // Route::post('input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@inputDriverJob');
 // Route::get('closure/driver/job/{id}', 'App\Http\Controllers\GeneralController@closureDriverJob');
 

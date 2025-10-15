@@ -481,7 +481,7 @@ class GeneralController extends Controller
 
             $fuel_actual_after = 0;
 
-            app(WhatsappController::class)->whatspie($phone, $message);
+            // app(WhatsappController::class)->whatspie($phone, $message);
 
             $response = array(
                 'status' => true,
@@ -534,7 +534,7 @@ class GeneralController extends Controller
 
                 $fuel_actual_after = 0;
 
-                app(WhatsappController::class)->whatspie($phone, $message);
+                // app(WhatsappController::class)->whatspie($phone, $message);
 
                 
                 $update_driver_task = DB::table('driver_tasks')
@@ -731,7 +731,7 @@ class GeneralController extends Controller
 
             $fuel_actual_after = 0;
 
-            app(WhatsappController::class)->whatspie($phone, $message);
+            // app(WhatsappController::class)->whatspie($phone, $message);
 
             $response = array(
                 'status' => true,

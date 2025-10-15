@@ -82,6 +82,14 @@
                                     </p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{url('index/driver/toll_parking')}}" class="nav-link">
+                                    <i class="nav-icon fas fa-parking"></i>
+                                    <p>
+                                        Tol & Parkir
+                                    </p>
+                                </a>
+                            </li>
                             @endcan                         
 
 
@@ -127,7 +135,40 @@
                                     </p>
                                 </a>
                             </li>       
-                            @endcan      
+                            @endcan
+
+                            @can('view molding new')
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-tasks"></i>
+                                    <p>
+                                        Diagnosa Molding
+                                        <i class="fas fa-angle-left right"></i>
+                                        <span class="badge badge-info right"></span>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview" style="display: none;">
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.molding_list') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-cubes"></i>
+                                            <p>Daftar Molding</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.molding_form') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-tasks"></i>
+                                            <p>Daftar Form</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.molding_form') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-chart-bar"></i>
+                                            <p>Monitoring</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            @endcan
 
                             @can('view fixed asset')
                             <li class="nav-item">
