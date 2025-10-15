@@ -473,15 +473,16 @@ class GeneralController extends Controller
             $message .= "Diminta Oleh: " . $driver_task->requested_name . "\\n";
             $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
 
-            $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
-            $link = url('') . '/index/additional/driver/daily_job/'.$insert_driver_task;
-            $message .= $link . "\\n";
-            $message .= "\\nAbaikan jika tidak ada biaya tambahan.\\n";
+            // $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
+            // $link = 'https://ympi.co.id/index/additional/driver/daily_job/'.$insert_driver_task;
+            // $message .= $link."\\n";
+            // $message .= "\\nAbaikan jika tidak ada biaya tambahan.\\n";
+            $message .= "\\nData dapat dicek di website.\\n";
+
+            $message .= "\\nBiaya tol dan parkir dapat diinput melalui website.\\n";
             $message .= "\\n-YMPI GA Dept.-";
 
-            $fuel_actual_after = 0;
-
-            // app(WhatsappController::class)->whatspie($phone, $message);
+            app(WhatsappController::class)->whatspie($phone, $message);
 
             $response = array(
                 'status' => true,
@@ -534,7 +535,7 @@ class GeneralController extends Controller
 
                 $fuel_actual_after = 0;
 
-                // app(WhatsappController::class)->whatspie($phone, $message);
+                app(WhatsappController::class)->whatspie($phone, $message);
 
                 
                 $update_driver_task = DB::table('driver_tasks')
@@ -723,15 +724,14 @@ class GeneralController extends Controller
             $message .= "Diminta Oleh: " . $driver_task->requested_name . "\\n";
             $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
 
-            $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
-            $link = url('') . '/index/additional/driver/job/'.$task_id;
-            $message .= $link . "\\n";
-            $message .= "\\nAbaikan jika tidak ada biaya tambahan.\\n";
+            $message .= "\\nData dapat dicek di website.\\n";
+
+            $message .= "\\nBiaya tol dan parkir dapat diinput melalui website.\\n";
             $message .= "\\n-YMPI GA Dept.-";
 
             $fuel_actual_after = 0;
 
-            // app(WhatsappController::class)->whatspie($phone, $message);
+            app(WhatsappController::class)->whatspie($phone, $message);
 
             $response = array(
                 'status' => true,

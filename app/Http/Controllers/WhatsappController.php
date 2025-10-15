@@ -21,33 +21,16 @@ class WhatsappController extends Controller
         $message = str_replace("%0A", "\\n", $message);
         
         // if(php_sapi_name() === 'cli' || (isset($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] == '10.109.33.34')){
-        //     if(ISSET(Auth::user()->username)){
-        //         $emp = DB::table('employee_syncs')->where('employee_id', Auth::user()->username)->first();
-        //         $mis_phone_number = [];
-        //         if($emp){
-        //             if (substr($emp->phone, 0, 1) == '+') {
-        //                 $phone = substr($emp->phone, 1, 15);
-        //             } else if (substr($emp->phone, 0, 1) == '0') {
-        //                 $phone = "62" . substr($emp->phone, 1, 15);
-        //             } else {
-        //                 $phone = $emp->phone;
-        //             }
-        //             array_push($mis_phone_number, $phone);
-        //         }else{
-        //             array_push($mis_phone_number, '6282334197238');
-        //         }
-        //     }else{
-        //         $mis_phone_number = [                            
-        //             // '082244167224', #Mas Aga
-        //             // '081554119011', #Mas Anton
-        //             '082334197238', #Khamdan
-        //             '085645896741', #Rio
-        //             '08980198771',  #Ibat
-        //             '082234955505', #Ikhlas
-        //             '082111414954', #Hendra            
-        //             '085155177297', #Thomi
-        //         ];
-        //     }
+        //     $mis_phone_number = [                            
+        //         // '082244167224', #Mas Aga
+        //         // '081554119011', #Mas Anton
+        //         '082334197238', #Khamdan
+        //         '085645896741', #Rio
+        //         '08980198771',  #Ibat
+        //         '082234955505', #Ikhlas
+        //         '082111414954', #Hendra            
+        //         '085155177297', #Thomi
+        //     ];
 
         //     // append $phone to message then add newline
         //     $message = '*[TRIAL MIS BFV]*' . "\\n" . "(Received by MIS), real receiver is: " . $phone . "\\n" . $message;
