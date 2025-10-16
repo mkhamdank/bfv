@@ -461,25 +461,8 @@ class GeneralController extends Controller
             $message = '';
 
             $message .= "_*DRIVER ORDER*_\\n";
-            $message .= "\\nTugas Anda telah dikonfirmasi.\\n";
-            
-            $message .= "\\nDetail Tugas:\\n";
-            $message .= "Nama Driver: " . $driver_task->driver_name . "\\n";
-            $message .= "Plat No: " . $driver_task->plat_no . "\\n";
-            $message .= "Mobil: " . $driver_task->car . "\\n";
-            $message .= "Tanggal: " . date('d-m-Y', strtotime($driver_task->date_from)) . "\\n";
-            $message .= "Jam Mulai: " . date('H:i', strtotime($driver_task->date_from)) . "\\n";
-            $message .= "Jam Selesai: " . date('H:i', strtotime($driver_task->date_to)) . "\\n";
-            $message .= "Diminta Oleh: " . $driver_task->requested_name . "\\n";
-            $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
-
-            // $message .= "\\nKlik tautan di bawah jika ada biaya lain-lain (Tol & Parkir).\\n";
-            // $link = 'https://ympi.co.id/index/additional/driver/daily_job/'.$insert_driver_task;
-            // $message .= $link."\\n";
-            // $message .= "\\nAbaikan jika tidak ada biaya tambahan.\\n";
+            $message .= "\\nTugas driver tanggal " . date('d-m-Y', strtotime($driver_task->date_from)) . " telah dikonfirmasi oleh " . $japanese->employee_name . ".\\n";
             $message .= "\\nData dapat dicek di website.\\n";
-
-            $message .= "\\nBiaya tol dan parkir dapat diinput melalui website.\\n";
             $message .= "\\n-YMPI GA Dept.-";
 
             app(WhatsappController::class)->whatspie($phone, $message);
@@ -712,21 +695,8 @@ class GeneralController extends Controller
             $message = '';
 
             $message .= "_*DRIVER ORDER*_\\n";
-            $message .= "\\nTugas Anda telah dikonfirmasi.\\n";
-
-            $message .= "\\nDetail Tugas:\\n";
-            $message .= "Nama Driver: " . $driver_task->driver_name . "\\n";
-            $message .= "Plat No: " . $driver_task->plat_no . "\\n";
-            $message .= "Mobil: " . $driver_task->car . "\\n";
-            $message .= "Tanggal: " . date('d-m-Y', strtotime($driver_task->date_from)) . "\\n";
-            $message .= "Jam Mulai: " . date('H:i', strtotime($driver_task->date_from)) . "\\n";
-            $message .= "Jam Selesai: " . date('H:i', strtotime($driver_task->date_to)) . "\\n";
-            $message .= "Diminta Oleh: " . $driver_task->requested_name . "\\n";
-            $message .= "Tujuan: " . ($driver_task->purpose ?? '-') . "\\n";
-
+            $message .= "\\nTugas driver tanggal " . date('d-m-Y', strtotime($driver_task->date_from)) . " telah dikonfirmasi oleh " . $driver_task->requested_name . ".\\n";
             $message .= "\\nData dapat dicek di website.\\n";
-
-            $message .= "\\nBiaya tol dan parkir dapat diinput melalui website.\\n";
             $message .= "\\n-YMPI GA Dept.-";
 
             $fuel_actual_after = 0;
