@@ -142,7 +142,7 @@
                                     Tanggal Audit</td>
                                 <td colspan="2"
                                     style="padding: 0px; background-color: #01579b; text-align: center; color: white; font-size: 20px;border: 1px solid black">
-                                    <?= date('d F Y') ?></td>
+                                    <?= date('d F Y') ?> <input type="hidden" id="molding_category"></td>
                             </tr>
                             <tr>
                                 <td
@@ -615,7 +615,6 @@
 
         var check_point = <?php echo json_encode($check_points); ?>;
         var moldings = <?php echo json_encode($moldings); ?>;
-        var parts = <?php echo json_encode($molding_parts); ?>;
         var part_status = [];
         var part_err = [];
         var num = 1;
@@ -726,11 +725,12 @@
             $("#employee_name").text($("#pic").val() + ' - ' + $("#pic option:selected").text());
             var type = '';
             var mold_num = '';
-
+            
             $.each(moldings, function(index, value) {
                 if (value.molding_type + "_" + value.molding_category == $("#moldings").val()) {
                     type = value.molding_type;
                     mold_num = value.mold_number;
+                    $("#molding_category").val(value.molding_category);
                 }
             })
 
@@ -742,30 +742,38 @@
             var body = '';
             body += "<tr>";
 
-            $.each(parts, function(index, value) {
-                if (value.molding_type + "_" + value.molding_category == $("#molding_id").val()) {
-                    cls = "btn-danger";
-
-                    if (value.sudah) {
-                        cls = "btn-success";
+            //get part molding list
+            var param = {
+                molding: $("#moldings").val(),
+                period: $("#prd").val()
+            };
+            $.get("{{ url('fetch/workshop/check_molding_vendor/part') }}", param, function(data) {
+                $.each(data.molding_part, function(index, value) {
+                    if (value.molding_type + "_" + value.molding_category == $("#molding_id").val()) {
+                        cls = "btn-danger";
+    
+                        if (value.sudah) {
+                            cls = "btn-success";
+                        }
+                        body += "<td width='1%' style='vertical-align: top'><button class='btn btn-xs " + cls +
+                            "' style='width: 100%; text-align:left' onclick='add_point(\"" + value.part_name + "\")'>" +
+                            num + ") " + value.part_name + "</button></td>";
+    
+    
+                        if (num % 5 === 0 && num != 1) {
+                            body += "</tr>";
+                            body += "<tr>";
+                        }
+    
+                        num++;
                     }
-                    body += "<td width='1%' style='vertical-align: top'><button class='btn btn-xs " + cls +
-                        "' style='width: 100%; text-align:left' onclick='add_point(\"" + value.part_name + "\")'>" +
-                        num + ") " + value.part_name + "</button></td>";
+                })
+    
+                body += '</tr>';
+    
+                $("#div_part").append(body);
+            });
 
-
-                    if (num % 5 === 0 && num != 1) {
-                        body += "</tr>";
-                        body += "<tr>";
-                    }
-
-                    num++;
-                }
-            })
-
-            body += '</tr>';
-
-            $("#div_part").append(body);
 
         }
 
@@ -1004,6 +1012,7 @@
             formData.append('molding_name', $('#molding_name').text());
             formData.append('pic', $('#employee_name').text());
             formData.append('location', $('#location').text());
+            formData.append('molding_category', $('#molding_category').val());
             formData.append('part', part);
             formData.append('cek_poin', cek_poin);
             formData.append('judgement', judgement);
@@ -1022,6 +1031,8 @@
                     $("#loading").hide();
 
                     alert('Pengecekan Berhasil Tersimpan');
+
+                    selectMolding();
 
                     $("#body_cek").empty();
                 },
@@ -1329,7 +1340,6 @@
 
         function loadMolding(elem) {
             var molds = <?php echo json_encode($period_cek); ?>;
-            console.table(molds);
             
             $("#moldings").empty();
 

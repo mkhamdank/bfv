@@ -113,19 +113,7 @@ class workshopController extends Controller
 		->orderBy('period', 'DESC')
 		->get();
 
-		$molding_part = db::table('pe_molding_part_masters')
-		->leftJoin(db::raw("(SELECT check_date, molding_name, molding_type, molding_category, molding_number, part_name from pe_molding_checks
-		LEFT JOIN pe_molding_check_details on pe_molding_checks.id = pe_molding_check_details.check_id) as cek"), function($q) {
-			$q->on('cek.molding_type', '=', 'pe_molding_part_masters.molding_type')
-			   ->on('cek.molding_category', '=', 'pe_molding_part_masters.molding_category')
-			   ->on('cek.part_name', '=', 'pe_molding_part_masters.part_name');
-		})
-			->select('molding_id', 'pe_molding_part_masters.molding_name', 'pe_molding_part_masters.molding_type', 'pe_molding_part_masters.molding_category', 'pe_molding_part_masters.molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('cek.part_name as sudah'))
-			->get();
-
 		$pic = db::table('employee_datas')->select('employee_id', db::raw('employee_name as name'))->orderBy('employee_name', 'asc')->get();
-
-		// dd($molding_part);
 
 		$period = [];
 
@@ -142,12 +130,41 @@ class workshopController extends Controller
 				'title_jp' => $title_jp,
 				'check_points' => $cek_poin,
 				'moldings' => $molding,
-				'molding_parts' => $molding_part,
 				'period_cek' => $period_cek,
 				'period' => $period,
 				'pics' => $pic
 			)
 		)->with('page', 'Workshop Audit Molding');
+	}
+
+	public function fetchPartMolding(Request $request)
+	{
+		try {
+			$period_from = date("Y-m-d", strtotime($request->get('period')."-01"));
+			$period_to = date("Y-m-t", strtotime($request->get('period')));
+
+			$molding_part = db::table('pe_molding_part_masters')
+			->leftJoin(db::raw("(SELECT check_date, molding_name, molding_type, molding_category, molding_number, part_name from pe_molding_checks
+			LEFT JOIN pe_molding_check_details on pe_molding_checks.id = pe_molding_check_details.check_id where check_date BETWEEN '$period_from' AND '$period_to') as cek"), function($q) {
+				$q->on('cek.molding_type', '=', 'pe_molding_part_masters.molding_type')
+				->on('cek.molding_category', '=', 'pe_molding_part_masters.molding_category')
+				->on('cek.part_name', '=', 'pe_molding_part_masters.part_name');
+			})
+			->select('molding_id', 'pe_molding_part_masters.molding_name', 'pe_molding_part_masters.molding_type', 'pe_molding_part_masters.molding_category', 'pe_molding_part_masters.molding_number', 'pe_molding_part_masters.part_number', 'pe_molding_part_masters.part_name', db::raw('cek.part_name as sudah'))
+			->get();
+
+			$response = array(
+				'status' => true,
+				'molding_part' => $molding_part
+			);
+			return Response::json($response);
+		} catch (\Throwable $th) {
+			$response = array(
+				'status' => false,
+				'message' => $th
+			);
+			return Response::json($response);
+		}
 	}
 
 	public function postCheckMolding(Request $request)
@@ -168,6 +185,7 @@ class workshopController extends Controller
 				'molding_number' => $request->get('molding_number'),
 				'pic' => $request->get('pic'),
 				'location' => $request->get('location'),
+				'molding_category' => $request->get('molding_category'),
 				'conclusion' => 'OK',
 				'status' => 'Close',
 				'created_by' => Auth::user()->username,

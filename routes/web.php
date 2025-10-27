@@ -393,6 +393,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::get('index/workshop/check_molding_vendor', 'workshopController@indexCheckMolding');
     Route::get('fetch/workshop/check_molding_vendor/monitoring', 'workshopController@fetchCheckMoldingMonitoring');
     Route::get('index/workshop/check_molding_vendor/create', 'workshopController@indexCreateCheckMolding');
+    Route::get('fetch/workshop/check_molding_vendor/part', 'workshopController@fetchPartMolding');
     Route::post('post/workshop/check_molding_vendor', 'workshopController@postCheckMolding');
     Route::get('fetch/workshop/check_molding_vendor/record', 'workshopController@fetchCheckMolding');
     Route::post('post/workshop/check_molding_vendor/temuan', 'workshopController@postFindingMolding');
