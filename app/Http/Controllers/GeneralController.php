@@ -593,6 +593,10 @@ class GeneralController extends Controller
                 $japanese_id = $japanese->id;
                 if($calendar->remark != 'H'){
                     array_unshift($driver_task_id_with_otp,'daily_'.$japanese->driver_otp);
+                }else{
+                    if($japanese->remark == 'NS'){
+                        array_unshift($driver_task_id_with_otp,'daily_'.$japanese->driver_otp);
+                    }
                 }
             }
         }
