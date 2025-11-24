@@ -155,6 +155,18 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
+                                        <a href="{{ route('user.molding_input_shot') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-user-edit"></i>
+                                            <p>Riwayat Shot</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('user.molding_trouble') }}" class="nav-link">
+                                            <i class="nav-icon fas fa-hand-holding-medical"></i>
+                                            <p>Riwayat Kerusakan</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
                                         <a href="{{ route('user.molding_form') }}" class="nav-link">
                                             <i class="nav-icon fas fa-tasks"></i>
                                             <p>Daftar Form</p>

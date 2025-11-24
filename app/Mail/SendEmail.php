@@ -48,5 +48,29 @@ class SendEmail extends Mailable
                 ->view('raw_material.po_notification');
         }
 
+        if ($this->remark == 'molding_approval') {
+            return $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+                ->subject('Molding Approval')
+                ->view('molding.mails.mold_approval');
+        }
+
+        if ($this->remark == 'reminder_shot_molding') {
+            return $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+                ->subject('Reminder Pengisian Shot Molding')
+                ->view('molding.mails.reminder_shot_molding');
+        }
+
+        if ($this->remark == 'reminder_form_molding') {
+            return $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+                ->subject('Reminder Diagnosa Molding')
+                ->view('molding.mails.reminder_form_molding');
+        }
+
+        if ($this->remark == 'summary_molding') {
+            return $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+                ->subject('Summary Molding')
+                ->view('molding.mails.summary_molding');
+        }
+
     }
 }

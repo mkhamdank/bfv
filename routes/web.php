@@ -676,6 +676,12 @@ Route::post('save/diagnose_molding/mold_molding_check', 'App\Http\Controllers\Mo
 Route::post('save/diagnose_molding/product_check_real', 'App\Http\Controllers\MoldingController@saveProductCheckReal');
 Route::get('index/diagnose_molding/evaluation/edit/{form_number}', 'App\Http\Controllers\MoldingController@indexEvaluationEdit');
 Route::post('save/diagnose_molding/evaluation', 'App\Http\Controllers\MoldingController@saveEvaluation');
+Route::get('save_and_send/diagnose_molding/molding_form', 'App\Http\Controllers\MoldingController@saveAndSendMoldingForm');
+Route::get('resend/diagnose_molding/molding_form', 'App\Http\Controllers\MoldingController@sendMoldingForm');
+Route::get('index/diagnose_molding/shot_list/{month_range?}', 'App\Http\Controllers\MoldingController@indexShotList')->name('user.molding_input_shot');
+Route::get('index/diagnose_molding/trouble_list', 'App\Http\Controllers\MoldingController@indexTroubleList')->name('user.molding_trouble');
+Route::get('approval/diagnose_molding/{status}/{approval}/{form_number}', 'App\Http\Controllers\MoldingController@approvalMoldingForm');
+Route::get('fetch/diagnose_molding/molding_shot', 'App\Http\Controllers\MoldingController@fetchMoldingShot');
 
 Route::get('index/diagnose_molding/mold_product_check/report/{form_number}', 'App\Http\Controllers\MoldingController@indexMoldProductReport');
 // Route::get('index/diagnose_molding/mold_product_check/report/{form_number}', 'App\Http\Controllers\MoldingController@MoldProductReport');

@@ -11,6 +11,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\PermissionControlPanel::class,
         Commands\PublicCleaner::class,
+        Commands\ReminderShotMolding::class,
+        Commands\SummaryMolding::class,
     ];
     /**
      * Define the application's command schedule.

@@ -1,0 +1,477 @@
+@extends('layouts.master')
+@section('stylesheets')
+    <link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
+    <style type="text/css">
+        #loading,
+        #error {
+            display: none;
+        }
+
+        table.table-bordered>thead>tr>th {
+            color: white;
+            background-color: black;
+        }
+
+        table.table-bordered>tbody>tr>td {
+            color: black;
+            background-color: white;
+        }
+
+        #loading {
+            display: none;
+        }
+
+        div.dataTables_filter {
+            float: right !important;
+            text-align: right;
+        }
+    </style>
+@stop
+@section('header')
+@stop
+@section('content')
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <section class="content" style="padding: 10px">
+        <div id="loading"
+            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display:none">
+            <p style="position: absolute; color: white; top: 45%; left: 35%;">
+                <span style="font-size: 40px">Loading, Please Wait . . . <i class="fa fa-spin fa-refresh"></i></span>
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10">
+                <input type="hidden" id="green">
+                <h2>Daftar Form Diagnosa Molding</h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped dataTable dtr-inline" style="width: 100%; margin-bottom: 10px" id="tableShot">
+                            <thead style="text-align: center">
+                                <tr>
+                                    <th style="width: 10%">FA Number</th>
+                                    <th>Nama Molding</th>
+                                    <th style="width: 10%">25 Apr W1</th>
+                                    <th style="width: 10%">25 Apr W2</th>
+                                    <th style="width: 10%">25 Apr W3</th>
+                                    <th style="width: 10%">25 Apr W4</th>
+                                    <th style="width: 10%">25 Apr W5</th>
+                                    <th style="width: 10%">25 Apr W6</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyTableShot">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+@section('scripts')
+    <script src="{{ url('js/bootstrap-toggle.min.js') }}"></script>
+    <script src="{{ url('plugins/timepicker/bootstrap-timepicker.min.js') }}"></script>
+    <script src="{{ url('js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ url('js/buttons.flash.min.js') }}"></script>
+    <script src="{{ url('js/jszip.min.js') }}"></script>
+    <script src="{{ url('js/vfs_fonts.js') }}"></script>
+    <script src="{{ url('js/buttons.html5.min.js') }}"></script>
+    <script src="{{ url('js/buttons.print.min.js') }}"></script>
+    <!-- <script src="{{ url('js/popper.min.js') }}"></script> -->
+    <script src="{{ url('js/jquery.gritter.min.js') }}"></script>
+
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        var check_point = [];
+        var moldings = [];
+        var parts = [];
+        var part_status = [];
+        var part_err = [];
+        var num = 1;
+        const compressedFiles = [];
+
+        jQuery(document).ready(function() {
+            $("#wrapper").toggleClass("toggled");
+
+            getData();
+
+            $('.select2').select2({
+                dropdownAutoWidth: true,
+                allowClear: true,
+                dropdownParent: $('#molding_select')
+            });
+        })
+
+        function getData() {
+            $.get('{{ url('fetch/diagnose_molding/molding_form') }}', function(result, status, xhr) {
+                if (result.status) {
+                    var tableData = "";
+                    $.each(result.data, function(key, value) {
+                        tableData += '<tr>';
+                        tableData += '<td></td>';
+                        tableData += '<td>' + value.month + '</td>';
+                        tableData += '<td>' + value.form_number + '</td>';
+                        tableData += '<td>' + value.fixed_asset_number + '</td>';
+                        tableData += '<td>' + value.fixed_asset_name + '</td>';
+                        if (!value.id_product_check) {
+                            tableData +=
+                                '<td><center>';
+                                
+                                if (value.form_product_id) {
+                                    tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_product_check/create') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit Form</a>';
+
+                                    tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_product_check/report') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-danger btn-sm" target="_blank"><i class="far fa-file-pdf"></i> Report</a>';
+
+                                    tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_product_check/report_ng') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-danger btn-sm" target="_blank"><i class="far fa-file-pdf"></i> NG</a>';
+                                } else {
+                                    tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_product_check/create') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-success btn-sm"><i class="fas fa-plus"></i> Buat Form</a>';
+                                }
+                                tableData += '</center></td>';
+                        } else {
+                            tableData += '<td>Form</td>';
+                        }
+
+                        if (value.form_molding_id) {
+                            tableData +=
+                                '<td><center>';
+                                tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_molding_check/create') }}/' +
+                                value.form_number +
+                                '" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit Form</a>';
+
+                                tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_molding_check/report') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-danger btn-sm" target="_blank"><i class="far fa-file-pdf"></i> Report</a>';
+
+                                tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_molding_check/report_ng') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-danger btn-sm" target="_blank"><i class="far fa-file-pdf"></i> NG</a>';
+                                tableData += '</center></td>';
+                        } else {
+                            tableData +=
+                                '<td><center>';
+                                tableData += '<a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/mold_molding_check/create') }}/' +
+                                value.form_number +
+                                '" class="btn btn-success btn-sm"><i class="fas fa-plus"></i> Buat Form</a></center>';
+                                tableData += '</td>';
+                        }
+
+                        tableData += '<td><center><a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/evaluation/edit') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit Form</a><br><a style="margin-bottom: 5px; margin-right: 5px;" href="{{ url('index/diagnose_molding/evaluation/report') }}/' +
+                                    value.form_number +
+                                    '" class="btn btn-danger btn-sm" target="_blank"><i class="far fa-file-pdf"></i> Report</a></center></td>';
+                        tableData += '<td style="text-align: center;">' + (value.status ? value.status : '-') + '</td>';
+                        tableData += '</tr>';
+                    });
+                    $('#bodyTableMaster').html(tableData);
+
+                    // Initialize DataTable
+                    var table = $('#tableMaster').DataTable({
+                        "buttons": [
+                            'copy', 'excel',
+                            {
+                                text: 'Show All',
+                                className: 'btn btn-info',
+                                action: function (e, dt, node, config) {
+                                    dt.search('').columns().search('').draw();
+                                    $('#tableMaster thead input, #tableMaster thead select').val('');
+                                }
+                            }
+                        ],
+                        "paging": true,
+                        "lengthChange": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": false,
+                        "responsive": true,
+                        "dom": '<"row mb-2"<"col-md-6"B><"col-md-6 text-end"f>>' +
+                        '<"row"<"col-12"tr>>' +
+                        '<"row mt-2"<"col-md-6"i><"col-md-6"p>>',
+                        "paging": true,
+                        "lengthChange": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": false,
+                        "responsive": true,
+                    });
+
+                    table.on('order.dt search.dt draw.dt', function() {
+                        let pageInfo = table.page.info();
+                        table.column(0, {
+                                search: 'applied',
+                                order: 'applied',
+                                page: 'current'
+                            })
+                            .nodes()
+                            .each(function(cell, i) {
+                                cell.innerHTML = i + 1 + pageInfo.start;
+                            });
+                    }).draw();
+                }
+            })
+        }
+
+        function fetchDetailRecord() {
+            $('#loading').show();
+            var date_from = $('#date_from').val();
+            var date_to = $('#date_to').val();
+            var moldings = $('#molding_select').val();
+            var pics = $('#molding_select').val();
+
+            var data = {
+                date_from: date_from,
+                date_to: date_to,
+                moldings: moldings
+            }
+            $.get('{{ url('fetch/workshop/check_molding_vendor/record') }}', data, function(result, status, xhr) {
+                if (result.status) {
+                    $('#bodyTableDetail').empty();
+                    var tableData = "";
+
+                    $.each(result.datas, function(key, value) {
+                        tableData += '<tr>';
+                        tableData += '<td>' + value.id + '</td>';
+                        tableData += '<td>' + value.check_date + '</td>';
+                        tableData += '<td>' + value.molding_name + '</td>';
+
+                        var nama = value.pic;
+                        $.each(result.employees, function(key2, value2) {
+                            if (value.pic == value2.employee_id) {
+                                nama = value2.name
+                            }
+                        })
+
+                        tableData += '<td>' + nama + '</td>';
+                        tableData += '<td>' + value.point_check + '</td>';
+                        tableData +=
+                            '<td><img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
+                            value.photo_before1 + '" alt="">';
+                        tableData +=
+                            '<img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
+                            value.photo_before2 + '" alt=""></td>';
+
+                        tableData +=
+                            '<td><img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
+                            value.photo_after1 + '" alt="">';
+                        tableData +=
+                            '<img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
+                            value.photo_after2 + '" alt=""></td>';
+
+                        tableData +=
+                            '<td><img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
+                            value.photo_activity1 + '" alt="">';
+                        tableData +=
+                            '<img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
+                            value.photo_activity2 + '" alt=""></td>';
+
+                        tableData += '<td>' + value.judgement + '</td>';
+                        tableData += '<td>' + value.status + '</td>';
+                        tableData += '</tr>';
+                    });
+
+                    $('#bodyTableDetail').append(tableData);
+                    $('#loading').hide();
+                } else {
+                    $('#loading').hide();
+                    openErrorGritter('Error', result.message);
+                }
+            });
+        }
+
+        // function readURL(input, idfile) {
+        //     const files = input.files;
+
+        //     // const files = input.target.files;
+        //     const imagePreview = $('#imagePreview');
+
+        //     // Clear any previous previews
+        //     imagePreview.empty();
+
+        //     for (let i = 0; i < files.length; i++) {
+        //         const file = files[i];
+        //         const option = {
+        //             quality: 0.7,
+        //             maxWidth: 800,
+        //             maxHeight: 600,
+        //         };
+        //         compressImage(file, option)
+        //             .then(function(compressedFile) {
+        //                 // compressedFiles.push(compressedFile);
+        //                 var img = $(input).closest("td").find("." + idfile);
+        //                 $(img).show();
+        //                 $(img).attr('src', compressedFile);
+        //                 console.log(compressedFile);
+        //             })
+        //             .catch(function(error) {
+        //                 console.log(error.message);
+        //             });
+        //     }
+        // }
+
+        function readURL(input, idfile) {
+            if (input.files && input.files[0]) {
+                quality = 60;
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    var img = $(input).parent().find("." + idfile);
+                    $(img).show();
+
+                    // Create a new image element
+                    var tempImage = new Image();
+
+                    tempImage.onload = function() {
+                        // Create a canvas element
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+
+                        // Set the canvas dimensions to the image dimensions
+                        canvas.width = tempImage.width;
+                        canvas.height = tempImage.height;
+
+                        // Draw the image on the canvas
+                        ctx.drawImage(tempImage, 0, 0);
+
+                        // Get the compressed data URL
+                        var compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                        // Set the source of the img element to the compressed data URL
+                        $(img).attr('src', compressedDataUrl);
+                    };
+
+                    // Set the source of the temporary image to the FileReader result
+                    tempImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function readURL2(input, idfile) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    var img = $(input).parent().find("." + idfile);
+                    $(img).show();
+                    $(img).attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function cariTemuan() {
+            // tableMasalah
+            $("#bodyMasalah").empty();
+            body = '';
+
+            var data = {
+                date_from: $("#riwayat_dari").val(),
+                date_to: $("#riwayat_sampai").val()
+            }
+
+            $.get('{{ url('fetch/workshop/check_molding_vendor/temuan') }}', data, function(result, status, xhr) {
+                if (result.status) {
+                    $.each(result.datas, function(index, value) {
+                        body += "<tr>";
+                        body += "<td>" + (index + 1) + "</td>";
+                        body += "<td>" + value.check_date + "</td>";
+                        body += "<td>" + value.molding_name + "</td>";
+                        body += "<td>" + value.part_name + "</td>";
+                        body += "<td>" + value.problem + "<br>";
+
+                        if (value.problem_att) {
+                            var problem_att = value.problem_att.split(",");
+                            body +=
+                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
+                                problem_att[0] + '" alt="">';
+                            body +=
+                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
+                                problem_att[1] + '" alt="">';
+                        }
+
+                        body += "</td>";
+                        body += "<td>" + value.handling_temporary + "<br>";
+
+                        if (value.handling_att) {
+                            var handling_att = value.handling_att.split(",");
+                            body +=
+                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
+                                handling_att[0] + '" alt="">';
+                            body +=
+                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
+                                handling_att[1] + '" alt="">';
+                        }
+
+                        body += "</td>";
+                        body += "<td>" + (value.note_problem || "") + "</td>";
+
+                        var label = '';
+
+                        if (value.status == "Open")
+                            label = 'badge-danger';
+                        else if (value.status == "Temporary Close")
+                            label = 'badge-warning';
+                        else
+                            label = 'badge-success';
+
+                        body += "<td><center><span class='badge " + label + "'>" + value.status +
+                            "</span></center></td>";
+                        body += "</tr>";
+                    })
+
+                    $("#bodyMasalah").append(body);
+                } else {
+                    openErrorGritter('Error', result.message);
+                }
+            })
+        }
+
+        function openSuccessGritter(title, message) {
+            jQuery.gritter.add({
+                title: title,
+                text: message,
+                class_name: 'growl-success',
+                image: '{{ url('images/image-screen.png') }}',
+                sticky: false,
+                time: '2000'
+            });
+        }
+
+        function openErrorGritter(title, message) {
+            jQuery.gritter.add({
+                title: title,
+                text: message,
+                class_name: 'growl-danger',
+                image: '{{ url('images/image-stop.png') }}',
+                sticky: false,
+                time: '2000'
+            });
+            audio_error.play();
+        }
+
+        // Handle the change event for the file input
+        var audio_error = new Audio('{{ url('sounds/error.mp3') }}');
+    </script>
+@endsection
