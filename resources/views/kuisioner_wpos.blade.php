@@ -950,7 +950,7 @@
 						<span>
 							Catatan
 							<br>◆ Tandai kolom "checkboxes" diatas sebagai perhatian khusus dan telah dikerjakan
-							<br>◆ Bekerja dalam jarak ± 10 m dari bahan yang mudah terbakar harus di-cover/isolasi dengan aman
+							<br>◆ Bekerja dalam jarak ± 11 m dari bahan yang mudah terbakar harus di-cover/isolasi dengan aman
 							<br>◆ Pekerjaan hanya boleh dikerjakan setelah Work Permit ini di approve dan anda telah menerima email konfirmasi
 							<br>◆ Penanggung jawab vendor harus memastikan 5S & keselamatan lokasi area kerja setelah selesai pekerjaan
 						</span>
@@ -1341,7 +1341,7 @@
 						<br>
 
 						<b>Inspeksi / Pengecekan <span style="color: red">*</span></b><br>
-						Apakah sudah dipastikan area kerja aman setelah 30 menit pekerjaan selesai?<br>
+						Apakah sudah dipastikan area kerja aman setelah 60 menit pekerjaan selesai?<br>
 
 						<div class="validate-input" style="position: relative; width: 100%">
 							<label class="radio" style="margin-top: 5px;margin-left: 25px;"> 
@@ -1365,7 +1365,7 @@
 						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
 							<span>Penyataan Pelaksana</span>
 						</span>
-						Untuk pekerjaan Hot Work ini selalu memastikan area kerja sebelum dan sesudah pelaksanaan betul-betul bebas dari resiko kebakaran dimana untuk material-material yang berpotensi menyebabkan kebakaran di-isolasi minimal 10 meter dari lokasi kerja atau di-isolasi dengan menggunakan welding curtain/blanket jika kondisi tidak memungkinkan.
+						Untuk pekerjaan Hot Work ini selalu memastikan area kerja sebelum dan sesudah pelaksanaan betul-betul bebas dari resiko kebakaran dimana untuk material-material yang berpotensi menyebabkan kebakaran di-isolasi minimal 11 meter dari lokasi kerja atau di-isolasi dengan menggunakan welding curtain/blanket jika kondisi tidak memungkinkan.
 					</div>
 					<div id="space_permit" style="display:none">
 						<span class="contact100-form-title" style="margin-top: 10px;color: white;background-color: #b464f5;text-align:left;font-weight: bold;padding: 10px;font-size: 16px;">
@@ -1639,6 +1639,7 @@
 				'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 			}
 		});
+
 		function ChangePermit(elem){
 
 			if (elem.value == "Height Permit") {
@@ -1653,6 +1654,9 @@
 				$('#hot_work_permit').show();
 				$('#space_permit').hide();
 				$('#vendor_permit').show();
+				
+				// CEK TANGGAL DI SINI
+				checkHotPermitDate();
 			}
 
 			else if (elem.value == "Confined Space Permit") {
@@ -1668,6 +1672,29 @@
 				$('#space_permit').hide();
 				$('#vendor_permit').show();
 			}
+		}
+
+		function checkHotPermitDate() {
+			var from = $('#date_from').val();
+			var to = $('#date_to').val();
+
+			if (from && to && from !== to) {
+				alert('Hot Work Permit hanya boleh 1 hari.');
+				
+				// SCROLL KE ATAS KE TANGGAL
+				$('html, body').animate({
+					scrollTop: $('#date_from').offset().top - 100
+				}, 500);
+
+				// OPTIONAL: fokus ke field
+				$('#date_from').focus();
+				
+				$('#height_permit').hide();
+				$('#hot_work_permit').hide();
+				$('#space_permit').hide();
+				$('#vendor_permit').hide();
+			}
+			
 		}
 
 		function alat_berat(elem){
@@ -1686,6 +1713,16 @@
 				openErrorGritter('Error!', 'Pastikan Semua Bertanda * Sudah Diisi');
 				return false;
 			}
+
+			// var permit = $('input[id="work_permit"]:checked').val();
+			// var from = $('#date_from').val();
+			// var to = $('#date_to').val();
+
+			// if (permit == "Hot Work Permit" && from != to) {
+			// 	$("#loading").hide();
+			// 	openErrorGritter('Error!', 'Hot Work Permit hanya boleh 1 hari (Tanggal Dari dan Sampai harus sama)');
+			// 	return false;
+			// }
 
 			var jenis_pekerjaan = [];
 			$("input[name='jenis_pekerjaan']:checked").each(function (i) {
