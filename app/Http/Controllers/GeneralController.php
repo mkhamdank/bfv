@@ -189,10 +189,24 @@ class GeneralController extends Controller
         ->where('plat_no',$plat_no)
         ->whereIn('remark',['japanese','reguler'])
         ->where('closure_status','driver')
-        ->whereDate('date_from','<=',date('Y-m-d'))
+        ->whereDate('date_from','=',date('Y-m-d'))
         ->whereNull('deleted_at')
         ->orderby('id','asc')
         ->get();
+
+        $check_daily = DB::table('driver_lists')
+        ->where('plat_no',$plat_no)
+        ->whereNotNull('passenger_id')
+        ->first();
+
+        if($check_daily){
+            $update = DB::table('driver_lists')
+            ->where('plat_no',$plat_no)
+            ->update([
+                'daily_close_status' => null,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
 
         if(count($driver_task) > 0){
             return view('general_affair.driver.index_search_driver_job')
@@ -241,6 +255,7 @@ class GeneralController extends Controller
                 $timestamp_attendance = $attendance->datetime;
             }
         }
+
         if(!$japanese){
             return view('general_affair.driver.index_confirm_daily_task')
             ->with('status','error')
@@ -257,6 +272,26 @@ class GeneralController extends Controller
             ->with('title_jp','日次ドライバータスクの確認')
             ->with('message','Driver Not Detected')
             ->with('message_jp','ドライバーが検出されませんでした');
+        }
+
+        $check_daily = DB::table('driver_lists')
+        ->where('plat_no',$plat_no)
+        ->whereNotNull('passenger_id')
+        ->whereNotNull('daily_close_status')
+        ->first();
+        if($check_daily){
+            return view('general_affair.driver.index_confirm_daily_task')
+            ->with('id',$id)
+            ->with('plat_no',$plat_no)
+            ->with('driver_lists',$driver_lists)
+            ->with('japanese',$japanese)
+            ->with('attendance',$attendance)
+            ->with('timestamp_attendance',$timestamp_attendance)
+            ->with('status','error_done')
+            ->with('title','Konfirmasi Daily Driver Task')
+            ->with('title_jp','日次ドライバータスクの確認')
+            ->with('message','Anda sudah melakukan closing tugas driver tanggal '.$check_daily->daily_close_status.'. Silakan Scan kembali jika ingin melakukan konfirmasi tugas driver untuk hari ini. Terima kasih.')
+            ->with('message_jp','あなたはすでに'.$check_daily->daily_close_status.'のドライバータスクを完了しています。ありがとうございます。');
         }
 
         return view('general_affair.driver.index_confirm_daily_task')
@@ -464,6 +499,13 @@ class GeneralController extends Controller
             $message .= "\\nTugas driver tanggal " . date('d-m-Y', strtotime($driver_task->date_from)) . " telah dikonfirmasi oleh " . $japanese->employee_name . ".\\n";
             $message .= "\\nData dapat dicek di website.\\n";
             $message .= "\\n-YMPI GA Dept.-";
+
+            $update = DB::table('driver_lists')
+            ->where('id',$driver_list_id)
+            ->update([
+                'daily_close_status' => date('Y-m-d'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             // app(WhatsappController::class)->whatspie($phone, $message);
 
@@ -704,6 +746,18 @@ class GeneralController extends Controller
             $message .= "\\n-YMPI GA Dept.-";
 
             $fuel_actual_after = 0;
+
+            $update_driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+            if(str_contains($update_driver_task->remark,'japanese')){
+                $update = DB::table('driver_list')
+                ->where('plat_no',$update_driver_task->plat_no)
+                ->update([
+                    'daily_close_status' => date('Y-m-d'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
 
             // app(WhatsappController::class)->whatspie($phone, $message);
 

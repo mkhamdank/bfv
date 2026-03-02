@@ -126,9 +126,16 @@
         <div class="row">
             <?php if($status == 'error'){ ?>
             <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
-                {{-- <p style="font-size: 20px; font-weight: bold; color: green;">Success!</p> --}}
                 <br>
                 <span style="font-size: 18px; color: red;">{{$message}}</span>
+                <br>
+                <span style="font-size: 18px; color: #605ca8;">{{$message_jp}}</span>
+            </div>
+            <?php } else if($status == 'error_done'){ ?>
+            <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
+                {{-- <p style="font-size: 20px; font-weight: bold; color: green;">Success!</p> --}}
+                <br>
+                <span style="font-size: 18px; color: green;">{{$message}}</span>
                 <br>
                 <span style="font-size: 18px; color: #605ca8;">{{$message_jp}}</span>
             </div>
