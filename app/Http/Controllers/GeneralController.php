@@ -290,8 +290,8 @@ class GeneralController extends Controller
             ->with('status','error_done')
             ->with('title','Konfirmasi Daily Driver Task')
             ->with('title_jp','日次ドライバータスクの確認')
-            ->with('message','Anda sudah melakukan closing tugas driver tanggal '.$check_daily->daily_close_status.'. Silakan Scan kembali jika ingin melakukan konfirmasi tugas driver untuk hari ini. Terima kasih.')
-            ->with('message_jp','あなたはすでに'.$check_daily->daily_close_status.'のドライバータスクを完了しています。ありがとうございます。');
+            ->with('message','Anda sudah scan tugas driver pada tanggal '.$check_daily->daily_close_status.'. Silakan scan kembali untuk konfirmasi tugas hari ini. Terima kasih.')
+            ->with('message_jp','あなたはすでに'.$check_daily->daily_close_status.'にドライバーのタスクをスキャンしています。今日のタスクを確認するためにもう一度スキャンしてください。ありがとうございました。');
         }
 
         return view('general_affair.driver.index_confirm_daily_task')
