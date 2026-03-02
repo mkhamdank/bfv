@@ -200,7 +200,7 @@ class GeneralController extends Controller
         ->first();
 
         if($check_daily){
-            $update = DB::table('driver_lists')
+            $update = DB::table('driver_closes')
             ->where('plat_no',$plat_no)
             ->update([
                 'daily_close_status' => null,
@@ -274,7 +274,7 @@ class GeneralController extends Controller
             ->with('message_jp','ドライバーが検出されませんでした');
         }
 
-        $check_daily = DB::table('driver_lists')
+        $check_daily = DB::table('driver_closes')
         ->where('plat_no',$plat_no)
         ->whereNotNull('passenger_id')
         ->whereNotNull('daily_close_status')
@@ -500,7 +500,7 @@ class GeneralController extends Controller
             $message .= "\\nData dapat dicek di website.\\n";
             $message .= "\\n-YMPI GA Dept.-";
 
-            $update = DB::table('driver_lists')
+            $update = DB::table('driver_closes')
             ->where('id',$driver_list_id)
             ->update([
                 'daily_close_status' => date('Y-m-d'),
@@ -751,7 +751,7 @@ class GeneralController extends Controller
             ->where('id',$id)
             ->first();
             if(str_contains($update_driver_task->remark,'japanese')){
-                $update = DB::table('driver_list')
+                $update = DB::table('driver_closes')
                 ->where('plat_no',$update_driver_task->plat_no)
                 ->update([
                     'daily_close_status' => date('Y-m-d'),
