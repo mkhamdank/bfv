@@ -440,10 +440,10 @@ class GeneralController extends Controller
             ->where('id',$driver_list_id)
             ->first();
 
-            $odometer = $this->getVehicle($plat_no)['odometer'];
-            $fuel = round($this->getVehicle($plat_no)['fuel'],2);
-            $latitude = $this->getVehicle($plat_no)['latitude'];
-            $longitude = $this->getVehicle($plat_no)['longitude'];
+            // $odometer = $this->getVehicle($plat_no)['odometer'];
+            // $fuel = round($this->getVehicle($plat_no)['fuel'],2);
+            // $latitude = $this->getVehicle($plat_no)['latitude'];
+            // $longitude = $this->getVehicle($plat_no)['longitude'];
 
             $japanese = DB::table('japaneses')
             ->where('id',$japanese_id)
@@ -460,10 +460,10 @@ class GeneralController extends Controller
                 'driver_phone' => $driver_lists->whatsapp_no,
                 'plat_no' => $plat_no,
                 'car' => $driver_lists->car,
-                'odometer' => $odometer,
-                'fuel' => $fuel,
-                'latitude' => $latitude,
-                'longitude' => $longitude,
+                // 'odometer' => $odometer,
+                // 'fuel' => $fuel,
+                // 'latitude' => $latitude,
+                // 'longitude' => $longitude,
                 'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
                 'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
                 'purpose' => 'Pekerjaan',
@@ -702,18 +702,18 @@ class GeneralController extends Controller
             ->first();
 
             $plat_no = $driver_task->plat_no;
-            $odometer = $this->getVehicle($plat_no)['odometer'];
-            $fuel = round($this->getVehicle($plat_no)['fuel'],2);
-            $latitude = $this->getVehicle($plat_no)['latitude'];
-            $longitude = $this->getVehicle($plat_no)['longitude'];
+            // $odometer = $this->getVehicle($plat_no)['odometer'];
+            // $fuel = round($this->getVehicle($plat_no)['fuel'],2);
+            // $latitude = $this->getVehicle($plat_no)['latitude'];
+            // $longitude = $this->getVehicle($plat_no)['longitude'];
 
             $update_driver_task = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
-                'odometer' => $odometer,
-                'fuel' => $fuel,
-                'latitude' => $latitude,
-                'longitude' => $longitude,
+                // 'odometer' => $odometer,
+                // 'fuel' => $fuel,
+                // 'latitude' => $latitude,
+                // 'longitude' => $longitude,
                 'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
                 'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
                 'closure_status' => 'japanese',
