@@ -619,6 +619,7 @@ Route::post('input/driver/job_image3', 'App\Http\Controllers\GeneralAffairContro
 Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@searchDriverJob');
 
 Route::get('index/confirmation/driver/job/{id}/{id_daily}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
+Route::get('index/closing/confirmation/driver/job/{task_id}/{pin}', 'App\Http\Controllers\GeneralController@indexClosingConfirmationDriverJob');
 Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
 Route::get('getIp', 'App\Http\Controllers\GeneralController@getIp');
 
@@ -693,3 +694,8 @@ Route::get('index/diagnose_molding/evaluation/report/{form_number}', 'App\Http\C
 Route::post('update/diagnose_molding/shot', 'App\Http\Controllers\MoldingController@updateShot');
 Route::get('fetch/diagnose_molding/shot_list', 'App\Http\Controllers\MoldingController@fetchShotList');
 Route::post('post/diagnose_molding/kerusakan', 'App\Http\Controllers\MoldingController@postKerusakan');
+
+Route::get('get/molding/pengiriman', 'App\Http\Controllers\MoldingController@getPengiriman');
+Route::post('post/molding/pengiriman', 'App\Http\Controllers\MoldingController@postPengiriman');
+Route::post('post/molding/pengiriman/kirim', 'App\Http\Controllers\MoldingController@postPengirimanKirim');
+Route::get('approval/molding/pengiriman/{status}/{id}', 'App\Http\Controllers\MoldingController@approvalPengiriman');

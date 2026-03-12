@@ -686,6 +686,34 @@ class GeneralController extends Controller
         }
     }
 
+    function indexClosingConfirmationDriverJob($task_id,$pin)
+    {
+        $driver_task = DB::table('driver_tasks')
+        ->where('task_id',$task_id)
+        ->where('closure_status','driver')
+        ->get();
+
+        if($driver_task){
+            return view('general_affair.driver.index_confirm_task_closing')
+            ->with('driver_task',$driver_task)
+            ->with('task_id',$task_id)
+            ->with('pin',$pin)
+            ->with('id',$driver_task[0]->id)
+            ->with('status','success')
+            ->with('title','Konfirmasi Driver Order')
+            ->with('title_jp','ドライバー注文の確認')
+            ->with('message','Konfirmasi Driver Order')
+            ->with('message_jp','ドライバー注文の確認');
+        }else{
+            return view('general_affair.driver.index_confirm_task_closing')
+            ->with('status','error')
+            ->with('title','Konfirmasi Driver Order')
+            ->with('title_jp','ドライバー注文の確認')
+            ->with('message','Driver Order Anda telah dikonfirmasi')
+            ->with('message_jp','ドライバー注文が確認されました');
+        }
+    }
+
     function inputConfirmationDriverJob(Request $request)
     {
         try {
