@@ -621,6 +621,7 @@ Route::get('search/driver/job/{id}', 'App\Http\Controllers\GeneralController@sea
 Route::get('index/confirmation/driver/job/{id}/{id_daily}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverJob');
 Route::get('index/closing/confirmation/driver/job/{task_id}/{pin}', 'App\Http\Controllers\GeneralController@indexClosingConfirmationDriverJob');
 Route::post('input/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverJob');
+Route::post('input/closing/confirmation/driver/job', 'App\Http\Controllers\GeneralController@inputClosingConfirmationDriverJob');
 Route::get('getIp', 'App\Http\Controllers\GeneralController@getIp');
 
 Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralController@indexAdditionalDriverJob');

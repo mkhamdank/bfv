@@ -341,7 +341,7 @@
             formData.append('task_id',$('#task_id_fix').val());
 
             $.ajax({
-                url:"{{ url('input/confirmation/driver/job') }}",
+                url:"{{ url('input/closing/confirmation/driver/job') }}",
                 method:"POST",
                 data:formData,
                 dataType:'JSON',
@@ -392,7 +392,6 @@
             }else{
                 id_real = $('#task_id').val();
                 $('#status_daily').val('not_daily');
-                $('#id_fix').val(id_real);
                 for (var i = 0; i < driver_task.length; i++) {
                     if (driver_task[i].task_id == id_real) {
                         $('#driver').val(driver_task[i].driver_name);

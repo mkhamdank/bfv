@@ -693,7 +693,7 @@ class GeneralController extends Controller
         ->where('closure_status','driver')
         ->get();
 
-        if($driver_task){
+        if(count($driver_task) > 0){
             return view('general_affair.driver.index_confirm_task_closing')
             ->with('driver_task',$driver_task)
             ->with('task_id',$task_id)
@@ -709,6 +709,7 @@ class GeneralController extends Controller
             ->with('status','error')
             ->with('title','Konfirmasi Driver Order')
             ->with('title_jp','ドライバー注文の確認')
+            ->with('driver_task',null)
             ->with('message','Driver Order Anda telah dikonfirmasi')
             ->with('message_jp','ドライバー注文が確認されました');
         }
@@ -724,6 +725,95 @@ class GeneralController extends Controller
             $date = $request->get('date');
             $id = $request->get('id');
             $task_id = base64_encode($request->get('task_id'));
+
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
+            $plat_no = $driver_task->plat_no;
+            // $odometer = $this->getVehicle($plat_no)['odometer'];
+            // $fuel = round($this->getVehicle($plat_no)['fuel'],2);
+            // $latitude = $this->getVehicle($plat_no)['latitude'];
+            // $longitude = $this->getVehicle($plat_no)['longitude'];
+
+            $update_driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                // 'odometer' => $odometer,
+                // 'fuel' => $fuel,
+                // 'latitude' => $latitude,
+                // 'longitude' => $longitude,
+                'date_from' => $date.' '.$hour_start.':'.$minute_start.':00',
+                'date_to' => $date.' '.$hour_end.':'.$minute_end.':00',
+                'closure_status' => 'japanese',
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
+            if(substr($driver_task->driver_phone, 0, 1) == '+' ){
+                $phone = substr($driver_task->driver_phone, 1, 15);
+            }
+            else if(substr($driver_task->driver_phone, 0, 1) == '0'){
+                $phone = "62".substr($driver_task->driver_phone, 1, 15);
+            }
+            else{
+                $phone = $driver_task->driver_phone;
+            }
+
+            if(php_sapi_name() === 'cli' || (isset($_SERVER['SERVER_ADDR']) && $_SERVER['SERVER_ADDR'] == '10.109.33.34')){
+                $phone = '6282334197238';
+            }
+
+            $message = '';
+
+            $message .= "_*DRIVER ORDER*_\\n";
+            $message .= "\\nTugas driver tanggal " . date('d-m-Y', strtotime($driver_task->date_from)) . " telah dikonfirmasi oleh " . $driver_task->requested_name . ".\\n";
+            $message .= "\\nData dapat dicek di website.\\n";
+            $message .= "\\n-YMPI GA Dept.-";
+
+            $fuel_actual_after = 0;
+
+            $update_driver_task = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+            if(str_contains($update_driver_task->remark,'japanese')){
+                $update = DB::table('driver_closes')
+                ->where('plat_no',$update_driver_task->plat_no)
+                ->update([
+                    'daily_close_status' => date('Y-m-d'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            // app(WhatsappController::class)->whatspie($phone, $message);
+
+            $response = array(
+                'status' => true,
+                'message' => 'Success Input Data (データの入力に成功しました)'
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputClosingConfirmationDriverJob(Request $request)
+    {
+        try {
+            $hour_start = $request->get('hour_start');
+            $hour_end = $request->get('hour_end');
+            $minute_start = $request->get('minute_start');
+            $minute_end = $request->get('minute_end');
+            $date = $request->get('date');
+            $id = $request->get('id');
+            $task_id = $request->get('task_id');
 
             $driver_task = DB::table('driver_tasks')
             ->where('id',$id)
