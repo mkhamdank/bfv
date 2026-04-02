@@ -1451,7 +1451,7 @@ class GeneralAffairController extends Controller
         $reguler = [
             'OS0005_Malang',
             'OS0111_Malang',
-            'OS0113_Surabaya',
+            'OS0115_Surabaya',
         ];
         $title = 'Absensi Penumpang';
         $title_jp = '乗客の出席';
