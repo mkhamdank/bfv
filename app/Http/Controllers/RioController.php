@@ -20,7 +20,7 @@ class RioController extends Controller
 
     public function index_vendor_registration()
     {
-        $title = "Kelengkapan Data Vendor PT. YMPI";
+        $title = "Kelengkapan Data Vendor";
         $title_jp = "";
 
         $kbli = DB::table('vendor_registration_kblis')->get();
@@ -35,7 +35,7 @@ class RioController extends Controller
 
     public function ympi_vendor_registration()
     {
-        $title = "Registrasi Data Vendor PT. YMPI";
+        $title = "Registrasi Data Vendor";
         $title_jp = "";
 
         $kbli = DB::table('vendor_registration_kblis')->get();

@@ -40,6 +40,18 @@
         border-radius: 12px;
         padding: 20px;
     }
+
+    
+    .content-header h3 {
+
+        position: relative;
+        margin-top: 0px;        
+        font-weight: bold;
+        background-color: #fff;
+        color: #333333;
+        border-radius: 12px;
+        padding: 20px;
+    }
     
     @media (max-width: 360px) {.content-header h1{ margin-top: 12%; padding: 5% 1%; } }
 
@@ -267,9 +279,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 content-header">
-                    <h1 style="text-align: center; border: 1px solid rgb(218,220,224); font-size: 3.5vw;">
+                    <h1 style="text-align: center; border: 1px solid rgb(218,220,224); font-size: 2.5vw;">
                         <div class="div-header"></div>
-                        <span id="training_title" style="margin-top: 20px">{{ $title }}</span>
+                        <span id="training_title" style="margin-top: 20px">{{ $title }}</span><br>
+                        <span style="font-size: 1.5vw;">PT. Yamaha Musical Products Indonesia</span>
                     </h1>
                 </div>
             </div>
