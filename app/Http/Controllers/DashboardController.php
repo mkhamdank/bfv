@@ -45,7 +45,7 @@ class DashboardController extends Controller
 
         $this->driver_reguler = [
             'OS0005',
-            'OS0111',
+            'OS0110',
             'OS0115',
         ];
         return view('dashboard')

@@ -1450,7 +1450,7 @@ class GeneralAffairController extends Controller
     function indexPassengerAttendance() {
         $reguler = [
             'OS0005_Malang',
-            'OS0111_Malang',
+            'OS0110_Surabaya',
             'OS0115_Surabaya',
         ];
         $title = 'Absensi Penumpang';
