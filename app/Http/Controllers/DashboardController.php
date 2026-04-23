@@ -39,14 +39,12 @@ class DashboardController extends Controller
             'PI9803004',
             'OS0112',
             'OS0114',
-            'OS0113',
-            'OS0115'
+            'OS0113'
         ];
 
         $this->driver_reguler = [
             'OS0005',
-            'OS0110',
-            'OS0115',
+            'OS0112',
         ];
         return view('dashboard')
         ->with('username',strtoupper(Auth::user()->username))
