@@ -155,6 +155,18 @@
                         </thead>
                         <tbody id="bodyTableMaster">
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
                     </table>
                     </div>
                 </div>
@@ -857,6 +869,22 @@
                         },
                         "order": [[6, "asc"]]
                     });
+
+                    
+                    // Tambahkan filter pada setiap kolom pada tabel
+                    $('#tableMaster').DataTable().columns().every(function() {
+                        var column = this;
+                        var columnTitle = $(this.header()).text();
+                        if (columnTitle != '') { // Opsional, jika Anda tidak ingin filter pada kolom tertentu
+                            $('<input type="text" placeholder="Cari '+columnTitle+'" />').appendTo($(column.footer()).empty())
+                                .on('change', function() {
+                                    var val = $(this).val();
+
+                                    column.search(val ? val : '', true, false).draw();
+                                });
+                        }
+                    });
+
                 }
             })
         }
