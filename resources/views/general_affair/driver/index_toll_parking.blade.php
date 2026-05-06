@@ -124,48 +124,51 @@
 @section('content')
     <section id="vfi-container">
         <div id="loading"
-            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display: none">
-            <p style="position: absolute; color: white; top: 20%; left: 10%;">
-                <span style="font-size: 40px"><i class="fa fa-spin fa-refresh"></i></span>
+            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 30001; display: none; backdrop-filter: blur(4px);">
+            <p style="position: absolute; color: white; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <span style="font-size: 50px"><i class="fa fa-spinner fa-spin"></i></span>
             </p>
         </div>
 
-        <div class="row">
-            <div class="col-md-12" style="text-align: center;">
-                <h1 style="font-size: 18px; font-weight: bold;">
-                    {{ $title }}<br><span style="color: #605ca8; font-size: 15px;">{{$title_jp}}</span>
+        <div class="row" style="margin-bottom: 10px;">
+            <div class="col-md-12">
+            <div style="text-align: center; padding: 5px 0;">
+                <h1 style="font-size: 28px; font-weight: 600; margin: 0; color: #2c3e50;">
+                {{ $title }}
                 </h1>
+                <p style="color: #7f8c8d; font-size: 14px; margin-top: 8px;">{{$title_jp}}</p>
+            </div>
             </div>
         </div>
+
         <div class="row">
-            <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
-                <div class="table-responsive" style="margin-top: 20px;">
-                    <table class="table table-bordered table-striped" style="width: 100%; text-align: center;">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="width: 5%;">#</th>
-                                <th style="width: 20%;">Tgl</th>
-                                <th style="width: 15%;">Jam</th>
-                                <th style="width: 25%;">User</th>
-                                <th style="width: 20%;">Car</th>
-                                <th style="width: 15%;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="toll_parking_table">
-                            <!-- Data rows go here -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="col-xs-12" style="padding: 0 15px;">
+            <div class="table-responsive" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
+                <table class="table table-striped" style="width: 100%; margin: 0; border: none;">
+                <thead style="background-color: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                    <tr>
+                    <th style="width: 5%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">#</th>
+                    <th style="width: 20%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Tgl</th>
+                    <th style="width: 15%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Jam</th>
+                    <th style="width: 25%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">User</th>
+                    <th style="width: 20%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Car</th>
+                    <th style="width: 15%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="toll_parking_table" style="background-color: white;">
+                    <!-- Data rows go here -->
+                </tbody>
+                </table>
             </div>
-            <table style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px; margin-top: 20px;">
-                <tr>
-                    <td>
-                        <a class="btn btn-danger btn-sm" style="width: 90%; font-weight: bold; font-size: 18px;" href="{{url('')}}">
-                            Kembali
-                        </a>
-                    </td>
-                </tr>
-            </table>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 25px;">
+            <div class="col-xs-12" style="text-align: center; padding: 0 15px;">
+            <a class="btn btn-outline-secondary" style="width: 150px; font-weight: 600; border-radius: 6px; border: 2px solid #bdc3c7; color: #2c3e50; transition: all 0.3s ease;" href="{{url('')}}" onmouseover="this.style.backgroundColor='#ecf0f1'; this.style.borderColor='#95a5a6';" onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#bdc3c7';">
+                ← Kembali
+            </a>
+            </div>
         </div>
 
     </section>
@@ -197,24 +200,24 @@
                     $('#toll_parking_table').html("");
                     var datas = "";
                     for(var i = 0; i < result.data.length; i++){
-                        datas += "<tr>";
-                        datas += "<td>" + (i+1) + "</td>";
-                        var dateParts = result.data[i].date_from.split(' ')[0].split('-');
+                        var dateFrom = result.data[i].date_from;
+                        var dateParts = dateFrom.split(' ')[0].split('-');
                         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        var day = dateParts[2];
-                        var month = months[parseInt(dateParts[1], 10) - 1];
-                        var year = dateParts[0].substr(2,2);
-                        datas += "<td>" + day + "-" + month + "-" + year + "</td>";
-                        datas += "<td>" + result.data[i].date_from.substr(11,5) + " - " + result.data[i].date_to.substr(11,5) + "</td>";
-                        datas += "<td>" + result.data[i].created_by_name + "</td>";
-                        datas += "<td>" + result.data[i].plat_no + " - " + result.data[i].car + "</td>";
-                        if(result.data[i].remark.match(/daily/gi)){
-                            var url = '{{ url("index/additional/driver/daily_job") }}/' + result.data[i].id;
-                            datas += "<td><a class='btn btn-success btn-sm' href='" + url + "'>Isi Data</a></td>";
-                        } else {
-                            var url = '{{ url("index/additional/driver/job") }}/' + btoa(result.data[i].task_id);
-                            datas += "<td><a class='btn btn-success btn-sm' href='" + url + "'>Isi Data</a></td>";
-                        }
+                        var formattedDate = dateParts[2] + " " + months[parseInt(dateParts[1], 10) - 1] + " " + dateParts[0].substr(2,2);
+                        var timeFrom = dateFrom.substr(11,5);
+                        var timeTo = result.data[i].date_to.substr(11,5);
+                        
+                        var actionUrl = result.data[i].remark.match(/daily/gi) 
+                            ? '{{ url("index/additional/driver/daily_job") }}/' + result.data[i].id
+                            : '{{ url("index/additional/driver/job") }}/' + btoa(result.data[i].task_id);
+                        
+                        datas += "<tr style='border-bottom: 1px solid #ecf0f1; transition: background-color 0.2s ease;' onmouseover=\"this.style.backgroundColor='#f8f9fa'\" onmouseout=\"this.style.backgroundColor='white'\">";
+                        datas += "<td style='padding: 12px 15px; color: #7f8c8d;'>" + (i+1) + "</td>";
+                        datas += "<td style='padding: 12px 15px; color: #2c3e50; font-weight: 500;'>" + formattedDate + "</td>";
+                        datas += "<td style='padding: 12px 15px; color: #2c3e50;'>" + timeFrom + " - " + timeTo + "</td>";
+                        datas += "<td style='padding: 12px 15px; color: #2c3e50;'>" + result.data[i].created_by_name + "</td>";
+                        datas += "<td style='padding: 12px 15px; color: #2c3e50; font-size: 13px;'>" + result.data[i].plat_no + " <br> " + result.data[i].car + "</td>";
+                        datas += "<td style='padding: 12px 15px;'><a class='btn btn-sm' style='background-color: #27ae60; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-weight: 500; transition: all 0.2s ease;' href='" + actionUrl + "' onmouseover=\"this.style.backgroundColor='#229954'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.2)'\" onmouseout=\"this.style.backgroundColor='#27ae60'; this.style.boxShadow='none'\">Isi Data</a></td>";
                         datas += "</tr>";
                     }
                     $('#toll_parking_table').append(datas);
