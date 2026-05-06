@@ -36,7 +36,7 @@ class MoldingController extends Controller
 
     function fetchMoldingDiagnoseList(Request $request) {
         $master_molding = DB::table('molding_diagnose_masters')
-        ->select('id', 'fixed_asset_number', 'fixed_asset_name', 'vendor', 'standard_shot', 'total_shot', 'status')
+        ->select('id', 'fixed_asset_number', 'fixed_asset_name', 'vendor', 'standard_shot', 'total_shot', 'status', 'status_kawasan')
         ->orderBy(db::raw('FIELD(status, "Butuh Pemeriksaan", null, "OK", "Sedang Diperiksa", "Sudah Diperiksa")'))
         ->get();
 
@@ -935,6 +935,34 @@ class MoldingController extends Controller
         }
     }
 
+    function getDateRangesPhp5($year, $month)
+    {
+        $totalDays = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $half = floor($totalDays / 2);
+
+        // TANGGAL PENTING UNTUK RANGE
+        $days = array(
+            1,               // start range 1
+            $half,           // end range 1
+            $half + 1,       // start range 2
+            $totalDays       // end range 2
+        );
+
+        $result = array(
+            'Ymd' => array(),
+            'YMd' => array(),
+        );
+
+        foreach ($days as $day) {
+            $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+
+            $result['Ymd'][] = date('Y-m-d', strtotime($date));
+            $result['YMd'][] = date('d M y', strtotime($date));
+        }
+
+        return $result;
+    }
+
     public function indexShotList($month_range = null)
     {
         $master_molding = DB::table('molding_diagnose_masters')
@@ -943,7 +971,49 @@ class MoldingController extends Controller
         ->orderBy('fixed_asset_name', 'asc')
         ->get();
 
-        return view('molding.index_shot_list', compact('master_molding'));
+       // ===============================
+        // BULAN INI
+        // ===============================
+        $yearNow  = date('Y');
+        $monthNow = date('m');
+
+        // ===============================
+        // BULAN KEMARIN
+        // ===============================
+        $lastMonth = strtotime('first day of last month');
+        $yearLast  = date('Y', $lastMonth);
+        $monthLast = date('m', $lastMonth);
+
+        // ===============================
+        // GABUNG JADI 1 ARRAY
+        // ===============================
+        $monthLastArr = $this->getDateRangesPhp5($yearLast, $monthLast);
+        $monthNowArr  = $this->getDateRangesPhp5($yearNow, $monthNow);
+
+        $dt = array_merge($monthLastArr['Ymd'], $monthNowArr['Ymd']);
+        $dt_name = array_merge($monthLastArr['YMd'], $monthNowArr['YMd']);
+
+        $output = array(
+            'Ymd' => array_reverse($dt),
+            'YMd' => array_reverse($dt_name),
+        );
+
+        $month_range = array_reverse($output);
+
+        
+        $grouped_month_range = array();
+        $i = 0;
+        while ($i < count($month_range['YMd'])) {
+            $grouped_month_range[floor($i / 2) + 1][] = $month_range['YMd'][$i];
+            $i++;
+        }
+        
+        $month_range_grouped = $grouped_month_range;
+
+        // dd($month_range_grouped);
+
+
+        return view('molding.index_shot_list', compact('master_molding', 'month_range_grouped', 'month_range'));
     }
 
     public function indexTroubleList()
@@ -1312,9 +1382,9 @@ class MoldingController extends Controller
 
         $data = DB::table('molding_diagnose_shots')
         ->whereNull('molding_diagnose_shots.deleted_at')
-        ->where('molding_diagnose_shots.week_number', '>=', $week_start)
-        ->where('molding_diagnose_shots.week_number', '<=', $week_end)
-        ->select('fixed_asset_number', 'molding_name', 'week_number', 'total_shot', 'created_by', 'created_at')
+        ->where('molding_diagnose_shots.created_at', '>=', $request->start_date)
+        ->where('molding_diagnose_shots.created_at', '<=', $request->end_date)
+        ->select('fixed_asset_number', 'molding_name', 'week_number', 'total_shot', 'accumulative_shot', 'created_by', 'created_at', db::raw('DATE_FORMAT(molding_diagnose_shots.created_at, "%Y-%m-%d") as create_date'), db::raw('DATE_FORMAT(molding_diagnose_shots.created_at, "%d %b %y") as tgl_buat'))
         ->orderBy('created_at', 'desc')
         ->get();
 
@@ -1324,5 +1394,141 @@ class MoldingController extends Controller
         ];
 
         return response()->json($response);
+    }
+
+    public function getPengiriman(Request $request)
+    {
+        $data = DB::table('molding_sends')
+        ->where('fixed_asset_number', $request->no_fixed_asset)
+        ->get();
+
+        $response = [
+            'status' => true,
+            'datas' => $data
+        ];
+
+        return response()->json($response);
+    }
+
+    public function postPengiriman(Request $request)
+    {
+        try {
+            $document = [];
+
+            if($request->surat_jalan_buat_kirim) {
+                $file = $request->surat_jalan_buat_kirim;
+                $extension = $file->getClientOriginalExtension();
+                $file_name = 'surat_jalan_'.time().'.'.$extension;
+                $file->move(public_path('workshop/molding/file_pengiriman/surat_jalan'), $file_name);
+                $document[] = ['surat_jalan' => $file_name];
+            }
+
+            if($request->foto_packing_buat_kirim) {
+                $file = $request->foto_packing_buat_kirim;
+                $extension = $file->getClientOriginalExtension();
+                $file_name = 'foto_packing_'.time().'.'.$extension;
+                $file->move(public_path('workshop/molding/file_pengiriman/foto_packing'), $file_name);
+                $document[] = ['foto_packing' => $file_name];
+            }
+
+            if($request->bc_27_buat_kirim) {
+                $file = $request->bc_27_buat_kirim;
+                $extension = $file->getClientOriginalExtension();
+                $file_name = 'bc_27_'.time().'.'.$extension;
+                $file->move(public_path('workshop/molding/file_pengiriman/bc_27'), $file_name);
+                $document[] = ['bc_27' => $file_name];
+            }
+
+            $document = json_encode($document);
+            // insert into molding_diagnose_sends
+            DB::table('molding_sends')->insert([
+                'fixed_asset_number' => $request->fa_number,
+                'molding_name' => $request->nama_molding,
+                'document' => $document,
+                'approved_by' => 'PI1908032/Erlangga Kharisma',
+                'created_by' => $request->createdBy,
+                'created_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Success',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function postPengirimanKirim(Request $request)
+    {
+        try {
+            DB::table('molding_sends')
+            ->where('id', $request->id)
+            ->update([
+                'status' => 'Approval',
+                'tgl_pengiriman' => $request->tgl_kirim
+            ]);
+
+            $data_molding = DB::table('molding_sends')
+            ->leftJoin('molding_diagnose_masters', 'molding_sends.fixed_asset_number', '=', 'molding_diagnose_masters.fixed_asset_number')
+            ->where('molding_sends.id', $request->id)
+            ->select('molding_sends.*', 'molding_diagnose_masters.vendor', 'molding_diagnose_masters.status_kawasan')
+            ->first();
+
+            $data = [
+                'data_form_molding' => $data_molding,
+                'status' => 'approval'
+            ];
+
+            Mail::to('erlangga.kharisma@music.yamaha.com')->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_pengiriman'));
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully Send Email',
+                'data' => $data_molding
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function approvalPengiriman($status, $id)
+    {
+        try {
+            if($status == "approve") {
+                DB::table('molding_sends')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'Approved',
+                    'approved_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+
+            }
+
+            $data_molding = DB::table('molding_sends')
+            ->leftJoin('molding_diagnose_masters', 'molding_sends.fixed_asset_number', '=', 'molding_diagnose_masters.fixed_asset_number')
+            ->where('molding_sends.id', $id)
+            ->select('molding_sends.*', 'molding_diagnose_masters.vendor', 'molding_diagnose_masters.status_kawasan')
+            ->first();
+
+            $data = [
+                'data_form_molding' => $data_molding,
+                'status' => $status
+            ];
+
+            return view('molding.report.mold_send_complete', $data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

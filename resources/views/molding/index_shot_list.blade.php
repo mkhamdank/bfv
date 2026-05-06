@@ -72,41 +72,25 @@
                             <thead style="text-align: center">
                                 <tr>
                                     <th style="width: 1%">No</th>
-                                    <th style="width: 10%">FA Number</th>
+                                    <th style="width: 8%">FA Number</th>
                                     <th style="border-right: 1px solid red">Nama Molding</th>
-                                    @php
-                                        if(Request::segment(4)) {
-                                            $month = Request::segment(4);
-                                        } else {
-                                            $month = date('Y-m');
-                                    
-                                        $six_week_before = date('Y-m-d', strtotime("-6 week", strtotime($month)));
-
-                                        }
-                                    @endphp
-                                    <th style="width: 10%;">25 Nov W1</th>
-                                    <th style="width: 10%;">25 Oct W4</th>
-                                    <th style="width: 10%;">25 Oct W3</th>
-                                    <th style="width: 10%;">25 Oct W2</th>
-                                    <th style="width: 10%;">25 Oct W1</th>
-                                    <th style="width: 10%;">25 Sep W4</th>
+                                    @foreach ($month_range_grouped as $month)
+                                        <th style="width: 10%">{{ $month[1] }} ~<br> {{ $month[0] }}</th>
+                                    @endforeach
                                 </tr>
                             </thead>
                             <tbody id="bodyTableShot">
                             </tbody>
-                            <tfoot>
+                            <!-- <tfoot>
                                 <tr>
                                     <td></td>
-                                    <th></th>
-                                    <th></th>
                                     <td></td>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    @foreach ($month_range_grouped as $month)
+                                        <td></td>
+                                    @endforeach
                                 </tr>
-                            </tfoot>
+                            </tfoot> -->
                         </table>
                     </div>
                 </div>
@@ -207,6 +191,7 @@
 
         var check_point = [];
         var moldings = <?php echo json_encode($master_molding); ?>;
+        var month_range_grouped = <?php echo json_encode($month_range_grouped); ?>;
         var parts = [];
         var part_status = [];
         var part_err = [];
@@ -258,15 +243,39 @@
             //     end_date: $('#month_range').val()
             // }
 
+            // tambahkan kolom 3 & 4
+            let arr = Object.values(month_range_grouped);
+
+            let month_range_grouped_new = arr.map(row => {
+                let date1 = parseDate(row[0]);
+                let date2 = parseDate(row[1]);
+
+                return [
+                    row[0],
+                    row[1],
+                    date1,
+                    date2
+                ];
+            });
+
             var params = {
-                start_date: '2025-10-01',
-                end_date: '2025-11-06'
+                start_date: month_range_grouped_new[month_range_grouped_new.length - 1][3].toISOString().split('T')[0],
+                end_date: month_range_grouped_new[0][2].toISOString().split('T')[0]
             }
             $.get('{{ url('fetch/diagnose_molding/molding_shot') }}', params, function(result, status, xhr) {
                 if (result.status) {
-                    const uniqueWeeks = [...new Set(result.data.map(item => item.week_number))];
+                    // const uniqueWeeks = [...new Set(result.data.map(item => item.week_number))];
 
-                    console.log(uniqueWeeks);
+                    let data_new = result.data.map(item => {
+                        let [y, m, d] = item.create_date.split('-');
+                        return {
+                            ...item,
+                            create_date_obj: new Date(y, m - 1, d) // FIX
+                        };
+                    });
+
+                    console.table(month_range_grouped_new);
+                    console.table(data_new);
 
                     var body = "";
                     $.each(moldings, function(key, value) {
@@ -275,28 +284,50 @@
                         body += "<td>" + value.fixed_asset_number + "</td>";
                         body += "<td style='border-right: 1px solid red'>" + value.fixed_asset_name + "</td>";
 
-                        $.each(uniqueWeeks, function(key, week) {
-                            var data = result.data.filter(item => item.fixed_asset_number === value.fixed_asset_number && item.week_number === week);
+                        $.each(month_range_grouped_new, function(index, week) {
+                            var first_date = week[1];
+                            var last_date = week[0];
+                            
+                            // var firstDate = new Date(first_date);
+                            // var lastDate = new Date(last_date);
+                            // var formattedFirstDate = firstDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+                            // var formattedLastDate = lastDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+
+                            
+                            let hasil = data_new.filter(item => {
+                                let itemDate = normalize(item.create_date_obj);
+
+                                // cek apakah masuk salah satu range
+                                let endDate = normalize(week[2]);   // kolom ke-3 (Date object)
+                                let startDate = normalize(week[3]); // kolom ke-4 (Date object)
+
+                                return itemDate >= startDate && itemDate <= endDate && item.fixed_asset_number === value.fixed_asset_number;
+                            });
+                            
+                            // var data = result.data.filter(item => item.fixed_asset_number === value.fixed_asset_number && item.week_number === week);
                             
                             var cursors = "";
                             var onclick = "";
 
-                            if(key == 0) {
+                            if(index == 0) {
                                 cursors = "cursor: pointer;";
                                 onclick = "onclick='openModalShot(\""+value.fixed_asset_number+"\", \""+value.fixed_asset_name+"\")'";
                             }
                             
-                            if(data.length > 0){
-                                body += "<td style='" + cursors + " text-align: right; background-color: #9df982ff'>" + data[0].total_shot + "</td>";
+                            if(hasil.length > 0){
+                                body += "<td style='" + cursors + " text-align: center; background-color: #9df982ff; font-weight: bold;'>" + hasil[0].total_shot + " / " + hasil[0].accumulative_shot + "</td>";
                             }else{
                                 body += "<td style='" + cursors + " text-align: center; background-color: #f67e7eff' " + onclick +">-</td>";
                             }
                         });
 
-                        const row = 6 - uniqueWeeks.length;
-                        for (let i = 0; i < row; i++) {
-                            body += "<td style='text-align: center; background-color: #f67e7eff'>-</td>";
-                        }
+                        // const row = 4;
+                        // for (let i = 0; i < row; i++) {
+                        //     if(i == 0)
+                        //         body += "<td style='" + cursors + " text-align: center; background-color: #f67e7eff' " + onclick +">-</td>";
+                        //     else
+                        //         body += "<td style='text-align: center; background-color: #f67e7eff'>-</td>";
+                        // }
                         body += "</tr>";
                         num++;
                     });
@@ -308,59 +339,59 @@
                     }
         
                     //add input search each th tfoot
-                    $("#tableShot").find("tfoot").find("th").each(function() {
-                        var title = $(this).text();
-                        $(this).html("<input type='text' placeholder='Search ' />");
-                    });
+                    // $("#tableShot").find("tfoot").find("th").each(function() {
+                    //     var title = $(this).text();
+                    //     $(this).html("<input type='text' placeholder='Search ' />");
+                    // });
         
-                    $('#tableShot').DataTable({
-                        'dom': '<"top">rt<"bottom"ilp><"clear">',
-                        'deferRender': true,
-                        'scrollY': 600,
-                        'scrollCollapse': true,
-                        'ordering': true,
-                        'info': true,
-                        'paging': false,
-                        'searching': true,
-                        'lengthChange': false,
-                        'autoWidth': false,
-                        'columnDefs': [
-                            {
-                                'targets': [3,4,5,6,7,8],
-                                'orderable': false
-                            }
-                        ],
-                        'pageLength': 10,
-                        'language': {
-                            'lengthMenu': "_MENU_",
-                            'info': "Showing _START_ to _END_ of _TOTAL_ entries",
-                            'infoEmpty': "Showing 0 to 0 of 0 entries",
-                            'infoFiltered': "(filtered from _MAX_ total entries)",
-                            'zeroRecords': "No matching records found",
-                            'emptyTable': "No data available in table",
-                            'loadingRecords': "Loading...",
-                            'processing': "Processing...",
-                            'search': "Search:",
-                            'paginate': {
-                                'first': "First",
-                                'last': "Last",
-                                'next': "Next",
-                                'previous': "Previous"
-                            }
-                        },
-                        'initComplete': function() {
-                            this.api().columns().every(function() {
-                                var that = this;
-                                $('input', this.footer()).on('keyup change clear', function() {
-                                    if (that.search() !== this.value) {
-                                        that
-                                            .search(this.value)
-                                            .draw();
-                                    }
-                                });
-                            });
-                        }
-                    });
+                    // $('#tableShot').DataTable({
+                    //     'dom': '<"top">rt<"bottom"ilp><"clear">',
+                    //     'deferRender': true,
+                    //     'scrollY': 600,
+                    //     'scrollCollapse': true,
+                    //     'ordering': true,
+                    //     'info': true,
+                    //     'paging': false,
+                    //     'searching': true,
+                    //     'lengthChange': false,
+                    //     'autoWidth': false,
+                    //     'columnDefs': [
+                    //         {
+                    //             'targets': [3,4,5,6,7,8],
+                    //             'orderable': false
+                    //         }
+                    //     ],
+                    //     'pageLength': 10,
+                    //     'language': {
+                    //         'lengthMenu': "_MENU_",
+                    //         'info': "Showing _START_ to _END_ of _TOTAL_ entries",
+                    //         'infoEmpty': "Showing 0 to 0 of 0 entries",
+                    //         'infoFiltered': "(filtered from _MAX_ total entries)",
+                    //         'zeroRecords': "No matching records found",
+                    //         'emptyTable': "No data available in table",
+                    //         'loadingRecords': "Loading...",
+                    //         'processing': "Processing...",
+                    //         'search': "Search:",
+                    //         'paginate': {
+                    //             'first': "First",
+                    //             'last': "Last",
+                    //             'next': "Next",
+                    //             'previous': "Previous"
+                    //         }
+                    //     },
+                    //     'initComplete': function() {
+                    //         this.api().columns().every(function() {
+                    //             var that = this;
+                    //             $('input', this.footer()).on('keyup change clear', function() {
+                    //                 if (that.search() !== this.value) {
+                    //                     that
+                    //                         .search(this.value)
+                    //                         .draw();
+                    //                 }
+                    //             });
+                    //         });
+                    //     }
+                    // });
         
                     //move tfoot column th and td to thead
 
@@ -464,6 +495,15 @@
                     audio_error.play();
                 }
             })
+        }
+
+        function parseDate(str) {
+            return new Date(str.replace(/(\d{2}) (\w{3}) (\d{2})/, '$1 $2 20$3'));
+        }
+
+        function normalize(d) {
+            if (!d || !(d instanceof Date)) return null;
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
         }
 
         // Handle the change event for the file input
