@@ -217,6 +217,11 @@
                 <p style="font-size: 48px; margin: 0; color: #2d5016;">✓</p>
                 <p style="font-size: 20px; font-weight: 600; color: #2d5016; margin: 12px 0 8px 0;">Sukses!</p>
                 <span style="font-size: 14px; color: #2d5016;">Data berhasil dikirim<br>データの入力に成功しました</span>
+                <div style="margin-top: 20px;">
+                    <a href="{{ url('index/driver/toll_parking') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 12px 24px; border-radius: 4px; text-decoration: none; font-weight: 600;">
+                        <i class="fa fa-arrow-left"></i> Kembali
+                    </a>
+                </div>
             </div>
             @endif
         </div>
