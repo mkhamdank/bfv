@@ -202,7 +202,10 @@ class GeneralAffairController extends Controller
             ->where('deleted_at',null)
             ->where('remark',null)
             ->where('closure_status','driver')
-            ->where(DB::RAW("DATE_FORMAT(date_from,'%Y-%m')"),'=',date('Y-m'))
+            ->where(function($query) {
+                $query->where(DB::RAW("DATE_FORMAT(date_from,'%Y-%m')"),'=',date('Y-m'))
+                      ->orWhere(DB::RAW("DATE_FORMAT(date_from,'%Y-%m')"),'=',date('Y-m', strtotime('last month')));
+            })
             ->orderby('times')
             ->get();
 
