@@ -1025,6 +1025,8 @@ class GeneralController extends Controller
     {
         try {
             $etoll = $request->get('etoll');
+            $etoll_from = $request->get('etoll_from');
+            $etoll_to = $request->get('etoll_to');
             $file_etoll = $request->get('file_etoll');
             $index = $request->get('index');
             $id = $request->get('id');
@@ -1045,19 +1047,27 @@ class GeneralController extends Controller
 
             $etoll_value = null;
             $etoll_file = null;
+            $etoll_froms = null;
+            $etoll_tos = null;
 
             if($get_etoll->etoll != null){
                 $etoll_value = $get_etoll->etoll.','.$etoll;
                 $etoll_file = $get_etoll->etoll_file.','.$file_etoll_name;
+                $etoll_froms = $get_etoll->etoll_from.','.$etoll_from;
+                $etoll_tos = $get_etoll->etoll_to.','.$etoll_to;
             }else{
                 $etoll_value = $etoll;
                 $etoll_file = $file_etoll_name;
+                $etoll_froms = $etoll_from;
+                $etoll_tos = $etoll_to;
             }
 
             $update = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
                 'etoll' => $etoll_value,
+                'etoll_from' => $etoll_froms,
+                'etoll_to' => $etoll_tos,
                 'etoll_file' => $etoll_file,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
@@ -1081,6 +1091,7 @@ class GeneralController extends Controller
         try {
             $parking = $request->get('parking');
             $file_parking = $request->get('file_parking');
+            $parking_at = $request->get('parking_at');
             $index = $request->get('index');
             $id = $request->get('id');
             $task_id = $request->get('task_id');
@@ -1100,13 +1111,16 @@ class GeneralController extends Controller
 
             $parking_value = null;
             $parking_file = null;
+            $parking_ats = null;
 
             if($get_parking->parking != null){
                 $parking_value = $get_parking->parking.','.$parking;
                 $parking_file = $get_parking->parking_file.','.$file_parking_name;
+                $parking_ats = $get_parking->parking_at.','.$parking_at;
             }else{
                 $parking_value = $parking;
                 $parking_file = $file_parking_name;
+                $parking_ats = $parking_at;
             }
 
             $update = DB::table('driver_tasks')
@@ -1114,6 +1128,7 @@ class GeneralController extends Controller
             ->update([
                 'parking' => $parking_value,
                 'parking_file' => $parking_file,
+                'parking_at' => $parking_ats,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 

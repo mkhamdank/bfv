@@ -110,109 +110,115 @@
 @section('content')
     <section id="vfi-container">
         <div id="loading"
-            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display: none">
-            <p style="position: absolute; color: white; top: 20%; left: 10%;">
-                <span style="font-size: 40px"><i class="fa fa-spin fa-refresh"></i></span>
-            </p>
+            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 30001; display: none; display: flex; align-items: center; justify-content: center;display: none; ">
+            <div style="text-align: center;">
+            <span style="font-size: 48px; color: white;"><i class="fa fa-spinner fa-spin"></i></span>
+            <p style="color: white; margin-top: 15px; font-size: 16px;">Loading...</p>
+            </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12" style="text-align: center;">
-                <h1 style="font-size: 18px; font-weight: bold;">
-                    {{ $title }}
-                </h1>
+        <div style="padding: 20px; max-width: 600px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 24px; font-weight: 600; color: #333; margin: 0;">
+                {{ $title }}
+            </h1>
             </div>
-        </div>
-        <div class="row">
-            <?php if($status == 'error'){ ?>
-            <div class="col-xs-12" style="text-align: center; padding-left: 15px; padding-right: 15px;">
-                <p style="font-size: 20px; font-weight: bold; color: red;">Error!</p>
-                <span style="font-size: 18px; color: red;">{{$message}}</span>
+
+            @if($status == 'error')
+            <div style="background-color: #fee; border-left: 4px solid #c33; padding: 16px; border-radius: 4px; margin-bottom: 20px;">
+                <p style="font-size: 16px; font-weight: 600; color: #c33; margin: 0 0 8px 0;">Error!</p>
+                <span style="font-size: 14px; color: #666;">{{$message}}</span>
             </div>
-            <?php } ?>
-            <?php if($status == 'success'){ ?>
+            @endif
+
+            @if($status == 'success')
             <input type="hidden" id="id" value="{{$driver_task->id}}">
             <input type="hidden" id="task_id" value="{{$driver_task->task_id}}">
-                <table id="div_driver_1" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
-                    <tr>
-                        <td style="padding-left: 20px; padding-right: 20px;">
-                            <label>Driver</label>
-                            <input type="text" name="driver" id="driver" class="form-control" style="width: 100%; text-align: center;" placeholder="Driver" readonly="" value="{{$driver_task->driver_name}}">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding-left: 20px; padding-right: 20px;">
-                            <label>Tanggal</label>
-                            <input type="text" name="date" id="date" class="form-control" style="width: 100%; text-align: center;" placeholder="Destination" readonly="" value="{{date('Y-m-d',strtotime($driver_task->date_from))}}">
-                        </td>
-                    </tr>
-                </table>
-                <table id="div_driver_2" style="text-align: center; width: 100%; padding-left: 10px;padding-right: 10px;">
-                    <tr>
-                        <td style="display: inline-block; padding-left: 20px; padding-right: 20px; margin-top: 20px;">
-                            <table style="width: 100%; padding-left: 20px; padding-right: 20px;">
-                                <thead style="background-color: lightgrey;">
-                                    <tr>
-                                        <th style="border: 1px solid black;" colspan="3">E-Toll</th>
-                                    </tr>
-                                    <tr>
-                                        <th style="border: 1px solid black;">Biaya</th>
-                                        <th style="border: 1px solid black;">File</th>
-                                        <th style="border: 1px solid black;"><button style="font-size: 10px;" onclick="addEtoll()" class="btn btn-success btn-xs"><i class="fa fa-plus"></i></button></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bodyEtoll">
-                                    <tr id="tr_etoll_0">
-                                        <td style="border: 1px solid black; width: 2%;"><input type="text" name="etoll_0" id="etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value="" inputmode="numeric" pattern="[0-9]*"></td>
-                                        <td style="border: 1px solid black; width: 2%;">
-                                            <input type="file" name="file_etoll_0" id="file_etoll_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll" onchange="readURLEtoll(this,0);">
-                                            <img id="blah_etoll_0" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
-                                        </td>
-                                        <td style="border: 1px solid black; width: 1%;"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="display: inline-block; padding-left: 20px; padding-right: 20px; margin-top: 20px;">
-                            <table style="width: 100%; padding-left: 20px; padding-right: 20px;">
-                                <thead style="background-color: lightgrey;">
-                                    <tr>
-                                        <th style="border: 1px solid black;" colspan="3">Parkir</th>
-                                    </tr>
-                                    <tr>
-                                        <th style="border: 1px solid black;">Biaya</th>
-                                        <th style="border: 1px solid black;">File</th>
-                                        <th style="border: 1px solid black;"><button style="font-size: 10px;" onclick="addParking()" class="btn btn-success btn-xs"><i class="fa fa-plus"></i></button></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bodyParking">
-                                    <tr id="tr_parking_0">
-                                        <td style="border: 1px solid black; width: 2%;"><input type="text" name="parking_0" id="parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value="" inputmode="numeric" pattern="[0-9]*"></td>
-                                        <td style="border: 1px solid black; width: 2%;">
-                                            <input type="file" name="file_parking_0" id="file_parking_0" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir" onchange="readURLParking(this,0);">
-                                            <img id="blah_parking_0" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
-                                        </td>
-                                        <td style="border: 1px solid black; width: 1%;"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding-top: 10px;">
-                            <button class="btn btn-success btn-sm" style="width: 90%; font-weight: bold; font-size: 20px;" onclick="submitDriver();">
-                                Submit
-                            </button>
-                        </td>
-                    </tr>
-                </table>
-                <div class="col-xs-12" id="div_driver_3" style="text-align: center; padding-left: 15px; padding-right: 15px; display: none;">
-                    <p style="font-size: 20px; font-weight: bold; color: green;">Success!</p>
-                    <span style="font-size: 18px; color: green;">Success Input Data<br>データの入力に成功しました</span>
+
+            <!-- Section 1: Driver Info -->
+            <div id="div_driver_1" style="margin-bottom: 30px;">
+                <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Driver</label>
+                <input type="text" id="driver" class="form-control" style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; background-color: #f9f9f9;" placeholder="Driver" readonly value="{{$driver_task->driver_name}}">
                 </div>
-            <?php } ?>
+                <div>
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Tanggal</label>
+                <input type="text" id="date" class="form-control" style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 14px; background-color: #f9f9f9;" placeholder="Date" readonly value="{{date('d-m-Y',strtotime($driver_task->date_from))}}">
+                </div>
+            </div>
+
+            <!-- Section 2: Form Input -->
+            <div id="div_driver_2">
+                <!-- E-Toll Table -->
+                <div style="margin-bottom: 30px; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>💳 E-Toll</span>
+                    <button type="button" onclick="addEtoll()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 600;">
+                    <i class="fa fa-plus"></i> Tambah
+                    </button>
+                </div>
+                <div style="padding: 16px; background-color: #fafafa;">
+                    <table id="bodyEtoll" style="width: 100%; border-collapse: collapse;">
+                    <tr id="tr_etoll_0">
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="text" name="from_0" id="from_0" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Dari">
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="text" name="to_0" id="to_0" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Ke">
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="text" name="etoll_0" id="etoll_0" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Biaya" inputmode="numeric" pattern="[0-9]*">
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="file" name="file_etoll_0" id="file_etoll_0" class="form-control" style="width: 100%; padding: 8px; border: 1px dashed #667eea; border-radius: 4px; font-size: 12px;" placeholder="Pilih file" onchange="readURLEtoll(this,0);">
+                        <img id="blah_etoll_0" src="" style="display: none; width: 100%; margin-top: 10px; border-radius: 4px; border: 1px solid #e0e0e0;" />
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0; text-align: center;"></td>
+                    </tr>
+                    </table>
+                </div>
+                </div>
+
+                <!-- Parking Table -->
+                <div style="margin-bottom: 30px; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 16px; font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>🅿️ Parkir</span>
+                    <button type="button" onclick="addParking()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 600;">
+                    <i class="fa fa-plus"></i> Tambah
+                    </button>
+                </div>
+                <div style="padding: 16px; background-color: #fafafa;">
+                    <table id="bodyParking" style="width: 100%; border-collapse: collapse;">
+                    <tr id="tr_parking_0">
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="text" name="parking_at_0" id="parking_at_0" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Lokasi">
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="text" name="parking_0" id="parking_0" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Biaya" inputmode="numeric" pattern="[0-9]*">
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">
+                        <input type="file" name="file_parking_0" id="file_parking_0" class="form-control" style="width: 100%; padding: 8px; border: 1px dashed #f5576c; border-radius: 4px; font-size: 12px;" placeholder="Pilih file" onchange="readURLParking(this,0);">
+                        <img id="blah_parking_0" src="" style="display: none; width: 100%; margin-top: 10px; border-radius: 4px; border: 1px solid #e0e0e0;" />
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #e0e0e0; text-align: center;"></td>
+                    </tr>
+                    </table>
+                </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button class="btn btn-success" onclick="submitDriver()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; font-weight: 600; font-size: 16px; border-radius: 6px; cursor: pointer; transition: transform 0.2s; margin-bottom: 20px;">
+                <i class="fa fa-check"></i> Submit
+                </button>
+            </div>
+
+            <!-- Section 3: Success -->
+            <div class="col-xs-12" id="div_driver_3" style="text-align: center; display: none; padding: 40px 20px; background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%); border-radius: 8px;">
+                <p style="font-size: 48px; margin: 0; color: #2d5016;">✓</p>
+                <p style="font-size: 20px; font-weight: 600; color: #2d5016; margin: 12px 0 8px 0;">Sukses!</p>
+                <span style="font-size: 14px; color: #2d5016;">Data berhasil dikirim<br>データの入力に成功しました</span>
+            </div>
+            @endif
         </div>
 
     </section>
@@ -345,18 +351,20 @@
         var count_parking = 1;
 
         function addEtoll() {
-            var etoll = '';
+            var etollBody = '';
 
-            etoll += '<tr id="tr_etoll_'+count_etoll+'">';
-                etoll += '<td style="border: 1px solid black; width: 2%;"><input type="text" name="etoll_'+count_etoll+'" id="etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="E-Toll" value="" inputmode="numeric" pattern="[0-9]*"></td>';
-                etoll += '<td style="border: 1px solid black; width: 2%;">';
-                etoll += '<input type="file" name="file_etoll_'+count_etoll+'" id="file_etoll_'+count_etoll+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File E-Toll" onchange="readURLEtoll(this,'+count_etoll+');">';
-                etoll += '<img id="blah_etoll_'+count_etoll+'" src="" style="display:none; width: 100%; height: auto; border: 1px solid black;">';
-                etoll += '</td>';
-                etoll += '<td style="border: 1px solid black; width: 1%;"><button style="font-size: 10px;" onclick="removeEtoll('+count_etoll+')" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i></button></td>';
-            etoll += '</tr>';
+            etollBody += '<tr id="tr_etoll_'+count_etoll+'">';
+            etollBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;"><input type="text" name="from_'+count_etoll+'" id="from_'+count_etoll+'" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Dari" value=""></td>';
+            etollBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;"><input type="text" name="to_'+count_etoll+'" id="to_'+count_etoll+'" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Ke" value=""></td>';
+            etollBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;"><input type="text" name="etoll_'+count_etoll+'" id="etoll_'+count_etoll+'" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Biaya" value="" inputmode="numeric" pattern="[0-9]*"></td>';
+            etollBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">';
+            etollBody += '<input type="file" name="file_etoll_'+count_etoll+'" id="file_etoll_'+count_etoll+'" class="form-control" style="width: 100%; padding: 8px; border: 1px dashed #667eea; border-radius: 4px; font-size: 12px;" placeholder="Pilih file" onchange="readURLEtoll(this,'+count_etoll+');">';
+            etollBody += '<img id="blah_etoll_'+count_etoll+'" src="" style="display: none; width: 100%; margin-top: 10px; border-radius: 4px; border: 1px solid #e0e0e0;">';
+            etollBody += '</td>';
+            etollBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0; text-align: center;"><button style="font-size: 12px; padding: 6px 10px;" onclick="removeEtoll('+count_etoll+')" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button></td>';
+            etollBody += '</tr>';
 
-            $('#bodyEtoll').append(etoll);
+            $('#bodyEtoll').append(etollBody);
 
             count_etoll++;
         }
@@ -366,18 +374,19 @@
         }
 
         function addParking() {
-            var parking = '';
+            var parkingBody = '';
 
-            parking += '<tr id="tr_parking_'+count_parking+'">';
-                parking += '<td style="border: 1px solid black; width: 2%;"><input type="text" name="parking_'+count_parking+'" id="parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="Parkir" value="" inputmode="numeric" pattern="[0-9]*"></td>';
-                parking += '<td style="border: 1px solid black; width: 2%;">';
-                parking += '<input type="file" name="file_parking_'+count_parking+'" id="file_parking_'+count_parking+'" class="form-control" style="width: 100%; text-align: center; background-color: white;" placeholder="File Parkir" onchange="readURLParking(this,'+count_parking+');">';
-                parking += '<img id="blah_parking_'+count_parking+'" src="" style="display:none; width: 100%; height: auto; border: 1px solid black;">';
-                parking += '</td>';
-                parking += '<td style="border: 1px solid black; width: 1%;"><button style="font-size: 10px;" onclick="removeParking('+count_parking+')" class="btn btn-danger btn-xs"><i class="fa fa-minus"></i></button></td>';
-            parking += '</tr>';
+            parkingBody += '<tr id="tr_parking_'+count_parking+'">';
+            parkingBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;"><input type="text" name="parking_at_'+count_parking+'" id="parking_at_'+count_parking+'" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Lokasi" value=""></td>';
+            parkingBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;"><input type="text" name="parking_'+count_parking+'" id="parking_'+count_parking+'" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 13px;" placeholder="Biaya" value="" inputmode="numeric" pattern="[0-9]*"></td>';
+            parkingBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0;">';
+            parkingBody += '<input type="file" name="file_parking_'+count_parking+'" id="file_parking_'+count_parking+'" class="form-control" style="width: 100%; padding: 8px; border: 1px dashed #f5576c; border-radius: 4px; font-size: 12px;" placeholder="Pilih file" onchange="readURLParking(this,'+count_parking+');">';
+            parkingBody += '<img id="blah_parking_'+count_parking+'" src="" style="display: none; width: 100%; margin-top: 10px; border-radius: 4px; border: 1px solid #e0e0e0;">';
+            parkingBody += '</td>';
+            parkingBody += '<td style="padding: 4px; border-bottom: 1px solid #e0e0e0; text-align: center;"><button style="font-size: 12px; padding: 6px 10px;" onclick="removeParking('+count_parking+')" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i></button></td>';
+            parkingBody += '</tr>';
 
-            $('#bodyParking').append(parking);
+            $('#bodyParking').append(parkingBody);
 
             count_parking++;
         }
@@ -398,7 +407,10 @@
         });
 
         var etoll = [];
+        var etoll_from = [];
+        var etoll_to = [];
         var parking = [];
+        var parking_at = [];
 
         var file_etoll = [];
         var file_parking = [];
@@ -407,14 +419,28 @@
             $('#loading').show();
 
             etoll = [];
+            etoll_from = [];
+            etoll_to = [];
             parking = [];
+            parking_at = [];
 
             file_etoll = [];
             file_parking = [];
 
             for(var i = 0; i < count_etoll;i++){
                 if($('#etoll_'+i).val() != '' && $('#etoll_'+i).val() != undefined && $('#etoll_'+i).val() != 'undefined'){
-                    etoll.push(parseInt($('#etoll_'+i).val()));
+                    var etoll_val = parseInt($('#etoll_'+i).val());
+                    
+                    // Validasi: minimal 3 digit (nominal harga minimum 100)
+                    if(isNaN(etoll_val) || etoll_val < 100){
+                        $('#loading').hide();
+                        openErrorGritter('Error!','E-Toll harus berupa nominal harga minimal 3 digit');
+                        return false;
+                    }
+                    
+                    etoll.push(etoll_val);
+                    etoll_from.push($('#from_'+i).val());
+                    etoll_to.push($('#to_'+i).val());
                     if ($('#file_etoll_'+i).prop('files')[0] == undefined) {
                         $('#loading').hide();
                         openErrorGritter('Error!','Isikan Foto Bukti E-Toll');
@@ -427,7 +453,17 @@
 
             for(var i = 0; i < count_parking;i++){
                 if($('#parking_'+i).val() != '' && $('#parking_'+i).val() != undefined && $('#parking_'+i).val() != 'undefined'){
-                    parking.push(parseInt($('#parking_'+i).val()));
+                    var parking_val = parseInt($('#parking_'+i).val());
+                    
+                    // Validasi: minimal 3 digit (nominal harga minimum 100)
+                    if(isNaN(parking_val) || parking_val < 100){
+                        $('#loading').hide();
+                        openErrorGritter('Error!','Parkir harus berupa nominal harga minimal 3 digit');
+                        return false;
+                    }
+                    
+                    parking.push(parking_val);
+                    parking_at.push($('#parking_at_'+i).val());
                     if ($('#file_parking_'+i).prop('files')[0] == undefined) {
                         $('#loading').hide();
                         openErrorGritter('Error!','Isikan Foto Bukti Parkir');
@@ -473,6 +509,8 @@
                     id : $('#id').val(),
                     task_id : $('#task_id').val(),
                     etoll : etoll[i],
+                    etoll_from : etoll_from[i],
+                    etoll_to : etoll_to[i],
                     file_etoll : file_etoll[i],
                     index : i,
                 }
@@ -501,6 +539,7 @@
                     id : $('#id').val(),
                     task_id : $('#task_id').val(),
                     parking : parking[i],
+                    parking_at : parking_at[i],
                     file_parking : file_parking[i],
                     index : i,
                 }
