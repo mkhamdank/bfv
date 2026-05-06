@@ -62,6 +62,7 @@
                                     <th style="width: 10%">Form Number</th>
                                     <th style="width: 10%">FA Number</th>
                                     <th>Nama Molding</th>
+                                    <th>Location</th>
                                     <th style="width: 12%">Form Produk</th>
                                     <th style="width: 12%">Form Molding</th>
                                     <th style="width: 10%">Form Evaluasi</th>
@@ -171,6 +172,7 @@
                         tableData += '<td>' + value.form_number + '</td>';
                         tableData += '<td>' + value.fixed_asset_number + '</td>';
                         tableData += '<td>' + value.fixed_asset_name + '</td>';
+                        tableData += '<td>' + value.vendor + '</td>';
                         if (!value.id_product_check) {
                             tableData +=
                                 '<td><center>';

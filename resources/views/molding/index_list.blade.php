@@ -556,6 +556,96 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalKirim" tabindex="-1" role="dialog" aria-labelledby="modalKirimLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalKirimLabel">Kirim Molding ke YMPI</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="fa_number_kirim">Nomor Molding</label>
+                        <input type="text" class="form-control" id="fa_number_kirim" readonly>
+                        <input type="hidden" class="form-control" id="kawasan_kirim">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nama_molding_kirim">Nama Molding</label>
+                        <input type="text" class="form-control" id="nama_molding_kirim" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="button" class="btn btn-success btn-sm" onclick="modal_buat_kirim()"><i class="fas fa-plus-square"></i> Buat Pengiriman</button>
+                    </div>
+                    
+                    <table class="table table-bordered" id="tableKirim">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th style="width: 15%;">Tgl Buat</th>
+                                <th style="width: 25%;">Tgl Pengiriman <span class="text-danger">*</span></th>
+                                <th>Lampiran</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyKirim">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalBuatKirim" tabindex="-1" role="dialog" aria-labelledby="modalBuatKirimLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalBuatKirimLabel">Buat Pengiriman</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="fa_number_buat_kirim">Nomor Molding</label>
+                        <input type="text" class="form-control" id="fa_number_buat_kirim" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nama_molding_buat_kirim">Nama Molding</label>
+                        <input type="text" class="form-control" id="nama_molding_buat_kirim" readonly>
+                    </div>
+
+                    <div class="form-group" style="display: none;" id="div_bc_27">
+                        <label for="bc_27_buat_kirim">Dokumen BC 2.7 <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="bc_27_buat_kirim" accept="document/pdf">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surat_jalan_buat_kirim">Surat Jalan <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="surat_jalan_buat_kirim">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="foto_packing_buat_kirim">Foto Packing <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="foto_packing_buat_kirim" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fas fa-times"></i> Close</button>
+                    <button type="button" class="btn btn-success" onclick="buat_pengiriman()"><i class="fas fa-paper-plane"></i> Buat Pengiriman</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 @section('scripts')
     <script src="{{ url('js/bootstrap-toggle.min.js') }}"></script>
@@ -727,14 +817,19 @@
                         }
 
                         tableData += '<td style="background-color:'+color+'; text-align: center;" >' + (value.status ? value.status : '-') + '</td>';
-
-                        if(value.status == 'Butuh Pemeriksaan') {
-                            tableData += '<td><button class="btn btn-warning btn-sm" onclick="openModalShot(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-marker"></i> Input Shot</button>&nbsp;<button class="btn btn-info btn-sm" onclick="openModalKerusakan(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-plus"></i> Kerusakan</button>&nbsp;<button class="btn btn-success btn-sm" onclick="generate_form(\''+value.fixed_asset_number+'\')"><i class="fas fa-plus"></i> Buat Form</button></td>';
-                        } else if (value.status == 'InProgress Pemeriksaan') {
-                            tableData += '<td><button class="btn btn-warning btn-sm" onclick="openModalShot(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-marker"></i> Input Shot</button>&nbsp;<button class="btn btn-info btn-sm" onclick="openModalKerusakan(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-plus"></i> Kerusakan</button>&nbsp;<a class="btn btn-primary btn-sm" href="{{ url('index/diagnose_molding/molding_form') }}/' + value.fixed_asset_number + '"><i class="fas fa-info"></i> Lihat Form</a></td>';
+                        
+                        if('{{ Auth::user()->username }}' !== 'molding_ympi') {
+                            if(value.status == 'Butuh Pemeriksaan') {
+                                tableData += '<td><button class="btn btn-warning btn-sm mt-1" onclick="openModalShot(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-marker"></i> Input Shot</button>&nbsp;<button class="btn btn-info btn-sm mt-1" onclick="openModalKerusakan(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-plus"></i> Kerusakan</button>&nbsp;<button class="btn btn-success btn-sm mt-1" onclick="generate_form(\''+value.fixed_asset_number+'\')"><i class="fas fa-plus"></i> Buat Form</button>&nbsp;<button class="btn btn-primary btn-sm mt-1" onclick="modal_kirim(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\', \''+value.status_kawasan+'\')"><i class="fas fa-paper-plane"></i> Kirim Molding</button></td>';
+                            } else if (value.status == 'InProgress Pemeriksaan') {
+                                tableData += '<td><button class="btn btn-warning btn-sm mt-1" onclick="openModalShot(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-marker"></i> Input Shot</button>&nbsp;<button class="btn btn-info btn-sm mt-1" onclick="openModalKerusakan(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-plus"></i> Kerusakan</button>&nbsp;<a class="btn btn-primary btn-sm mt-1" href="{{ url('index/diagnose_molding/molding_form') }}/' + value.fixed_asset_number + '"><i class="fas fa-info"></i> Lihat Form</a>&nbsp;<button class="btn btn-primary btn-sm mt-1" onclick="modal_kirim(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\', \''+value.status_kawasan+'\')"><i class="fas fa-paper-plane"></i> Kirim Molding</button></td>';
+                            } else {
+                                tableData += '<td><button class="btn btn-warning btn-sm mt-1" onclick="openModalShot(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-marker"></i> Input Shot</button>&nbsp;<button class="btn btn-info btn-sm mt-1" onclick="openModalKerusakan(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-plus"></i> Kerusakan</button>&nbsp;<button class="btn btn-primary btn-sm mt-1" onclick="modal_kirim(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\', \''+value.status_kawasan+'\')"><i class="fas fa-paper-plane"></i> Kirim Molding</button></td>';
+                            }
                         } else {
-                            tableData += '<td><button class="btn btn-warning btn-sm" onclick="openModalShot(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-marker"></i> Input Shot</button>&nbsp;<button class="btn btn-info btn-sm" onclick="openModalKerusakan(\''+value.fixed_asset_number+'\', \''+value.fixed_asset_name+'\')"><i class="fas fa-plus"></i> Kerusakan</button></td>';
+                            tableData += '<td><button class="btn btn-success btn-sm mt-1" onclick="generate_form(\''+value.fixed_asset_number+'\')"><i class="fas fa-plus"></i> Buat Form</button></td>';
                         }
+                        
                         tableData += '</tr>';
                     });
                     $('#bodyTableMaster').html(tableData);
@@ -972,6 +1067,189 @@
                     return xhr;
                 }
             })
+        }
+
+        function modal_kirim(asset_number, nama_molding, kawasan) {
+            $('#modalKirim').modal('show');
+            $('#fa_number_kirim').val(asset_number);
+            $('#nama_molding_kirim').val(nama_molding);
+            $('#kawasan_kirim').val(kawasan);
+            $('#tbodyKirim').empty();
+
+            var data = {
+                no_fixed_asset : asset_number
+            }
+
+            $.get('{{ url("get/molding/pengiriman") }}', data, function(result) {
+                if(result.status) {
+                    var body = "";
+
+                    $.each(result.datas, function(key, value) {
+                        body += '<tr>';
+                        body += '<td>' + (key+1) + '</td>';
+                        body += '<td>' + value.created_at + '</td>';
+                        if (value.tgl_pengiriman) {
+                            body += '<td>' + value.tgl_pengiriman + '</td>';
+                        } else {
+                            body += `<td><div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                </div>
+                                <input type="text" class="form-control datepicker" placeholder="Tgl Kirim" id="tgl_pengiriman_${value.id}">
+                                </div></td>`;
+                        }
+                        
+                        body += '<td>';
+
+                        var doc = JSON.parse(value.document);
+                        $.each(doc, function(key, value) {
+                            console.log(value);
+
+                            // Get the key value pair from variable `value`
+                            var key = Object.keys(value)[0];
+                            var val = value[key];
+                            
+                            body += '<p><a class="btn btn-sm btn-primary" href="{{ url("workshop/molding/file_pengiriman/") }}/' + key + '/' + val + '" target="_blank"><i class="far fa-file-image"></i> ' + key + '</a></p>';
+                        });
+
+                        body += '</td>';
+                        body += '<td>' + (value.status || '') + '</td>';
+                        if (!value.status) {
+                            body += '<td><button class="btn btn-sm btn-success" onclick="kirim('+ value.id +')"><i class="fas fa-paper-plane"></i> Kirim</button></td>';
+                        } else if (value.status == 'Rejected') {
+                            body += '<td><button class="btn btn-sm btn-success" onclick="kirim('+ value.id +')"><i class="fas fa-paper-plane"></i> Kirim</button></td>';
+                        } else {
+                            body += '<td></td>';
+                        }
+                        body += '</tr>';
+                    });
+
+                    $('#tbodyKirim').append(body);
+
+                    $('.datepicker').datepicker({
+                        format: 'yyyy-mm-dd',
+                        autoclose: true,
+                        todayHighlight: true,
+                        todayBtn: true,
+                        todayBtn: 'linked',
+                        todayHighlight: true,
+                        language: 'id',
+                        orientation: 'bottom',
+                        templates: {
+                            leftArrow: '<i class="fas fa-chevron-left"></i>',
+                            rightArrow: '<i class="fas fa-chevron-right"></i>'
+                        },
+                        // endDate: '0d'
+                    });
+                }
+            });
+        }
+
+        function modal_buat_kirim() {
+            if($('#kawasan_kirim').val() == 'KB') {
+                $('#div_bc_27').show();
+            } else {
+                $('#div_bc_27').hide();
+            }
+
+            $('#fa_number_buat_kirim').val($('#fa_number_kirim').val());
+            $('#nama_molding_buat_kirim').val($('#nama_molding_kirim').val());
+            $('#modalBuatKirim').modal('show');
+        }
+
+        function buat_pengiriman() {
+            // simpan data ajax post
+            var formData = new FormData();
+
+            if($('#surat_jalan_buat_kirim')[0].files[0] == '') {
+                audio_error.play();
+                toastr.error('Surat Jalan harus diisi');
+                return;
+            }
+
+            if($('#foto_packing_buat_kirim')[0].files[0] == '') {
+                audio_error.play();
+                toastr.error('Foto Packing harus diisi');
+                return;
+            }
+
+            if($('#kawasan_kirim').val() == 'KB') {
+                if($('#bc_27_buat_kirim')[0].files[0]) {
+                    formData.append('bc_27_buat_kirim', $('#bc_27_buat_kirim')[0].files[0]);
+                } else {
+                    audio_error.play();
+                    toastr.error('BC 27 harus diisi');
+                    return;
+                }
+            }
+
+            formData.append('fa_number', $('#fa_number_buat_kirim').val());
+            formData.append('nama_molding', $('#nama_molding_buat_kirim').val());
+            formData.append('surat_jalan_buat_kirim', $('#surat_jalan_buat_kirim')[0].files[0]);
+            formData.append('foto_packing_buat_kirim', $('#foto_packing_buat_kirim')[0].files[0]);
+            $("#loading").show();
+
+            $.ajax({
+                url: '{{ url("post/molding/pengiriman") }}',
+                type: 'POST',
+                contentType: false,
+                processData: false,
+                data : formData,
+                success: function(response) {
+                    $("#loading").hide();
+                    if (!response.status) {
+                        audio_error.play();
+                        toastr.error(response.message);
+                    } else {
+                        audio_success.play();
+                        toastr.success(response.message);
+
+                        $("#surat_jalan_buat_kirim").val('');
+                        $("#foto_packing_buat_kirim").val('');
+                        $("#bc_27_buat_kirim").val('');
+
+                        $('#modalBuatKirim').modal('hide');
+                        // $('#modalKirim').modal('hide');
+                        modal_kirim($('#fa_number_buat_kirim').val(), $('#nama_molding_buat_kirim').val(), $('#kawasan_kirim').val());
+                    }
+                },
+                error: function(response) {
+                    $("#loading").hide();
+                    audio_error.play();
+                    toastr.error(response.message);
+                }
+            })
+        }
+
+        function kirim(id) {
+            if ($("#tgl_pengiriman_"+id).val() == "") {
+                audio_error.play();
+                toastr.error("Mohon Lengkapi Tanggal Kirim");
+                return;
+            }
+
+            $("#loading").show();
+
+            if (confirm("Apakah Anda Yakin Mengirim Molding pada Tanggal : "+ $("#tgl_pengiriman_"+id).val())) {
+                var data = {
+                    id : id,
+                    tgl_kirim : $("#tgl_pengiriman_"+id).val()
+                }
+
+                $.post('{{ url("post/molding/pengiriman/kirim") }}', data, function(result) {
+                    $("#loading").hide();
+                    if (result.status) {
+                        toastr.success(result.message);
+                        audio_success.play();
+
+                        $("#modalKirim").modal("hide");
+                        modal_kirim(result.data.fixed_asset_number, result.data.fixed_asset_name, result.data.status_kawasan);
+                    } else {
+                        toastr.error(result.message);
+                        audio_error.play();
+                    }
+                })
+            }
         }
 
         // Handle the change event for the file input

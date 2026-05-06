@@ -58,10 +58,11 @@ class MoldingController extends Controller
 
     function fetchMoldingDiagnoseFormList(Request $request)  {
         $master_molding = DB::table('molding_diagnose_forms')
+        ->leftJoin('molding_diagnose_masters', 'molding_diagnose_forms.fixed_asset_name', '=', 'molding_diagnose_masters.fixed_asset_name')
         ->leftJoin('molding_diagnose_product_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_product_forms.master_form_number')
         ->leftJoin('molding_diagnose_molding_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_molding_forms.master_form_number')
         ->whereNull('molding_diagnose_forms.deleted_at')
-        ->select('molding_diagnose_forms.form_number', 'molding_diagnose_forms.fixed_asset_number', 'molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.id_molding_check', 'molding_diagnose_forms.id_product_check', 'molding_diagnose_forms.total_score', 'molding_diagnose_forms.rank', 'molding_diagnose_forms.status', 'molding_diagnose_product_forms.id as form_product_id', 'molding_diagnose_molding_forms.id as form_molding_id', db::raw('DATE_FORMAT(molding_diagnose_forms.created_at,"%Y %b") as month'))
+        ->select('molding_diagnose_forms.form_number', 'molding_diagnose_forms.fixed_asset_number', 'molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.id_molding_check', 'molding_diagnose_forms.id_product_check', 'molding_diagnose_forms.total_score', 'molding_diagnose_forms.rank', 'molding_diagnose_forms.status', 'molding_diagnose_product_forms.id as form_product_id', 'molding_diagnose_molding_forms.id as form_molding_id', db::raw('DATE_FORMAT(molding_diagnose_forms.created_at,"%Y %b") as month'), 'molding_diagnose_masters.vendor', 'molding_diagnose_masters.location')
         ->get();
 
         return Response::json([
