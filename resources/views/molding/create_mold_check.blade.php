@@ -647,6 +647,8 @@
                 return;
             }
 
+            $("#loading").show();
+
             var formData = new FormData();
             formData.append('image', $('#customFile')[0].files[0]);
             formData.append('form_number', $('#form_number').text());
@@ -657,18 +659,21 @@
                 processData: false,
                 contentType: false,
                 success: function(result) {
+                    $("#loading").hide();
                     if (result.status) {
                         toastr.success(result.message);
                         $('#customFile').val('');
-                        $('#photo_product').attr('src', '{{ asset("workshop/molding/photo_product/main/") }}' + result.image);
-                        $('#form_diagnose_container').show();
+                        // $('#photo_product').attr('src', '{{ asset("workshop/molding/photo_product/main/") }}' + result.image);
+                        location.reload();
+                        // $('#form_diagnose_container').show();
                     } else {
                         toastr.error(result.message)
                         audio_error.play();
                     }
                 },
                 error: function(result) {
-                    toastr.error(result.message)
+                    $("#loading").hide();
+                        toastr.error(result.message)
                     audio_error.play();
                 }
             })
@@ -686,6 +691,8 @@
                 return;
             }
 
+            $("#loading").show();
+
             var formData = new FormData();
             formData.append('nomor', $('#nomor').text());
             formData.append('nama_ng', $('#nama_ng').text());
@@ -701,6 +708,7 @@
                 processData: false,
                 contentType: false,
                 success: function(result) {
+                    $("#loading").hide();
                     if (result.status) {
                         toastr.success(result.message);
                         $('#modal_ng').modal('hide');
@@ -723,6 +731,7 @@
                     }
                 },
                 error: function(result) {
+                    $("#loading").hide();
                     toastr.error(result.message)
                     audio_error.play();
                 }

@@ -154,7 +154,7 @@ class MoldingController extends Controller
             }
 
             $moldings = DB::table('molding_diagnose_forms')
-            ->where('master_form_number', $request->form_number)
+            ->where('form_number', $request->form_number)
             ->select('fixed_asset_number', 'fixed_asset_name', 'vendor')
             ->first();
 
