@@ -330,6 +330,20 @@ class VendorController extends Controller
                 ->where('department', '=', 'Maintenance Department')
                 ->first();
 
+            $foreman = db::table('approvers')
+                ->where('department', '=', 'Maintenance Department')
+                ->where('remark', '=', 'Foreman')
+                ->pluck('approver_email')
+                ->filter()
+                ->toArray();
+
+            $deputy_foreman = db::table('approvers')
+                ->where('department', '=', 'Maintenance Department')
+                ->where('remark', '=', 'Deputy Foreman')
+                ->pluck('approver_email')
+                ->filter()
+                ->toArray();
+
             db::table('wpos_approvals')->insert([
                 'wpos_id' => $forms,
                 'approver_id' => $manager->approver_id,
@@ -350,6 +364,7 @@ class VendorController extends Controller
             ];
 
             Mail::to($manager->approver_email)
+            ->cc(array_merge($foreman, $deputy_foreman))
             ->bcc(['ympi-mis-ML@music.yamaha.com'])
             ->send(new SendEmail($data, 'wpos'));
 
@@ -368,11 +383,60 @@ class VendorController extends Controller
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
-            // Mail::to(['widura@music.yamaha.com'])->cc('prawoto@music.yamaha.com')->bcc(['rio.irvansyah@music.yamaha.com','mokhamad.khamdan.khabibi@music.yamaha.com'])->send(new SendEmail($mail, 'guest'));
 
-            // Mail::to(['rio.irvansyah@music.yamaha.com'])
-            // ->cc(['mokhamad.khamdan.khabibi@music.yamaha.com'])
-            // ->send(new SendEmail($data_mail, 'wpos'));
+
+            if ($request->input('work_permit') == 'Hot Work Permit') {
+                // For Hot Work Permit, check each department and send to manager and chief if not HR
+                for ($j=0; $j < count($dept); $j++) {
+                    if ($dept[$j] != 'Human Resources Department') {
+                        $manager = db::table('approvers')->where('remark', '=', 'Manager')
+                            ->where('department', '=', 'Human Resources Department')
+                            ->first();
+
+                        $chiefs = db::table('approvers')
+                            ->where('department', '=', 'Human Resources Department')
+                            ->where('remark', '=', 'Chief')
+                            ->where('section','=','Industrial Relation Section')
+                            ->pluck('approver_email')
+                            ->filter()
+                            ->toArray();
+
+                        $hwp_emails = [];
+                        if ($manager && !empty($manager->approver_email)) {
+                            $hwp_emails[] = $manager->approver_email;
+                        }
+                        if (!empty($chiefs)) {
+                            $hwp_emails = array_merge($hwp_emails, $chiefs);
+                        }
+
+                        if (!empty($hwp_emails)) {
+                            $data_hwp = [
+                                'dept' => $dept[$j],
+                                'wpos_data' => $data_mail
+                            ];
+                            Mail::to($hwp_emails)
+                                ->bcc(['ympi-mis-ML@music.yamaha.com'])
+                                ->send(new SendEmail($data_hwp, 'wpos'));
+                        }
+
+                        // Insert only manager in wpos_approvals for Hot Work Permit
+                        if ($manager) {
+                            db::table('wpos_approvals')->insert([
+                                'wpos_id' => $forms,
+                                'approver_id' => $manager->approver_id,
+                                'approver_name' => $manager->approver_name,
+                                'approver_email' => $manager->approver_email,
+                                'department' => $manager->department,
+                                'status' => 'Waiting',
+                                'position' => 'Manager',
+                                'remark' => 'Approved By',
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'updated_at' => date('Y-m-d H:i:s'),
+                            ]);
+                        }
+                    }
+                }
+            }
 
             $response = array(
                 'status' => true,
