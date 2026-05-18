@@ -1692,6 +1692,7 @@ class GeneralAffairController extends Controller
             AND closure_status != 'driver'
             AND closure_status != 'closed'
             AND etoll IS NULL
+            AND parking IS NULL
             AND driver_id = '".$driver_id."'
             ORDER BY
             date_from DESC");
