@@ -1139,6 +1139,7 @@ class GeneralAffairController extends Controller
             ->where('id',$id)
             ->update([
                 'fuel_in_evidence' => $fileData_name,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
             $response = array(
                 'status' => true,
@@ -1175,6 +1176,7 @@ class GeneralAffairController extends Controller
             ->where('id',$id)
             ->update([
                 'odometer_before_evidence' => $fileDataOdoBefore_name,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
             $response = array(
                 'status' => true,
@@ -1211,6 +1213,7 @@ class GeneralAffairController extends Controller
             ->where('id',$id)
             ->update([
                 'odometer_after_evidence' => $fileDataOdoAfter_name,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
             $response = array(
                 'status' => true,
@@ -1360,6 +1363,7 @@ class GeneralAffairController extends Controller
                 'location' => $location,
                 'latitude' => $latitude,
                 'longitude' => $longitude,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
             $response = array(
                 'status' => true,
