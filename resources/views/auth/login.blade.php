@@ -1,99 +1,359 @@
 @extends('layouts.app')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/login-style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        .login100-form-title {
-            font-family: 'Poppins', sans-serif !important;
-            font-weight: 600 !important;
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        .input100 {
-            font-family: 'Poppins', sans-serif !important;
-            font-weight: 400 !important;
+        body, html {
+            min-height: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
-        .login100-form-btn {
-            font-family: 'Poppins', sans-serif !important;
-            font-weight: 600 !important;
+        /* ── Page background ── */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0eef9;
+            background-image:
+                radial-gradient(ellipse 60% 50% at 20% 20%, rgba(96, 92, 168, 0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 60% at 80% 80%, rgba(96, 92, 168, 0.08) 0%, transparent 70%);
+            padding: 24px;
+        }
+
+        /* ── Card ── */
+        .login-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow:
+                0 1px 3px rgba(96, 92, 168, 0.08),
+                0 8px 32px rgba(96, 92, 168, 0.12),
+                0 32px 64px rgba(96, 92, 168, 0.06);
+            width: 100%;
+            max-width: 440px;
+            padding: 44px 40px 40px;
+            animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Logo / Brand ── */
+        .brand-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            /* gap: 5px; */
+            background-color: #605ca8;
+            padding: 10px 20px 10px 12px;
+            border-radius: 50px;
+        }
+
+        .brand-pill img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            margin-left: 10px;
+        }
+
+        .brand-pill span {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+
+        /* ── Heading ── */
+        .form-heading {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .form-heading h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e1b3a;
+            margin-bottom: 6px;
+        }
+
+        .form-heading p {
+            font-size: 13.5px;
+            color: #8b87b5;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: #eeecfb;
+            margin-bottom: 28px;
+        }
+
+        /* ── Alerts ── */
+        .alert-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-box.error {
+            background: #fef3f2;
+            border: 1px solid #fecdca;
+            color: #b42318;
+        }
+
+        .alert-box.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .alert-box .alert-icon {
+            font-size: 15px;
+            line-height: 1.4;
+            flex-shrink: 0;
+        }
+
+        /* ── Fields ── */
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3d3a5c;
+            margin-bottom: 7px;
+        }
+
+        .field-inner {
+            position: relative;
+        }
+
+        .field-inner .f-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b0acd8;
+            font-size: 14px;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+
+        .field-inner input {
+            width: 100%;
+            border: 1.5px solid #e2dff5;
+            border-radius: 10px;
+            padding: 11px 14px 11px 40px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: #1e1b3a;
+            background: #faf9ff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .field-inner input::placeholder {
+            color: #c4c0e0;
+        }
+
+        .field-inner input:focus {
+            border-color: #605ca8;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(96, 92, 168, 0.12);
+        }
+
+        .field-inner:focus-within .f-icon {
+            color: #605ca8;
+        }
+
+        .field-inner input.is-invalid {
+            border-color: #f04438;
+        }
+
+        .field-error {
+            font-size: 12px;
+            color: #f04438;
+            margin-top: 5px;
+            padding-left: 2px;
+        }
+
+        /* toggle password */
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #b0acd8;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 14px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .toggle-pw:hover { color: #605ca8; }
+
+        /* ── Submit ── */
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background-color: #605ca8;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(96, 92, 168, 0.35);
+            margin-top: 6px;
+        }
+
+        .btn-submit:hover {
+            background-color: #534da0;
+            box-shadow: 0 6px 20px rgba(96, 92, 168, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(96, 92, 168, 0.3);
+        }
+
+        /* ── Footer ── */
+        .card-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #c4c0e0;
         }
     </style>
 @endsection
 
 @section('content')
-    <div class="container-login100">
-        <div class="wrap-login100">
-            <div class="col-md-12 pl-md-5" style="margin-top: 50px;">
-                <form method="post" action="{{ route('login') }}">
-                    @csrf
-                    {{-- {{ csrf_field() }} --}}
-                    <span class="login100-form-title" style="color: white;background-color: #605ca8;padding-bottom: 0;text-align: center;font-size: 20px;font-weight: bold;padding: 10px;border-radius: 16px;margin-top: 20px;">
-                        <img src="{{ asset('img/bridgesmall.png') }}" alt="smallogo" width="50px">&nbsp;&nbsp;Bridge For Vendor
-                    </span>
+<div class="login-page">
+    <div class="login-card">
 
-                    @if ($errors->has('email'))
-                        <div class="alert alert-danger alert-dismissible" style="margin-top: 10px;">
-                            <h4 style="font-size: 15px;font-weight: bold;"> Error!</h4>
-                            <span style="font-size: 12px">These credentials do not match our records.</span>
-                        </div>
-                    @endif
-                    @if (session('success'))
-                        <div class="alert alert-success alert-dismissible">
-                            <h4 style="font-size: 15px;font-weight: bold;"> Success!</h4>
-                            <span style="font-size: 12px">{{ session('success') }}</span>
-                        </div>
-                    @endif
-
-                    <div class="wrap-input100 validate-input" style="margin-top:20px">
-                        <!-- <input autocomplete="off" type="text" class="input100" placeholder="Email" id="email" name="email" value="{{ old('email') }}" required autofocus a> -->
-                        <input id="username" type="text" class="input100 @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autofocus>
-                        <span class="focus-input100"></span>
-                        @error('username')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                        <span class="symbol-input100">
-                            <i class="fa fa-envelope" aria-hidden="true"></i>
-                        </span>
-                    </div>
-                                        
-
-                    <!-- <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz" style="margin-top:20px">
-                        <input autocomplete="off" type="text" class="input100" placeholder="Email" id="email" name="email" value="{{ old('email') }}" required autofocus a>
-                        <span class="focus-input100"></span>
-                        <span class="symbol-input100">
-                            <i class="fa fa-envelope" aria-hidden="true"></i>
-                        </span>
-                    </div> -->
-
-                    <div class="wrap-input100 validate-input" data-validate="Password is required">
-                        <input class="input100" type="password" placeholder="Password" id="password" name="password" required>
-                        <span class="focus-input100"></span>
-                        <span class="symbol-input100">
-                            <i class="fa fa-lock" aria-hidden="true"></i>
-                        </span>
-                    </div>
-
-
-
-                    <div class="container-login100-form-btn">
-                        <button class="login100-form-btn" type="submit">
-                            Login
-                        </button>
-                    </div>
-                </form>
+        {{-- Logo (original) --}}
+        <div class="brand-wrap">
+            <div class="brand-pill">
+                <img src="{{ asset('img/bridgesmall.png') }}" alt="smallogo" width="50px">&nbsp;&nbsp;<span>Bridge For Vendor</span>
             </div>
         </div>
+
+        {{-- Heading --}}
+        <div class="form-heading">
+            <h1>Selamat Datang</h1>
+            <p>Masuk untuk melanjutkan ke dashboard Anda</p>
+        </div>
+
+        <div class="divider"></div>
+
+        {{-- Alerts --}}
+        @if ($errors->has('email'))
+            <div class="alert-box error">
+                <span class="alert-icon">&#9888;</span>
+                <span>Kredensial tidak cocok dengan data kami. Silakan coba lagi.</span>
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="alert-box success">
+                <span class="alert-icon">&#10003;</span>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        {{-- Form --}}
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
+
+            {{-- Username --}}
+            <div class="field">
+                <label for="username">Username</label>
+                <div class="field-inner">
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        class="@error('username') is-invalid @enderror"
+                        value="{{ old('username') }}"
+                        placeholder="Masukkan username"
+                        required
+                        autofocus
+                        autocomplete="off"
+                    >
+                    <span class="f-icon"><i class="fa fa-user"></i></span>
+                </div>
+                @error('username')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Password --}}
+            <div class="field">
+                <label for="password">Password</label>
+                <div class="field-inner">
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        placeholder="Masukkan password"
+                        required
+                    >
+                    <span class="f-icon"><i class="fa fa-lock"></i></span>
+                    <button type="button" class="toggle-pw" id="togglePw" aria-label="Tampilkan password">
+                        <i class="fa fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Masuk</button>
+        </form>
+
+        <div class="card-footer">
+            &copy; {{ date('Y') }} Bridge For Vendor &mdash; All rights reserved.
+        </div>
+
     </div>
+</div>
 @endsection
 
-@section('script')
+@section('scripts')
     <script>
-        $(function() {
+        $(function () {
             $('input').iCheck({
                 checkboxClass: 'icheckbox_square-blue',
                 radioClass: 'iradio_square-blue',
@@ -101,9 +361,22 @@
             });
         });
 
-        jQuery(document).ready(function() {
+        jQuery(document).ready(function () {
             $('#username').val('');
             $('#password').val('');
+        });
+
+        // Toggle password visibility
+        document.getElementById('togglePw').addEventListener('click', function () {
+            var pw  = document.getElementById('password');
+            var ico = document.getElementById('eyeIcon');
+            if (pw.type === 'password') {
+                pw.type = 'text';
+                ico.className = 'fa fa-eye-slash';
+            } else {
+                pw.type = 'password';
+                ico.className = 'fa fa-eye';
+            }
         });
     </script>
 @endsection

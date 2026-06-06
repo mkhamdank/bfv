@@ -1,5 +1,176 @@
 .nmpd-wrapper {display: none;}
 .nmpd-target {cursor: pointer;}
-.nmpd-grid {position:absolute; left:50px; top:50px; z-index:5000; -khtml-user-select: none; padding:10px; width: initial;}
-.nmpd-overlay {z-index:4999;}
-input.nmpd-display {text-align: right;}
+.nmpd-grid, .numpad.modal-content {
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 20px 60px rgba(45,43,78,.35) !important;
+    width: 340px !important;
+    min-width: 300px !important;
+    max-width: 95vw !important;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+}
+
+.nmpd-overlay, .modal-backdrop.in {
+    opacity: .55 !important;
+    background: #2d2b4e !important;
+    z-index: 30099 !important;
+}
+
+.nmpd-grid table,
+.numpad table {
+    border-collapse: separate !important;
+    border-spacing: 6px !important;
+    padding: 10px !important;
+    background: #f7f8fc !important;
+    width: 100%;
+}
+
+.nmpd-grid td,
+.numpad td {
+    padding: 0 !important;
+}
+
+.nmpd-grid .display input,
+.numpad .display input,
+.nmpd-grid input[type=text].form-control,
+.numpad input[type=text].form-control {
+    background: linear-gradient(135deg, #2d2b4e, #605ca8) !important;
+    color: #fff !important;
+    font-size: 36px !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    border: none !important;
+    border-radius: 0 !important;
+    height: 80px !important;
+    letter-spacing: 2px !important;
+    padding: 0 20px !important;
+    box-shadow: none !important;
+    width: 100% !important;
+}
+
+.nmpd-grid .label,
+.numpad .label {
+    background: linear-gradient(135deg, #2d2b4e, #605ca8) !important;
+    color: rgba(255,255,255,.6) !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1.2px !important;
+    text-align: center !important;
+    padding: 14px 0 0 !important;
+}
+
+.nmpd-grid .btn.btn-info,
+.numpad .btn.btn-info {
+    background: #fff !important;
+    color: #2d3748 !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    width: 80px !important;
+    height: 64px !important;
+    line-height: 1 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,.06) !important;
+    transition: all .15s !important;
+}
+
+.nmpd-grid .btn.btn-info:hover,
+.numpad .btn.btn-info:hover,
+.nmpd-grid .btn.btn-info:active,
+.numpad .btn.btn-info:active {
+    background: #ede9fe !important;
+    border-color: #605ca8 !important;
+    color: #4a4690 !important;
+    transform: scale(.97) !important;
+}
+
+.nmpd-grid .btn.btn-success,
+.numpad .btn.btn-success {
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    height: 64px !important;
+    line-height: 1 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,.06) !important;
+    transition: all .15s !important;
+    width: 100% !important;
+}
+
+.nmpd-grid .done,
+.numpad .done {
+    background: linear-gradient(135deg, #15803d, #16a34a) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+}
+
+.nmpd-grid .done:hover,
+.numpad .done:hover { opacity: .88 !important; }
+
+.nmpd-grid .cancel,
+.numpad .cancel {
+    background: #fee2e2 !important;
+    color: #dc2626 !important;
+    border: 1.5px solid #fecaca !important;
+    border-radius: 12px !important;
+}
+
+.nmpd-grid .cancel:hover,
+.numpad .cancel:hover { background: #fecaca !important; }
+
+.nmpd-grid .clear,
+.numpad .clear {
+    background: #fef3c7 !important;
+    color: #b45309 !important;
+    border: 1.5px solid #fde68a !important;
+    border-radius: 12px !important;
+}
+
+.nmpd-grid .clear:hover,
+.numpad .clear:hover { background: #fde68a !important; }
+
+.nmpd-grid .del,
+.numpad .del {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+}
+
+.nmpd-grid .del:hover,
+.numpad .del:hover { background: #e2e8f0 !important; }
+
+.nmpd-grid .sep,
+.numpad .sep {
+    background: #ebf2ff !important;
+    color: #2d6bc4 !important;
+    border: 1.5px solid #c3d9f8 !important;
+    border-radius: 12px !important;
+    width: 80px !important;
+}
+
+@media (max-width: 767px) {
+    .nmpd-grid,
+    .numpad.modal-content { width: 300px !important; }
+    .nmpd-grid .btn.btn-info,
+    .numpad .btn.btn-info { width: 68px !important; height: 56px !important; font-size: 18px !important; }
+    .nmpd-grid .btn.btn-success,
+    .numpad .btn.btn-success { height: 56px !important; }
+    .nmpd-grid input[type=text].form-control,
+    .numpad input[type=text].form-control { font-size: 28px !important; height: 68px !important; }
+}
+
+@media (max-width: 400px) {
+    .nmpd-grid,
+    .numpad.modal-content { width: 280px !important; }
+    .nmpd-grid .btn.btn-info,
+    .numpad .btn.btn-info { width: 60px !important; height: 50px !important; font-size: 16px !important; }
+    .nmpd-grid table,
+    .numpad table { border-spacing: 4px !important; padding: 8px !important; }
+}

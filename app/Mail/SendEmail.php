@@ -72,5 +72,11 @@ class SendEmail extends Mailable
                 ->view('molding.mails.summary_molding');
         }
 
+        if ($this->remark == 'molding_pengiriman') {
+            return $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+                ->subject('Molding Pengiriman')
+                ->view('molding.mails.mold_pengiriman');
+        }
+
     }
 }

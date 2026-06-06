@@ -187,25 +187,11 @@
     {{-- PAGE HEADER --}}
     <div class="page-header-modern">
         <div class="header-left">
-			<?php if (in_array($username, $all_username)) { ?>
             <div class="badge-tag">
                 <i class="fas fa-car"></i>&nbsp; Driver
             </div>
             <h1>Driver Management</h1>
             <p>Kelola tugas driver, kehadiran, penumpang, dan biaya tol &amp; parkir</p>
-			<?php } else if (in_array($username, $driver_reguler)) { ?>
-			<div class="badge-tag">
-				<i class="fas fa-car"></i>&nbsp; Penumpang
-			</div>
-			<h1>Penumpang Management</h1>
-			<p>Kelola absensi penumpang pada rute reguler</p>
-			 <?php } else { ?>
-			<div class="badge-tag">
-				<i class="fas fa-car"></i>&nbsp; Dashboard
-			</div>
-			<h1>Dashboard</h1>
-			<p>Selamat datang di dashboard, {{ $username }}!</p>
-			 <?php } ?>
         </div>
     </div>
 
@@ -213,15 +199,10 @@
     <div class="menu-card">
         <div class="menu-card-header">
             <span class="dot"></span>
-			<!-- atau -->
-			 <?php if (in_array($username, $all_username) || in_array($username, $driver_reguler)) { ?>
             <h4><i class="fas fa-th-large" style="color:#605ca8;"></i>&nbsp; Menu Driver</h4>
-			 <?php } else { ?>
-			<h4><i class="fas fa-th-large" style="color:#605ca8;"></i>&nbsp; Menu Dashboard</h4>
-			 <?php } ?>
         </div>
         <div class="menu-card-body">
-			<?php if (in_array($username, $all_username)) { ?>
+
             {{-- Tugas Driver --}}
             <a href="{{ url('index/driver/job') }}" class="driver-menu-btn">
                 <div class="btn-icon purple">
@@ -246,20 +227,6 @@
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>
 
-			{{-- Tol & Parkir --}}
-			<a href="{{ url('index/driver/toll_parking') }}" class="driver-menu-btn">
-				<div class="btn-icon amber">
-					<i class="fas fa-parking"></i>
-				</div>
-				<div class="btn-content">
-					<span class="btn-title">Tol &amp; Parkir</span>
-					<span class="btn-desc">Pencatatan biaya tol dan parkir operasional driver</span>
-				</div>
-				<i class="fas fa-chevron-right btn-arrow"></i>
-			</a>
-			<?php } ?>
-
-			<?php if (in_array($username, $driver_reguler)) { ?>
             {{-- Absensi Penumpang Reguler --}}
             <a href="{{ url('index/passenger/attendance') }}" class="driver-menu-btn">
                 <div class="btn-icon green">
@@ -271,8 +238,18 @@
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>
-			<?php } ?>
 
+            {{-- Tol & Parkir --}}
+            <a href="{{ url('index/driver/toll_parking') }}" class="driver-menu-btn">
+                <div class="btn-icon amber">
+                    <i class="fas fa-parking"></i>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">Tol &amp; Parkir</span>
+                    <span class="btn-desc">Pencatatan biaya tol dan parkir operasional driver</span>
+                </div>
+                <i class="fas fa-chevron-right btn-arrow"></i>
+            </a>
 
         </div>
     </div>
@@ -283,9 +260,8 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        $('#side_dashboard').addClass('menu-open');
+        $('#side_driver').addClass('menu-open');
         $('body').toggleClass("sidebar-collapse");
     });
 </script>
 @endsection
-

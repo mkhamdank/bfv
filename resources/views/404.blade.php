@@ -56,7 +56,7 @@
                     <a class="navbar-brand" href="{{ url('') }}">
                         <center>
                             <b class="logo-icon" style="padding-left: 10px !important" id="logo-icon">
-                                <span class="logo-mini"><img src="{{ url('images/bridge.png') }}" height="30px"
+                                <span class="logo-mini"><img src="{{ url('img/bridgesmall.png') }}" height="30px"
                                         id="logo-bridge"
                                         style="margin-bottom: 0px;padding: 0px;height: 30px !important"></span>
                             </b>
@@ -131,12 +131,14 @@
                 <div class="col-xs-8">
                     <h3><i class="fa fa-warning text-yellow"></i> Oops! Page not found.</h3>
                     <p>
-                        Halaman yang anda kunjungi sedang dalam perbaikan.<br>
-                        Atau anda tidak memiliki hak akses ke halaman ini.<br>
-                        Tekan link di bawah ini untuk kembali ke halaman sebelumnya.<br>
+                        The page you are visiting is currently under maintenance.
+                        <br>
+                        Or you do not have permission to access this page.
+                        <br>
+                        Click the link below to return to the previous page.<br>
 
                         <a href="javascript:history.back()" type="button" class="btn btn-warning"
-                            style="font-weight: bold;"><i class="fa fa-angle-double-left "></i> Kembali 戻る</a>
+                            style="font-weight: bold;"><i class="fa fa-angle-double-left "></i><i class="fa fa-angle-double-left "></i> Back 戻る</a>
                     </p>
                     <p style="font-weight: bold; font-size:20px; color: red;">
                         {{ isset($message) == 1 ? $message : '' }}

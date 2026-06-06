@@ -39,17 +39,29 @@ class DashboardController extends Controller
             'PI9803004',
             'OS0112',
             'OS0114',
-            'OS0113'
+            'OS0113',
+   
         ];
 
         $this->driver_reguler = [
             'OS0005',
             'OS0115',
+
         ];
-        return view('dashboard')
-        ->with('username',strtoupper(Auth::user()->username))
-        ->with('all_username',$this->username)
-        ->with('driver_reguler',$this->driver_reguler);
+        
+        if(Auth::user()->username == 'ympimis')
+        {
+            return view('admin.dashboard')
+            ->with('username',strtoupper(Auth::user()->username))
+            ->with('all_username',$this->username)
+            ->with('driver_reguler',$this->driver_reguler);
+        }
+        else {
+            return view('dashboard')
+            ->with('username',strtoupper(Auth::user()->username))
+            ->with('all_username',$this->username)
+            ->with('driver_reguler',$this->driver_reguler);
+        }
     }
 
     /**

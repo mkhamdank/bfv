@@ -180,6 +180,18 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+            try {
+                $user = User::findOrFail($id);
+                $user->delete();
+    
+                return response()->json([
+                    'message' => 'User deleted successfully'
+                ]);
+    
+            } catch (\Throwable $th) {
+                return response()->json([
+                    'message' => 'User not found'
+                ]);
+            }
     }
 }

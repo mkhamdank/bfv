@@ -1,179 +1,228 @@
-@extends('layouts.master_full')
+@extends('layouts.master')
 
 @section('title', 'VFI')
 
 @section('styles')
 <link href="<?php echo e(url("css/jquery.numpad.css")); ?>" rel="stylesheet">
 <link href="{{ url("css/jquery.gritter.css") }}" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-     crossorigin=""/>
-    <style>
-        #vfi-container {
-            color: #333333;
-        }
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
 
-        .menu-btn {
-            width: 100%;
-            margin: 1% 0;
-        }
+<style>
+    body { background: #f0f2f7 !important; }
 
-        .menu-name {
+    /* Reuse style dari index_list */
+    body p, body span:not([class*="fa"]):not([class*="glyphicon"]),
+    body div, body label, body input, body select, body button {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    .select2-container .select2-selection--single {
+        height: 40px !important;
+        border-radius: 8px !important;
+    }
 
-        }
+    /* Loading */
+    #loading {
+        display: none; position: fixed; inset: 0;
+        background: rgba(30,31,58,.4); backdrop-filter: blur(5px);
+        z-index: 30001; align-items: center; justify-content: center;
+    }
+    #loading.show { display: flex !important; }
+    .loading-box {
+        background: #fff; border-radius: 20px; padding: 36px 48px;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.15);
+    }
+    .loading-spinner {
+        width: 42px; height: 42px; border: 3px solid #ede9fe;
+        border-top-color: #605ca8; border-radius: 50%;
+        animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        .auth-name {
-            font-weight: 600;
-            color: #BA241C;
-        }
+    /* Page Header */
+    .page-header-modern {
+        background: linear-gradient(135deg, #2d2b4e 0%, #4a4690 50%, #605ca8 100%);
+        padding: 28px 36px 24px; margin: 24px 0 24px;
+        border-radius: 18px; color: white;
+    }
 
-        thead>tr>th{
-            text-align:center;
-            overflow:hidden;
-        }
-        tbody>tr>td{
-            text-align:center;
-        }
-        tfoot>tr>th{
-            text-align:center;
-        }
-        th:hover {
-            overflow: visible;
-        }
-        td:hover {
-            overflow: visible;
-        }
-        table.table-bordered{
-            border:1px solid black;
-        }
-        table.table-bordered > thead > tr > th{
-            border:1px solid black;
-            padding-top: 0;
-            padding-bottom: 0;
-            vertical-align: middle;
-        }
-        table.table-bordered > tbody > tr > td{
-            border:1px solid black;
-            padding: 0px;
-            vertical-align: middle;
-        }
-        table.table-bordered > tfoot > tr > th{
-            border:1px solid black;
-            padding:0;
-            vertical-align: middle;
-            background-color: rgb(126,86,134);
-            color: #FFD700;
-        }
-        thead {
-            background-color: rgb(126,86,134);
-        }
-        td{
-            overflow:hidden;
-            text-overflow: ellipsis;
-        }
-        #ngTemp {
-            height:200px;
-            overflow-y: scroll;
-        }
+    .form-card {
+        background: #fff; border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06); 
+        border: 1px solid rgba(0,0,0,.05);
+        padding: 32px; margin-bottom: 24px;
+    }
 
-        #ngList2 {
-            height:454px;
-            overflow-y: scroll;
-            /*padding-top: 5px;*/
-        }
-        #loading, #error { display: none; }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            /* display: none; <- Crashes Chrome on hover */
-            -webkit-appearance: none;
-            margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-        }
+    .form-label {
+        font-size: 13px; font-weight: 700; color: #4a5568;
+        letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px;
+    }
 
-        input[type=number] {
-            -moz-appearance:textfield; /* Firefox */
-        }
-        .page-wrapper{
-            padding-top: 0px;
-        }
-        .datepicker-days > table > thead,
-        .datepicker-days > table > thead >tr>th,
-        .datepicker-months > table > thead>tr>th,
-        .datepicker-years > table > thead>tr>th,
-        .datepicker-decades > table > thead>tr>th,
-        .datepicker-centuries > table > thead>tr>th{
-            background-color: white;
-            color: #696969 !important;
-        }
+    .form-control-modern {
+        width: 100%;
+        display: block;
+        border: 1.5px solid #e2e8f0 !important;
+        border-radius: 9px !important;
+        padding: 12px 16px !important;
+        font-size: 15px !important;
+        background: #fafbff !important;
+    }
+    .select2-container {
+        width: 100% !important;
+    }
+    .select2-container .select2-selection--single {
+        width: 100% !important;
+    }
 
-        #map { height: 180px; }
+    .form-control-modern:focus {
+        border-color: #605ca8 !important;
+        box-shadow: 0 0 0 3px rgba(96,92,168,.1) !important;
+        background: #fff !important;
+    }
 
-    </style>
+    .photo-upload {
+        border: 2px dashed #c4bfef;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .photo-upload:hover {
+        border-color: #605ca8;
+        background: #f0eef9;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #15803d, #16a34a);
+        color: white;
+        font-size: 18px;
+        font-weight: 700;
+        padding: 14px 32px;
+        border-radius: 12px;
+        width: 100%;
+        margin-top: 20px;
+        box-shadow: 0 4px 12px rgba(21,128,61,.3);
+    }
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        opacity: 0.95;
+    }
+
+    .numpad-input {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 600;
+        background: white;
+    }
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        padding-left: 1px !important;
+        padding-right: 0px !important;
+        width: 210px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+        right: 4px !important;
+        width: 30px !important;
+    }
+</style>
 @stop
 
 @section('content')
-    <section id="vfi-container">
-        <div id="loading"
-            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display: none">
-            <p style="position: absolute; color: white; top: 45%; left: 35%;">
-                <span style="font-size: 40px">Loading, Please Wait . . . <i class="fa fa-spin fa-refresh"></i></span>
-            </p>
+<div id="loading">
+    <div class="loading-box">
+        <div class="loading-spinner"></div>
+        <p>Memproses...</p>
+    </div>
+</div>
+
+<div class="content-header" style="padding: 0 20px;">
+
+    <!-- Page Header -->
+    <div class="page-header-modern">
+        <div>
+            <div class="badge-tag" style="background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.3); color: #fff; display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:11px; font-weight:700;">
+                <i class="fas fa-car"></i> DRIVER ATTENDANCE
+            </div>
+            <h1 style="color:#fff; font-size:28px; font-weight:700; margin:12px 0 4px 0;">Absensi Driver</h1>
+            <p style="color:rgba(255,255,255,.75); margin:0;">運転手の不在</p>
         </div>
+    </div>
+
+    <div class="form-card">
+        <input type="hidden" id="employee_id" value="{{Auth::user()->username}}">
+        <input type="hidden" id="name" value="{{Auth::user()->name}}">
+        <input type="hidden" id="department" value="General Affairs Department">
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
 
         <div class="row">
-            <div class="col-md-12" style="text-align: center;">
-                <h1 style="font-size: 18px; font-weight: bold;">
-                    {{ $title }}<br><span style="color: #605ca8; font-size: 15px;">{{$title_jp}}</span>
-                </h1>
+            <div class="col-md-12">
+                <div class="form-label">Karyawan</div>
+                <input type="text" class="form-control form-control-modern" readonly 
+                       value="{{Auth::user()->username}} - {{Auth::user()->name}}">
             </div>
         </div>
-        <div class="row" id="divDriver" style="padding-bottom: 20px; padding-left: 20px; padding-right: 20px; overflow-y: scroll;">
-            <input type="hidden" name="employee_id" id="employee_id" value="{{Auth::user()->username}}">
-            <input type="hidden" name="name" id="name" value="{{Auth::user()->name}}">
-            <input type="hidden" id="department" name="department" placeholder="Department" readonly="" value="General Affairs Department">
-            <label>Karyawan</label>
-            <input type="text" class="form-control"  placeholder="NIK Karyawan" readonly="" value="{{Auth::user()->username}} - {{Auth::user()->name}}" style="margin-bottom: 10px;">
-            <input type="hidden" class="form-control" id="latitude" name="latitude">
-            <input type="hidden" class="form-control" id="longitude" name="longitude">
 
-            <label>Kendaraan</label>
-            <select class="form-control" style="width: 100%; height: 200px;" data-placeholder="Pilih Kendaraan" id="vehicle" onchange="changeVehicle(this.value)">
-                <option value="-">Pilih Kendaraan</option>
-                <?php for ($i = 0; $i < count($vehicle); ++$i) { ?>
-                    <option value="{{$vehicle[$i]->plat_no}}_{{$vehicle[$i]->car}}">{{$vehicle[$i]->plat_no}} - {{$vehicle[$i]->car}}</option>
-                <?php } ?>
-            </select>
-
-            <label>Odometer (KM) <span style="color: red;">*</span></label>
-            <input type="text" name="odometer" id="odometer" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Odometer" value="" >
-
-            <label>Fuel (Liter) <span style="color: red;">*</span></label>
-            <input type="text" name="fuel" id="fuel" class="form-control numpad" style="width: 100%; background-color: white; text-align: center;" placeholder="Fuel" value="" >
-        </div>
-        {{-- <div class="col-lg-12 col-md-12 col-sm-12" >
-            <div id="map"></div>
-        </div> --}}
-        <div class="col-lg-12 col-md-12 col-sm-12" >
-            <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
-                <label style="font-size: 14px;font-weight: bold;">Foto Absensi<span style="color:red">*</span></label>
-                <input type="file" onchange="readURL(this);" id="file_foto" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" class="file">
-                <button class="btn btn-primary btn-lg" id="btnImageSim" value="Photo" onclick="buttonImage(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Selfie</button>
-                <img id="blahsim" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="form-label">Kendaraan <span style="color:red">*</span></div>
+                <select class="form-control form-control-modern select2" id="vehicle" onchange="changeVehicle(this.value)" style="width:100%;">
+                    <option value="-">Pilih Kendaraan</option>
+                    @foreach($vehicle as $v)
+                        <option value="{{$v->plat_no}}_{{$v->car}}">{{$v->plat_no}} - {{$v->car}}</option>
+                    @endforeach
+                </select>
             </div>
-            <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
-                <input type="file" onchange="readURL2(this);" id="file_foto_odometer" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" class="file">
-                <button class="btn btn-primary btn-lg" id="btnImageOdo" value="Photo" onclick="buttonImageOdo(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Odometer</button>
-                <img id="blahOdo" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
+            <div class="col-md-4">
+                <div class="form-label">Odometer (KM) <span style="color:red">*</span></div>
+                <input type="text" id="odometer" class="form-control form-control-modern numpad" placeholder="0">
             </div>
-            <div class="validate-input" style="position: relative; width: 100% !important;margin-top:10px">
-                <input type="file" onchange="readURL3(this);" id="file_location" style="display:none;width: 100%; height: 40px; font-size: 20px; text-align: center;" class="file">
-                <button class="btn btn-primary btn-lg" id="btnImageLoc" value="Photo" onclick="buttonImageLoc(this)" style="width: 100%; font-size: 20px; text-align: center;"><i class="fa fa-camera"></i> Masukkan Foto Lokasi</button>
-                <img id="blahLoc" src="" style="display: none;width: 100%;margin-top: 5px;" alt="your image" />
+            <div class="col-md-4">
+                <div class="form-label">Fuel (Liter) <span style="color:red">*</span></div>
+                <input type="text" id="fuel" class="form-control form-control-modern numpad" placeholder="0">
             </div>
-            <button class="btn btn-success" style="width: 100%; margin-top: 10px; font-weight: bold; font-size: 20px;" onclick="save()">SUBMIT</button>
         </div>
 
-    </section>
+        <!-- Photo Uploads -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="form-label">Foto Selfie <span style="color:red">*</span></div>
+                <div class="photo-upload" onclick="buttonImage(this)">
+                    <i class="fas fa-camera fa-2x mb-2" style="color:#605ca8"></i>
+                    <p style="margin:0; font-weight:600; color:#4a5568;">Selfie</p>
+                    <input type="file" id="file_foto" style="display:none" onclick="event.stopPropagation();" onchange="readURL(this)">
+                    <img id="blahsim" src="" style="display:none; width:100%; margin-top:8px; border-radius:8px;" alt="">
+                </div>
+            </div>
 
+            <div class="col-md-4">
+                <div class="form-label">Foto Odometer <span style="color:red">*</span></div>
+                <div class="photo-upload" onclick="buttonImageOdo(this)">
+                    <i class="fas fa-tachometer-alt fa-2x mb-2" style="color:#605ca8"></i>
+                    <p style="margin:0; font-weight:600; color:#4a5568;">Odometer</p>
+                    <input type="file" id="file_foto_odometer" style="display:none" onclick="event.stopPropagation();" onchange="readURL2(this)">
+                    <img id="blahOdo" src="" style="display:none; width:100%; margin-top:8px; border-radius:8px;" alt="">
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="form-label">Foto Lokasi <span style="color:red">*</span></div>
+                <div class="photo-upload" onclick="buttonImageLoc(this)">
+                    <i class="fas fa-map-marker-alt fa-2x mb-2" style="color:#605ca8"></i>
+                    <p style="margin:0; font-weight:600; color:#4a5568;">Lokasi</p>
+                    <input type="file" id="file_location" style="display:none" onclick="event.stopPropagation();" onchange="readURL3(this)">
+                    <img id="blahLoc" src="" style="display:none; width:100%; margin-top:8px; border-radius:8px;" alt="">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-submit" onclick="save()">
+            <i class="fas fa-save"></i> SUBMIT ABSENSI
+        </button>
+    </div>
+
+</div>
 @endsection
 
 @section('scripts')
@@ -189,89 +238,163 @@ crossorigin=""></script>
             }
         });
 
-        if (screen.width < 400) {
-            $.fn.numpad.defaults.gridTpl = '<table class="table modal-content" style="width: 80%; left: 20.225px;background-color:white;"></table>';
-            $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in" style="opacity:.4"></div>';
-            $.fn.numpad.defaults.displayTpl = '<input type="text" class="form-control" style="font-size:6vw; height: 50px;"/>';
-            $.fn.numpad.defaults.buttonNumberTpl =  '<button type="button" class="btn btn-info" style="font-size:5vw; width:50px;"></button>';
-            $.fn.numpad.defaults.buttonFunctionTpl = '<button type="button" class="btn btn-success" style="font-size:5vw; width: 100%;color:white;background-color:green;border-color:green"></button>';
-            $.fn.numpad.defaults.onKeypadCreate = function(){
-                $(this).find('.done').css('background-color','white');
-                $(this).find('.done').css('color','rgb(72,156,78)');
-                $(this).find('.done').css('border-color','rgb(72,156,78)');
+        var isMobile = window.innerWidth <= 767;
+        var btnW  = isMobile ? '62px'  : '76px';
+        var btnH  = isMobile ? '54px'  : '66px';
+        var btnFS = isMobile ? '20px'  : '24px';
+        var dispH = isMobile ? '70px'  : '86px';
+        var dispFS= isMobile ? '30px'  : '38px';
+        var padW  = isMobile ? '220px' : '270px';
 
-                $(this).find('.sep').css('background-color','white');
-                $(this).find('.sep').css('color','black');
-                $(this).find('.sep').css('border-color','#0dcaf0');
-                $(this).find('.sep').css('width','50px');
+        var numBtnStyle = [
+            'background:#fff',
+            'color:#2d3748',
+            'border:1.5px solid #e2e8f0',
+            'border-radius:12px',
+            'font-size:'+btnFS,
+            'font-weight:700',
+            'width:'+btnW,
+            'height:'+btnH,
+            'line-height:1',
+            'box-shadow:0 2px 6px rgba(0,0,0,.06)',
+            'transition:background .15s',
+            'cursor:pointer',
+            'font-family:Plus Jakarta Sans,sans-serif'
+        ].join(';');
 
-                $(this).find('.cancel').css('background-color','white');
-                $(this).find('.cancel').css('color','rgb(219,103,115)');
-                $(this).find('.cancel').css('border-color','rgb(219,103,115)');
-                $(this).find('.cancel').html('<i class="fas fa-times"></i>');
+        var funcBtnStyle = [
+            'border-radius:12px',
+            'font-size:13px',
+            'font-weight:700',
+            'height:'+btnH,
+            'line-height:1',
+            'width:'+btnW,
+            'cursor:pointer',
+            'transition:all .15s',
+            'font-family:Plus Jakarta Sans,sans-serif'
+        ].join(';');
 
-                $(this).find('.clear').css('background-color','white');
-                $(this).find('.clear').css('color','black');
-                $(this).find('.clear').css('border-color','black');
-                $(this).find('.clear').html('<i class="fas fa-trash"></i>');
+        $.fn.numpad.defaults.gridTpl = [
+            '<table style="',
+                'background:#f7f8fc;',
+                'border-radius:0 0 20px 20px;',
+                'border-collapse:separate;',
+                'border-spacing:6px;',
+                'padding:10px;',
+                'width:'+padW+';',
+                'position:fixed;',
+                'top:50%;',
+                'left:50%;',
+                'transform:translate(-50%,-50%);',
+                'z-index:30100;',
+                'box-shadow:0 24px 64px rgba(45,43,78,.4);',
+                'border-radius:20px;',
+                'overflow:hidden;',
+            '"></table>'
+        ].join('');
 
-                $(this).find('.del').css('background-color','white');
-                $(this).find('.del').css('color','black');
-                $(this).find('.del').css('border-color','black');
-                $(this).find('.del').css('font-size','4vw');
-                $(this).find('.del').html('<i class="fas fa-backspace"></i>');
-            };
-        }else{
-            $.fn.numpad.defaults.gridTpl = '<table class="table modal-content" style="width: 25%;background-color:white;"></table>';
-            $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in" style="opacity:.4"></div>';
-            $.fn.numpad.defaults.displayTpl = '<input type="text" class="form-control" style="font-size:2vw; height: 50px;"/>';
-            $.fn.numpad.defaults.buttonNumberTpl =  '<button type="button" class="btn btn-info" style="font-size:2vw; width:50px;"></button>';
-            $.fn.numpad.defaults.buttonFunctionTpl = '<button type="button" class="btn btn-success" style="font-size:2vw; width: 100%;color:white;background-color:green;border-color:green"></button>';
-            $.fn.numpad.defaults.onKeypadCreate = function(){
-                $(this).find('.done').css('background-color','white');
-                $(this).find('.done').css('color','rgb(72,156,78)');
-                $(this).find('.done').css('border-color','rgb(72,156,78)');
+        $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in" style="opacity:.55;background:#2d2b4e;z-index:30099;"></div>';
 
-                $(this).find('.sep').css('background-color','white');
-                $(this).find('.sep').css('color','black');
-                $(this).find('.sep').css('border-color','#0dcaf0');
-                $(this).find('.sep').css('width','50px');
+        $.fn.numpad.defaults.displayTpl = [
+            '<input type="text" style="',
+                'background:linear-gradient(135deg,#2d2b4e,#605ca8);',
+                'color:#fff;',
+                'font-size:'+dispFS+';',
+                'font-weight:800;',
+                'text-align:center;',
+                'border:none;',
+                'border-radius:0;',
+                'height:'+dispH+';',
+                'letter-spacing:3px;',
+                'padding:0 20px;',
+                'box-shadow:none;',
+                'width:100%;',
+                'font-family:Plus Jakarta Sans,sans-serif;',
+            '"/>'
+        ].join('');
 
-                $(this).find('.cancel').css('background-color','white');
-                $(this).find('.cancel').css('color','rgb(219,103,115)');
-                $(this).find('.cancel').css('border-color','rgb(219,103,115)');
+        $.fn.numpad.defaults.buttonNumberTpl  = '<button type="button" style="'+numBtnStyle+'"></button>';
+        $.fn.numpad.defaults.buttonFunctionTpl= '<button type="button" style="'+funcBtnStyle+'"></button>';
 
-                $(this).find('.clear').css('background-color','white');
-                $(this).find('.clear').css('color','black');
-                $(this).find('.clear').css('border-color','black');
+        $.fn.numpad.defaults.onKeypadCreate = function() {
+            var $table = $(this);
+            if ($table.find('.numpad-title').length === 0) {
+                $table.prepend('<tr class="numpad-title"><td colspan="3" style="padding:0; border:none;"></td></tr>');
+            }
 
-                $(this).find('.del').css('background-color','white');
-                $(this).find('.del').css('color','black');
-                $(this).find('.del').css('border-color','black');
-            };
-        }
+            $table.find('.done').css({
+                'background': 'linear-gradient(135deg,#15803d,#16a34a)',
+                'color':       '#fff',
+                'border':      'none',
+                'width':       btnW,
+                'height':      btnH,
+                'border-radius': '12px',
+                'font-size':   '13px',
+                'font-weight': '700',
+                'font-family': 'Plus Jakarta Sans,sans-serif'
+            });
+
+            $table.find('.cancel').css({
+                'background':    '#fee2e2',
+                'color':         '#dc2626',
+                'border':        '1.5px solid #fecaca',
+                'width':         btnW,
+                'height':        btnH,
+                'border-radius': '12px',
+                'font-size':     '13px',
+                'font-weight':   '700',
+                'font-family':   'Plus Jakarta Sans,sans-serif'
+            });
+
+            $table.find('.clear').css({
+                'background':    '#fef3c7',
+                'color':         '#b45309',
+                'border':        '1.5px solid #fde68a',
+                'width':         btnW,
+                'height':        btnH,
+                'border-radius': '12px',
+                'font-size':     '13px',
+                'font-weight':   '700',
+                'font-family':   'Plus Jakarta Sans,sans-serif'
+            });
+
+            $table.find('.del').css({
+                'background':    '#f1f5f9',
+                'color':         '#475569',
+                'border':        '1.5px solid #e2e8f0',
+                'width':         btnW,
+                'height':        btnH,
+                'border-radius': '12px',
+                'font-size':     '18px',
+                'font-family':   'Plus Jakarta Sans,sans-serif'
+            });
+
+            $table.find('.sep').css({
+                'background':    '#ebf2ff',
+                'color':         '#2d6bc4',
+                'border':        '1.5px solid #c3d9f8',
+                'width':         btnW,
+                'height':        btnH,
+                'border-radius': '12px',
+                'font-size':     btnFS,
+                'font-weight':   '700',
+                'font-family':   'Plus Jakarta Sans,sans-serif'
+            });
+
+            $table.find('button').not('.done,.cancel,.clear,.del,.sep').on('mouseenter', function(){
+                $(this).css({'background':'#ede9fe','border-color':'#605ca8','color':'#4a4690'});
+            }).on('mouseleave', function(){
+                $(this).css({'background':'#fff','border-color':'#e2e8f0','color':'#2d3748'});
+            });
+        };
 
         
-        var hour;
-        var minute;
-        var second;
-        var intervalTime;
-        var intervalUpdate;
         $(document).ready(function() {
-            $('#odometer').val('');
-            $('#fuel').val('');
-            $('#vehicle').val('').trigger('change');
-            $('body').toggleClass("sidebar-collapse");
-            $('#side_driver_attendance').addClass('menu-open');
+            $('#vehicle').select2();
+            $('.numpad').numpad({ hidePlusMinusButton: true, decimalSeparator: '.' });
             getLocation();
-            $("#vehicle").select2({
-                allowClear:true
-            });
-
-            $('.numpad').numpad({
-                hidePlusMinusButton : true,
-                decimalSeparator : '.'
-            });
+            $('body').addClass("sidebar-collapse");
+            $('#side_driver').addClass('menu-open');
         });
 
         var audio_error = new Audio('{{ url("sounds/error.mp3") }}');

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Driver')
+@section('title', 'Fixed Asset')
 
 @section('styles')
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -101,21 +101,24 @@
     .menu-card-body {
         padding: 20px 24px;
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 14px;
     }
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
         .menu-card-body { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .menu-card-body { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* ══════════════════════════════════════
-       DRIVER MENU BUTTONS
+       MENU BUTTONS
     ══════════════════════════════════════ */
-    .driver-menu-btn {
+    .fa-menu-btn {
         display: flex;
         align-items: center;
         gap: 16px;
-        padding: 18px 20px;
+        padding: 20px;
         background: #fafbff;
         border: 1.5px solid #e2e8f0;
         border-radius: 12px;
@@ -124,7 +127,7 @@
         transition: all 0.2s ease;
         cursor: pointer;
     }
-    .driver-menu-btn:hover {
+    .fa-menu-btn:hover {
         background: #ede9fe;
         border-color: #605ca8;
         color: #4a4690;
@@ -132,7 +135,7 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 14px rgba(96,92,168,.15);
     }
-    .driver-menu-btn .btn-icon {
+    .fa-menu-btn .btn-icon {
         width: 48px; height: 48px;
         border-radius: 12px;
         display: flex;
@@ -140,41 +143,38 @@
         justify-content: center;
         font-size: 20px;
         flex-shrink: 0;
-        transition: all 0.2s;
+        transition: transform 0.2s;
     }
-    .driver-menu-btn:hover .btn-icon {
-        transform: scale(1.08);
-    }
+    .fa-menu-btn:hover .btn-icon { transform: scale(1.08); }
 
     .btn-icon.purple { background: #ede9fe; color: #7c3aed; }
-    .btn-icon.blue   { background: #ebf2ff; color: #2d6bc4; }
-    .btn-icon.green  { background: #dcfce7; color: #15803d; }
-    .btn-icon.amber  { background: #fef3c7; color: #b45309; }
+    .btn-icon.indigo { background: #e0e7ff; color: #4338ca; }
+    .btn-icon.teal   { background: #ccfbf1; color: #0f766e; }
 
-    .driver-menu-btn .btn-content { flex: 1; min-width: 0; }
-    .driver-menu-btn .btn-content .btn-title {
+    .fa-menu-btn .btn-content { flex: 1; min-width: 0; }
+    .fa-menu-btn .btn-content .btn-title {
         display: block;
         font-size: 14px;
         font-weight: 700;
         color: inherit;
         margin-bottom: 3px;
     }
-    .driver-menu-btn .btn-content .btn-desc {
+    .fa-menu-btn .btn-content .btn-desc {
         display: block;
         font-size: 12px;
         font-weight: 400;
         color: #718096;
         line-height: 1.4;
     }
-    .driver-menu-btn:hover .btn-content .btn-desc { color: #7c6fd0; }
+    .fa-menu-btn:hover .btn-content .btn-desc { color: #7c6fd0; }
 
-    .driver-menu-btn .btn-arrow {
+    .fa-menu-btn .btn-arrow {
         font-size: 12px;
         color: #c4c1e0;
         flex-shrink: 0;
         transition: transform .2s, color .2s;
     }
-    .driver-menu-btn:hover .btn-arrow {
+    .fa-menu-btn:hover .btn-arrow {
         transform: translateX(4px);
         color: #605ca8;
     }
@@ -187,25 +187,11 @@
     {{-- PAGE HEADER --}}
     <div class="page-header-modern">
         <div class="header-left">
-			<?php if (in_array($username, $all_username)) { ?>
             <div class="badge-tag">
-                <i class="fas fa-car"></i>&nbsp; Driver
+                <i class="fas fa-cubes"></i>&nbsp; Asset Management
             </div>
-            <h1>Driver Management</h1>
-            <p>Kelola tugas driver, kehadiran, penumpang, dan biaya tol &amp; parkir</p>
-			<?php } else if (in_array($username, $driver_reguler)) { ?>
-			<div class="badge-tag">
-				<i class="fas fa-car"></i>&nbsp; Penumpang
-			</div>
-			<h1>Penumpang Management</h1>
-			<p>Kelola absensi penumpang pada rute reguler</p>
-			 <?php } else { ?>
-			<div class="badge-tag">
-				<i class="fas fa-car"></i>&nbsp; Dashboard
-			</div>
-			<h1>Dashboard</h1>
-			<p>Selamat datang di dashboard, {{ $username }}!</p>
-			 <?php } ?>
+            <h1>Fixed Asset</h1>
+            <p>Kelola pemeriksaan, audit, dan laporan aset tetap perusahaan</p>
         </div>
     </div>
 
@@ -213,66 +199,45 @@
     <div class="menu-card">
         <div class="menu-card-header">
             <span class="dot"></span>
-			<!-- atau -->
-			 <?php if (in_array($username, $all_username) || in_array($username, $driver_reguler)) { ?>
-            <h4><i class="fas fa-th-large" style="color:#605ca8;"></i>&nbsp; Menu Driver</h4>
-			 <?php } else { ?>
-			<h4><i class="fas fa-th-large" style="color:#605ca8;"></i>&nbsp; Menu Dashboard</h4>
-			 <?php } ?>
+            <h4><i class="fas fa-th-large" style="color:#605ca8;"></i>&nbsp; Menu</h4>
         </div>
         <div class="menu-card-body">
-			<?php if (in_array($username, $all_username)) { ?>
-            {{-- Tugas Driver --}}
-            <a href="{{ url('index/driver/job') }}" class="driver-menu-btn">
+
+            {{-- Fixed Asset Check --}}
+            <a href="{{ route('user.fixed_asset') }}" class="fa-menu-btn">
                 <div class="btn-icon purple">
-                    <i class="fas fa-clipboard-list"></i>
+                    <i class="fas fa-tasks"></i>
                 </div>
                 <div class="btn-content">
-                    <span class="btn-title">Tugas Driver</span>
-                    <span class="btn-desc">Lihat dan kelola daftar tugas harian driver</span>
+                    <span class="btn-title">Fixed Asset Check</span>
+                    <span class="btn-desc">Pemeriksaan kondisi dan status aset tetap</span>
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>
 
-            {{-- Rekam Kehadiran --}}
-            <a href="{{ url('index/driver/attendance/report') }}" class="driver-menu-btn">
-                <div class="btn-icon blue">
-                    <i class="fas fa-user-check"></i>
+            {{-- Fixed Asset Audit --}}
+            <a href="{{ route('user.fixed_asset_audit') }}" class="fa-menu-btn">
+                <div class="btn-icon indigo">
+                    <i class="fas fa-clipboard-check"></i>
                 </div>
                 <div class="btn-content">
-                    <span class="btn-title">Rekam Kehadiran</span>
-                    <span class="btn-desc">Catat dan pantau kehadiran driver setiap hari</span>
+                    <span class="btn-title">Fixed Asset Audit</span>
+                    <span class="btn-desc">Audit menyeluruh terhadap data aset tetap</span>
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>
 
-			{{-- Tol & Parkir --}}
-			<a href="{{ url('index/driver/toll_parking') }}" class="driver-menu-btn">
-				<div class="btn-icon amber">
-					<i class="fas fa-parking"></i>
-				</div>
-				<div class="btn-content">
-					<span class="btn-title">Tol &amp; Parkir</span>
-					<span class="btn-desc">Pencatatan biaya tol dan parkir operasional driver</span>
-				</div>
-				<i class="fas fa-chevron-right btn-arrow"></i>
-			</a>
-			<?php } ?>
-
-			<?php if (in_array($username, $driver_reguler)) { ?>
-            {{-- Absensi Penumpang Reguler --}}
-            <a href="{{ url('index/passenger/attendance') }}" class="driver-menu-btn">
-                <div class="btn-icon green">
-                    <i class="fas fa-users"></i>
+            {{-- Fixed Asset Report --}}
+            <a href="{{ route('user.fixed_asset_report') }}" class="fa-menu-btn">
+                <div class="btn-icon teal">
+                    <i class="fas fa-chart-bar"></i>
                 </div>
                 <div class="btn-content">
-                    <span class="btn-title">Absensi Penumpang Reguler</span>
-                    <span class="btn-desc">Rekap absensi penumpang pada rute reguler</span>
+                    <span class="btn-title">Fixed Asset Report</span>
+                    <span class="btn-desc">Laporan dan rekapitulasi data aset tetap</span>
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>
-			<?php } ?>
-
 
         </div>
     </div>
@@ -283,9 +248,8 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
-        $('#side_dashboard').addClass('menu-open');
-        $('body').toggleClass("sidebar-collapse");
+        $('#side_fixed_asset').addClass('menu-open');
+        $('body').addClass("sidebar-collapse");
     });
 </script>
 @endsection
-

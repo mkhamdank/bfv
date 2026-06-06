@@ -1,274 +1,430 @@
-@extends('layouts.master_full')
+@extends('layouts.master')
 
-@section('title', 'VFI')
+@section('title', 'Tol & Parkir')
 
 @section('styles')
-<link href="<?php echo e(url("css/jquery.numpad.css")); ?>" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
-     crossorigin=""/>
-<link href="{{ url("css/jquery.gritter.css") }}" rel="stylesheet">
-    <style>
-        #vfi-container {
-            color: #333333;
+<link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+    body { background: #f0f2f7 !important; }
+
+    body p, body span:not([class*="fa"]):not([class*="glyphicon"]),
+    body div, body label, body input, body select, body textarea,
+    body button, body a, body td, body th,
+    body h1, body h2, body h3, body h4, body h5, body h6, body li {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+
+    /* ── Loading ── */
+    #loading {
+        display: none; position: fixed; inset: 0;
+        background: rgba(30,31,58,.4); backdrop-filter: blur(5px);
+        z-index: 30001; align-items: center; justify-content: center;
+    }
+    #loading.show { display: flex !important; }
+    .loading-box {
+        background: #fff; border-radius: 20px; padding: 36px 48px;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.15);
+    }
+    .loading-spinner {
+        width: 42px; height: 42px; border: 3px solid #ede9fe;
+        border-top-color: #605ca8; border-radius: 50%;
+        animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-box p { font-size: 13px; color: #718096; margin: 0; font-weight: 600; }
+
+    /* ── Page header ── */
+    .page-header-modern {
+        background: linear-gradient(135deg, #2d2b4e 0%, #4a4690 50%, #605ca8 100%);
+        padding: 28px 36px 24px; margin: 24px 0 24px;
+        border-radius: 18px; display: flex; align-items: center;
+        justify-content: space-between; flex-wrap: wrap; gap: 16px;
+        position: relative; overflow: hidden;
+    }
+    .page-header-modern::before {
+        content: ''; position: absolute; right: -40px; top: -40px;
+        width: 200px; height: 200px; border-radius: 50%;
+        background: rgba(255,255,255,.04); pointer-events: none;
+    }
+    .header-left .badge-tag {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+        color: #c9c6f0; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+        text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 10px;
+    }
+    .header-left h1 { color: #fff !important; font-size: 22px !important; font-weight: 700 !important; margin: 0 0 3px !important; line-height: 1.2 !important; }
+    .header-left p  { color: rgba(255,255,255,.5); font-size: 13px; margin: 0; }
+    .btn-back {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(255,255,255,.15); color: #fff;
+        border: 1.5px solid rgba(255,255,255,.25); border-radius: 10px;
+        padding: 10px 20px; font-size: 13px; font-weight: 600;
+        text-decoration: none; transition: all .2s; z-index: 999;
+    }
+    .btn-back:hover { background: rgba(255,255,255,.25); color: #fff; text-decoration: none; }
+
+    /* ── Table card ── */
+    .table-card {
+        background: #fff; border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.05);
+        overflow: hidden; margin-bottom: 32px;
+    }
+    .table-card-header {
+        padding: 16px 24px; border-bottom: 1px solid #f0f2f7; background: #fafbff;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-card-title { font-size: 14px; font-weight: 700; color: #1a202c; display: flex; align-items: center; gap: 10px; }
+    .table-card-title .dot { width: 8px; height: 8px; background: #605ca8; border-radius: 50%; }
+    .table-count { font-size: 12px; color: #a0aec0; font-weight: 500; }
+
+    /* ── Table ── */
+    #tp-table { width: 100%; border-collapse: collapse; }
+    #tp-table thead th {
+        background: #f7f8fc; color: #718096;
+        font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase;
+        padding: 12px 16px; border-bottom: 2px solid #edf0f5; white-space: nowrap; text-align: left;
+    }
+    #tp-table tbody tr { transition: background .15s; }
+    #tp-table tbody tr:hover td { background: #f5f8ff !important; }
+    #tp-table tbody td {
+        padding: 14px 16px; font-size: 13px; color: #2d3748;
+        border-bottom: 1px solid #f0f2f7; vertical-align: middle;
+    }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 768px) {
+        .page-header-modern {
+            flex-direction: column; align-items: flex-start;
+            padding: 20px 16px;
         }
-
-        .menu-btn {
-            width: 100%;
-            margin: 1% 0;
+        
+        .btn-back { align-self: flex-start; padding: 8px 16px; font-size: 12px; }
+        .header-left h1 { font-size: 20px !important; }
+        
+        #tp-table { width: 100%; }
+        #tp-table thead { display: none; }
+        
+        #tp-table tbody tr {
+            display: block;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.04);
         }
-
-        .menu-name {
-
+        
+        #tp-table tbody tr:hover td { background: transparent !important; }
+        
+        #tp-table tbody td {
+            display: block;
+            padding: 8px 0 12px 0;
+            border: none !important;
+            border-bottom: 1px solid #f0f2f7;
+            font-size: 13px;
+            position: relative;
         }
-
-        .auth-name {
+        
+        #tp-table tbody td:last-child { border-bottom: none; padding: 12px 0 0 0; }
+        
+        #tp-table tbody td::before {
+            content: attr(data-label);
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #a0aec0;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+        }
+        
+        #tp-table tbody td:first-child { padding: 0; }
+        #tp-table tbody td:first-child::before { display: none; }
+        
+        .date-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f0f5ff;
+            color: #2d6bc4;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
-            color: #BA241C;
         }
+        
+        .time-range {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #2d3748;
+            font-weight: 500;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+        
+        .car-plat {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .car-name {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-top: 3px;
+        }
+        
+        .btn-isi {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 12px;
+            gap: 6px;
+        }
+    }
 
-        thead>tr>th{
-            text-align:center;
-            overflow:hidden;
+    @media (max-width: 480px) {
+        .page-header-modern {
+            padding: 16px 12px;
         }
-        tbody>tr>td{
-            text-align:center;
+        
+        .header-left h1 { font-size: 18px !important; }
+        .header-left p { font-size: 12px; }
+        
+        #tp-table tbody tr {
+            padding: 12px;
+            margin-bottom: 10px;
         }
-        tfoot>tr>th{
-            text-align:center;
+        
+        #tp-table tbody td {
+            padding: 6px 0 10px 0;
+            font-size: 12px;
         }
-        th:hover {
-            overflow: visible;
+        
+        #tp-table tbody td::before {
+            font-size: 9px;
+            margin-bottom: 3px;
         }
-        td:hover {
-            overflow: visible;
+        
+        .table-card-header {
+            padding: 12px 16px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
         }
-        table.table-bordered{
-            border:1px solid black;
-        }
-        table.table-bordered > thead > tr > th{
-            border:1px solid black;
-            padding-top: 0;
-            padding-bottom: 0;
-            vertical-align: middle;
-        }
-        table.table-bordered > tbody > tr > td{
-            border:1px solid black;
-            padding: 0px;
-            vertical-align: middle;
-        }
-        table.table-bordered > tfoot > tr > th{
-            border:1px solid black;
-            padding:0;
-            vertical-align: middle;
-            background-color: rgb(126,86,134);
-            color: #FFD700;
-        }
-        thead {
-            background-color: rgb(126,86,134);
-        }
-        td{
-            overflow:hidden;
-            text-overflow: ellipsis;
-        }
-        #ngTemp {
-            height:200px;
-            overflow-y: scroll;
-        }
+        
+        .table-card-title { font-size: 13px; }
+        .table-count { font-size: 11px; }
+        
+        .date-chip { padding: 5px 10px; font-size: 11px; }
+        .time-range { font-size: 12px; }
+        .user-avatar { width: 28px; height: 28px; font-size: 10px; }
+        .car-plat { font-size: 12px; }
+        .btn-isi { padding: 9px 10px; font-size: 11px; }
+    }
 
-        #ngList2 {
-            height:454px;
-            overflow-y: scroll;
-            /*padding-top: 5px;*/
-        }
-        #loading, #error { display: none; }
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            /* display: none; <- Crashes Chrome on hover */
-            -webkit-appearance: none;
-            margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-        }
+    /* Date chip */
+    .date-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: #f0f5ff; color: #2d6bc4;
+        padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    }
 
-        input[type=number] {
-            -moz-appearance:textfield; /* Firefox */
-        }
-        .page-wrapper{
-            padding-top: 0px;
-        }
-        .datepicker-days > table > thead,
-        .datepicker-days > table > thead >tr>th,
-        .datepicker-months > table > thead>tr>th,
-        .datepicker-years > table > thead>tr>th,
-        .datepicker-decades > table > thead>tr>th,
-        .datepicker-centuries > table > thead>tr>th{
-            background-color: white;
-            color: #696969 !important;
-        }
+    /* Time */
+    .time-range {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 12.5px; color: #4a5568; font-weight: 500;
+    }
+    .time-sep { color: #c4bfef; }
 
-        #map { height: 180px; }
-        @media (max-width: 600px) {
-            .table-responsive {
-                font-size: 13px;
-            }
-            .table th, .table td {
-                padding: 6px !important;
-            }
-            .table thead th {
-                font-size: 12px;
-            }
-        }
+    /* User cell */
+    .user-cell { display: flex; align-items: center; gap: 9px; }
+    .user-avatar {
+        width: 30px; height: 30px; border-radius: 8px;
+        background: linear-gradient(135deg, #4a4690, #605ca8);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .user-name { font-weight: 600; color: #1a202c; }
 
-    </style>
-@stop
+    /* Car cell */
+    .car-plat { font-weight: 700; color: #1a202c; font-family: monospace; font-size: 13px; }
+    .car-name { font-size: 11.5px; color: #a0aec0; margin-top: 2px; }
+
+    /* Action button */
+    .btn-isi {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 16px; border: none; border-radius: 8px;
+        background: linear-gradient(135deg, #4a4690, #605ca8);
+        color: #fff; font-size: 12.5px; font-weight: 700;
+        text-decoration: none; transition: all .18s;
+        box-shadow: 0 3px 10px rgba(96,92,168,.3);
+    }
+    .btn-isi:hover { opacity: .88; transform: translateY(-1px); color: #fff; text-decoration: none; }
+
+    /* State row */
+    .state-row td { text-align: center; padding: 48px 24px; color: #a0aec0; }
+    .state-row td i { font-size: 32px; display: block; margin-bottom: 10px; }
+</style>
+@endsection
 
 @section('content')
-    <section id="vfi-container">
-        <div id="loading"
-            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 30001; display: none; backdrop-filter: blur(4px);">
-            <p style="position: absolute; color: white; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <span style="font-size: 50px"><i class="fa fa-spinner fa-spin"></i></span>
-            </p>
+
+<div id="loading">
+    <div class="loading-box">
+        <div class="loading-spinner"></div>
+        <p>Memuat data...</p>
+    </div>
+</div>
+
+<div class="content-header" style="padding: 0 20px;">
+
+    {{-- PAGE HEADER --}}
+    <div class="page-header-modern">
+        <div class="header-left">
+            <div class="badge-tag"><i class="fas fa-car"></i> Driver</div>
+            <h1>{{ $title }}</h1>
+            <p>{{ $title_jp }}</p>
+        </div>
+        <a href="{{ url('index/driver') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
+
+    {{-- TABLE CARD --}}
+    <div class="table-card">
+        <div class="table-card-header">
+            <div class="table-card-title">
+                <span class="dot"></span> Daftar Penugasan Tol & Parkir
+            </div>
+            <span class="table-count" id="row-count">Memuat...</span>
         </div>
 
-        <div class="row" style="margin-bottom: 10px;">
-            <div class="col-md-12">
-            <div style="text-align: center; padding: 5px 0;">
-                <h1 style="font-size: 28px; font-weight: 600; margin: 0; color: #2c3e50;">
-                {{ $title }}
-                </h1>
-                <p style="color: #7f8c8d; font-size: 14px; margin-top: 8px;">{{$title_jp}}</p>
-            </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-xs-12" style="padding: 0 15px;">
-            <div class="table-responsive" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden;">
-                <table class="table table-striped" style="width: 100%; margin: 0; border: none;">
-                <thead style="background-color: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+        <div style="overflow-x:auto;">
+            <table id="tp-table" style="width:100%">
+                <thead>
                     <tr>
-                    <th style="width: 5%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">#</th>
-                    <th style="width: 20%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Tgl</th>
-                    <th style="width: 15%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Jam</th>
-                    <th style="width: 25%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">User</th>
-                    <th style="width: 20%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Car</th>
-                    <th style="width: 15%; padding: 15px; font-weight: 600; color: #2c3e50; border: none;">Action</th>
+                        <th style="width:46px;">#</th>
+                        <th>Tanggal</th>
+                        <th>Jam</th>
+                        <th>User</th>
+                        <th>Kendaraan</th>
+                        <th style="width:130px;">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="toll_parking_table" style="background-color: white;">
-                    <!-- Data rows go here -->
+                <tbody id="toll_parking_table">
+                    <tr class="state-row">
+                        <td colspan="6">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Memuat data...
+                        </td>
+                    </tr>
                 </tbody>
-                </table>
-            </div>
-            </div>
+            </table>
         </div>
+    </div>
 
-        <div class="row" style="margin-top: 25px;">
-            <div class="col-xs-12" style="text-align: center; padding: 0 15px;">
-            <a class="btn btn-outline-secondary" style="width: 150px; font-weight: 600; border-radius: 6px; border: 2px solid #bdc3c7; color: #2c3e50; transition: all 0.3s ease;" href="{{url('')}}" onmouseover="this.style.backgroundColor='#ecf0f1'; this.style.borderColor='#95a5a6';" onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#bdc3c7';">
-                ← Kembali
-            </a>
-            </div>
-        </div>
-
-    </section>
+</div>
 @endsection
 
 @section('scripts')
-<script src="<?php echo e(url("js/jquery.numpad.js")); ?>"></script>
-<script src="{{ url("js/jquery.gritter.min.js") }}"></script>
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+<script src="{{ url('js/jquery.numpad.js') }}"></script>
+<script src="{{ url('js/jquery.gritter.min.js') }}"></script>
+
+<script>
+    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
+
+    var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    $(document).ready(function () {
+        $('body').toggleClass("sidebar-collapse");
+        $('#side_driver').addClass('menu-open');
+        fetchData();
+    });
+
+    function fetchData() {
+        $('#loading').addClass('show');
+
+        $.get('{{ url("fetch/driver/toll_parking") }}', { driver_id: '{{ $driver_id }}' }, function (result) {
+            $('#loading').removeClass('show');
+
+            if (result.status) {
+                var data = result.data;
+                $('#row-count').text(data.length + ' data');
+
+                if (data.length === 0) {
+                    $('#toll_parking_table').html(
+                        '<tr class="state-row"><td colspan="6"><i class="fas fa-inbox"></i>Tidak ada data penugasan.</td></tr>'
+                    );
+                    return;
+                }
+
+                var html = '';
+                data.forEach(function (item, i) {
+                    var parts    = item.date_from.split(' ')[0].split('-');
+                    var fmtDate  = parts[2] + ' ' + months[parseInt(parts[1], 10) - 1] + ' ' + parts[0].substr(2, 2);
+                    var timeFrom = item.date_from.substr(11, 5);
+                    var timeTo   = item.date_to.substr(11, 5);
+
+                    var actionUrl = item.remark.match(/daily/gi)
+                        ? '{{ url("index/additional/driver/daily_job") }}/' + item.id
+                        : '{{ url("index/additional/driver/job") }}/' + btoa(item.task_id);
+
+                    var initials = (item.created_by_name || '?')
+                        .split(' ').map(function(w){ return w[0]; }).slice(0,2).join('').toUpperCase();
+
+                    html += '<tr>';
+                    html += '<td style="text-align:center;color:#a0aec0;font-size:12px;font-weight:600;" data-label="#">' + (i+1) + '</td>';
+                    html += '<td data-label="Tanggal"><span class="date-chip"><i class="fas fa-calendar-alt"></i> ' + fmtDate + '</span></td>';
+                    html += '<td data-label="Jam"><div class="time-range"><i class="fas fa-clock" style="color:#c4bfef;font-size:12px;"></i> ' + timeFrom + '<span class="time-sep">→</span>' + timeTo + '</div></td>';
+                    html += '<td data-label="User"><div class="user-cell"><div class="user-avatar">' + initials + '</div><span class="user-name">' + item.created_by_name + '</span></div></td>';
+                    html += '<td data-label="Kendaraan"><div class="car-plat">' + item.plat_no + '</div><div class="car-name">' + item.car + '</div></td>';
+                    html += '<td data-label="Aksi"><a class="btn-isi" href="' + actionUrl + '"><i class="fas fa-pen"></i> Isi Data</a></td>';
+                    html += '</tr>';
+                });
+
+                $('#toll_parking_table').html(html);
+            } else {
+                $('#row-count').text('0 data');
+                $('#toll_parking_table').html(
+                    '<tr class="state-row"><td colspan="6"><i class="fas fa-exclamation-circle" style="color:#fca5a5;"></i>' + (result.message || 'Gagal memuat data.') + '</td></tr>'
+                );
+                openErrorGritter('Error!', result.message);
             }
         });
-        $(document).ready(function() {
-            $('body').toggleClass("sidebar-collapse");
-            $('#side_vfi').addClass('menu-open');
-            fetchData();
-        });
+    }
 
-        function fetchData() {
-            $('#loading').show();
-            var data = {
-                driver_id: '{{ $driver_id }}'
-            }
-            $.get('{{ url("fetch/driver/toll_parking") }}', data, function(result, status, xhr){
-                if(result.status){
-                    $('#loading').hide();
-                    $('#toll_parking_table').html("");
-                    var datas = "";
-                    for(var i = 0; i < result.data.length; i++){
-                        var dateFrom = result.data[i].date_from;
-                        var dateParts = dateFrom.split(' ')[0].split('-');
-                        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        var formattedDate = dateParts[2] + " " + months[parseInt(dateParts[1], 10) - 1] + " " + dateParts[0].substr(2,2);
-                        var timeFrom = dateFrom.substr(11,5);
-                        var timeTo = result.data[i].date_to.substr(11,5);
-                        
-                        var actionUrl = result.data[i].remark.match(/daily/gi) 
-                            ? '{{ url("index/additional/driver/daily_job") }}/' + result.data[i].id
-                            : '{{ url("index/additional/driver/job") }}/' + btoa(result.data[i].task_id);
-                        
-                        datas += "<tr style='border-bottom: 1px solid #ecf0f1; transition: background-color 0.2s ease;' onmouseover=\"this.style.backgroundColor='#f8f9fa'\" onmouseout=\"this.style.backgroundColor='white'\">";
-                        datas += "<td style='padding: 12px 15px; color: #7f8c8d;'>" + (i+1) + "</td>";
-                        datas += "<td style='padding: 12px 15px; color: #2c3e50; font-weight: 500;'>" + formattedDate + "</td>";
-                        datas += "<td style='padding: 12px 15px; color: #2c3e50;'>" + timeFrom + " - " + timeTo + "</td>";
-                        datas += "<td style='padding: 12px 15px; color: #2c3e50;'>" + result.data[i].created_by_name + "</td>";
-                        datas += "<td style='padding: 12px 15px; color: #2c3e50; font-size: 13px;'>" + result.data[i].plat_no + " <br> " + result.data[i].car + "</td>";
-                        datas += "<td style='padding: 12px 15px;'><a class='btn btn-sm' style='background-color: #27ae60; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-weight: 500; transition: all 0.2s ease;' href='" + actionUrl + "' onmouseover=\"this.style.backgroundColor='#229954'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.2)'\" onmouseout=\"this.style.backgroundColor='#27ae60'; this.style.boxShadow='none'\">Isi Data</a></td>";
-                        datas += "</tr>";
-                    }
-                    $('#toll_parking_table').append(datas);
-                }
-                else{
-                    $('#loading').hide();
-                    openErrorGritter('Error!', result.message);
-                }
-            });
-        }
-        var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
+    function addZero(i) { return i < 10 ? '0' + i : i; }
 
-        function addZero(i) {
-            if (i < 10) {
-                i = "0" + i;
-            }
-            return i;
-        }
+    function getActualFullDate() {
+        var d = new Date();
+        return d.getFullYear() + '-' + addZero(d.getMonth()+1) + '-' + addZero(d.getDate()) + ' ' + addZero(d.getHours()) + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds());
+    }
 
-        function getActualFullDate() {
-            var d = new Date();
-            var day = addZero(d.getDate());
-            var month = addZero(d.getMonth()+1);
-            var year = addZero(d.getFullYear());
-            var h = addZero(d.getHours());
-            var m = addZero(d.getMinutes());
-            var s = addZero(d.getSeconds());
-            return year + "-" + month + "-" + day + " " + h + ":" + m + ":" + s;
-        }
+    function openSuccessGritter(title, message) {
+        jQuery.gritter.add({ title: title, text: message, class_name: 'growl-success', image: '{{ url("images/image-screen.png") }}', sticky: false, time: '3000' });
+    }
 
-        function openSuccessGritter(title, message){
-            jQuery.gritter.add({
-                title: title,
-                text: message,
-                class_name: 'growl-success',
-                image: '{{ url("images/image-screen.png") }}',
-                sticky: false,
-                time: '3000'
-            });
-        }
-
-        function openErrorGritter(title, message) {
-            jQuery.gritter.add({
-                title: title,
-                text: message,
-                class_name: 'growl-danger',
-                image: '{{ url("images/image-stop.png") }}',
-                sticky: false,
-                time: '3000'
-            });
-        }
-
-    </script>
+    function openErrorGritter(title, message) {
+        jQuery.gritter.add({ title: title, text: message, class_name: 'growl-danger', image: '{{ url("images/image-stop.png") }}', sticky: false, time: '3000' });
+    }
+</script>
 @endsection

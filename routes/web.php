@@ -60,6 +60,9 @@ Route::get('/wilayah-proxy/{level}/{code?}', function ($level, $code = null) {
 
 Route::get('testmail', 'App\Http\Controllers\TrialController@testmail');
 
+// Route::get('dashboard/admin', function () {
+//     return view('admin.dashboard');
+// })->middleware('auth')->name('admin.dashboard');
 Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], function () {
     Route::get('/', 'DashboardController@index')->name('admin.dashboard');
     Route::get('/home', 'DashboardController@index')->name('admin.dashboard');
@@ -95,7 +98,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     // route group prefix admin/permission
     Route::group(['prefix' => 'user', 'middleware' => ['can:view users']], function () {
 
-        Route::get('/', 'UserController@index')->name('admin.user.index');
+        // Route::get('/', 'UserController@index')->name('admin.user.index');
+        Route::get('/', function() { return view('users.index_user'); });
         Route::get('/home', 'UserController@index')->name('admin.user.index');
         Route::get('/create', 'UserController@create')->name('admin.user.create');
         Route::post('/store', 'UserController@store')->name('admin.user.store');
@@ -440,6 +444,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::get('fetch/invoice', 'AccountingController@fetchInvoice');
     Route::get('report/invoice/{id}', 'AccountingController@reportInvoice');
     Route::get('request/reject/invoice', 'AccountingController@requestRejectInvoice');
+    Route::get('index/invoice/tanda_terima', function() { return view('accounting_purchasing.invoice.tanda_terima'); });
+    Route::get('index/invoice/tanda_terima/create', function() { return view('accounting_purchasing.invoice.create'); });
 
     Route::group(['nav' => 'S1', 'middleware' => 'permission'], function () {
         Route::get('index/upload_invoice', 'AccountingController@uploadInvoice');
@@ -522,6 +528,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     });
 
     //ALL - FIXED ASSET
+    Route::get('index/fixed_asset/dashboard', function() { return view('fixed_asset.dashboard'); })->name("user.fixed_asset_dashboard");
     Route::get('index/fixed_asset', 'AccountingController@indexFixedAsset')->name("user.fixed_asset");
     Route::get('index/fixed_asset/audit', 'AccountingController@indexFixedAssetAudit')->name("user.fixed_asset_audit");
     Route::get('fetch/fixed_asset/list', 'AccountingController@fetchFixedAsset');
@@ -568,6 +575,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     // Route::get('send/po_eq_confirmation/{po_number}', 'PoConfirmationController@sendPoNotificationEquipment');
 
     // RECRUITMENT MONITORING
+    Route::get('index/human_resource', function() { return view('recruitment.hr_dashboard'); });
     Route::post('input/ympi_recruitment_monitoring/change_setting', 'App\Http\Controllers\RecruitmentHrController@changeRecruitmentSetting');
     Route::get('index/ympi_recruitment_monitoring', 'App\Http\Controllers\RecruitmentHrController@monitoring');
     Route::get('fetch/ympi_recruitment_monitoring', 'App\Http\Controllers\RecruitmentHrController@fetchMonitoring');
@@ -575,6 +583,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::post('download/ympi_recruitment_monitoring/kraepelin_result', 'App\Http\Controllers\RecruitmentHrController@kraepelinResult');
 
 });
+
 
 // RECRUITMENT
 Route::get('index/ympi_recruitment', 'App\Http\Controllers\RecruitmentController@index');
@@ -604,6 +613,8 @@ Route::get('fetch/qr_code/vehicle', 'App\Http\Controllers\GeneralAffairControlle
 
 Route::get('index/driver/job', 'App\Http\Controllers\GeneralAffairController@indexDriverJob');
 Route::get('fetch/driver/job', 'App\Http\Controllers\GeneralAffairController@fetchDriverJob');
+Route::get('index/driver', function() { return view('general_affair.driver.index_driver'); });
+
 
 Route::get('index/input/driver/job/{id}', 'App\Http\Controllers\GeneralAffairController@indexInputDriverJob');
 
@@ -661,6 +672,7 @@ Route::get('fetch/passenger/attendance', 'App\Http\Controllers\GeneralAffairCont
 Route::post('input/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@inputPassengerAttendance');
 
 // Form Diagnosa Molding
+Route::get('molding', function() { return view('molding.index_molding'); });
 Route::get('index/diagnose_molding/molding_list', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseList')->name('user.molding_list');
 Route::get('fetch/diagnose_molding/molding_list', 'App\Http\Controllers\MoldingController@fetchMoldingDiagnoseList');
 Route::get('index/diagnose_molding/molding_form/{asset_number?}', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseFormList')->name('user.molding_form');

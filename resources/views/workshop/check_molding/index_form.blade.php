@@ -1,1403 +1,1060 @@
 @extends('layouts.master')
-@section('stylesheets')
-    <link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
-    <style type="text/css">
-        #loading,
-        #error {
-            display: none;
-        }
 
-        table.table-bordered>thead>tr>th {
-            color: white;
-            background-color: black;
-        }
+@section('styles')
+<link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        table.table-bordered>tbody>tr>td {
-            color: black;
-            background-color: white;
-        }
+<style>
+    /* ══ BASE ══ */
+    body { background: #f0f2f7 !important; }
+    body p, body span:not([class*="fa"]):not([class*="glyphicon"]):not([class*="select2"]):not([class*="ck"]),
+    body div:not([class*="ck"]), body label, body input, body select, body textarea,
+    body button, body a, body td, body th,
+    body h1, body h2, body h3, body h4, body h5, body h6, body li {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
 
-        #loading {
-            display: none;
-        }
+    /* ══ LOADING ══ */
+    #loading {
+        display: none; position: fixed; inset: 0;
+        background: rgba(30,31,58,.42); backdrop-filter: blur(6px);
+        z-index: 30001; align-items: center; justify-content: center;
+    }
+    #loading.show { display: flex !important; }
+    .loading-box {
+        background: #fff; border-radius: 20px; padding: 36px 52px;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 14px; box-shadow: 0 16px 48px rgba(0,0,0,.18);
+    }
+    .loading-spinner {
+        width: 44px; height: 44px; border: 3px solid #ede9fe;
+        border-top-color: #605ca8; border-radius: 50%;
+        animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-box p { font-size: 13px; color: #718096; margin: 0; font-weight: 600; }
 
-        .radio {
-            display: inline-block;
-            position: relative;
-            padding-left: 35px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+    /* ══ PAGE HEADER ══ */
+    .page-header-modern {
+        background: linear-gradient(135deg, #2d2b4e 0%, #4a4690 50%, #605ca8 100%);
+        padding: 26px 32px 22px; margin: 20px 0 22px;
+        border-radius: 18px; display: flex; align-items: center;
+        justify-content: space-between; flex-wrap: wrap; gap: 14px;
+        position: relative; overflow: hidden;
+    }
+    .page-header-modern::before {
+        content: ''; position: absolute; right: -40px; top: -40px;
+        width: 200px; height: 200px; border-radius: 50%;
+        background: rgba(255,255,255,.04); pointer-events: none;
+    }
+    .header-left .badge-tag {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22);
+        color: #c9c6f0; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+        text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 10px;
+    }
+    .header-left h1 {
+        color: #fff !important; font-size: 24px !important; font-weight: 700 !important;
+        margin: 0 0 4px !important; line-height: 1.2 !important;
+    }
+    .header-left p { color: rgba(255,255,255,.5); font-size: 13px; margin: 0; }
+    .header-right { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-hdr {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 700;
+        cursor: pointer; text-decoration: none; transition: all .18s; border: none;
+    }
+    .btn-hdr-ghost { background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.25); color: #fff; }
+    .btn-hdr-ghost:hover { background: rgba(255,255,255,.25); color: #fff; text-decoration: none; }
+    .btn-hdr-amber { background: #f59e0b; color: #fff; box-shadow: 0 3px 10px rgba(245,158,11,.3); }
+    .btn-hdr-amber:hover { background: #d97706; color: #fff; }
 
-        /* Hide the browser's default radio button */
-        .radio input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
+    /* ══ INFO CARDS (General Info) ══ */
+    .info-grid {
+        display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px;
+    }
+    .info-item {
+        background: #fff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .info-item.accent { background: linear-gradient(135deg,#f0eef9,#e9e6f5); border-color: #c4bfef; }
+    .info-lbl {
+        font-size: 10.5px; font-weight: 700; color: #a0aec0;
+        letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px;
+    }
+    .info-val { font-size: 15px; font-weight: 700; color: #1a202c; }
+    .info-item.accent .info-val { color: #4a4690; }
 
-        /* Create a custom radio button */
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 25px;
-            width: 25px;
-            background-color: #ccc;
-            border-radius: 50%;
-        }
+    /* ══ SECTION CARD ══ */
+    .sec-card {
+        background: #fff; border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.05);
+        overflow: hidden; margin-bottom: 20px;
+    }
+    .sec-card-header {
+        padding: 14px 22px; border-bottom: 1px solid #f0f2f7; background: #fafbff;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .sec-card-title { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: #1a202c; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot-purple { background: #605ca8; }
+    .dot-blue   { background: #3b82f6; }
+    .dot-red    { background: #ef4444; }
+    .dot-green  { background: #22c55e; }
+    .sec-card-body { padding: 18px 20px; }
 
-        /* On mouse-over, add a grey background color */
-        .radio:hover input~.checkmark {
-            background-color: #ccc;
-        }
+    /* ══ PART BUTTONS ══ */
+    .part-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .part-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 7px 14px; border-radius: 9px; border: none;
+        font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .18s;
+    }
+    .part-btn-pending { background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; }
+    .part-btn-pending:hover { background: #fecaca; }
+    .part-btn-done    { background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; }
+    .part-btn-done:hover    { background: #bbf7d0; }
 
-        /* When the radio button is checked, add a blue background */
-        .radio input:checked~.checkmark {
-            background-color: #2196F3;
-        }
+    /* ══ CHECKLIST TABLE ══ */
+    .cek-wrap { overflow-x: auto; }
+    .cek-table { width: 100%; border-collapse: collapse; }
+    .cek-table thead th {
+        background: #f7f8fc; color: #718096;
+        font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+        padding: 10px 12px; border-bottom: 2px solid #edf0f5;
+        white-space: nowrap; text-align: center;
+    }
+    .cek-table tbody td {
+        padding: 10px 12px; font-size: 13px; color: #2d3748;
+        border-bottom: 1px solid #f0f2f7; vertical-align: top; text-align: center;
+    }
+    .cek-table tbody td.left { text-align: left; }
+    .cek-table tbody tr:hover td { background: #f5f8ff; }
+    .cek-table tbody tr:last-child td { border-bottom: none; }
 
-        /* Create the indicator (the dot/circle - hidden when not checked) */
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
+    /* ══ PHOTO SECTION ══ */
+    .photo-group { text-align: left; }
+    .photo-group-lbl {
+        font-size: 11px; font-weight: 700; color: #605ca8;
+        text-transform: uppercase; letter-spacing: .06em;
+        margin-bottom: 7px; display: flex; align-items: center; gap: 5px;
+    }
+    .photo-group-lbl .req { color: #dc2626; }
+    .photo-btn-row { display: flex; gap: 6px; margin-bottom: 7px; }
+    .btn-photo {
+        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+        padding: 6px 10px; border-radius: 8px; border: 1.5px solid #c4bfef;
+        background: #f0eef9; color: #605ca8; font-size: 11.5px; font-weight: 700;
+        cursor: pointer; transition: all .18s;
+    }
+    .btn-photo:hover { background: #e2dff5; border-color: #8b87d4; }
+    .photo-previews { display: flex; gap: 6px; flex-wrap: wrap; }
+    .photo-previews img {
+        width: 80px; height: 80px; object-fit: cover; border-radius: 8px;
+        border: 2px solid #ede9fe; display: none;
+    }
+    .photo-sep { height: 1px; background: #f0f2f7; margin: 10px 0; }
 
-        /* Show the indicator (dot/circle) when checked */
-        .radio input:checked~.checkmark:after {
-            display: block;
-        }
+    /* ══ FORM FIELDS ══ */
+    .ff { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .ff:last-child { margin-bottom: 0; }
+    .ff label { font-size: 11px; font-weight: 700; color: #4a5568; letter-spacing: .06em; text-transform: uppercase; margin: 0; }
+    .ff label .req { color: #dc2626; }
+    .ff input, .ff select {
+        border: 1.5px solid #e2e8f0 !important; border-radius: 9px !important;
+        padding: 8px 12px !important; font-size: 13px !important; color: #1a202c !important;
+        background: #fafbff !important; outline: none !important; width: 100% !important;
+        transition: border-color .18s, box-shadow .18s !important;
+    }
+    .ff input:focus, .ff select:focus {
+        border-color: #605ca8 !important; background: #fff !important;
+        box-shadow: 0 0 0 3px rgba(96,92,168,.1) !important;
+    }
+    .ff input[readonly] { background: #f0eef9 !important; color: #605ca8 !important; font-weight: 600 !important; border-color: #c4bfef !important; }
 
-        /* Style the indicator (dot/circle) */
-        .radio .checkmark:after {
-            top: 9px;
-            left: 9px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: white;
-        }
+    /* ══ SELECT2 MODERN ══ */
+    .select2-container--default .select2-selection--single,
+    .select2-container--default .select2-selection--multiple {
+        border: 1.5px solid #e2e8f0 !important;
+        border-radius: 9px !important;
+        height: auto !important;
+        min-height: 36px !important;
+        padding: 4px 10px !important;
+        font-size: 13px !important;
+        color: #1a202c !important;
+        background: #fafbff !important;
+        outline: none !important;
+        transition: border-color .18s, box-shadow .18s !important;
+    }
+    .select2-container--default.select2-container--open .select2-selection--single,
+    .select2-container--default.select2-container--open .select2-selection--multiple {
+        border-color: #605ca8 !important;
+        background: #fff !important;
+        box-shadow: 0 0 0 3px rgba(96,92,168,.1) !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #1a202c !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        /* line-height: 24px !important; */
+        margin-top: 0px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__placeholder {
+        color: #a0aec0 !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100% !important;
+        right: 8px !important;
+    }
 
-        #tableResult>thead>tr>th {
-            border: 1px solid black;
-        }
+    /* ══ STATUS PILLS ══ */
+    .pill {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 11px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap;
+    }
+    .pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+    .pill-ok     { background: #dcfce7; color: #15803d; }
+    .pill-ok::before   { background: #22c55e; }
+    .pill-ng     { background: #fee2e2; color: #dc2626; }
+    .pill-ng::before   { background: #ef4444; }
+    .pill-open   { background: #fee2e2; color: #dc2626; }
+    .pill-open::before { background: #ef4444; }
+    .pill-temp   { background: #fef3c7; color: #92400e; }
+    .pill-temp::before { background: #f59e0b; }
+    .pill-close  { background: #dcfce7; color: #15803d; }
+    .pill-close::before{ background: #22c55e; }
 
-        #tableResult>tbody>tr>td {
-            border: 1px solid #b0bec5;
-        }
+    /* ══ BUTTONS ══ */
+    .btn-modern {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 18px; border-radius: 9px; border: none;
+        font-size: 13px; font-weight: 700; cursor: pointer; transition: all .18s;
+    }
+    .btn-modern:hover { opacity: .87; transform: translateY(-1px); }
+    .btn-purple { background: linear-gradient(135deg,#4a4690,#605ca8); color:#fff; box-shadow:0 3px 10px rgba(96,92,168,.3); }
+    .btn-green  { background: linear-gradient(135deg,#15803d,#16a34a); color:#fff; box-shadow:0 3px 10px rgba(21,128,61,.3); }
+    .btn-red    { background: linear-gradient(135deg,#b91c1c,#dc2626); color:#fff; }
+    .btn-yellow { background: linear-gradient(135deg,#b45309,#f59e0b); color:#fff; }
+    .btn-act-sm {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; border-radius: 8px; border: none;
+        font-size: 13px; cursor: pointer; transition: all .18s; margin: 2px;
+    }
+    .btn-act-sm:hover { opacity: .85; transform: scale(1.08); }
+    .btn-act-sm-red    { background: #fee2e2; color: #dc2626; }
+    .btn-act-sm-yellow { background: #fef3c7; color: #92400e; }
 
-        hr {
-            margin-top: 2px;
-            margin-bottom: 2px;
-            border-color: black;
-        }
-    </style>
+    .btn-submit-full {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; padding: 14px; border: none; border-radius: 12px;
+        background: linear-gradient(135deg,#15803d,#16a34a);
+        color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+        box-shadow: 0 4px 16px rgba(21,128,61,.3); transition: all .18s;
+    }
+    .btn-submit-full:hover { opacity: .9; transform: translateY(-1px); }
+
+    /* ══ MODAL ══ */
+    .mh {
+        padding: 18px 24px; border-bottom: 1px solid #f0f2f7; background: #fafbff;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .mh h4 { margin: 0; font-size: 15px; font-weight: 700; color: #1a202c; display: flex; align-items: center; gap: 9px; }
+    .mh-close {
+        width: 30px; height: 30px; border-radius: 8px; border: none;
+        background: #fee2e2; color: #dc2626; font-size: 16px; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .mh-close:hover { background: #fecaca; }
+    .mb { padding: 20px 24px; }
+    .mf { padding: 14px 24px; border-top: 1px solid #f0f2f7; background: #fafbff; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn-mf-cancel {
+        padding: 9px 18px; border: 1.5px solid #e2e8f0; border-radius: 9px;
+        background: #fff; color: #718096; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-mf-cancel:hover { background: #f5f4fb; border-color: #c4bfef; color: #605ca8; }
+    .btn-mf-save {
+        padding: 9px 20px; border-radius: 9px; border: none;
+        background: linear-gradient(135deg,#15803d,#16a34a); color: #fff;
+        font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 10px rgba(21,128,61,.25);
+    }
+
+    /* modal table */
+    .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .modal-table thead th {
+        background: #f7f8fc; color: #718096; font-size: 11px; font-weight: 700;
+        letter-spacing: .06em; text-transform: uppercase; padding: 9px 12px;
+        border-bottom: 1.5px solid #edf0f5; text-align: center;
+    }
+    .modal-table tbody td {
+        padding: 9px 12px; color: #2d3748; border-bottom: 1px solid #f0f2f7; vertical-align: middle; text-align: center;
+    }
+    .modal-table tbody tr:last-child td { border-bottom: none; }
+
+    /* photo upload inside modal */
+    .photo-upload-wrap {
+        border: 1.5px dashed #c4bfef; border-radius: 10px;
+        background: #faf9ff; padding: 12px; margin-top: 6px; transition: border-color .18s;
+    }
+    .photo-upload-wrap:hover { border-color: #605ca8; }
+    .photo-upload-wrap input[type="file"] {
+        border: none !important; background: transparent !important;
+        padding: 0 !important; font-size: 12.5px !important; width: 100% !important; cursor: pointer; color: #4a5568 !important; margin-bottom: 6px;
+    }
+    .photo-upload-label { font-size: 11px; font-weight: 700; color: #605ca8; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; display: block; }
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+
+    /* ══ MISC ══ */
+    .page-wrapper { padding-top: 0 !important; }
+    .datepicker-days > table > thead,
+    .datepicker-days > table > thead > tr > th,
+    .datepicker-months > table > thead > tr > th,
+    .datepicker-years > table > thead > tr > th {
+        background-color: white; color: #696969 !important;
+    }
+</style>
 @stop
-@section('header')
-@stop
+
+@section('header')@stop
+
 @section('content')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <section class="content" style="padding: 10px">
-        <div id="loading"
-            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display:none">
-            <p style="position: absolute; color: white; top: 45%; left: 35%;">
-                <span style="font-size: 40px">Loading, Please Wait . . . <i class="fa fa-spin fa-refresh"></i></span>
-            </p>
+{{-- Loading --}}
+<div id="loading">
+    <div class="loading-box">
+        <div class="loading-spinner"></div>
+        <p>Memproses data...</p>
+    </div>
+</div>
+
+<div class="content-header" style="padding: 0 20px;">
+
+    {{-- ── PAGE HEADER ── --}}
+    <div class="page-header-modern">
+        <div class="header-left">
+            <div class="badge-tag"><i class="fas fa-cube"></i> Audit Molding</div>
+            <h1>Audit Molding</h1>
+            <p>Pengecekan kondisi &amp; kelayakan molding vendor</p>
         </div>
+        <div class="header-right">
+            <button class="btn-hdr btn-hdr-amber" onclick="openModal('modal_problem_log')">
+                <i class="fas fa-exclamation-triangle"></i> Riwayat Temuan
+            </button>
+            <button class="btn-hdr btn-hdr-ghost" onclick="openModal('modal_history')">
+                <i class="fas fa-history"></i> Riwayat Pengecekan
+            </button>
+        </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-10">
-                <input type="hidden" id="green">
-                <h1>
-                    Audit Molding
-                </h1>
-            </div>
-            <div class="col-md-2">
-                <buton class="btn btn-primary" style="width: 100%;" onclick="openModal('modal_history')"><i
-                        class="fa fa-book"></i> Riwayat Pengecekan</button>
+    {{-- ── GENERAL INFORMATION ── --}}
+    <input type="hidden" id="molding_category">
+    <input type="hidden" id="employee_id">
+    <input type="hidden" name="type_molding" id="type_molding">
+    <input type="hidden" name="molding_number" id="molding_number">
+    <input type="hidden" id="molding_id">
+
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="info-lbl"><i class="fas fa-calendar-alt" style="margin-right:4px;"></i>Tanggal Audit</div>
+            <div class="info-val"><?= date('d F Y') ?></div>
+        </div>
+        <div class="info-item accent">
+            <div class="info-lbl"><i class="fas fa-cube" style="margin-right:4px;"></i>Nama Molding</div>
+            <div class="info-val" id="molding_name">—</div>
+        </div>
+        <div class="info-item accent">
+            <div class="info-lbl"><i class="fas fa-user" style="margin-right:4px;"></i>PIC</div>
+            <div class="info-val" id="employee_name">—</div>
+        </div>
+        <div class="info-item">
+            <div class="info-lbl"><i class="fas fa-map-marker-alt" style="margin-right:4px;"></i>Lokasi</div>
+            <div class="info-val" id="location">ARISA</div>
+        </div>
+    </div>
+
+    {{-- ── PART LIST ── --}}
+    <div class="sec-card">
+        <div class="sec-card-header">
+            <div class="sec-card-title"><span class="dot dot-blue"></span> Part List Molding</div>
+        </div>
+        <div class="sec-card-body">
+            <div class="part-grid" id="div_part">
+                <span style="color:#a0aec0;font-size:13px;"><i class="fas fa-info-circle" style="margin-right:5px;"></i>Pilih Molding untuk menampilkan part list.</span>
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="col-xs-12" style="padding-right: 0; padding-left: 0;">
-                    <table class="table table-bordered" style="width: 100%; margin-bottom: 10px">
+    {{-- ── PENGECEKAN MOLDING ── --}}
+    <div class="sec-card">
+        <div class="sec-card-header">
+            <div class="sec-card-title"><span class="dot dot-red"></span> Pengecekan Molding</div>
+            <button class="btn-modern btn-yellow" style="padding:7px 14px;font-size:12px;" onclick="openModal('modal_problem_log')">
+                <i class="fas fa-book"></i> Riwayat Temuan
+            </button>
+        </div>
+        <div class="cek-wrap">
+            <table class="cek-table" id="tableResult">
+                <thead>
+                    <tr>
+                        <th style="width:36px;">No</th>
+                        <th style="text-align:left;min-width:120px;">Nama Part</th>
+                        <th style="min-width:140px;">Poin Cek</th>
+                        <th style="min-width:130px;">Standar</th>
+                        <th style="min-width:130px;">Cara Pengecekan</th>
+                        <th style="min-width:130px;">Cara Penanganan</th>
+                        <th style="min-width:260px;">Eviden</th>
+                        <th style="min-width:100px;">Judgement</th>
+                        <th style="width:80px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="body_cek">
+                    <tr>
+                        <td colspan="9" style="text-align:center;color:#a0aec0;padding:32px 16px;font-size:13px;">
+                            <i class="fas fa-mouse-pointer" style="margin-right:6px;"></i>Klik salah satu part untuk memulai pengecekan.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:16px 20px;border-top:1px solid #f0f2f7;background:#fafbff;">
+            <button class="btn-submit-full" onclick="cek()">
+                <i class="fas fa-paper-plane"></i> Submit Pengecekan
+            </button>
+        </div>
+    </div>
+
+</div>
+
+{{-- ══ MODAL: Pilih Periode, PIC & Molding ══ --}}
+<div class="modal modal-default fade" id="molding_select">
+    <div class="modal-dialog" style="max-width:480px;">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+            <div class="mh">
+                <h4><i class="fas fa-cube" style="color:#605ca8;"></i> Pilih Periode, PIC &amp; Molding</h4>
+                <button type="button" class="mh-close" data-dismiss="modal" onclick="$('#molding_select').modal('hide');">&times;</button>
+            </div>
+            <div class="mb" style="display:flex;flex-direction:column;gap:16px;">
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Periode Cek <span class="req">*</span></label>
+                    <select class="select2" id="prd" style="width:100%;" data-placeholder="Pilih Periode" onchange="loadMolding(this)">
+                        <option value=""></option>
+                        @foreach ($period as $pr)
+                            <option value="{{ $pr }}">{{ $pr }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>PIC <span class="req">*</span></label>
+                    <select class="select2" id="pic" style="width:100%;" data-placeholder="Pilih PIC">
+                        <option value=""></option>
+                        @foreach ($pics as $pic)
+                            <option value="{{ $pic->employee_id }}">{{ $pic->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Molding <span class="req">*</span></label>
+                    <select class="select2" id="moldings" style="width:100%;" data-placeholder="Pilih Molding">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div class="mf">
+                <button type="button" class="btn-mf-cancel" data-dismiss="modal" onclick="$('#molding_select').modal('hide');"><i class="fas fa-times"></i> Batal</button>
+                <button class="btn-mf-save" onclick="selectMolding()">
+                    <i class="fas fa-check"></i> OK, Mulai Audit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ══ MODAL: Riwayat Pengecekan ══ --}}
+<div class="modal fade" id="modal_history" tabindex="-1">
+    <div class="modal-dialog modal-lg" style="max-width:1200px;">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+            <div class="mh">
+                <h4><i class="fas fa-history" style="color:#605ca8;"></i> Riwayat Pengecekan</h4>
+                <button type="button" class="mh-close" data-dismiss="modal" onclick="$('#modal_history').modal('hide');">&times;</button>
+            </div>
+            <div class="mb">
+                <div class="g2" style="margin-bottom:14px;">
+                    <div class="ff" style="margin-bottom:0;">
+                        <label>Tanggal Dari</label>
+                        <input type="text" class="datepicker2" id="date_from" name="date_from" placeholder="yyyy-mm-dd" autocomplete="off">
+                    </div>
+                    <div class="ff" style="margin-bottom:0;">
+                        <label>Tanggal Sampai</label>
+                        <input type="text" class="datepicker2" id="date_to" name="date_to" placeholder="yyyy-mm-dd" autocomplete="off">
+                    </div>
+                </div>
+                <div class="ff" style="margin-bottom:14px;">
+                    <label>Molding</label>
+                    <select class="form-control select4" multiple="multiple" id="molding_select" data-placeholder="Pilih Molding" style="width:100%;">
+                        @foreach ($moldings as $molding)
+                            <option value="{{ $molding->molding_name }}">{{ $molding->molding_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="ff" style="margin-bottom:16px;">
+                    <label>PIC</label>
+                    <select class="select4" id="pic_select" multiple="multiple" style="width:100%;" data-placeholder="Pilih PIC">
+                        @foreach ($pics as $pic)
+                            <option value="{{ $pic->employee_id }}">{{ $pic->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+                    <button class="btn-modern btn-purple" onclick="fetchDetailRecord()">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="modal-table" id="tableDetail">
                         <thead>
                             <tr>
-                                <th style="width:15%; background-color: white; color: black; text-align: center; padding:0;font-size: 18px;border: 1px solid black"
-                                    colspan="3">General Information</th>
+                                <th rowspan="2">Id</th>
+                                <th rowspan="2">Tanggal</th>
+                                <th rowspan="2">Molding</th>
+                                <th rowspan="2">PIC</th>
+                                <th rowspan="2">Poin Cek</th>
+                                <th colspan="3">Eviden</th>
+                                <th rowspan="2">Judgement</th>
+                                <th rowspan="2">Status</th>
+                            </tr>
+                            <tr>
+                                <th>Before</th>
+                                <th>After</th>
+                                <th>Aktifitas</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td
-                                    style="padding: 0px; background-color: #3f51b5; text-align: center; color: white; font-size:20px; width: 30%;border: 1px solid black">
-                                    Tanggal Audit</td>
-                                <td colspan="2"
-                                    style="padding: 0px; background-color: #01579b; text-align: center; color: white; font-size: 20px;border: 1px solid black">
-                                    <?= date('d F Y') ?> <input type="hidden" id="molding_category"></td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding: 0px; background-color: #3f51b5; text-align: center; color: white; font-size:20px; width: 30%;border: 1px solid black">
-                                    Nama Molding</td>
-                                <td colspan="2"
-                                    style="padding: 0px; background-color: #01579b; text-align: center; color: white; font-size: 20px;border: 1px solid black"
-                                    id="molding_name"></td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding: 0px; background-color: #3f51b5; text-align: center; color: white; font-size:20px; width: 30%;border: 1px solid black">
-                                    PIC</td>
-                                <td colspan="2"
-                                    style="padding: 0px; background-color: #01579b; text-align: center; color: white; font-size: 20px;border: 1px solid black"
-                                    id="employee_name"></td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding: 0px; background-color: #3f51b5; text-align: center; color: white; font-size:20px; width: 30%;border: 1px solid black">
-                                    Lokasi</td>
-                                <td colspan="2"
-                                    style="padding: 0px; background-color: #01579b; text-align: center; color: white; font-size: 20px;border: 1px solid black"
-                                    id="location">ARISA</td>
-                            </tr>
-                        </tbody>
+                        <tbody id="bodyTableDetail"></tbody>
                     </table>
                 </div>
+            </div>
+            <div class="mf">
+                <button type="button" class="btn-mf-cancel" data-dismiss="modal" onclick="$('#modal_history').modal('hide');"><i class="fas fa-times"></i> Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <input type="hidden" id="employee_id">
-
-                <div class="col-xs-12">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <h2>Part List Molding : </h2>
-                        </div>
-                        <div class="col-xs-12">
-                            <table id="div_part" style="width: 100%">
-
-                            </table>
-                            <br>
+{{-- ══ MODAL: Tuliskan Permasalahan ══ --}}
+<div class="modal modal-default fade" id="modal_problem">
+    <div class="modal-dialog modal-lg" style="max-width:740px;">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+            <div class="mh">
+                <h4><i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i> Tuliskan Permasalahan</h4>
+                <button type="button" class="mh-close" data-dismiss="modal" onclick="$('#modal_problem').modal('hide');">&times;</button>
+            </div>
+            <div class="mb" style="display:flex;flex-direction:column;gap:14px;">
+                <div class="g2">
+                    <div class="ff" style="margin-bottom:0;">
+                        <label>Nama Molding</label>
+                        <input type="text" id="nama_molding" readonly>
+                    </div>
+                    <div class="ff" style="margin-bottom:0;">
+                        <label>Nama Part</label>
+                        <input type="text" id="nama_part" readonly>
+                    </div>
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Permasalahan <span class="req">*</span></label>
+                    <textarea id="permasalahan" style="border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;font-size:13px;background:#fafbff;width:100%;"></textarea>
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Foto Permasalahan</label>
+                    <div class="photo-upload-wrap">
+                        <span class="photo-upload-label"><i class="fas fa-camera" style="margin-right:4px;"></i>Pilih Foto</span>
+                        <input type="file" id="permasalahan1" class="permasalahan1" accept="image/*" onchange="readURL2(this,'img_permasalahan1')" style="margin-bottom:6px;">
+                        <input type="file" id="permasalahan2" class="permasalahan2" accept="image/*" onchange="readURL2(this,'img_permasalahan2')">
+                        <div class="photo-previews" style="margin-top:8px;">
+                            <img src="" class="img_permasalahan1" alt="">
+                            <img src="" class="img_permasalahan2" alt="">
                         </div>
                     </div>
                 </div>
-
-                <div class="col-md-12" style="padding: 0">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <h2>Pengecekan Molding</h2>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Perbaikan Sementara <span class="req">*</span></label>
+                    <textarea id="perbaikan_sementara" style="border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;font-size:13px;background:#fafbff;width:100%;"></textarea>
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Foto Perbaikan</label>
+                    <div class="photo-upload-wrap">
+                        <span class="photo-upload-label"><i class="fas fa-camera" style="margin-right:4px;"></i>Pilih Foto</span>
+                        <input type="file" id="perbaikan1" class="perbaikan1" accept="image/*" onchange="readURL2(this,'img_perbaikan1')" style="margin-bottom:6px;">
+                        <input type="file" id="perbaikan2" class="perbaikan2" accept="image/*" onchange="readURL2(this,'img_perbaikan2')">
+                        <div class="photo-previews" style="margin-top:8px;">
+                            <img src="" class="img_perbaikan1" alt="">
+                            <img src="" class="img_perbaikan2" alt="">
                         </div>
-                        <div class="col-md-2" style="padding: 0 5px 0 5px"><button style="color: white; width: 100%"
-                                class="btn bg-purple" onclick="openModal('modal_problem_log')"><i class="fa fa-book"></i>
-                                Riwayat Temuan</button></div>
-                        {{-- <div class="col-md-2" style="padding: 0 5px 0 5px"><button style="width: 100%"
-                                class="btn btn-success" id="add_check" onclick="add_point()"><i class="fa fa-plus"></i>
-                                Tambah Pengecekan</button></div> --}}
                     </div>
-                    <input type="hidden" id="molding_id">
-                    <input type="hidden" name="type_molding" id="type_molding">
-                    <input type="hidden" name="molding_number" id="molding_number">
-                    <table class="table table-bordered" style="width: 100%; color: rgb(0, 0, 0);" id="tableResult">
-                        <thead style="font-weight: bold; background-color: #f20000">
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Catatan</label>
+                    <textarea id="note" style="border:1.5px solid #e2e8f0;border-radius:9px;padding:9px 12px;font-size:13px;background:#fafbff;width:100%;"></textarea>
+                </div>
+                <div class="ff" style="margin-bottom:0;">
+                    <label>Status <span class="req">*</span></label>
+                    <div id="status_div" style="width:220px;">
+                        <select class="select5" id="status" style="width:100%;" data-placeholder="Pilih Status">
+                            <option value=""></option>
+                            <option value="Open">Open</option>
+                            <option value="Temporary Close">Temporary Close</option>
+                            <option value="Close">Close</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="mf">
+                <button type="button" class="btn-mf-cancel" data-dismiss="modal" onclick="$('#modal_problem').modal('hide');"><i class="fas fa-times"></i> Batal</button>
+                <button class="btn-mf-save" onclick="simpanTemuan()">
+                    <i class="fas fa-save"></i> Simpan Temuan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- ══ MODAL: Riwayat Temuan ══ --}}
+<div class="modal modal-default fade" id="modal_problem_log">
+    <div class="modal-dialog modal-lg" style="max-width:1200px;">
+        <div class="modal-content" style="border-radius:16px;overflow:hidden;border:none;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+            <div class="mh">
+                <h4><i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i> Riwayat Temuan</h4>
+                <button type="button" class="mh-close" data-dismiss="modal" onclick="$('#modal_problem_log').modal('hide');">&times;</button>
+            </div>
+            <div class="mb">
+                <div class="g2" style="margin-bottom:14px;">
+                    <div class="ff" style="margin-bottom:0;">
+                        <label>Tanggal Dari</label>
+                        <input type="text" class="datepicker2" id="riwayat_dari" placeholder="yyyy-mm-dd">
+                    </div>
+                    <div class="ff" style="margin-bottom:0;">
+                        <label>Tanggal Sampai</label>
+                        <input type="text" class="datepicker2" id="riwayat_sampai" placeholder="yyyy-mm-dd">
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+                    <button class="btn-modern btn-purple" onclick="cariTemuan()">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="modal-table" id="tableMasalah">
+                        <thead>
                             <tr>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 1%;">No</th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 15%;">Nama Part
-                                </th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 15%;">Poin Cek</th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 17%;">Standar</th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 17%;">Cara
-                                    Pengecekan</th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 17%;">Cara
-                                    Penanganan</th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 20%;">Eviden</th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 20%;">Judgement
-                                </th>
-                                <th style="border-right: 1px solid white;background-color:#f20000;width: 1%;">Action</th>
+                                <th style="width:36px;">No.</th>
+                                <th>Tanggal</th>
+                                <th>Nama Molding</th>
+                                <th>Nama Part</th>
+                                <th>Permasalahan</th>
+                                <th>Perbaikan Sementara</th>
+                                <th>Note</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
-                        <tbody id="body_cek">
-                        </tbody>
+                        <tbody id="bodyMasalah"></tbody>
                     </table>
-
-                    <br>
-                    <button class="btn btn-success" style="width: 100%;font-size: 25px" onclick="cek()"><i
-                            class="fa fa-check"></i> Submit</button>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <div class="modal modal-default fade" id="molding_select">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">
-                        <center>Pilih Periode, PIC & Molding</center>
-                    </h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <label>Pilih Periode Cek</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <select class="select2" id="prd" style="width: 100%" data-placeholder="Pilih Periode"
-                                onchange="loadMolding(this)">
-                                <option value=""></option>
-                                @foreach ($period as $pr)
-                                    <option value="{{ $pr }}">{{ $pr }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <label>Pilih PIC</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <select class="select2" id="pic" style="width: 100%" data-placeholder="Pilih PIC">
-                                <option value=""></option>
-                                @foreach ($pics as $pic)
-                                    <option value="{{ $pic->employee_id }}">{{ $pic->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Pilih Molding</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <select class="select2" id="moldings" style="width: 100%"
-                                data-placeholder="Pilih Type Molding">
-                                <option value=""></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <br>
-                            <button class="btn btn-success pull-right" onclick="selectMolding()"><i
-                                    class="fa fa-check"></i> OK</button>
-                        </div>
-                    </div>
-
-                </div>
+            <div class="mf">
+                <button type="button" class="btn-mf-cancel" data-dismiss="modal" onclick="$('#modal_problem_log').modal('hide');"><i class="fas fa-times"></i> Tutup</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="modal fade" id="modal_history" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document" style="max-width: 1200px !important;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <center>
-                        <h4 class="modal-title">Riwayat Pengecekan</h4>
-                    </center>
-                    <!-- <button class="btn btn-danger pull-left" data-dismiss="modal"><i class="fa fa-close"></i> Close</button> -->
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <span style="font-weight: bold;">Tanggal Dari</span>
-                            <div class="form-group">
-                                <input type="text" class="form-control datepicker2" id="date_from" name="date_from"
-                                    placeholder="Select Date From" autocomplete="off">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <span style="font-weight: bold;">Tanggal Sampai</span>
-                            <div class="form-group">
-                                <input type="text" class="form-control datepicker2" id="date_to" name="date_to"
-                                    placeholder="Select Date To" autocomplete="off">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <span style="font-weight: bold;">Molding</span>
-                            <div class="form-group">
-                                <select class="form-control select4" multiple="multiple" id='molding_select'
-                                    data-placeholder="Pilih Molding" style="width: 100%;color: black !important">
-                                    @foreach ($moldings as $molding)
-                                        <option value="{{ $molding->molding_name }}">{{ $molding->molding_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <span style="font-weight: bold;">PIC</span>
-                            <div class="form-group">
-                                <select class="select4" id="pic_select" multiple="multiple" style="width: 100%"
-                                    data-placeholder="Pilih PIC">
-                                    @foreach ($pics as $pic)
-                                        <option value="{{ $pic->employee_id }}">{{ $pic->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button class="btn btn-primary pull-right" onclick="fetchDetailRecord()"><i
-                                    class="fa fa-search"></i> Cari</button>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-xs-12" style="overflow-x: scroll; margin-top: 5px">
-                            <table class="table table-bordered" id="tableDetail">
-                                <thead
-                                    style="border-bottom:3px solid black;border-top:3px solid black;background-color:#cddc39">
-                                    <tr>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>Id</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>Tanggal</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>Molding</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>PIC</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>Poin Cek</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" colspan="3">
-                                            <center>Eviden</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>Judgement</center>
-                                        </th>
-                                        <th style="font-weight: bold; vertical-align: middle;" rowspan="2">
-                                            <center>Status</center>
-                                        </th>
-                                    </tr>
-                                    <tr>
-                                        <th style="font-weight: bold;">
-                                            <center>Before</center>
-                                        </th>
-                                        <th style="font-weight: bold;">
-                                            <center>After</center>
-                                        </th>
-                                        <th style="font-weight: bold;">
-                                            <center>Aktifitas</center>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bodyTableDetail">
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal modal-default fade" id="modal_problem">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">
-                        <center>Tuliskan Permasalahan</center>
-                    </h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <label>Nama Molding</label>
-                        </div>
-                        <div class="col-xs-6">
-                            <input type="text" id="nama_molding" class="form-control" readonly>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Nama Part</label>
-                        </div>
-                        <div class="col-xs-4">
-                            <input type="text" class="form-control" id="nama_part" readonly>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Permasalahan</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <textarea class="form-control" id="permasalahan"></textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Permasalahan Foto</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <input type="file" id="permasalahan1" class="permasalahan1" accept="image/*"
-                                onchange="readURL2(this,'img_permasalahan1')" hidden>
-                            <button class="btn btn-primary" style="width : 49%"
-                                onclick="buttonImage(this,'permasalahan1')"><i class="fa fa-camera"></i> Photo 1</button>
-                            <input type="file" id="permasalahan2" class="permasalahan2" accept="image/*"
-                                onchange="readURL2(this,'img_permasalahan2')" hidden>
-                            &nbsp;<button class="btn btn-primary" style="width : 49%"
-                                onclick="buttonImage(this,'permasalahan2')"><i class="fa fa-camera"></i> Photo 2</button>
-                            <br>
-                            <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image"
-                                class="img_permasalahan1">
-                            &nbsp; <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image"
-                                class="img_permasalahan2">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Perbaikan Sementara</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <textarea class="form-control" id="perbaikan_sementara"></textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Perbaikan Foto</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <input type="file" id="perbaikan1" class="perbaikan1" accept="image/*"
-                                onchange="readURL2(this,'img_perbaikan1')" hidden>
-                            <button class="btn btn-primary" style="width : 49%"
-                                onclick="buttonImage(this,'perbaikan1')"><i class="fa fa-camera"></i> Photo 1</button>
-                            <input type="file" id="perbaikan2" class="perbaikan2" accept="image/*"
-                                onchange="readURL2(this,'img_perbaikan2')" hidden>
-                            &nbsp;<button class="btn btn-primary" style="width : 49%"
-                                onclick="buttonImage(this,'perbaikan2')"><i class="fa fa-camera"></i> Photo 2</button>
-                            <br>
-                            <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image"
-                                class="img_perbaikan1">
-                            &nbsp; <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image"
-                                class="img_perbaikan2">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Catatan</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <textarea class="form-control" id="note"></textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <br>
-                            <label>Status</label>
-                        </div>
-                        <div class="col-xs-3" id="status_div">
-                            <select class="select5" id="status" style="width: 100%" data-placeholder="Pilih Status">
-                                <option value=""></option>
-                                <option value="Open">Open</option>
-                                <option value="Temporary Close">Temporary Close</option>
-                                <option value="Close">Close</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <br>
-                            <button class="btn btn-success pull-right" onclick="simpanTemuan()"><i
-                                    class="fa fa-check"></i> Simpan Temuan</button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal modal-default fade" id="modal_problem_log">
-        <div class="modal-dialog modal-lg" style="max-width: 1200px !important;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">
-                        <center>Riwayat Temuan</center>
-                    </h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="col-md-5 control-label">Tanggal Dari</label>
-                                <div class="col-md-7">
-                                    <input type="text" class="form-control datepicker2" id="riwayat_dari"
-                                        placeholder="Masukkan Tanggal">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="col-md-5 control-label">Tanggal Sampai</label>
-                                <div class="col-md-7">
-                                    <input type="text" class="form-control datepicker2" id="riwayat_sampai"
-                                        placeholder="Masukkan Tanggal">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <br>
-                            <button class="btn btn-info pull-right" onclick="cariTemuan()"><i class="fa fa-search"></i>
-                                Cari</button>
-                        </div>
-                        <div class="col-xs-12">
-                            <table class="table table-bordered" id="tableMasalah">
-                                <thead style="background-color: #d87cf7">
-                                    <tr>
-                                        <th style="width: 1%;">No.</th>
-                                        <th style="width: 4%;">Tanggal</th>
-                                        <th>Nama Molding</th>
-                                        <th>Nama Part</th>
-                                        <th>Permasalahan</th>
-                                        <th>Perbaikan Sementara</th>
-                                        <th>Note</th>
-                                        <th style="width: 1%;">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="bodyMasalah"></tbody>
-
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
+
 @section('scripts')
-    <script src="{{ url('js/bootstrap-toggle.min.js') }}"></script>
-    <script src="{{ url('plugins/timepicker/bootstrap-timepicker.min.js') }}"></script>
-    <!-- <script src="{{ url('js/dataTables.buttons.min.js') }}"></script> -->
-    <!-- <script src="{{ url('js/buttons.flash.min.js') }}"></script> -->
-    <script src="{{ url('js/jszip.min.js') }}"></script>
-    <script src="{{ url('js/vfs_fonts.js') }}"></script>
-    <!-- <script src="{{ url('js/buttons.html5.min.js') }}"></script> -->
-    <!-- <script src="{{ url('js/buttons.print.min.js') }}"></script> -->
-    <!-- <script src="{{ url('js/popper.min.js') }}"></script> -->
-    <script src="{{ url('js/jquery.gritter.min.js') }}"></script>
-    <script src="{{ url('ckeditor/ckeditor.js') }}"></script>
-    <script src="{{ url('js/compressImage.js') }}"></script>
+<script src="{{ url('js/bootstrap-toggle.min.js') }}"></script>
+<script src="{{ url('plugins/timepicker/bootstrap-timepicker.min.js') }}"></script>
+<script src="{{ url('js/jszip.min.js') }}"></script>
+<script src="{{ url('js/vfs_fonts.js') }}"></script>
+<script src="{{ url('js/jquery.gritter.min.js') }}"></script>
+<script src="{{ url('ckeditor/ckeditor.js') }}"></script>
+<script src="{{ url('js/compressImage.js') }}"></script>
 
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+<script>
+    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
+
+    var check_point  = <?php echo json_encode($check_points); ?>;
+    var moldings     = <?php echo json_encode($moldings); ?>;
+    var part_status  = [];
+    var part_err     = [];
+    var num          = 1;
+    const compressedFiles = [];
+
+    /* ── CKEditor ── */
+    var ckCfg = {
+        filebrowserImageBrowseUrl: '{{ url('kcfinder_master') }}',
+        toolbar: [
+            ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo'],
+            { name:'basicstyles', items:['Bold','Italic'] },
+            { name:'document',   items:['Source'] },
+            { name:'tools',      items:['Maximize'] }
+        ],
+        height: 100
+    };
+    CKEDITOR.replace('permasalahan',      ckCfg);
+    CKEDITOR.replace('perbaikan_sementara', ckCfg);
+    CKEDITOR.replace('note',              ckCfg);
+
+    /* ── Ready ── */
+    jQuery(document).ready(function () {
+        $('#wrapper').toggleClass('toggled');
+        $('#molding_select').modal('show');
+        $('body').toggleClass('sidebar-collapse');
+        $('#side_molding').addClass('menu-open');
+
+        $('.select2').select2({ dropdownAutoWidth: true, allowClear: true, dropdownParent: $('#molding_select') });
+        $('.select3').select2({ minimumResultsForSearch: -1, dropdownAutoWidth: true, allowClear: true });
+        $('.select4').select2({ dropdownAutoWidth: true, dropdownParent: $('#modal_history') });
+        $('.select5').select2({ dropdownAutoWidth: true, dropdownParent: $('#status_div') });
+        $('.datepicker2').datepicker({ format: 'yyyy-mm-dd', autoclose: true, todayHighlight: true });
+    });
+
+    /* ── SELECT MOLDING ── */
+    function selectMolding() {
+        if ($('#moldings').val() == '' || $('#pic').val() == '') {
+            openErrorGritter('Gagal', 'Pilih PIC dan Molding terlebih dahulu');
+            return false;
+        }
+        $('#molding_id').val($('#moldings').val());
+        $('#molding_select').modal('hide');
+        $('#molding_name').text($('#moldings option:selected').text());
+        $('#employee_name').text($('#pic').val() + ' - ' + $('#pic option:selected').text());
+
+        var type = '', mold_num = '';
+        $.each(moldings, function (i, v) {
+            if (v.molding_type + '_' + v.molding_category == $('#moldings').val()) {
+                type     = v.molding_type;
+                mold_num = v.mold_number;
+                $('#molding_category').val(v.molding_category);
             }
         });
+        $('#type_molding').val(type);
+        $('#molding_number').val(mold_num);
 
-        var check_point = <?php echo json_encode($check_points); ?>;
-        var moldings = <?php echo json_encode($moldings); ?>;
-        var part_status = [];
-        var part_err = [];
-        var num = 1;
-        const compressedFiles = [];
-
-        CKEDITOR.replace('permasalahan', {
-            filebrowserImageBrowseUrl: '{{ url('kcfinder_master') }}',
-            toolbar: [
-                ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
-                {
-                    name: 'basicstyles',
-                    items: ['Bold', 'Italic']
-                },
-                {
-                    name: 'document',
-                    items: ['Source']
-                },
-                {
-                    name: 'tools',
-                    items: ['Maximize']
+        num = 1;
+        var body = '';
+        var param = { molding: $('#moldings').val(), period: $('#prd').val() };
+        $.get('{{ url('fetch/workshop/check_molding_vendor/part') }}', param, function (data) {
+            $('#div_part').empty();
+            $.each(data.molding_part, function (i, v) {
+                if (v.molding_type + '_' + v.molding_category == $('#molding_id').val()) {
+                    var cls = v.sudah ? 'part-btn-done' : 'part-btn-pending';
+                    var ico = v.sudah ? 'fa-check' : 'fa-wrench';
+                    body += '<button class="part-btn ' + cls + '" onclick="add_point(\'' + v.part_name + '\')">'
+                          + '<i class="fas ' + ico + '"></i> ' + num + ') ' + v.part_name + '</button>';
+                    num++;
                 }
-            ],
-            height: 100
+            });
+            $('#div_part').html(body || '<span style="color:#a0aec0;font-size:13px;">Tidak ada part ditemukan.</span>');
         });
+    }
 
-        CKEDITOR.replace('perbaikan_sementara', {
-            filebrowserImageBrowseUrl: '{{ url('kcfinder_master') }}',
-            toolbar: [
-                ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
-                {
-                    name: 'basicstyles',
-                    items: ['Bold', 'Italic']
-                },
-                {
-                    name: 'document',
-                    items: ['Source']
-                },
-                {
-                    name: 'tools',
-                    items: ['Maximize']
-                }
-            ],
-            height: 100
+    /* ── ADD POINT ── */
+    function add_point(nama_part) {
+        $('#body_cek').empty();
+        var body = '<tr>';
+        body += '<td>1</td>';
+        body += '<td class="part left" style="font-weight:600;">' + nama_part;
+        if (UrlExists('{{ url('workshop/Audit_Molding/Part_Image') }}/' + $('#molding_id').val() + '/' + nama_part + '.jpg')) {
+            body += '<br><img src="{{ url('workshop/Audit_Molding/Part_Image') }}/' + $('#molding_id').val() + '/' + nama_part + '.jpg" style="max-width:120px;margin-top:8px;border-radius:8px;">';
+        }
+        body += '</td>';
+
+        /* Poin Cek */
+        body += '<td><select class="form-control select3 cek_poin" data-placeholder="Pilih" style="width:100%;" onchange="changeCek(this)">';
+        body += '<option></option>';
+        $.each(check_point, function (i, v) {
+            body += '<option value="' + v.check_point + '">' + v.poin_cek + '</option>';
         });
+        body += '</select></td>';
+        body += '<td class="standar left" style="font-size:12px;"></td>';
+        body += '<td class="cara_cek left" style="font-size:12px;"></td>';
+        body += '<td class="penanganan left" style="font-size:12px;"></td>';
 
-        CKEDITOR.replace('note', {
-            filebrowserImageBrowseUrl: '{{ url('kcfinder_master') }}',
-            toolbar: [
-                ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
-                {
-                    name: 'basicstyles',
-                    items: ['Bold', 'Italic']
-                },
-                {
-                    name: 'document',
-                    items: ['Source']
-                },
-                {
-                    name: 'tools',
-                    items: ['Maximize']
-                }
-            ],
-            height: 100
-        });
+        /* Eviden */
+        body += '<td><div class="photo-group">';
 
-        jQuery(document).ready(function() {
-            $("#wrapper").toggleClass("toggled");
-            $('#molding_select').modal('show');
-            $('.select2').select2({
-                dropdownAutoWidth: true,
-                allowClear: true,
-                dropdownParent: $('#molding_select')
-            });
+        /* Before */
+        body += '<div class="photo-group-lbl"><span class="req">*</span>&nbsp;Foto Before</div>';
+        body += '<input type="file" class="before1" id="img_before1" accept="image/*" onchange="readURL(this,\'img_before1\');" style="display:none;">';
+        body += '<input type="file" class="before2" id="img_before2" accept="image/*" onchange="readURL(this,\'img_before2\');" style="display:none;">';
+        body += '<div class="photo-btn-row"><button class="btn-photo" onclick="buttonImage(this,\'before1\')"><i class="fas fa-camera"></i> Photo 1</button><button class="btn-photo" onclick="buttonImage(this,\'before2\')"><i class="fas fa-camera"></i> Photo 2</button></div>';
+        body += '<div class="photo-previews"><img src="" class="img_before1" alt=""><img src="" class="img_before2" alt=""></div>';
+        body += '<div class="photo-sep"></div>';
 
-            $('.select3').select2({
-                minimumResultsForSearch: -1,
-                dropdownAutoWidth: true,
-                allowClear: true
-            });
+        /* After */
+        body += '<div class="photo-group-lbl"><span class="req">*</span>&nbsp;Foto After</div>';
+        body += '<input type="file" class="after1" accept="image/*" onchange="readURL(this,\'img_after1\');" style="display:none;">';
+        body += '<input type="file" class="after2" accept="image/*" onchange="readURL(this,\'img_after2\');" style="display:none;">';
+        body += '<div class="photo-btn-row"><button class="btn-photo" onclick="buttonImage(this,\'after1\')"><i class="fas fa-camera"></i> Photo 1</button><button class="btn-photo" onclick="buttonImage(this,\'after2\')"><i class="fas fa-camera"></i> Photo 2</button></div>';
+        body += '<div class="photo-previews"><img src="" class="img_after1" alt=""><img src="" class="img_after2" alt=""></div>';
+        body += '<div class="photo-sep"></div>';
 
-            $('.select4').select2({
-                dropdownAutoWidth: true,
-                dropdownParent: $('#modal_history')
-            });
+        /* Aktifitas */
+        body += '<div class="photo-group-lbl">Aktifitas Pekerjaan</div>';
+        body += '<input type="file" class="aktifitas1" accept="image/*" onchange="readURL(this,\'img_aktifitas1\');" style="display:none;">';
+        body += '<input type="file" class="aktifitas2" accept="image/*" onchange="readURL(this,\'img_aktifitas2\');" style="display:none;">';
+        body += '<div class="photo-btn-row"><button class="btn-photo" onclick="buttonImage(this,\'aktifitas1\')"><i class="fas fa-camera"></i> Photo 1</button><button class="btn-photo" onclick="buttonImage(this,\'aktifitas2\')"><i class="fas fa-camera"></i> Photo 2</button></div>';
+        body += '<div class="photo-previews"><img src="" class="img_aktifitas1" alt=""><img src="" class="img_aktifitas2" alt=""></div>';
+        body += '</div></td>';
 
-            $('.select5').select2({
-                dropdownAutoWidth: true,
-                dropdownParent: $('#status_div')
-            });
+        /* Judgement */
+        body += '<td><select class="form-control select3 judgement" data-placeholder="Judgement" style="width:100%;"><option value=""></option><option value="OK">OK</option><option value="NG">NG</option></select></td>';
 
-            $('.datepicker2').datepicker({
-                format: "yyyy-mm-dd",
-                autoclose: true,
-                todayHighlight: true
-            });
-        })
+        /* Action */
+        body += '<td>';
+        body += '<button class="btn-act-sm btn-act-sm-red" style="display:block;margin-bottom:4px;width:32px;" onclick="delete_cek(this)"><i class="fas fa-trash"></i></button>';
+        body += '<button class="btn-act-sm btn-act-sm-yellow" style="display:block;width:32px;" onclick="modal_problem(this)"><i class="fas fa-exclamation-triangle"></i></button>';
+        body += '</td></tr>';
 
-        function selectMolding() {
-            if ($("#moldings").val() == '' || $("#pic").val() == '') {
-                openErrorGritter('Gagal', 'Pilih PIC dan Molding');
-                return false;
+        $('#body_cek').append(body);
+        $('.select3').select2({ minimumResultsForSearch: -1, dropdownAutoWidth: true, allowClear: true });
+    }
+
+    /* ── HELPERS ── */
+    function buttonImage(elem, cls) { $(elem).parent().find('.' + cls).click(); }
+
+    function changeCek(elem) {
+        $.each(check_point, function (i, v) {
+            if ($(elem).val() == v.check_point) {
+                $(elem).closest('tr').find('.standar').text(v.std);
+                $(elem).closest('tr').find('.cara_cek').text(v.how);
+                $(elem).closest('tr').find('.penanganan').text(v.handle2);
             }
+        });
+    }
 
-            $("#molding_id").val($("#moldings").val());
+    function delete_cek(elem) { $(elem).closest('tr').remove(); }
 
-            $("#molding_select").modal('hide');
-            $("#molding_name").text($("#moldings option:selected").text());
-            $("#employee_name").text($("#pic").val() + ' - ' + $("#pic option:selected").text());
-            var type = '';
-            var mold_num = '';
-            
-            $.each(moldings, function(index, value) {
-                if (value.molding_type + "_" + value.molding_category == $("#moldings").val()) {
-                    type = value.molding_type;
-                    mold_num = value.mold_number;
-                    $("#molding_category").val(value.molding_category);
+    function modal_problem(elem) {
+        $('#modal_problem').modal('show');
+        $('#nama_molding').val($('#molding_name').text());
+        $('#nama_part').val($(elem).closest('tr').find('.part').text());
+    }
+
+    /* ── CEK / SUBMIT ── */
+    function cek() {
+        $('#loading').addClass('show');
+        var formData = new FormData();
+        var part = [], cek_poin = [], judgement = [];
+        var status = true, status2 = true;
+        part_err = [];
+
+        $('.part').each(function (i, obj) { if (!$(obj).text()) status = false; part.push($(obj).text()); });
+        if (!status) { openErrorGritter('Error', 'Lengkapi kolom Part'); $('#loading').removeClass('show'); return false; }
+
+        $('.cek_poin').each(function (i, obj) { if (!$(obj).val()) status = false; cek_poin.push($(obj).val()); });
+        if (!status) { openErrorGritter('Error', 'Lengkapi kolom Poin Cek'); $('#loading').removeClass('show'); return false; }
+
+        $('.before1').each(function (i, obj) { if (typeof $(obj).prop('files')[0] === 'undefined') status = false; formData.append('before1_' + i, compressedFiles[i]); });
+        $('.before2').each(function (i, obj) { if (typeof $(obj).prop('files')[0] === 'undefined') status = false; formData.append('before2_' + i, $(obj).prop('files')[0]); });
+        if (!status) { openErrorGritter('Error', 'Lengkapi Foto Before'); $('#loading').removeClass('show'); return false; }
+
+        $('.after1').each(function (i, obj) { if (typeof $(obj).prop('files')[0] === 'undefined') status = false; formData.append('after1_' + i, $(obj).prop('files')[0]); });
+        $('.after2').each(function (i, obj) { if (typeof $(obj).prop('files')[0] === 'undefined') status = false; formData.append('after2_' + i, $(obj).prop('files')[0]); });
+        if (!status) { openErrorGritter('Error', 'Lengkapi Foto After'); $('#loading').removeClass('show'); return false; }
+
+        $('.aktifitas1').each(function (i, obj) { formData.append('aktifitas1_' + i, $(obj).prop('files')[0]); });
+        $('.aktifitas2').each(function (i, obj) { compressedFiles.push($(obj).prop('files')[0]); formData.append('aktifitas2_' + i, compressedFiles[i]); });
+
+        $('.judgement').each(function (i, obj) {
+            if (!$(obj).val()) status = false;
+            judgement.push($(obj).val());
+            if ($(obj).val() == 'NG') {
+                var prt = $('.part').eq(i).text();
+                if (!findItem(part_status, prt)) { part_err.push(prt); status2 = false; }
+            }
+        });
+        if (!status2) { openErrorGritter('Error', 'Lengkapi Form Temuan: ' + part_err.join(', ')); $('#loading').removeClass('show'); return false; }
+        if (!status)  { openErrorGritter('Error', 'Lengkapi kolom Judgement'); $('#loading').removeClass('show'); return false; }
+
+        formData.append('date', '{{ date('Y-m-d') }}');
+        formData.append('molding_name', $('#molding_name').text());
+        formData.append('pic', $('#employee_name').text());
+        formData.append('location', $('#location').text());
+        formData.append('molding_category', $('#molding_category').val());
+        formData.append('part', part);
+        formData.append('cek_poin', cek_poin);
+        formData.append('judgement', judgement);
+        formData.append('molding_type', $('#type_molding').val());
+        formData.append('molding_number', $('#molding_number').val());
+
+        $.ajax({
+            url: "{{ url('post/workshop/check_molding_vendor') }}",
+            method: 'POST', data: formData, dataType: 'JSON',
+            contentType: false, cache: false, processData: false,
+            success: function (response) {
+                $('#loading').removeClass('show');
+                openSuccessGritter('Sukses', 'Pengecekan berhasil tersimpan');
+                selectMolding();
+                $('#body_cek').empty();
+            },
+            error: function (resp) {
+                $('#loading').removeClass('show');
+                openErrorGritter('Error!', resp.responseJSON ? resp.responseJSON.message : 'Terjadi kesalahan');
+            }
+        });
+    }
+
+    /* ── CARI TEMUAN ── */
+    function cariTemuan() {
+        $('#bodyMasalah').empty();
+        var data = { date_from: $('#riwayat_dari').val(), date_to: $('#riwayat_sampai').val() };
+        $.get('{{ url('fetch/workshop/check_molding_vendor/temuan') }}', data, function (result) {
+            if (result.status) {
+                var body = '';
+                $.each(result.datas, function (i, v) {
+                    var sClass = v.status == 'Open' ? 'pill-open' : v.status == 'Temporary Close' ? 'pill-temp' : 'pill-close';
+                    var imgUrl = '{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/';
+                    body += '<tr>';
+                    body += '<td>' + (i+1) + '</td><td>' + v.check_date + '</td><td>' + v.molding_name + '</td><td>' + v.part_name + '</td>';
+                    body += '<td style="text-align:left;">' + v.problem;
+                    if (v.problem_att) {
+                        v.problem_att.split(',').forEach(function (f) { body += '<br><img style="max-width:90px;border-radius:6px;margin:2px;" src="' + imgUrl + f + '">'; });
+                    }
+                    body += '</td>';
+                    body += '<td style="text-align:left;">' + v.handling_temporary;
+                    if (v.handling_att) {
+                        v.handling_att.split(',').forEach(function (f) { body += '<br><img style="max-width:90px;border-radius:6px;margin:2px;" src="' + imgUrl + f + '">'; });
+                    }
+                    body += '</td>';
+                    body += '<td>' + (v.note_problem || '—') + '</td>';
+                    body += '<td><span class="pill ' + sClass + '">' + v.status + '</span></td>';
+                    body += '</tr>';
+                });
+                $('#bodyMasalah').html(body || '<tr><td colspan="8" style="color:#a0aec0;text-align:center;padding:24px;">Tidak ada data.</td></tr>');
+            } else {
+                openErrorGritter('Error', result.message);
+            }
+        });
+    }
+
+    /* ── FETCH DETAIL RECORD ── */
+    function fetchDetailRecord() {
+        $('#loading').addClass('show');
+        var data = { date_from: $('#date_from').val(), date_to: $('#date_to').val(), moldings: $('#molding_select').val() };
+        $.get('{{ url('fetch/workshop/check_molding_vendor/record') }}', data, function (result) {
+            if (result.status) {
+                var html = '';
+                var imgUrl = '{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/';
+                $.each(result.datas, function (k, v) {
+                    var nama = v.pic;
+                    $.each(result.employees, function (k2, v2) { if (v.pic == v2.employee_id) nama = v2.name; });
+                    var jPill = v.judgement == 'OK' ? "<span class='pill pill-ok'>OK</span>" : "<span class='pill pill-ng'>NG</span>";
+                    html += '<tr>';
+                    html += '<td>' + v.id + '</td><td>' + v.check_date + '</td><td>' + v.molding_name + '</td><td>' + nama + '</td><td>' + v.point_check + '</td>';
+                    html += '<td><img style="max-width:80px;border-radius:6px;margin:2px;" src="'+imgUrl+v.photo_before1+'"><img style="max-width:80px;border-radius:6px;margin:2px;" src="'+imgUrl+v.photo_before2+'"></td>';
+                    html += '<td><img style="max-width:80px;border-radius:6px;margin:2px;" src="'+imgUrl+v.photo_after1+'"><img style="max-width:80px;border-radius:6px;margin:2px;" src="'+imgUrl+v.photo_after2+'"></td>';
+                    html += '<td><img style="max-width:80px;border-radius:6px;margin:2px;" src="'+imgUrl+v.photo_activity1+'"><img style="max-width:80px;border-radius:6px;margin:2px;" src="'+imgUrl+v.photo_activity2+'"></td>';
+                    html += '<td>' + jPill + '</td><td>' + (v.status || '—') + '</td></tr>';
+                });
+                $('#bodyTableDetail').html(html || '<tr><td colspan="10" style="color:#a0aec0;text-align:center;padding:24px;">Tidak ada data.</td></tr>');
+                $('#loading').removeClass('show');
+            } else {
+                $('#loading').removeClass('show');
+                openErrorGritter('Error', result.message);
+            }
+        });
+    }
+
+    /* ── SIMPAN TEMUAN ── */
+    function simpanTemuan() {
+        if (CKEDITOR.instances.permasalahan.getData() == '' || CKEDITOR.instances.perbaikan_sementara.getData() == '' || $('#status').val() == '') {
+            openErrorGritter('Gagal', 'Lengkapi semua kolom');
+            return false;
+        }
+        $('#loading').addClass('show');
+        var formData = new FormData();
+        formData.append('date', '{{ date('Y-m-d H:i:s') }}');
+        formData.append('pic', $('#employee_name').text());
+        formData.append('molding_name', $('#nama_molding').val());
+        formData.append('part_name', $('#nama_part').val());
+        formData.append('problem', CKEDITOR.instances.permasalahan.getData());
+        formData.append('handling_temporary', CKEDITOR.instances.perbaikan_sementara.getData());
+        formData.append('notes', CKEDITOR.instances.note.getData());
+        formData.append('status', $('#status').val());
+        ['permasalahan1','permasalahan2','perbaikan1','perbaikan2'].forEach(function (id) {
+            var f = $('#' + id).prop('files')[0];
+            if (f) formData.append(id, f);
+        });
+        $.ajax({
+            url: "{{ url('post/workshop/check_molding_vendor/temuan') }}",
+            method: 'POST', data: formData, dataType: 'JSON',
+            contentType: false, cache: false, processData: false,
+            success: function (data) {
+                if (data.status) {
+                    part_status.push({ part: $('#nama_part').val(), status: $('#status').val() });
+                    openSuccessGritter('Success', data.message);
+                    $('#loading').removeClass('show');
+                    $('#modal_problem').modal('hide');
+                } else {
+                    openErrorGritter('Error!', data.message);
+                    $('#loading').removeClass('show');
                 }
-            })
+            }
+        });
+    }
 
-            $("#type_molding").val(type);
-            $("#molding_number").val(mold_num);
-
-            num = 1;
-            $("#div_part").empty();
-            var body = '';
-            body += "<tr>";
-
-            //get part molding list
-            var param = {
-                molding: $("#moldings").val(),
-                period: $("#prd").val()
+    /* ── IMAGE UTILS ── */
+    function readURL(input, idfile) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var tmp = new Image();
+                tmp.onload = function () {
+                    var c = document.createElement('canvas');
+                    c.width = tmp.width; c.height = tmp.height;
+                    c.getContext('2d').drawImage(tmp, 0, 0);
+                    var compressed = c.toDataURL('image/jpeg', 0.6);
+                    $(input).parent().find('.' + idfile).attr('src', compressed).show();
+                };
+                tmp.src = e.target.result;
             };
-            $.get("{{ url('fetch/workshop/check_molding_vendor/part') }}", param, function(data) {
-                $.each(data.molding_part, function(index, value) {
-                    if (value.molding_type + "_" + value.molding_category == $("#molding_id").val()) {
-                        cls = "btn-danger";
-    
-                        if (value.sudah) {
-                            cls = "btn-success";
-                        }
-                        body += "<td width='1%' style='vertical-align: top'><button class='btn btn-xs " + cls +
-                            "' style='width: 100%; text-align:left' onclick='add_point(\"" + value.part_name + "\")'>" +
-                            num + ") " + value.part_name + "</button></td>";
-    
-    
-                        if (num % 5 === 0 && num != 1) {
-                            body += "</tr>";
-                            body += "<tr>";
-                        }
-    
-                        num++;
-                    }
-                })
-    
-                body += '</tr>';
-    
-                $("#div_part").append(body);
-            });
-
-
+            reader.readAsDataURL(input.files[0]);
         }
+    }
 
-        function add_point(nama_part) {
-            $("#body_cek").empty();
-            var body = '';
-
-            body += '<tr>';
-            body += '<td>1</td>';
-            body += '<td class="part">';
-            body += nama_part;
-
-            if (UrlExists('{{ url('workshop/Audit_Molding/Part_Image') }}' + "/" + $("#molding_id").val() + "/" +
-                    nama_part + ".jpg")) {
-                url = '{{ url('workshop/Audit_Molding/Part_Image') }}' + "/" + $("#molding_id").val() + "/" + nama_part +
-                    ".jpg";
-                body += "<img src='" + url + "' style='max-width: 200px'>";
-            } else {
-                console.log("gambar tidak ada");
-            }
-
-            body += '</td>';
-            body += '<td>';
-            body +=
-                '<select class="form-control select3 cek_poin" data-placeholder="Pilih Poin Cek" style="width: 100%;" onchange="changeCek(this)">';
-            body += '<option></option>';
-            $.each(check_point, function(index, value) {
-                body += '<option value="' + value.check_point + '">' + value.poin_cek + '</option>';
-            })
-            body += '</select>';
-            body += '</td>';
-            body += '<td class="standar">';
-            body += '</td>';
-            body += '<td class="cara_cek">';
-            body += '</td>';
-            body += '<td class="penanganan">';
-            body += '</td>';
-            body += '<td style="font-weight: bold">';
-
-            body += '<span class="text-red">*</span> Foto Before : <br>';
-            body +=
-                '<input type="file" class="before1" id="img_before1" onchange="readURL(this,\'img_before1\');" accept="image/*" style="display: none"> <input type="file" class="before2" id="img_before2" onchange="readURL(this,\'img_before2\');" accept="image/*" style="display: none">';
-            body +=
-                '<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'before1\')"><i class="fa fa-camera"></i> Photo 1</button>&nbsp;<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'before2\')"><i class="fa fa-camera"></i> Photo 2</button> <br>';
-            body +=
-                '<img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image" class="img_before1">&nbsp; <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image" class="img_before2"><hr>';
-
-            body += '<span class="text-red">*</span> Foto After : <br>';
-            body +=
-                '<input type="file" class="after1" style="display: none" onchange="readURL(this,\'img_after1\');" accept="image/*"> <input type="file" class="after2" style="display: none" onchange="readURL(this,\'img_after2\');" accept="image/*">';
-            body +=
-                '<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'after1\')"><i class="fa fa-camera"></i> Photo 1</button>&nbsp;<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'after2\')"><i class="fa fa-camera"></i> Photo 2</button> <br>';
-            body +=
-                '<img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image" class="img_after1">&nbsp; <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image" class="img_after2"><hr>';
-
-            body += 'Aktifitas Pekerjaan : <br>';
-            body +=
-                '<input type="file" class="aktifitas1" onchange="readURL(this,\'img_aktifitas1\');" accept="image/*" style="display: none"> <input type="file" class="aktifitas2" onchange="readURL(this,\'img_aktifitas2\');" accept="image/*" style="display: none">';
-            body +=
-                '<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'aktifitas1\')"><i class="fa fa-camera"></i> Photo 1</button>&nbsp;<button class="btn btn-primary" style="width : 49%" onclick="buttonImage(this,\'aktifitas2\')"><i class="fa fa-camera"></i> Photo 2</button> <br>';
-            body +=
-                '<img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image" class="img_aktifitas1">&nbsp; <img src="" style="display: none;width: 48%; margin-top: 2px" alt="your image" class="img_aktifitas2">';
-            body += '</td>';
-
-            body += '<td>';
-            body += '<select class="form-control select3 judgement" data-placeholder="Judgement" style="width: 100%;">';
-            body += '<option value=""></option>';
-            body += '<option value="OK">OK</option>';
-            body += '<option value="NG">NG</option>';
-            body += '</select>';
-            body += '</td>';
-            body += '<td>';
-            body +=
-                '<button class="btn btn-danger" onclick="delete_cek(this)" style="margin-bottom: 3px"><i class="fa fa-trash"></i></button>';
-            body +=
-                '<button class="btn btn-warning btn_problem" onclick="modal_problem(this)"><i class="fa fa-exclamation-triangle"></i></button>';
-            body += '</td>';
-            body += '</tr>';
-
-            $("#body_cek").append(body);
-
-            $('.select3').select2({
-                minimumResultsForSearch: -1,
-                dropdownAutoWidth: true,
-                allowClear: true
-            });
-
-            // num++;
+    function readURL2(input, idfile) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) { $(input).parent().find('.' + idfile).attr('src', e.target.result).show(); };
+            reader.readAsDataURL(input.files[0]);
         }
-
-        function buttonImage(elem, cls) {
-            $(elem).parent().find("." + cls).click();
-        }
-
-        function changeCek(elem) {
-            $.each(check_point, function(index, value) {
-                if ($(elem).val() == value.check_point) {
-                    $(elem).parent().parent().children(".standar").text(value.std);
-                    $(elem).parent().parent().children(".cara_cek").text(value.how);
-                    $(elem).parent().parent().children(".penanganan").text(value.handle2);
-                }
-            })
-        }
-
-        function cek() {
-            console.log(compressedFiles);
-            $("#loading").show();
-
-            var formData = new FormData();
-
-            var part = [];
-            var cek_poin = [];
-            var judgement = [];
-
-            var status = true;
-            var status2 = true;
-            $('.part').each(function(i, obj) {
-                if ($(obj).text() == '') {
-                    status = false;
-                }
-                part.push($(obj).text());
-            });
-
-            if (!status) {
-                alert('Lengkapi Semua Kolom Part');
-                $("#loading").hide();
-                return false;
-            }
-
-            $('.cek_poin').each(function(i, obj) {
-                if ($(obj).val() == '') {
-                    status = false;
-                }
-
-                cek_poin.push($(obj).val());
-            });
-
-            if (!status) {
-                alert('Lengkapi Semua Kolom Cek Poin');
-                $("#loading").hide();
-                return false;
-            }
-
-            $('.before1').each(function(i, obj) {
-                if (typeof $(obj).prop('files')[0] === 'undefined') {
-                    status = false;
-                }
-                // formData.append('before1_' + i, $(obj).attr('src'));
-
-                // formData append compressedFiles                
-
-
-                formData.append('before1_' + i, compressedFiles[i]);
-
-            });
-
-            $('.before2').each(function(i, obj) {
-                if (typeof $(obj).prop('files')[0] === 'undefined') {
-                    status = false;
-                }
-
-                formData.append('before2_' + i, $(obj).prop('files')[0]);
-            });
-
-            if (!status) {
-                alert('Lengkapi Semua Foto Before');
-                $("#loading").hide();
-                return false;
-            }
-
-            $('.after1').each(function(i, obj) {
-                if (typeof $(obj).prop('files')[0] === 'undefined') {
-                    status = false;
-                }
-
-                formData.append('after1_' + i, $(obj).prop('files')[0]);
-            });
-
-            $('.after2').each(function(i, obj) {
-                if (typeof $(obj).prop('files')[0] === 'undefined') {
-                    status = false;
-                }
-
-                formData.append('after2_' + i, $(obj).prop('files')[0]);
-            });
-
-            if (!status) {
-                alert('Lengkapi Semua Foto After');
-                $("#loading").hide();
-                return false;
-            }
-
-            $('.aktifitas1').each(function(i, obj) {
-                formData.append('aktifitas1_' + i, $(obj).prop('files')[0]);
-            });
-
-            $('.aktifitas2').each(function(i, obj) {
-                // formData.append('aktifitas2_' + i, $(obj).prop('files')[0]);
-                // formData append compressed file
-                compressedFiles.push($(obj).prop('files')[0]);
-                formData.append('aktifitas2_' + i, compressedFiles[i]);
-            });
-
-            $('.judgement').each(function(i, obj) {
-                if ($(obj).val() == '') {
-                    status = false;
-                }
-
-                judgement.push($(obj).val());
-
-                if ($(obj).val() == 'NG') {
-                    // part_status
-
-                    var prt = $('.part').eq(i).text();
-                    if (!findItem(part_status, prt)) {
-                        part_err.push(prt);
-                        status2 = false;
-                    }
-                }
-
-            });
-
-            if (!status2) {
-                alert('Lengkapi Form Temuan untuk Part berikut : ' + part_err.join(", "));
-                $("#loading").hide();
-                return false;
-            }
-
-            if (!status) {
-                alert('Lengkapi Semua Kolom Judgement');
-                $("#loading").hide();
-                return false;
-            }
-
-            formData.append('date', '{{ date('Y-m-d') }}');
-            formData.append('molding_name', $('#molding_name').text());
-            formData.append('pic', $('#employee_name').text());
-            formData.append('location', $('#location').text());
-            formData.append('molding_category', $('#molding_category').val());
-            formData.append('part', part);
-            formData.append('cek_poin', cek_poin);
-            formData.append('judgement', judgement);
-            formData.append('molding_type', $("#type_molding").val());
-            formData.append('molding_number', $("#molding_number").val());
-
-            $.ajax({
-                url: "{{ url('post/workshop/check_molding_vendor') }}",
-                method: "POST",
-                data: formData,
-                dataType: 'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function(response) {
-                    $("#loading").hide();
-
-                    alert('Pengecekan Berhasil Tersimpan');
-
-                    selectMolding();
-
-                    $("#body_cek").empty();
-                },
-                error: function(response) {
-                    $("#loading").hide();
-
-                    openErrorGritter('Error!', response.message);
-                },
-            })
-
-        }
-
-        function fetchDetailRecord() {
-            $('#loading').show();
-            var date_from = $('#date_from').val();
-            var date_to = $('#date_to').val();
-            var moldings = $('#molding_select').val();
-            var pics = $('#molding_select').val();
-
-            var data = {
-                date_from: date_from,
-                date_to: date_to,
-                moldings: moldings
-            }
-            $.get('{{ url('fetch/workshop/check_molding_vendor/record') }}', data, function(result, status, xhr) {
-                if (result.status) {
-                    $('#bodyTableDetail').empty();
-                    var tableData = "";
-
-                    $.each(result.datas, function(key, value) {
-                        tableData += '<tr>';
-                        tableData += '<td>' + value.id + '</td>';
-                        tableData += '<td>' + value.check_date + '</td>';
-                        tableData += '<td>' + value.molding_name + '</td>';
-
-                        var nama = value.pic;
-                        $.each(result.employees, function(key2, value2) {
-                            if (value.pic == value2.employee_id) {
-                                nama = value2.name
-                            }
-                        })
-
-                        tableData += '<td>' + nama + '</td>';
-                        tableData += '<td>' + value.point_check + '</td>';
-                        tableData +=
-                            '<td><img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
-                            value.photo_before1 + '" alt="">';
-                        tableData +=
-                            '<img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
-                            value.photo_before2 + '" alt=""></td>';
-
-                        tableData +=
-                            '<td><img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
-                            value.photo_after1 + '" alt="">';
-                        tableData +=
-                            '<img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
-                            value.photo_after2 + '" alt=""></td>';
-
-                        tableData +=
-                            '<td><img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
-                            value.photo_activity1 + '" alt="">';
-                        tableData +=
-                            '<img style="max-width: 90px; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/check_att') }}/' +
-                            value.photo_activity2 + '" alt=""></td>';
-
-                        tableData += '<td>' + value.judgement + '</td>';
-                        tableData += '<td>' + value.status + '</td>';
-                        tableData += '</tr>';
-                    });
-
-                    $('#bodyTableDetail').append(tableData);
-                    $('#loading').hide();
-                } else {
-                    $('#loading').hide();
-                    openErrorGritter('Error', result.message);
-                }
-            });
-        }
-
-        // function readURL(input, idfile) {
-        //     const files = input.files;
-
-        //     // const files = input.target.files;
-        //     const imagePreview = $('#imagePreview');
-
-        //     // Clear any previous previews
-        //     imagePreview.empty();
-
-        //     for (let i = 0; i < files.length; i++) {
-        //         const file = files[i];
-        //         const option = {
-        //             quality: 0.7,
-        //             maxWidth: 800,
-        //             maxHeight: 600,
-        //         };
-        //         compressImage(file, option)
-        //             .then(function(compressedFile) {
-        //                 // compressedFiles.push(compressedFile);
-        //                 var img = $(input).closest("td").find("." + idfile);
-        //                 $(img).show();
-        //                 $(img).attr('src', compressedFile);
-        //                 console.log(compressedFile);
-        //             })
-        //             .catch(function(error) {
-        //                 console.log(error.message);
-        //             });
-        //     }
-        // }
-
-        function readURL(input, idfile) {
-            if (input.files && input.files[0]) {
-                quality = 60;
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                    var img = $(input).parent().find("." + idfile);
-                    $(img).show();
-
-                    // Create a new image element
-                    var tempImage = new Image();
-
-                    tempImage.onload = function() {
-                        // Create a canvas element
-                        var canvas = document.createElement('canvas');
-                        var ctx = canvas.getContext('2d');
-
-                        // Set the canvas dimensions to the image dimensions
-                        canvas.width = tempImage.width;
-                        canvas.height = tempImage.height;
-
-                        // Draw the image on the canvas
-                        ctx.drawImage(tempImage, 0, 0);
-
-                        // Get the compressed data URL
-                        var compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-
-                        // Set the source of the img element to the compressed data URL
-                        $(img).attr('src', compressedDataUrl);
-                    };
-
-                    // Set the source of the temporary image to the FileReader result
-                    tempImage.src = e.target.result;
-                };
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function readURL2(input, idfile) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                    var img = $(input).parent().find("." + idfile);
-                    $(img).show();
-                    $(img).attr('src', e.target.result);
-                };
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function simpanTemuan() {
-            if (CKEDITOR.instances.permasalahan.getData() == '' || CKEDITOR.instances.perbaikan_sementara.getData() ==
-                '' ||
-                $("#status").val() == '') {
-                openErrorGritter('Gagal', 'Mohon lengkapi semua kolom');
-                return false;
-            }
-
-            $('#loading').show();
-            var formData = new FormData();
-            formData.append('date', '{{ date('Y-m-d H:i:s') }}');
-            formData.append('pic', $("#employee_name").text());
-            formData.append('molding_name', $("#nama_molding").val());
-            formData.append('part_name', $("#nama_part").val());
-            formData.append('problem', CKEDITOR.instances.permasalahan.getData());
-            formData.append('handling_temporary', CKEDITOR.instances.perbaikan_sementara.getData());
-            formData.append('notes', CKEDITOR.instances.note.getData());
-            formData.append('status', $("#status").val());
-
-            $('#permasalahan1').each(function(i, obj) {
-                formData.append('permasalahan1', $(obj).prop('files')[0]);
-            });
-
-            $('#permasalahan2').each(function(i, obj) {
-                formData.append('permasalahan2', $(obj).prop('files')[0]);
-            });
-
-            $('#perbaikan1').each(function(i, obj) {
-                formData.append('perbaikan1', $(obj).prop('files')[0]);
-            });
-
-            $('#perbaikan2').each(function(i, obj) {
-                formData.append('perbaikan2', $(obj).prop('files')[0]);
-            });
-
-            $.ajax({
-                url: "{{ url('post/workshop/check_molding_vendor/temuan') }}",
-                method: "POST",
-                data: formData,
-                dataType: 'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function(data) {
-                    if (data.status) {
-                        part_status.push({
-                            'part': $("#nama_part").val(),
-                            'status': $("#status").val()
-                        });
-                        openSuccessGritter('Success', data.message);
-                        $('#loading').hide();
-                        $('#modal_problem').modal('hide');
-                    } else {
-                        openErrorGritter('Error!', data.message);
-                        $('#loading').hide();
-                    }
-
-                }
-            });
-
-        }
-
-        function delete_cek(elem) {
-            $(elem).closest('tr').remove();
-        }
-
-        function modal_problem(elem) {
-            $("#modal_problem").modal('show');
-            $("#nama_molding").val($("#molding_name").text());
-            $("#nama_part").val($(elem).parent().parent().children('td').eq(1).text());
-        }
-
-        function cariTemuan() {
-            // tableMasalah
-            $("#bodyMasalah").empty();
-            body = '';
-
-            var data = {
-                date_from: $("#riwayat_dari").val(),
-                date_to: $("#riwayat_sampai").val()
-            }
-
-            $.get('{{ url('fetch/workshop/check_molding_vendor/temuan') }}', data, function(result, status, xhr) {
-                if (result.status) {
-                    $.each(result.datas, function(index, value) {
-                        body += "<tr>";
-                        body += "<td>" + (index + 1) + "</td>";
-                        body += "<td>" + value.check_date + "</td>";
-                        body += "<td>" + value.molding_name + "</td>";
-                        body += "<td>" + value.part_name + "</td>";
-                        body += "<td>" + value.problem + "<br>";
-
-                        if (value.problem_att) {
-                            var problem_att = value.problem_att.split(",");
-                            body +=
-                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
-                                problem_att[0] + '" alt="">';
-                            body +=
-                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
-                                problem_att[1] + '" alt="">';
-                        }
-
-                        body += "</td>";
-                        body += "<td>" + value.handling_temporary + "<br>";
-
-                        if (value.handling_att) {
-                            var handling_att = value.handling_att.split(",");
-                            body +=
-                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
-                                handling_att[0] + '" alt="">';
-                            body +=
-                                '<img style="max-width: 50%; margin-bottom: 20px" src="{{ url('workshop/Audit_Molding/Check_Molding/problem_att') }}/' +
-                                handling_att[1] + '" alt="">';
-                        }
-
-                        body += "</td>";
-                        body += "<td>" + (value.note_problem || "") + "</td>";
-
-                        var label = '';
-
-                        if (value.status == "Open")
-                            label = 'badge-danger';
-                        else if (value.status == "Temporary Close")
-                            label = 'badge-warning';
-                        else
-                            label = 'badge-success';
-
-                        body += "<td><center><span class='badge " + label + "'>" + value.status +
-                            "</span></center></td>";
-                        body += "</tr>";
-                    })
-
-                    $("#bodyMasalah").append(body);
-                } else {
-                    openErrorGritter('Error', result.message);
-                }
-            })
-        }
-
-        function openModal(nama_modal) {
-            $("#" + nama_modal).modal('show');
-        }
-
-        function loadMolding(elem) {
-            var molds = <?php echo json_encode($period_cek); ?>;
-            
-            $("#moldings").empty();
-
-            var isi = "<option value=''></option>";
-            $.each(molds, function(index, value) {
-                if (value.period == $(elem).val()) {
-                    isi += "<option value='" + value.molding_type + "_" + value.molding_category + "'>" + value.molding_name + "</option>";
-                }
-            })
-            $("#moldings").append(isi);
-        }
-
-        function openSuccessGritter(title, message) {
-            jQuery.gritter.add({
-                title: title,
-                text: message,
-                class_name: 'growl-success',
-                image: '{{ url('images/image-screen.png') }}',
-                sticky: false,
-                time: '2000'
-            });
-        }
-
-        function openErrorGritter(title, message) {
-            jQuery.gritter.add({
-                title: title,
-                text: message,
-                class_name: 'growl-danger',
-                image: '{{ url('images/image-stop.png') }}',
-                sticky: false,
-                time: '2000'
-            });
-            audio_error.play();
-        }
-
-        function findItem(array, value) {
-            var stts = false;
-            if (array.length > 0) {
-                for (var i = 0; i < array.length; i++) {
-                    if (array[i].part == value) {
-                        stts = true;
-                        return stts;
-                    }
-                }
-                return stts;
-            } else {
-                return stts;
-            }
-        }
-
-        function UrlExists(url) {
-            var http = new XMLHttpRequest();
-            http.open('HEAD', url, false);
-            http.send();
-            return http.status != 404;
-        }
-
-        // Handle the change event for the file input
-        var audio_error = new Audio('{{ url('sounds/error.mp3') }}');
-    </script>
+    }
+
+    /* ── MISC ── */
+    function openModal(id)   { $('#' + id).modal('show'); }
+    function loadMolding(elem) {
+        var molds = <?php echo json_encode($period_cek); ?>;
+        $('#moldings').empty();
+        var isi = '<option value=""></option>';
+        $.each(molds, function (i, v) {
+            if (v.period == $(elem).val())
+                isi += '<option value="' + v.molding_type + '_' + v.molding_category + '">' + v.molding_name + '</option>';
+        });
+        $('#moldings').html(isi);
+    }
+    function findItem(arr, val) {
+        for (var i = 0; i < arr.length; i++) { if (arr[i].part == val) return true; }
+        return false;
+    }
+    function UrlExists(url) {
+        var http = new XMLHttpRequest(); http.open('HEAD', url, false); http.send();
+        return http.status != 404;
+    }
+    var audio_error = new Audio('{{ url('sounds/error.mp3') }}');
+    function openSuccessGritter(title, message) {
+        jQuery.gritter.add({ title: title, text: message, class_name: 'growl-success', image: '{{ url('images/image-screen.png') }}', sticky: false, time: '2000' });
+    }
+    function openErrorGritter(title, message) {
+        jQuery.gritter.add({ title: title, text: message, class_name: 'growl-danger', image: '{{ url('images/image-stop.png') }}', sticky: false, time: '2000' });
+        audio_error.play();
+    }
+</script>
 @endsection

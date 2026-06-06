@@ -1,952 +1,540 @@
 @extends('layouts.master')
-@section('stylesheets')
-    <link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
-    <link href="{{ url('css/bootstrap4.min.css') }}" rel="stylesheet">
-    <link href="{{ url('css/toastr.min.css') }}" rel="stylesheet">
-    <link href="{{ url('css/icheck-bootstrap.min.css') }}" rel="stylesheet">
 
-    <style type="text/css">
-        #loading,
-        #error {
-            display: none;
-        }
+@section('styles')
+<link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
+<link href="{{ url('css/toastr.min.css') }}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    body { background: #f0f2f7 !important; }
+    body p, body span:not([class*="fa"]):not([class*="glyphicon"]),
+    body div, body label, body input, body select, body textarea,
+    body button, body a, body td, body th,
+    body h1, body h2, body h3, body h4, body h5, body h6, body li {
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+    #loading, #error { display: none; }
 
-        table.table-bordered>thead>tr>th {
-            color: white;
-            background-color: black;
-        }
+    /* ══ LOADING ══ */
+    #loading {
+        position: fixed; inset: 0; background: rgba(30,20,60,.45);
+        backdrop-filter: blur(4px); z-index: 9999;
+        display: flex !important; align-items: center; justify-content: center;
+    }
+    .loading-box {
+        background: #fff; border-radius: 20px; padding: 36px 48px;
+        display: flex; flex-direction: column; align-items: center; gap: 14px;
+        box-shadow: 0 12px 40px rgba(0,0,0,.15);
+    }
+    .loading-spinner { width: 42px; height: 42px; border: 3px solid #e2e8f0; border-top-color: #605ca8; border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-box p { font-size: 13px; color: #718096; margin: 0; font-weight: 600; }
 
-        table.table-bordered>tbody>tr>td {
-            color: black;
-            background-color: white;
-        }
+    /* ══ PAGE HEADER ══ */
+    .page-header-modern {
+        background: linear-gradient(135deg, #2d2b4e 0%, #4a4690 50%, #605ca8 100%);
+        padding: 28px 36px 24px; margin: 24px 0 24px; border-radius: 18px;
+        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+        position: relative; overflow: hidden;
+    }
+    .page-header-modern::before { content: ''; position: absolute; right: -40px; top: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.04); }
+    .page-header-modern::after  { content: ''; position: absolute; left: 30%; bottom: -60px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,.03); }
+    .header-left .badge-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); color: #c9c6f0; font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 10px; }
+    .header-left h1 { color: #fff !important; font-size: 26px !important; font-weight: 700 !important; margin: 0 0 4px !important; line-height: 1.2 !important; }
+    .header-left p  { color: rgba(255,255,255,.5); font-size: 13px; margin: 0; }
+    .btn-standar { background: rgba(255,255,255,.15); color: #fff; border: 1.5px solid rgba(255,255,255,.3); border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background .18s; position: relative; z-index: 1; }
+    .btn-standar:hover { background: rgba(255,255,255,.25); }
 
-        #loading {
-            display: none;
-        }
+    /* ══ SECTION CARD ══ */
+    .section-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); border: 1px solid rgba(0,0,0,.05); overflow: hidden; margin-bottom: 20px; }
+    .section-card-header { padding: 14px 22px; border-bottom: 1px solid #f0f2f7; background: #fafbff; display: flex; align-items: center; gap: 10px; }
+    .section-card-header .dot { width: 8px; height: 8px; background: #605ca8; border-radius: 50%; flex-shrink: 0; }
+    .section-card-header h4 { font-size: 13px; font-weight: 700; color: #1a202c; margin: 0; }
+    .section-card-body { padding: 20px 24px; }
 
-        .radio {
-            display: inline-block;
-            position: relative;
-            padding-left: 35px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+    /* ══ INFO GRID ══ */
+    .info-top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 768px) { .info-top-grid { grid-template-columns: 1fr; } }
+    .il { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: #718096; margin-bottom: 5px; display: block; }
+    .iv { display: flex; align-items: center; gap: 8px; background: #fafbff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #1a202c; }
+    .iv i { color: #605ca8; }
 
-        /* Hide the browser's default radio button */
-        .radio input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-        }
+    /* ══ POINT CARDS ══ */
+    .point-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 16px; }
+    @media (max-width: 900px) { .point-grid { grid-template-columns: 1fr 1fr; } }
+    .point-card { border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+    .pc-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; }
+    .pc-val { font-size: 34px; font-weight: 800; line-height: 1; }
+    .pc-produk  { background: #ede9fe; border: 1.5px solid #ddd6fe; } .pc-produk  .pc-lbl, .pc-produk  .pc-val { color: #5b21b6; }
+    .pc-molding { background: #ebf2ff; border: 1.5px solid #c3d9f8; } .pc-molding .pc-lbl, .pc-molding .pc-val { color: #2d6bc4; }
+    .pc-rank { border: 1.5px solid; }
+    .pc-rank-AA { background: #dcfce7; border-color: #bbf7d0; } .pc-rank-AA .pc-lbl, .pc-rank-AA .pc-val { color: #15803d; }
+    .pc-rank-A  { background: #ebf2ff; border-color: #c3d9f8; } .pc-rank-A  .pc-lbl, .pc-rank-A  .pc-val { color: #2d6bc4; }
+    .pc-rank-B  { background: #fef3c7; border-color: #fde68a; } .pc-rank-B  .pc-lbl, .pc-rank-B  .pc-val { color: #b45309; }
+    .pc-rank-C  { background: #fee2e2; border-color: #fecaca; } .pc-rank-C  .pc-lbl, .pc-rank-C  .pc-val { color: #dc2626; }
+    .pc-keputusan { background: #f7f8fc; border: 1.5px solid #edf0f5; border-radius: 14px; padding: 14px 18px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+    .pc-keputusan .pc-lbl { color: #718096; }
+    .pc-keputusan .pc-val { font-size: 13px; font-weight: 600; color: #4a5568; line-height: 1.4; }
 
-        /* Create a custom radio button */
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 25px;
-            width: 25px;
-            background-color: #ccc;
-            border-radius: 50%;
-        }
+    /* ══ UPLOAD AREA ══ */
+    .upload-area { border: 2px dashed #c4bfef; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #faf9ff; transition: border-color .18s; }
+    .upload-area:hover { border-color: #605ca8; }
+    .upload-area .fa { font-size: 28px; color: #c4bfef; display: block; margin-bottom: 8px; }
+    .upload-area p { font-size: 12.5px; color: #718096; margin: 0 0 4px; }
+    .upload-area small { font-size: 11px; color: #a0aec0; }
+    .btn-upload { display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg,#4a4690,#605ca8); color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .18s; margin-top: 10px; }
+    .btn-upload:hover { opacity: .88; }
 
-        /* On mouse-over, add a grey background color */
-        .radio:hover input~.checkmark {
-            background-color: #ccc;
-        }
+    /* ══ LEGENDA ══ */
+    .legenda-wrap { display: flex; gap: 8px; flex-wrap: wrap; }
+    .legenda-item { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 7px; font-size: 11.5px; font-weight: 600; }
+    .leg-dot { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+    .lg-ok   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .lg-ng-m { background: #fff5f5; color: #dc2626; border: 1px solid #fecaca; }
+    .lg-ng-s { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .lg-ok-s { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .lg-isi  { background: #fdf4ff; color: #9333ea; border: 1px solid #e9d5ff; }
 
-        /* When the radio button is checked, add a blue background */
-        .radio input:checked~.checkmark {
-            background-color: #2196F3;
-        }
+    /* ══ DIAGNOSA TABLE ══ */
+    .diag-table { width: 100%; border-collapse: collapse; }
+    .diag-table thead th { background: #f7f8fc; color: #718096; font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; padding: 10px 14px; border-bottom: 2px solid #edf0f5; text-align: center; white-space: nowrap; }
+    .diag-table tbody tr { border-bottom: 1px solid #f0f2f7; }
+    .diag-table tbody td { padding: 10px 12px; font-size: 13px; color: #2d3748; vertical-align: middle; }
+    .row-ng-main { background: #fff8f8; } .row-ng-main:hover { background: #fee2e2 !important; }
+    .row-ng-sub  { background: #f0f8ff; } .row-ng-sub:hover  { background: #dbeafe !important; }
+    .row-ok      { background: #f0fdf4; } .row-ok:hover      { background: #dcfce7 !important; }
+    .row-isi     { background: #fdf4ff; } .row-isi:hover     { background: #f3e8ff !important; }
 
-        /* Create the indicator (the dot/circle - hidden when not checked) */
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
+    /* Radio pills */
+    .radio-grp { display: flex; flex-direction: column; gap: 5px; }
+    .r-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; border: 1.5px solid #e2e8f0; background: #fafbff; transition: all .15s; user-select: none; }
+    .r-pill input[type=radio] { accent-color: #605ca8; cursor: pointer; }
+    .r-pill.ok:has(input:checked)  { background: #f0fdf4; border-color: #15803d; color: #15803d; }
+    .r-pill.ng:has(input:checked)  { background: #fee2e2; border-color: #dc2626; color: #dc2626; }
+    .r-pill.oks:has(input:checked) { background: #fef3c7; border-color: #b45309; color: #b45309; }
 
-        /* Show the indicator (dot/circle) when checked */
-        .radio input:checked~.checkmark:after {
-            display: block;
-        }
+    /* Isi pills */
+    .isi-grp { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+    .isi-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; border: 1.5px solid #e2e8f0; background: #fafbff; transition: all .15s; user-select: none; }
+    .isi-pill input[type=radio] { accent-color: #9333ea; cursor: pointer; }
+    .isi-pill:has(input:checked) { background: #fdf4ff; border-color: #9333ea; color: #9333ea; }
 
-        /* Style the indicator (dot/circle) */
-        .radio .checkmark:after {
-            top: 9px;
-            left: 9px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: white;
-        }
+    /* Poin & cek cells */
+    .poin-cell { font-size: 22px; font-weight: 800; text-align: center; color: #1a202c; }
+    .poin-cell.neg { color: #dc2626; }
+    .cek { font-size: 20px; color: #ddd; display: block; text-align: center; transition: color .18s; }
+    .cek.done { color: #15803d; }
 
-        #tableResult>tbody>tr>td {
-            border: 1px solid #b0bec5;
-        }
+    /* Action buttons */
+    .act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 8px; font-size: 11px; font-weight: 700; border: none; cursor: pointer; transition: opacity .15s; white-space: nowrap; margin: 2px; }
+    .act-btn:hover { opacity: .82; }
+    .ab-photo  { background: #dcfce7; color: #15803d; }
+    .ab-detail { background: #ebf2ff; color: #2d6bc4; }
 
-        hr {
-            margin-top: 2px;
-            margin-bottom: 2px;
-            border-color: black;
-        }
+    /* Total row */
+    .total-row td { background: #f7f8fc !important; font-weight: 700; border-top: 2px solid #edf0f5 !important; }
+    .total-val { font-size: 22px; font-weight: 800; color: #dc2626; text-align: center; }
+    .point-val { font-size: 14px; font-weight: 700; color: #5b21b6; text-align: center; }
 
-        #bodyTableMaster>tr>td {
-            vertical-align: middle;
-        }
-    </style>
+    /* ══ FOOTER ACTIONS ══ */
+    .footer-actions { display: flex; gap: 12px; justify-content: space-between; padding: 18px 24px; border-top: 1px solid #f0f2f7; background: #fafbff; }
+    .btn-temp { display: inline-flex; align-items: center; gap: 8px; background: #fef3c7; color: #b45309; border: 1.5px solid #fde68a; border-radius: 12px; padding: 12px 28px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .18s; }
+    .btn-temp:hover { background: #fde68a; }
+    .btn-save-full { display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg,#15803d,#16a34a); color: #fff; border: none; border-radius: 12px; padding: 12px 32px; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(21,128,61,.28); transition: opacity .18s, transform .18s; }
+    .btn-save-full:hover { opacity: .88; transform: translateY(-1px); }
+
+    /* ══ MODALS ══ */
+    .modal-content { border-radius: 18px !important; overflow: hidden !important; border: none !important; }
+    .modal-hdr { background: linear-gradient(135deg,#2d2b4e,#605ca8); padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-hdr-warn { background: linear-gradient(135deg,#b45309,#d97706); padding: 18px 24px; display: flex; align-items: center; justify-content: center; }
+    .modal-hdr h5, .modal-hdr-warn h5 { color: #fff; font-size: 15px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .modal-hdr .close { color: rgba(255,255,255,.7) !important; font-size: 20px; opacity: 1 !important; }
+    .modal-body-pad { padding: 20px 24px; }
+    .modal-ftr { padding: 14px 24px; border-top: 1px solid #f0f2f7; display: flex; gap: 10px; justify-content: flex-end; background: #fafbff; }
+    .btn-modal-ok   { background: linear-gradient(135deg,#15803d,#16a34a); color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-modal-save { background: linear-gradient(135deg,#4a4690,#605ca8);  color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-modal-cancel { background: #f0f2f7; color: #718096; border: none; border-radius: 10px; padding: 10px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-modal-cancel:hover { background: #e2e8f0; }
+
+    .standar-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 10px; margin-bottom: 8px; }
+    .si-ok  { background: #f0fdf4; border: 1.5px solid #bbf7d0; } .si-ok  .si-lbl { color: #15803d; }
+    .si-ng  { background: #fff5f5; border: 1.5px solid #fecaca; } .si-ng  .si-lbl { color: #dc2626; }
+    .si-oks { background: #fffbeb; border: 1.5px solid #fde68a; } .si-oks .si-lbl { color: #b45309; }
+    .si-lbl { font-weight: 800; font-size: 13px; min-width: 80px; }
+    .si-desc { font-size: 13px; color: #4a5568; line-height: 1.5; }
+
+    .photo-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+    .photo-slot { border: 2px dashed #c4bfef; border-radius: 12px; padding: 16px; text-align: center; background: #faf9ff; }
+    .btn-choose { display: inline-flex; align-items: center; gap: 6px; background: #ebf2ff; color: #2d6bc4; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-choose:hover { background: #c3d9f8; }
+
+    .detail-table { width: 100%; border-collapse: collapse; }
+    .detail-table thead th { background: #f7f8fc; color: #718096; font-size: 11px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; padding: 10px 12px; border-bottom: 2px solid #edf0f5; text-align: center; }
+    .detail-table tbody td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #f0f2f7; vertical-align: middle; text-align: center; }
+    .detail-table tbody tr:last-child td { border-bottom: none; }
+    .btn-del-sm { display: inline-flex; align-items: center; gap: 4px; background: #fee2e2; color: #dc2626; border: none; border-radius: 7px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .btn-del-sm:hover { background: #fecaca; }
+
+    .blinking { animation: blinkingIcon 1s infinite; }
+    @keyframes blinkingIcon { 0%,100%{opacity:1;} 50%{opacity:0;} }
+</style>
 @stop
+
 @section('header')
 @stop
+
 @section('content')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <section class="content" style="padding: 10px">
-        <div id="loading"
-            style="margin: 0px; padding: 0px; position: fixed; right: 0px; top: 0px; width: 100%; height: 100%; background-color: rgb(0,191,255); z-index: 30001; opacity: 0.8; display:none">
-            <p style="position: absolute; color: white; top: 45%; left: 35%;">
-                <span style="font-size: 40px">Loading, Please Wait . . . <i class="fa fa-spin fa-refresh"></i></span>
-            </p>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <input type="hidden" id="green">
-                <h2>Form Diagnosa Molding</h2>
-            </div>
-            <div class="col-md-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">
-                        <button type="button" onclick="$('#modal_info').modal('show')" class="btn btn-info btn-sm">
-                            <i class="fas fa-info-circle"></i> Standar Diagnosa
-                        </button>
-                    </li>
-                </ol>
-            </div>
-        </div>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <div class="container-fluid">
-            <div class="card card-success color-palette-box">
-            <div class="card-header">
-                <h3 class="card-title" style="font-weight: bold"><i class="fas fa-info-circle"></i> Informasi Molding</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-7">
-                        <table style="font-size: 1.2rem; width: 100%">
-                            <tr>
-                                <th>Form Number</th>
-                                <td style="width: 20px; text-align: center">:</td>
-                                <td id="form_number">{{ $form_number }}</td>
-                            </tr>
-                            <tr>
-                                <th>Nama Molding</th>
-                                <td style="width: 20px; text-align: center">:</td>
-                                <td>{{ $molding_name->fixed_asset_name }}</td>
-                            </tr>
-                            <tr>
-                                <th>Poin Produk</th>
-                                <td style="width: 20px; text-align: center">:</td>
-                                <td id="total_point" style="font-weight: bold; font-size: 40px;">100</td>
-                            </tr>
-                            <tr>
-                                <th>Poin Molding</th>
-                                <td style="width: 20px; text-align: center">:</td>
-                                <td id="molding_point" style="font-weight: bold; font-size: 40px;">
-                                    @if(isset($penilaian_molding))
-                                        {{ $penilaian_molding->points }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Ranking</th>
-                                <td style="width: 20px; text-align: center">:</td>
-                                <td id="ranking" style="font-weight: bold; font-size: 40px;">C</td>
-                            </tr>
-                            <tr>
-                                <th>Keputusan</th>
-                                <td style="width: 20px; text-align: center">:</td>
-                                <td id="keputusan">Sulit melanjutkan proses produksi. Perlu peremajaan.</td>
-                            </tr>
-                        </table>
+<div class="container-fluid" style="padding: 0 24px;">
+
+    <div id="loading"><div class="loading-box"><div class="loading-spinner"></div><p>Memproses...</p></div></div>
+
+    {{-- PAGE HEADER --}}
+    <div class="page-header-modern">
+        <div class="header-left">
+            <div class="badge-tag"><i class="fas fa-tasks"></i>&nbsp; Diagnosa Molding</div>
+            <h1>Form Diagnosa Produk</h1>
+            <p>{{ $molding_name->fixed_asset_name }} &mdash; {{ $form_number }}</p>
+        </div>
+        <button class="btn-standar" onclick="$('#modal_info').modal('show')">
+            <i class="fas fa-info-circle"></i> Standar Diagnosa
+        </button>
+    </div>
+
+    {{-- INFORMASI MOLDING --}}
+    <div class="section-card">
+        <div class="section-card-header"><span class="dot"></span><h4><i class="fas fa-cube" style="color:#605ca8;margin-right:6px;"></i> Informasi Molding</h4></div>
+        <div class="section-card-body">
+            <div class="info-top-grid">
+                <div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                        <div><span class="il">Form Number</span><div class="iv"><i class="fas fa-file-alt"></i><span id="form_number">{{ $form_number }}</span></div></div>
+                        <div><span class="il">Nama Molding</span><div class="iv"><i class="fas fa-cube"></i> {{ $molding_name->fixed_asset_name }}</div></div>
                     </div>
-                    <div class="col-md-5">
-                        <div class="form-group d-flex align-items-center">
-                            <div class="custom-file mr-2" style="flex: 1;">
-                                <input type="file" class="custom-file-input" id="customFile" accept="image/*">
-                                <label class="custom-file-label" for="customFile">Masukkan Foto Produk Terlebih Dahulu</label>
-                            </div>
-                            <button type="button" class="btn btn-success mr-2" onclick="uploadImage()"><i class="fas fa-upload"></i> Upload</button>
+                    <div class="point-grid">
+                        <div class="point-card pc-produk">
+                            <span class="pc-lbl">Poin Produk</span>
+                            <span class="pc-val" id="total_point">100</span>
                         </div>
-                        <div class="form-group">
-                            <div>
-                                <center>
-                                    @if($molding_name->photo_product)
-                                        <img src="{{ url('workshop/molding/photo_product/main/' . $molding_name->photo_product) }}" alt="Foto Produk" style="width: 100%; height: auto;" id="photo_product">
-                                    @else
-                                        <i class="fa fa-image" style="font-size: 100px; color: #ccc;"></i>
-                                    @endif
-                                </center>
-                            </div> 
+                        <div class="point-card pc-molding">
+                            <span class="pc-lbl">Poin Molding</span>
+                            <span class="pc-val" id="molding_point">@if(isset($penilaian_molding)){{ $penilaian_molding->points }}@else —@endif</span>
+                        </div>
+                        <div class="point-card pc-rank pc-rank-C" id="ranking_card">
+                            <span class="pc-lbl">Ranking</span>
+                            <span class="pc-val" id="ranking">C</span>
+                        </div>
+                        <div class="pc-keputusan">
+                            <span class="pc-lbl">Keputusan</span>
+                            <span class="pc-val" id="keputusan">Sulit melanjutkan proses produksi. Perlu peremajaan.</span>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- /.card-body -->
-            </div>
-        </div>
-
-        <div class="container-fluid" style="display: none;" id="form_diagnose_container">
-            <div class="card card-primary color-palette-box">
-                <div class="card-header">
-                    <h3 class="card-title" style="font-weight: bold"><i class="fas fa-info-circle"></i> Lembar Diagnosa Produk</h3>
-                </div>
-                <div class="card-body">
-                    <div class="col-12">
-                        <table width="90%">
-                            <tr>
-                                <th rowspan="3" width="15%">Standar Penilaian :</th>
-                                <td width="15%">OK</td>
-                                <td> 0 Poin</td>
-                            </tr>
-                            <tr style="border-top: 1px solid #dee2e6">
-                                <td>NG</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #ffa3a3;">&nbsp;</button> : -10 Poin</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #6dcdf0;">&nbsp;</button> : -5 Poin</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #d4ffb0;">&nbsp;</button> : 0 Poin</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #e9a7fb;">&nbsp;</button> : Mengikuti Tabel Hasil Diagnosa</td>
-                            </tr>
-                            <tr style="border-top: 1px solid #dee2e6">
-                                <td>OK Sementara</td>   
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #ffa3a3;">&nbsp;</button> : -3 Poin</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #6dcdf0;">&nbsp;</button> : -1 Poin</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #d4ffb0;">&nbsp;</button> : 0 Poin</td>
-                                <td style="padding-top: 5px; padding-bottom: 5px;"><button class="btn btn-xs" style="background-color: #e9a7fb;">&nbsp;</button> : Mengikuti Tabel Hasil Diagnosa</td>
-                            </tr>
-                        </table>
-                        <br>
-                        <table class="table table-bordered" id="tableMaster">
-                            <thead>
-                                <tr style="text-align: center; background-color:rgb(147, 40, 255); color: white;">
-                                    <th colspan="2">Jenis NG</th>
-                                    <th>Hasil Diagnosa</th>
-                                    <th width="10%">Pengurangan</th>
-                                    <th width="5%">Cek</th>
-                                    <th width="22%">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="bodyTableMaster">
-                            </tbody>
-                        </table>
+                <div>
+                    <span class="il">Foto Produk</span>
+                    <div class="upload-area" onclick="document.getElementById('customFile').click()">
+                        <i class="fas fa-cloud-upload-alt fa" ></i>
+                        <p>Klik untuk pilih foto produk</p>
+                        <small>Format: JPG, PNG, JPEG</small>
+                        <input type="file" id="customFile" accept="image/*" style="display:none;" onchange="updateFileLabel(this)">
                     </div>
-                </div>
-                <div class="card-footer">
-                    <button type="button" class="btn btn-lg btn-warning float-left" id="btn_save_temp" onclick="saveProductCheckTemp()"><i class="fas fa-save"></i> Simpan Sementara</button>
-                    <button type="button" class="btn btn-lg btn-success float-right" id="btn_save" onclick="saveProductCheck()"><i class="fas fa-check-double"></i> Simpan Sepenuhnya</button>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    <div class="modal fade" id="modal_info" tabindex="-1" role="dialog" aria-labelledby="modalInfoLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                <center>
-                    <h5 class="modal-title" id="modalInfoLabel" style="font-weight: bold; color: red">
-                        <i class="fas fa-bullhorn blinking"></i> Standar Diagnosa
-                    </h5>
-                </center>
-                <style>
-                    .blinking {
-                        animation: blinkingIcon 1s infinite;
-                    }
-                    @keyframes blinkingIcon {
-                        0% { opacity: 1; }
-                        50% { opacity: 0; }
-                        100% { opacity: 1; }
-                    }
-                </style>
-                </div>
-                <div class="modal-body">
-                <table>
-                    <thead>
-                    <tr>
-                        <th style="width: 20%">OK</th>
-                        <th style="width: 20px">:</th>
-                        <td>Yang tidak ada masalah. → Tidak ada masalah berdasarkan hasil keputusan QA.</td>
-                    </tr>
-                    <tr>
-                        <th>NG</th>
-                        <th>:</th>
-                        <td>Ada masalah.</td>
-                    </tr>
-                    <tr>
-                        <th style="vertical-align: top;">OK Sementara</th>
-                        <th style="vertical-align: top;">:</th>
-                        <td>Berdasarkan poin saat ini, QA memutuskan tidak ada masalah, tetapi kedepannya akan menjadi masalah pada saat melanjutkan produksi. <br> Ada penanganan lanjutan setelah dilakukan injection.</td>
-                    </tr>
-                    </thead>
-                </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" data-dismiss="modal"><i class="fas fa-check"></i> Mengerti</button>
+                    <div id="file-label" style="font-size:12px;color:#605ca8;font-weight:600;margin-top:6px;display:none;"></div>
+                    <button type="button" class="btn-upload" onclick="uploadImage()"><i class="fas fa-upload"></i> Upload Foto</button>
+                    @if($molding_name->photo_product)
+                        <img src="{{ url('workshop/molding/photo_product/main/' . $molding_name->photo_product) }}" alt="Foto Produk" style="border-radius:10px;width:100%;height:auto;display:block;margin-top:12px;" id="photo_product">
+                    @else
+                        <div style="text-align:center;padding:24px;color:#ddd;"><i class="fas fa-image" style="font-size:60px;display:block;margin-bottom:8px;"></i><span style="font-size:13px;color:#a0aec0;">Belum ada foto produk</span></div>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="modal_ng" tabindex="-1" role="dialog" aria-labelledby="modalNgLabel" data-bs-backdrop="static" data-bs-keyboard="false">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100 text-center" id="modalNgLabel" style="font-weight: bold; color: red">
-                        Tambah Foto NG
-                    </h5>
-                </div>
-                <div class="modal-body">
-                <table width="100%">
-                    <thead>
-                    <tr>
-                        <th style="width: 20%">Nama NG</th>
-                        <th style="width: 30px">:</th>
-                        <td id="nama_ng" colspan="2"></td>
-                    </tr>
-                    <tr>
-                        <th style="width: 20%">Nomor</th>
-                        <th>:</th>
-                        <td id="nomor" colspan="2"></td>
-                    </tr>
-                    <tr>
-                        <th rowspan="2" style="vertical-align: top;">Foto</th>
-                        <th rowspan="2" style="vertical-align: top;">:</th>
-                        <td style="width: 50%">
-                            <input type="file" id="photo_file_1" class="form-control" style="display:none;" accept="image/*">
-                            <button type="button" id="btn_photo_1" class="btn btn-primary btn-sm" onclick="document.getElementById('photo_file_1').click();"><i class="far fa-image"></i> Choose Image <span style="color: red">*</span></button>
-                        </td>
-                        <td style="width: 50%">
-                            <input type="file" id="photo_file_2" class="form-control" style="display:none;" accept="image/*">
-                            <button type="button" id="btn_photo_2" class="btn btn-primary btn-sm" onclick="document.getElementById('photo_file_2').click();"><i class="far fa-image"></i> Choose Image</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="vertical-align: top;">
-                            <img id="photo_ng_1" src="" alt="Photo NG" style="width: 200px; height: auto; display: none;">
-                            <i class="fa fa-image" style="font-size: 100px; color: #ccc;" id="dummy_photo_1"></i>
-                        </td>
-                        <td style="vertical-align: top;">
-                            <img id="photo_ng_2" src="" alt="Photo NG" style="width: 200px; height: auto; display: none;">
-                            <i class="fa fa-image" style="font-size: 100px; color: #ccc;" id="dummy_photo_2"></i>
-                        </td>
-                    </tr>
-                    </thead>
-                </table>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal" data-dismiss="modal"><i class="fas fa-times"></i> Batal</button>
-                    <button type="button" class="btn btn-success" onclick="savePhotoNg()"><i class="fas fa-check"></i> Simpan</button>
-                </div>
+    {{-- LEMBAR DIAGNOSA --}}
+    <div class="section-card" id="form_diagnose_container" style="display:none;">
+        <div class="section-card-header"><span class="dot"></span><h4><i class="fas fa-clipboard-check" style="color:#605ca8;margin-right:6px;"></i> Lembar Diagnosa Produk</h4></div>
+        <div style="padding:14px 24px;border-bottom:1px solid #f0f2f7;background:#fafbff;">
+            <div style="font-size:11px;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;">Standar Penilaian</div>
+            <div class="legenda-wrap">
+                <span class="legenda-item lg-ok"><span class="leg-dot" style="background:#bbf7d0;"></span> OK — 0 Poin</span>
+                <span class="legenda-item lg-ng-m"><span class="leg-dot" style="background:#ffa3a3;"></span> NG Main — −10 Poin</span>
+                <span class="legenda-item lg-ng-s"><span class="leg-dot" style="background:#6dcdf0;"></span> NG Sub — −5 Poin</span>
+                <span class="legenda-item lg-ok-s"><span class="leg-dot" style="background:#fde68a;"></span> OK Sementara Main −3 / Sub −1</span>
+                <span class="legenda-item lg-isi"><span class="leg-dot" style="background:#e9a7fb;"></span> Isi — Mengikuti tabel</span>
             </div>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="diag-table" id="tableMaster">
+                <thead>
+                    <tr>
+                        <th style="width:40px;">#</th>
+                        <th style="text-align:left;min-width:160px;">Jenis NG</th>
+                        <th style="min-width:240px;">Hasil Diagnosa</th>
+                        <th style="width:80px;">Poin</th>
+                        <th style="width:56px;">Cek</th>
+                        <th style="min-width:190px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="bodyTableMaster"></tbody>
+            </table>
+        </div>
+        <div class="footer-actions">
+            <button type="button" class="btn-temp" id="btn_save_temp" onclick="saveProductCheckTemp()"><i class="fas fa-save"></i> Simpan Sementara</button>
+            <button type="button" class="btn-save-full" id="btn_save" onclick="saveProductCheck()"><i class="fas fa-check-double"></i> Simpan Sepenuhnya</button>
         </div>
     </div>
 
-    <div class="modal fade" id="modal_detail" tabindex="-1" role="dialog" aria-labelledby="modalDetailLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100 text-center" id="modalDetailLabel" style="font-weight: bold; color: #007bff">
-                        Detail NG '<span id="nama_ng_detail"></span>'
-                    </h5>
+</div>
 
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+{{-- MODAL: STANDAR DIAGNOSA --}}
+<div class="modal fade" id="modal_info" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+        <div class="modal-hdr-warn"><h5><i class="fas fa-bullhorn blinking"></i> Standar Diagnosa</h5></div>
+        <div class="modal-body-pad">
+            <div class="standar-item si-ok"><div class="si-lbl"><i class="fas fa-check-circle"></i> OK</div><div class="si-desc">Yang tidak ada masalah. → Tidak ada masalah berdasarkan hasil keputusan QA.</div></div>
+            <div class="standar-item si-ng"><div class="si-lbl"><i class="fas fa-times-circle"></i> NG</div><div class="si-desc">Ada masalah.</div></div>
+            <div class="standar-item si-oks"><div class="si-lbl"><i class="fas fa-exclamation-circle"></i> OK Sementara</div><div class="si-desc">Berdasarkan poin saat ini QA memutuskan tidak ada masalah, tetapi kedepannya akan menjadi masalah. Ada penanganan lanjutan setelah injection.</div></div>
+        </div>
+        <div class="modal-ftr"><button type="button" class="btn-modal-ok" data-bs-dismiss="modal" data-dismiss="modal"><i class="fas fa-check"></i> Mengerti</button></div>
+    </div></div>
+</div>
+
+{{-- MODAL: TAMBAH FOTO NG --}}
+<div class="modal fade" id="modal_ng" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+        <div class="modal-hdr"><h5><i class="fas fa-camera"></i> Tambah Foto NG — <span id="nama_ng"></span></h5></div>
+        <div class="modal-body-pad">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+                <div><span class="il">Nama NG</span><div style="font-size:14px;font-weight:700;color:#1a202c;" id="nama_ng_disp"></div></div>
+                <div><span class="il">Nomor</span><div style="font-size:14px;font-weight:700;color:#605ca8;" id="nomor"></div></div>
+            </div>
+            <div class="photo-upload-grid">
+                <div class="photo-slot">
+                    <i class="fas fa-image" style="font-size:48px;color:#ddd;display:block;margin-bottom:8px;" id="dummy_photo_1"></i>
+                    <img id="photo_ng_1" src="" style="display:none;width:100%;border-radius:8px;">
+                    <input type="file" id="photo_file_1" accept="image/*" style="display:none;">
+                    <button type="button" class="btn-choose" onclick="document.getElementById('photo_file_1').click()"><i class="fas fa-image"></i> Foto 1 <span style="color:#dc2626;">*</span></button>
                 </div>
-                <div class="modal-body">
-                <table class="table table-bordered" id="table_detail" style="width: 100%">
-                    <thead>
-                    <tr>
-                        <th style="width: 1%">No</th>
-                        <th style="width: 10%">Tanggal</th>
-                        <th style="width: 20%">Foto 1</th>
-                        <th style="width: 20%">Foto 2</th>
-                        <th style="width: 5%">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tbody_detail">
-                    </tbody>
-                </table>
+                <div class="photo-slot">
+                    <i class="fas fa-image" style="font-size:48px;color:#ddd;display:block;margin-bottom:8px;" id="dummy_photo_2"></i>
+                    <img id="photo_ng_2" src="" style="display:none;width:100%;border-radius:8px;">
+                    <input type="file" id="photo_file_2" accept="image/*" style="display:none;">
+                    <button type="button" class="btn-choose" onclick="document.getElementById('photo_file_2').click()"><i class="fas fa-image"></i> Foto 2</button>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="modal-ftr">
+            <button type="button" class="btn-modal-cancel" data-dismiss="modal">Batal</button>
+            <button type="button" class="btn-modal-save" onclick="savePhotoNg()"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+    </div></div>
+</div>
+
+{{-- MODAL: DETAIL NG --}}
+<div class="modal fade" id="modal_detail" tabindex="-1">
+    <div class="modal-dialog modal-lg"><div class="modal-content">
+        <div class="modal-hdr">
+            <h5><i class="fas fa-search"></i> Detail NG — <span id="nama_ng_detail"></span></h5>
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body-pad" style="overflow-x:auto;">
+            <table class="detail-table">
+                <thead><tr><th style="width:40px;">No</th><th>Tanggal</th><th>Foto 1</th><th>Foto 2</th><th style="width:80px;">Aksi</th></tr></thead>
+                <tbody id="tbody_detail"></tbody>
+            </table>
+        </div>
+    </div></div>
+</div>
+
 @endsection
+
 @section('scripts')
-    <script src="{{ url('js/bootstrap-toggle.min.js') }}"></script>
-    <script src="{{ url('plugins/timepicker/bootstrap-timepicker.min.js') }}"></script>
-    <!-- <script src="{{ url('js/dataTables.buttons.min.js') }}"></script> -->
-    <!-- <script src="{{ url('js/buttons.flash.min.js') }}"></script> -->
-    <script src="{{ url('js/jszip.min.js') }}"></script>
-    <script src="{{ url('js/vfs_fonts.js') }}"></script>
-    <!-- <script src="{{ url('js/buttons.html5.min.js') }}"></script> -->
-    <!-- <script src="{{ url('js/buttons.print.min.js') }}"></script> -->
-    <!-- <script src="{{ url('js/popper.min.js') }}"></script> -->
-    <script src="{{ url('js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url('js/sweetalert2.min.js') }}"></script>
-    <script src="{{ url('js/toastr.min.js') }}"></script>
-    <script src="https://adminlte.io/themes/v3/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+<script src="{{ url('js/jszip.min.js') }}"></script>
+<script src="{{ url('js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url('js/sweetalert2.min.js') }}"></script>
+<script src="{{ url('js/toastr.min.js') }}"></script>
 
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+<script>
+    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
+
+    var master_check_list = {!! json_encode($master_check_list) !!};
+    var ranks             = {!! json_encode($ranks) !!};
+    var molding_penilaian = {!! isset($penilaian_molding) ? json_encode($penilaian_molding->points) : '0' !!};
+    var audio_error   = new Audio('{{ url("sounds/error.mp3") }}');
+    var audio_success = new Audio('{{ url("sounds/success.mp3") }}');
+
+    jQuery(document).ready(function () {
+        $("#wrapper").toggleClass("toggled");
+        $('#side_diagnosa_molding').addClass('menu-open');
+        $('body').addClass("sidebar-collapse");
+        @if($molding_name->photo_product) $('#form_diagnose_container').show(); getData(); @endif
+        $('#modal_info').modal('show');
+        $('#photo_file_1').on('change', function() { selectPhoto(1); });
+        $('#photo_file_2').on('change', function() { selectPhoto(2); });
+        var loading = document.getElementById('loading');
+        if (loading) {
+            loading.style.setProperty('display', 'none', 'important');
+        }
+    });
+
+    function updateFileLabel(input) {
+        if (input.files && input.files[0]) { $('#file-label').show().text('📎 ' + input.files[0].name); }
+    }
+
+    function updateRankCard() {
+        var molding = parseInt($('#molding_point').text()) || 0;
+        var produk  = parseInt($('#total_point').text())   || 100;
+        var smallest = (molding_penilaian && molding > 0) ? Math.min(produk, molding) : produk;
+        var rankClass = 'pc-rank-C';
+        $.each(ranks, function(k, r) {
+            if (smallest >= r.point) {
+                $('#ranking').text(r.rank); $('#keputusan').text(r.keputusan);
+                rankClass = 'pc-rank-' + r.rank.replace(' ',''); return false;
             }
         });
+        $('#ranking_card').removeClass('pc-rank-AA pc-rank-A pc-rank-B pc-rank-C').addClass(rankClass);
+    }
 
-        var master_check_list = {!! json_encode($master_check_list) !!};
-        var ranks = {!! json_encode($ranks) !!};
+    function getData() {
+        $.get('{{ url("fetch/diagnose_molding/product/check_list") }}', { form_number: $('#form_number').text() }, function(result) {
+            if (!result.status) return;
+            var tData = ''; var ctr = 1;
+            $.each(result.master_check_list, function(key, value) {
+                var rc = '', ng = 0, tmp = 0;
+                if (value.grouping == 'Main' && value.category_check == 'OK/NG')  { rc='row-ng-main'; ng=10; tmp=3; }
+                else if (value.grouping == 'Main' && value.category_check == 'Isi') { rc='row-isi'; }
+                else if (value.grouping == 'Secondary') { rc='row-ng-sub'; ng=5; tmp=1; }
+                else if (!value.grouping) { rc='row-ok'; }
 
-        var molding_penilaian = {!! isset($penilaian_molding) ? json_encode($penilaian_molding->points) : '0' !!};
+                tData += '<tr class="'+rc+'">';
+                tData += '<td style="text-align:center;color:#a0aec0;font-weight:700;font-size:12px;">'+(ctr++)+'<input type="hidden" class="ng_id_val" value="'+value.id+'"></td>';
+                tData += '<td style="font-weight:600;" class="ng_name">'+value.item_ng+'</td>';
 
-        console.log(molding_penilaian);
-        jQuery(document).ready(function() {
-            $("#wrapper").toggleClass("toggled");
+                if (value.category_check == 'OK/NG') {
+                    tData += '<td><div class="radio-grp">';
+                    tData += '<label class="r-pill ok"><input type="radio" name="r3_'+value.id+'" id="OK_'+value.id+'" value="0" onclick="changePengurangan('+value.id+')" tag="OK"> OK</label>';
+                    tData += '<label class="r-pill ng"><input type="radio" name="r3_'+value.id+'" id="NG_'+value.id+'" value="'+ng+'" onclick="changePengurangan('+value.id+')" tag="NG"> NG</label>';
+                    tData += '<label class="r-pill oks"><input type="radio" name="r3_'+value.id+'" id="OK_Sementara_'+value.id+'" value="'+tmp+'" onclick="changePengurangan('+value.id+')" tag="OK Sementara"> OK Sementara</label>';
+                    tData += '</div></td>';
+                } else {
+                    tData += '<td><div class="isi-grp">';
+                    tData += '<label class="isi-pill"><input type="radio" name="r3_'+value.id+'" value="10" onclick="changePengurangan('+value.id+')" tag="1 ~ 10"> 1~10 : −10</label>';
+                    tData += '<label class="isi-pill"><input type="radio" name="r3_'+value.id+'" value="20" onclick="changePengurangan('+value.id+')" tag="11 ~ 30"> 11~30 : −20</label>';
+                    tData += '<label class="isi-pill"><input type="radio" name="r3_'+value.id+'" value="30" onclick="changePengurangan('+value.id+')" tag="31 ~ 50"> 31~50 : −30</label>';
+                    tData += '<label class="isi-pill"><input type="radio" name="r3_'+value.id+'" value="50" onclick="changePengurangan('+value.id+')" tag="> 51"> >51 : −50</label>';
+                    tData += '</div></td>';
+                }
 
-            @if($molding_name->photo_product)
-                $('#form_diagnose_container').show();
-                getData();
-            @endif
-
-            $("#modal_info").modal('show');
-
-            $('.select2').select2({
-                dropdownAutoWidth: true,
-                allowClear: true,
-                dropdownParent: $('#molding_select')
+                tData += '<td class="poin-cell" id="pengurangan_'+value.id+'">0</td>';
+                tData += '<td><i class="fas fa-check cek" id="cek_'+value.id+'"></i></td>';
+                tData += '<td style="text-align:center;">';
+                tData += '<button class="act-btn ab-photo btn_ng" onclick="buatNG('+value.id+',\''+value.item_ng+'\')"><i class="fas fa-camera"></i> Foto NG</button>';
+                tData += '<button class="act-btn ab-detail" onclick="modalDetail('+value.id+',\''+value.item_ng+'\')"><i class="fas fa-info"></i> Detail</button>';
+                tData += '</td></tr>';
             });
-        })
 
-        $(function () {
-            bsCustomFileInput.init();
+            tData += '<tr class="total-row"><td colspan="3" style="text-align:right;padding:12px 14px;">Total Pengurangan</td><td class="total-val" id="total_pengurangan">0</td><td colspan="2" class="point-val">Poin : <span id="total_points">100</span></td></tr>';
+            $('#bodyTableMaster').html(tData);
+
+            var status_form = true;
+            if (result.actual_check_list.length > 0) {
+                if (result.actual_check_list[0].status == 'Closed') status_form = false;
+                $.each(result.actual_check_list, function(k, v) {
+                    $('input[name="r3_'+v.ng_id+'"][value="'+v.actual_deduction+'"]').prop('checked', true);
+                    changePengurangan(v.ng_id);
+                });
+            }
+            if (!status_form) {
+                $.each(result.master_check_list, function(k, v) { $('input[name="r3_'+v.id+'"]').prop('disabled', true); });
+                $('.btn_ng, #btn_save_temp, #btn_save').prop('disabled', true);
+            }
         });
+    }
 
-        $(function () {
-           var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000
-            });
-        })
+    function changePengurangan(id) {
+        var val = parseInt($('input[name="r3_'+id+'"]:checked').val()) || 0;
+        $('#pengurangan_'+id).text(val > 0 ? '-'+val : '0').toggleClass('neg', val > 0);
+        $('#cek_'+id).addClass('done');
+        var total = 0;
+        $('.poin-cell').each(function() { total += Math.abs(parseInt($(this).text().replace('-','')) || 0); });
+        $('#total_pengurangan').text(total > 0 ? '-'+total : '0');
+        $('#total_point, #total_points').text(100 - total);
+        updateRankCard();
+    }
 
-        function getData() {
-            var data = {
-                form_number: $('#form_number').text(),
-            };
-            $.get('{{ url('fetch/diagnose_molding/product/check_list') }}', data, function(result, status, xhr) {
-                if (result.status) {
-                    var tableData = "";
-                    $.each(result.master_check_list, function(key, value) {
-                        var bgcolor = '';
-                        var deduction_ng = 0;
-                        var deduction_temp = 0;
-                        if (value.grouping == 'Main' && value.category_check == 'OK/NG') {
-                            bgcolor = 'background-color:rgb(255, 163, 163);';
-                            deduction_ng = 10;
-                            deduction_temp = 3;
-                        } else if (value.grouping == 'Main' && value.category_check == 'Isi') {
-                            bgcolor = 'background-color:rgb(233, 167, 251);';
-                        } else if (value.grouping == 'Secondary') {
-                            bgcolor = 'background-color:#6dcdf0;';
-                            deduction_ng = 5;
-                            deduction_temp = 1;
-                        } else if (!value.grouping) {
-                            bgcolor = 'background-color:rgb(212, 255, 176);';
-                        }
-
-                        tableData += '<tr style="' + bgcolor + '">';
-                        tableData += '<td class="ng_id">' + value.id + '</td>';
-                        tableData += '<td class="ng_name">' + value.item_ng + '</td>';
-                        if (value.category_check == 'OK/NG') {
-                            tableData += '<td>';
-                            tableData += `<div class="form-group clearfix">
-                                <div class="icheck-success d-inline">
-                                    <input type="radio" name="r3_${value.id}" id="OK_${value.id}" value="0" onclick="changePengurangan(${value.id})" tag="OK">
-                                    <label for="OK_${value.id}">OK</label>
-                                </div>
-                                <div class="icheck-success d-inline">
-                                    <input type="radio" name="r3_${value.id}" id="NG_${value.id}" value="${deduction_ng}" onclick="changePengurangan(${value.id})" tag="NG">
-                                    <label for="NG_${value.id}">NG</label>
-                                </div>
-                                <div class="icheck-success d-inline">
-                                    <input type="radio" name="r3_${value.id}" id="OK_Sementara_${value.id}" value="${deduction_temp}" onclick="changePengurangan(${value.id})" tag="OK Sementara">
-                                    <label for="OK_Sementara_${value.id}">OK Sementara</label>
-                                </div>
-                            </div>`;
-                            tableData += '</td>';
-                        } else {
-                            tableData += '<td>';
-                            tableData += `<div class="form-group clearfix">
-                                <table style="width: 100%;">
-                                    <tr>
-                                        <td style="border: none;">
-                                            <div class="icheck-success d-inline">
-                                                <input type="radio" name="r3_${value.id}" id="10_${value.id}" value="10" onclick="changePengurangan(${value.id})" tag="1 ~ 10">
-                                                <label for="10_${value.id}">1 ~ 10 : -10 Poin</label>
-                                            </div>
-                                        </td>
-                                        <td style="border: none;">
-                                            <div class="icheck-success d-inline">
-                                                <input type="radio" name="r3_${value.id}" id="20_${value.id}" value="20" onclick="changePengurangan(${value.id})" tag="11 ~ 30">
-                                                <label for="20_${value.id}">11 ~ 30 : -20 Poin</label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="border: none;">
-                                            <div class="icheck-success d-inline">
-                                                <input type="radio" name="r3_${value.id}" id="30_${value.id}" value="30" onclick="changePengurangan(${value.id})" tag="31 ~ 50">
-                                                <label for="30_${value.id}">31 ~ 50 : -30 Poin</label>
-                                            </div>
-                                        </td>
-                                        <td style="border: none;">
-                                            <div class="icheck-success d-inline">
-                                                <input type="radio" name="r3_${value.id}" id="50_${value.id}" value="50" onclick="changePengurangan(${value.id})" tag="> 51">
-                                                <label for="50_${value.id}">> 51 : -50 Poin</label>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>`;
-                            tableData += '</td>';
-                        }
-                        tableData += '<td id="pengurangan_' + value.id + '" style="text-align: center; font-weight: bold; font-size: 22px;" class="pengurangan">0</td>';
-                        tableData += '<td id="cek_' + value.id + '" style="text-align: center; font-weight: bold; font-size: 22px; color: #ddd;" class="cek"><i class="fas fa-check"></i></td>';
-                        tableData += '<td><center>';
-                        tableData += '<button class="btn btn-success btn-sm btn_ng" onclick="buatNG(' + value.id + ', \'' + value.item_ng + '\')" style="margin-right: 3px;"><i class="fas fa-plus"></i> Tambah Foto NG</button>';
-                        tableData += '<button class="btn btn-primary btn-sm" onclick="modalDetail(' + value.id + ', \'' + value.item_ng + '\')"><i class="fas fa-info"></i> Lihat Detail</button>';
-                        tableData += '</center></td>';
-                        tableData += '</tr>';
-                    });
-
-                    tableData += '<tr>';
-                    tableData += '<td colspan="3" style="text-align: right; font-weight: bold; font-size: 22px;">Total Pengurangan</td>';
-                    tableData += '<td id="total_pengurangan" style="text-align: center; font-weight: bold; font-size: 20px;">0</td>';
-                    tableData += '<td style="text-align: center; font-weight: bold; font-size: 24px;" colspan="2">Total Point : <span id="total_points">100</span></td>';
-                    tableData += '</tr>';
-                    $('#bodyTableMaster').html(tableData);
-
-                    var status_form = true;
-
-                    if(result.actual_check_list.length > 0) {
-                        if(result.actual_check_list[0].status == 'Closed') {
-                            status_form = false;
-                        }
-
-                        $.each(result.actual_check_list, function(key, value) {
-                            if(value.diagnose_result == 'OK') {
-                                $('input[name="r3_' + value.ng_id + '"][value="' + value.actual_deduction + '"]').prop('checked', true);
-                                changePengurangan(value.ng_id);
-                            } else if(value.diagnose_result == 'NG') {
-                                $('input[name="r3_' + value.ng_id + '"][value="' + value.actual_deduction + '"]').prop('checked', true);
-                                changePengurangan(value.ng_id);
-                            } else if(value.diagnose_result == 'OK Sementara') {
-                                $('input[name="r3_' + value.ng_id + '"][value="' + value.actual_deduction + '"]').prop('checked', true);
-                                changePengurangan(value.ng_id);
-                            } else if (value.ng_id == 1) {
-                                $('input[name="r3_' + value.ng_id + '"][value="' + value.actual_deduction + '"]').prop('checked', true);
-                                changePengurangan(value.ng_id);
-                            }
-                        });
-                    }
-
-                    if(!status_form) {
-                        $.each(result.master_check_list, function(key, value) {
-                            $('input[name="r3_' + value.id + '"]').prop('disabled', true);
-                        });
-
-                        $('.btn_ng').prop('disabled', true);
-                        $('#btn_save_temp').prop('disabled', true);
-                        $('#btn_save').prop('disabled', true);
-                    }
-
-                    if($("#molding_point").text() != "") {
-                        //get the smallest number
-                        var smallest = Math.min(parseInt($("#total_point").text()), parseInt($("#molding_point").text()));
-
-                        // console.log($("#total_produk_point").text());
-                        
-                        $.each(ranks, function(key, value) {
-                            if(smallest >= value.point) {
-                                $("#ranking").text(value.rank);
-                                $("#keputusan").text(value.keputusan);
-                                return false;
-                            }
-                        })
-
-                    }
-                }
-            })
-        }
-
-        function changePengurangan(id) {
-            var value = $('input[name="r3_' + id + '"]:checked').val();
-            if (value == 0) {
-                $('#pengurangan_' + id).text(value);
-            } else {
-                $('#pengurangan_' + id).text("-" + value);
-            }
-
-            var total = 0;
-            $('.pengurangan').each(function() {
-                total += Math.abs(parseInt($(this).text())) || 0;
-            });
-            $('#total_point').text((100 - total));
-
-            if(total > 0) {
-                $('#total_pengurangan').text("-" + total);
-            } else {
-                $('#total_pengurangan').text(total);
-            }
-            $('#total_points').text((100 - total));
-
-            $('#cek_' + id).css('color', '#3a9e54');
-
-            if($("#molding_point").text() != "") {
-                //get the smallest number
-                var smallest = Math.min(parseInt($("#total_point").text()), parseInt($("#molding_point").text()));
-
-                // console.log($("#total_produk_point").text());
-                
-                $.each(ranks, function(key, value) {
-                    if(smallest >= value.point) {
-                        $("#ranking").text(value.rank);
-                        $("#keputusan").text(value.keputusan);
-                        return false;
-                    }
-                })
-
-            }
-        }
-
-        function uploadImage() {
-            // if file not selected
-            if ($('#customFile')[0].files.length == 0) {
-                toastr.error('Mohon pilih file terlebih dahulu')
-                audio_error.play();
-
-                return;
-            }
-
-            $("#loading").show();
-
-            var formData = new FormData();
-            formData.append('image', $('#customFile')[0].files[0]);
-            formData.append('form_number', $('#form_number').text());
-            $.ajax({
-                url: '{{ url("upload/diagnose_molding/product_image") }}',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(result) {
-                    $("#loading").hide();
-                    if (result.status) {
-                        toastr.success(result.message);
-                        $('#customFile').val('');
-                        // $('#photo_product').attr('src', '{{ asset("workshop/molding/photo_product/main/") }}' + result.image);
-                        location.reload();
-                        // $('#form_diagnose_container').show();
-                    } else {
-                        toastr.error(result.message)
-                        audio_error.play();
-                    }
-                },
-                error: function(result) {
-                    $("#loading").hide();
-                        toastr.error(result.message)
-                    audio_error.play();
-                }
-            })
-        }
-
-        function buatNG(id, nama_ng) {
-            $('#modal_ng').modal('show');
-            $('#nomor').text(id);
-            $('#nama_ng').text(nama_ng);
-        }
-
-        function savePhotoNg() {
-            if ($('#photo_file_1')[0].files[0] == null) {
-                toastr.error('Mohon input foto dengan tanda (*) terlebih dahulu');
-                return;
-            }
-
-            $("#loading").show();
-
-            var formData = new FormData();
-            formData.append('nomor', $('#nomor').text());
-            formData.append('nama_ng', $('#nama_ng').text());
-            formData.append('photo_file_1', $('#photo_file_1')[0].files[0]);
-            if ($('#photo_file_2')[0].files[0]) {
-                formData.append('photo_file_2', $('#photo_file_2')[0].files[0]);
-            }
-            formData.append('form_number', $('#form_number').text());
-            $.ajax({
-                url: '{{ url("upload/diagnose_molding/photo_ng") }}',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(result) {
-                    $("#loading").hide();
-                    if (result.status) {
-                        toastr.success(result.message);
-                        $('#modal_ng').modal('hide');
-
-                        $('#photo_file_1').val('');
-                        $('#photo_file_2').val('');
-
-                        $('#dummy_photo_1').show();
-                        $('#photo_ng_1').hide();
-                        $('#photo_ng_1').attr('src', '');
-
-                        if (result.image2) {
-                            $('#dummy_photo_2').show();
-                            $('#photo_ng_2').hide();
-                            $('#photo_ng_2').attr('src', '');
-                        }
-                    } else {
-                        toastr.error(result.message)
-                        audio_error.play();
-                    }
-                },
-                error: function(result) {
-                    $("#loading").hide();
-                    toastr.error(result.message)
-                    audio_error.play();
-                }
-            })
-        }
-
-        function selectPhoto(id) {
-            var file = $('#photo_file_' + id)[0].files[0];
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                $('#photo_ng_' + id).attr('src', reader.result);
-            };
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-            $('#photo_ng_' + id).show();
-            $('#dummy_photo_' + id).hide();
-        }
-
-        //onchange photo_file_1
-        $('#photo_file_1').on('change', function() {
-            selectPhoto(1);
+    function uploadImage() {
+        if ($('#customFile')[0].files.length == 0) { toastr.error('Mohon pilih file terlebih dahulu'); audio_error.play(); return; }
+        $('#loading').show();
+        var fd = new FormData();
+        fd.append('image', $('#customFile')[0].files[0]);
+        fd.append('form_number', $('#form_number').text());
+        $.ajax({ url:'{{ url("upload/diagnose_molding/product_image") }}', type:'POST', data:fd, processData:false, contentType:false,
+            success: function(r) { $('#loading').hide(); if (r.status) { toastr.success(r.message); location.reload(); } else { toastr.error(r.message); audio_error.play(); } },
+            error: function() { $('#loading').hide(); toastr.error('Terjadi kesalahan'); audio_error.play(); }
         });
+    }
 
-        //onchange photo_file_2
-        $('#photo_file_2').on('change', function() {
-            selectPhoto(2);
+    function buatNG(id, nama_ng) { $('#modal_ng').modal('show'); $('#nomor').text(id); $('#nama_ng, #nama_ng_disp').text(nama_ng); }
+
+    function savePhotoNg() {
+        if (!$('#photo_file_1')[0].files[0]) { toastr.error('Foto 1 wajib diisi'); return; }
+        $('#loading').show();
+        var fd = new FormData();
+        fd.append('nomor', $('#nomor').text()); fd.append('nama_ng', $('#nama_ng').text());
+        fd.append('photo_file_1', $('#photo_file_1')[0].files[0]);
+        if ($('#photo_file_2')[0].files[0]) fd.append('photo_file_2', $('#photo_file_2')[0].files[0]);
+        fd.append('form_number', $('#form_number').text());
+        $.ajax({ url:'{{ url("upload/diagnose_molding/photo_ng") }}', type:'POST', data:fd, processData:false, contentType:false,
+            success: function(r) {
+                $('#loading').hide();
+                if (r.status) { toastr.success(r.message); audio_success.play(); $('#modal_ng').modal('hide'); $('#photo_file_1,#photo_file_2').val(''); $('#photo_ng_1,#photo_ng_2').hide().attr('src',''); $('#dummy_photo_1,#dummy_photo_2').show(); }
+                else { toastr.error(r.message); audio_error.play(); }
+            }, error: function() { $('#loading').hide(); toastr.error('Terjadi kesalahan'); audio_error.play(); }
         });
+    }
 
-        function modalDetail(id, nama_ng) {
-            var data = {
-                id: id,
-                form_number: $('#form_number').text()
-            }
-            $('#tbody_detail').html('');
+    function selectPhoto(id) {
+        var file = $('#photo_file_'+id)[0].files[0];
+        if (file) { var r = new FileReader(); r.onloadend = function() { $('#photo_ng_'+id).attr('src',r.result).show(); $('#dummy_photo_'+id).hide(); }; r.readAsDataURL(file); }
+    }
 
-            $.get('{{ url('fetch/diagnose_molding/product_details') }}', data, function(result, status, xhr){
-                if(result.status){
-                    var tableData = '';
-
-                    if(result.product_ng.length > 0){
-                        $.each(result.product_ng, function(key, value) {
-                            tableData += '<tr>';
-                            tableData += '<td>' + value.id + '</td>';
-                            tableData += '<td>' + value.check_at.replace(/ /g, '<br>') + '</td>';
-                            tableData += '<td><img src="{{ asset('workshop/molding/photo_product/ng/') }}/' + value.photo1 + '" alt="Photo 1" style="width: 200px; height: auto;"></td>';
-                            if (value.photo2){
-                                tableData += '<td><img src="{{ asset('workshop/molding/photo_product/ng/') }}/' + value.photo2 + '" alt="Photo 2" style="width: 200px; height: auto;"></td>';
-                            } else {
-                                tableData += '<td></td>';
-                            }
-                            tableData += '<td><button class="btn btn-danger btn-sm" onclick="deleteProductNg(' + value.id + ')"><i class="fas fa-trash"></i> Hapus</button></td>';
-                            tableData += '</tr>';
-                        });
-                    }else{
-                        tableData += '<tr><td colspan="5" style="text-align: center; color: #a5a4a4;">Tidak ada data</td></tr>';
-                    }
-                    $('#tbody_detail').html(tableData);
-                }else{
-                    toastr.error(result.message);
-                    audio_error.play();
-                }
+    function modalDetail(id, nama_ng) {
+        $('#tbody_detail').html('<tr><td colspan="5" style="text-align:center;padding:20px;color:#718096;">Memuat...</td></tr>');
+        $('#modal_detail').modal('show'); $('#nama_ng_detail').text(nama_ng);
+        $.get('{{ url("fetch/diagnose_molding/product_details") }}', { id:id, form_number:$('#form_number').text() }, function(result) {
+            if (!result.status) { toastr.error(result.message); return; }
+            var rows = result.product_ng.length > 0 ? '' : '<tr><td colspan="5" style="text-align:center;color:#a0aec0;padding:16px;">Tidak ada data</td></tr>';
+            $.each(result.product_ng, function(k, v) {
+                rows += '<tr><td>'+(k+1)+'</td><td>'+v.check_at.replace(' ','<br>')+'</td>';
+                rows += '<td><img src="{{ asset("workshop/molding/photo_product/ng/") }}/'+v.photo1+'" style="max-width:110px;border-radius:6px;"></td>';
+                rows += '<td>'+(v.photo2?'<img src="{{ asset("workshop/molding/photo_product/ng/") }}/'+v.photo2+'" style="max-width:110px;border-radius:6px;">':'—')+'</td>';
+                rows += '<td><button class="btn-del-sm" onclick="deleteProductNg('+v.id+')"><i class="fas fa-trash"></i></button></td></tr>';
             });
-            
-            $("#modal_detail").modal('show');
-            $("#nama_ng_detail").text(nama_ng);
-        }
+            $('#tbody_detail').html(rows);
+        });
+    }
 
-        function deleteProductNg(id) {
-            if (confirm('Yakin ingin menghapus data ini?')) {
-                $.ajax({
-                    url: '{{ url('delete/diagnose_molding/product_ng') }}',
-                    type: 'POST',
-                    data: {
-                        id: id,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(result) {
-                        if (result.status) {
-                            toastr.success(result.message);
-                            audio_success.play();
-                            $('#modal_detail').modal('hide');
-                        } else {
-                            toastr.error(result.message);
-                            audio_error.play();
-                        }
-                    },
-                    error: function(result) {
-                        toastr.error(result.message);
-                    }
-                })
-            }
-        }
+    function deleteProductNg(id) {
+        Swal.fire({ title:'Hapus data ini?', icon:'warning', showCancelButton:true, confirmButtonText:'Hapus', cancelButtonText:'Batal', confirmButtonColor:'#dc2626', cancelButtonColor:'#718096' })
+        .then(function(r) { if (r.isConfirmed) { $.post('{{ url("delete/diagnose_molding/product_ng") }}', {id:id, _token:'{{ csrf_token() }}'}, function(res) { if (res.status) { toastr.success(res.message); audio_success.play(); $('#modal_detail').modal('hide'); } else { toastr.error(res.message); audio_error.play(); } }); } });
+    }
 
-        function saveProductCheckTemp() {
-            if(confirm('Yakin ingin menyimpan data ini?')) {
-                var ng_id = [];
-                var ng_name = [];
-                var ng_value_name = [];
-                var ng_value = [];
+    function collectNgData() {
+        var ng_id=[],ng_name=[],ng_value_name=[],ng_value=[];
+        $('.ng_id_val').each(function() { var ids=$(this).val(); $('input[name="r3_'+ids+'"]:checked').each(function() { ng_id.push(ids); ng_value.push($(this).val()); ng_value_name.push($(this).attr('tag')); }); });
+        $('.ng_name').each(function() { ng_name.push($(this).text()); });
+        return { form_number:$('#form_number').text(), total_point:$('#total_points').text(), ng_id, ng_name, ng_value, ng_value_name };
+    }
 
-                $('.ng_id').each(function() {
-                    var ids = $(this).text();
-                    $("input[name='r3_" + ids + "']:checked").each(function() {
-                        ng_id.push(ids);
-                        ng_value.push($(this).val());
-                        ng_value_name.push($(this).attr('tag'));
-                    });
-                });
+    function saveProductCheckTemp() {
+        Swal.fire({ title:'Simpan Sementara?', icon:'question', showCancelButton:true, confirmButtonText:'<i class="fas fa-save"></i> Ya', cancelButtonText:'Batal', confirmButtonColor:'#b45309', cancelButtonColor:'#718096' })
+        .then(function(r) { if (r.isConfirmed) { $.ajax({ url:'{{ url("save/diagnose_molding/product_check") }}', type:'POST', data:collectNgData(), success:function(res){ if(res.status){toastr.success(res.message);audio_success.play();}else{toastr.error(res.message);audio_error.play();} } }); } });
+    }
 
-                $('.ng_name').each(function() {
-                    ng_name.push($(this).text());
-                });
-                
-                var data = {
-                    form_number: $('#form_number').text(),
-                    total_point: $('#total_points').text(),
-                    ng_id: ng_id,
-                    ng_name: ng_name,
-                    ng_value: ng_value,
-                    ng_value_name: ng_value_name,
-                };
-
-                // console.log(data);
-
-                $.ajax({
-                    url: '{{ url('save/diagnose_molding/product_check') }}',
-                    type: 'POST',
-                    data: data,
-                    success: function(result) {
-                        if (result.status) {
-                            toastr.success(result.message);
-                            audio_success.play();
-                        } else {
-                            toastr.error(result.message);
-                            audio_error.play();
-                        }
-                    },
-                    error: function(result) {
-                        toastr.error(result.message);
-                        audio_error.play();
-                    }
-                })
-            }
-        }
-
-        function saveProductCheck() {
-            // get all element with class cek
-            var cek = $('.cek');
-            var belum_cek = 0;
-
-            $.each(cek, function(key, value) {
-                if($(value).css('color') == 'rgb(221, 221, 221)') {
-                    belum_cek++;
-                }
-            })
-            
-            if(belum_cek > 0) {
-                toastr.error('Harap cek semua item');
-                audio_error.play();
-                return;
-            }
-            
-            if(confirm('Yakin ingin menyimpan data ini?')) {
-                var ng_id = [];
-                var ng_name = [];
-                var ng_value_name = [];
-                var ng_value = [];
-
-                $('.ng_id').each(function() {
-                    var ids = $(this).text();
-                    $("input[name='r3_" + ids + "']:checked").each(function() {
-                        ng_id.push(ids);
-                        ng_value.push($(this).val());
-                        ng_value_name.push($(this).attr('tag'));
-                    });
-                });
-
-                $('.ng_name').each(function() {
-                    ng_name.push($(this).text());
-                });
-                
-                var data = {
-                    form_number: $('#form_number').text(),
-                    total_point: $('#total_points').text(),
-                    ng_id: ng_id,
-                    ng_name: ng_name,
-                    ng_value: ng_value,
-                    ng_value_name: ng_value_name,
-                };
-
-                $.ajax({
-                    url: '{{ url("save/diagnose_molding/product_check_real") }}',
-                    type: 'POST',
-                    data: data,
-                    success: function(result) {
-                        if (result.status) {
-                            toastr.success(result.message);
-                            audio_success.play();
-                        } else {
-                            toastr.error(result.message);
-                            audio_error.play();
-                        }
-                    },
-                    error: function(result) {
-                        toastr.error(result.message);
-                        audio_error.play();
-                    }
-                })
-            }
-            
-        }
-        
-        // Handle the change event for the file input
-        var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
-        var audio_success = new Audio('{{ url("sounds/success.mp3") }}');
-    </script>
+    function saveProductCheck() {
+        if ($('.cek:not(.done)').length > 0) { toastr.error('Harap cek semua item terlebih dahulu'); audio_error.play(); return; }
+        Swal.fire({ title:'Simpan Sepenuhnya?', icon:'question', showCancelButton:true, confirmButtonText:'<i class="fas fa-check-double"></i> Ya, Simpan', cancelButtonText:'Batal', confirmButtonColor:'#15803d', cancelButtonColor:'#718096' })
+        .then(function(r) { if (r.isConfirmed) { $.ajax({ url:'{{ url("save/diagnose_molding/product_check_real") }}', type:'POST', data:collectNgData(), success:function(res){ if(res.status){toastr.success(res.message);audio_success.play();}else{toastr.error(res.message);audio_error.play();} } }); } });
+    }
+</script>
 @endsection
