@@ -1099,9 +1099,12 @@ class GeneralAffairController extends Controller
             // $ada_data = 'Ada';
         }
 
+        $pertamax = DB::table('driver_gasoline_prices')->where('type','Pertamax')->first();
+        $dex = DB::table('driver_gasoline_prices')->where('type','Dex')->first();
+
         $bbm = [
-            'Pertamax_12200',
-            'Pertamina Dex_14000'
+            'Pertamax_'.$pertamax->price,
+            'Pertamina Dex_'.$dex->price
         ];
         return view('general_affair.driver.index_task',
             array(
