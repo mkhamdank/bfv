@@ -282,11 +282,6 @@
                     </div>
                 </div>
 
-                <div class="ff scan-field" style="margin-bottom:20px;">
-                    <label><i class="fas fa-id-card" style="margin-right:5px;color:#605ca8;"></i> Scan ID Card Penumpang</label>
-                    <input type="text" id="tag" name="tag" placeholder="Arahkan kursor ke sini lalu scan ID Card..." value="">
-                </div>
-
                 {{-- Stat Cards --}}
                 <div class="stat-row">
                     <div class="stat-card">
@@ -327,6 +322,11 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="ff scan-field" style="margin-bottom:20px;">
+        <label><i class="fas fa-id-card" style="margin-right:5px;color:#605ca8;"></i> Scan ID Card Penumpang</label>
+        <input type="text" id="tag" name="tag" placeholder="Arahkan kursor ke sini lalu scan ID Card..." value="">
     </div>
 
     <style>
