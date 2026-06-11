@@ -240,7 +240,7 @@
     <div class="error-card">
         <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
         <h4>Terjadi Kesalahan</h4>
-        <p>{{ $message }}</p>
+        <p><?php echo $message; ?></p>
         <a href="{{ url('index/driver') }}" class="btn-back" style="display:inline-flex;margin-top:20px;background:#605ca8;border:none;border-radius:10px;padding:10px 20px;color:#fff;font-size:13px;font-weight:600;gap:7px;text-decoration:none;justify-content:center;align-items:center;">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
@@ -257,74 +257,86 @@
 
     {{-- Info Card --}}
     <div class="info-card">
-        <div class="info-card-header">
-            <span class="dot"></span> Informasi Perjalanan
+        <div class="info-card-header" style="cursor:pointer;" data-toggle="collapse" data-target="#accordionInfo" aria-expanded="false">
+            <span class="dot"></span> Informasi Perjalanan & Statistik
+            <i class="fas fa-chevron-down" style="margin-left:auto;transition:transform .3s;"></i>
         </div>
-        <div class="info-card-body">
-            <div class="g2">
-                <div class="ff">
-                    <label>ID</label>
-                    <input type="text" id="id" name="id" readonly value="{{ $id }}" placeholder="Driver ID">
+        <div id="accordionInfo" class="collapse">
+            <div class="info-card-body">
+                <div class="g2">
+                    <div class="ff">
+                        <label>ID</label>
+                        <input type="text" id="id" name="id" readonly value="{{ $id }}" placeholder="Driver ID">
+                    </div>
+                    <div class="ff">
+                        <label>Tanggal</label>
+                        <input type="text" id="date" name="date" readonly value="{{ date('Y-m-d') }}">
+                    </div>
+                    <div class="ff">
+                        <label>Driver</label>
+                        <input type="text" id="driver_name" name="driver_name" readonly value="{{ $detail_attendance->name }}">
+                    </div>
+                    <div class="ff">
+                        <label>Shuttle</label>
+                        <input type="text" id="destination" name="destination" readonly value="{{ $destination }}">
+                    </div>
                 </div>
-                <div class="ff">
-                    <label>Tanggal</label>
-                    <input type="text" id="date" name="date" readonly value="{{ date('Y-m-d') }}">
-                </div>
-                <div class="ff">
-                    <label>Driver</label>
-                    <input type="text" id="driver_name" name="driver_name" readonly value="{{ $detail_attendance->name }}">
-                </div>
-                <div class="ff">
-                    <label>Shuttle</label>
-                    <input type="text" id="destination" name="destination" readonly value="{{ $destination }}">
-                </div>
-            </div>
 
-            <div class="ff scan-field" style="margin-bottom:0;">
-                <label><i class="fas fa-id-card" style="margin-right:5px;color:#605ca8;"></i> Scan ID Card Penumpang</label>
-                <input type="text" id="tag" name="tag" placeholder="Arahkan kursor ke sini lalu scan ID Card..." value="">
+                <div class="ff scan-field" style="margin-bottom:20px;">
+                    <label><i class="fas fa-id-card" style="margin-right:5px;color:#605ca8;"></i> Scan ID Card Penumpang</label>
+                    <input type="text" id="tag" name="tag" placeholder="Arahkan kursor ke sini lalu scan ID Card..." value="">
+                </div>
+
+                {{-- Stat Cards --}}
+                <div class="stat-row">
+                    <div class="stat-card">
+                        <div class="stat-icon si-purple"><i class="fas fa-users"></i></div>
+                        <div>
+                            <div class="stat-val" id="total">0</div>
+                            <div class="stat-lbl">Total Penumpang</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon si-green"><i class="fas fa-sign-in-alt"></i></div>
+                        <div>
+                            <div class="stat-val" id="hadir_masuk">0</div>
+                            <div class="stat-lbl">Hadir Masuk</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon si-red"><i class="fas fa-user-times"></i></div>
+                        <div>
+                            <div class="stat-val" id="belum_hadir_masuk">0</div>
+                            <div class="stat-lbl">Belum Hadir Masuk</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon si-blue"><i class="fas fa-sign-out-alt"></i></div>
+                        <div>
+                            <div class="stat-val" id="hadir_pulang">0</div>
+                            <div class="stat-lbl">Hadir Pulang</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon si-yellow"><i class="fas fa-user-clock"></i></div>
+                        <div>
+                            <div class="stat-val" id="belum_hadir_pulang">0</div>
+                            <div class="stat-lbl">Belum Hadir Pulang</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Stat Cards --}}
-    <div class="stat-row">
-        <div class="stat-card">
-            <div class="stat-icon si-purple"><i class="fas fa-users"></i></div>
-            <div>
-                <div class="stat-val" id="total">0</div>
-                <div class="stat-lbl">Total Penumpang</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon si-green"><i class="fas fa-sign-in-alt"></i></div>
-            <div>
-                <div class="stat-val" id="hadir_masuk">0</div>
-                <div class="stat-lbl">Hadir Masuk</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon si-red"><i class="fas fa-user-times"></i></div>
-            <div>
-                <div class="stat-val" id="belum_hadir_masuk">0</div>
-                <div class="stat-lbl">Belum Hadir Masuk</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon si-blue"><i class="fas fa-sign-out-alt"></i></div>
-            <div>
-                <div class="stat-val" id="hadir_pulang">0</div>
-                <div class="stat-lbl">Hadir Pulang</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon si-yellow"><i class="fas fa-user-clock"></i></div>
-            <div>
-                <div class="stat-val" id="belum_hadir_pulang">0</div>
-                <div class="stat-lbl">Belum Hadir Pulang</div>
-            </div>
-        </div>
-    </div>
+    <style>
+        .info-card-header i {
+            transition: transform .3s ease;
+        }
+        .info-card-header[aria-expanded="false"] i {
+            transform: rotate(-90deg);
+        }
+    </style>
 
     {{-- Attendance Table --}}
     <div class="table-card">
@@ -534,7 +546,7 @@
 
                     table += "<tr>";
                     table += "<td><span class='no-badge'>" + (i + 1) + "</span></td>";
-                    table += "<td>" + new_passenger_all[i].name + "</td>";
+                    table += "<td>" + new_passenger_all[i].name + "<br><span style='font-size:12px;color:#a0aec0;'>" + new_passenger_all[i].employee_id + "</span></td>";
                     table += "<td>" + masukPill + "</td>";
                     table += "<td>" + pulangPill + "</td>";
                     table += "</tr>";
