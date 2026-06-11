@@ -370,7 +370,7 @@
                     <i class="fas fa-receipt" style="margin-right:5px;"></i>
                     Foto Nota Pengisian <span class="req">*</span>
                 </span>
-                <input type="file" id="fileData" name="fileData" accept="image/*" onchange="readURL(this);">
+                <input type="file" id="fileData" name="fileData"  onchange="readURL(this);">
                 <div class="photo-preview" id="previewNota">
                     <img id="blah" src="" alt="Preview Nota">
                 </div>
@@ -383,7 +383,7 @@
                     Foto Odometer &amp; Indikator <strong>Sebelum</strong> Pengisian <span class="req">*</span>
                 </span>
                 <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore"
-                       accept="image/*" onchange="readURLOdoBefore(this);">
+                        onchange="readURLOdoBefore(this);">
                 <div class="photo-preview" id="previewOdoBefore">
                     <img id="blahOdoBefore" src="" alt="Preview Odo Before">
                 </div>
@@ -396,7 +396,7 @@
                     Foto Odometer &amp; Indikator <strong>Setelah</strong> Pengisian <span class="req">*</span>
                 </span>
                 <input type="file" id="fileDataOdoAfter" name="fileDataOdoAfter"
-                       accept="image/*" onchange="readURLOdoAfter(this);">
+                        onchange="readURLOdoAfter(this);">
                 <div class="photo-preview" id="previewOdoAfter">
                     <img id="blahOdoAfter" src="" alt="Preview Odo After">
                 </div>
