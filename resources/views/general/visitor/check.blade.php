@@ -318,7 +318,7 @@
         <div id="errorContainer" style="display: none; margin-top: 28px;">
             <div class="alert-box error">
                 <span class="alert-icon">&#9888;</span>
-                <span>ID Kunjungan atau Email tidak ditemukan. Silakan periksa input Anda dan coba lagi.</span>
+                <span>ID Kunjungan atau Email tidak ditemukan. Silakan Cek input Anda dan coba lagi.</span>
             </div>
         </div>
 

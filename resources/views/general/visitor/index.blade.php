@@ -300,12 +300,12 @@
                 <a href="{{url('index/visitor/input')}}" style="display: block; padding: 11px 16px; background-color: #605ca8; color: white; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s;">Mulai Sekarang</a>
             </div>
 
-            <!-- Periksa Status -->
+            <!-- Cek Status -->
             <div style="border: 1.5px solid #e2dff5; border-radius: 14px; padding: 28px 20px; text-align: center; transition: all 0.3s;">
                 <div style="font-size: 48px; margin-bottom: 14px; color: #605ca8;">🔍</div>
-                <h3 style="font-size: 16px; font-weight: 700; color: #1e1b3a; margin-bottom: 6px;">Periksa<br> Kunjungan</h3>
+                <h3 style="font-size: 16px; font-weight: 700; color: #1e1b3a; margin-bottom: 6px;">Cek<br> Kunjungan</h3>
                 <p style="font-size: 13px; color: #8b87b5; margin-bottom: 18px;">Lihat status permintaan Anda</p>
-                <a href="{{url('index/visitor/check')}}" style="display: block; padding: 11px 16px; background-color: #3d3a5c; color: white; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s;">Periksa Sekarang</a>
+                <a href="{{url('index/visitor/check')}}" style="display: block; padding: 11px 16px; background-color: #3d3a5c; color: white; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s;">Cek Sekarang</a>
             </div>
         </div>
 
