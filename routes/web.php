@@ -712,3 +712,13 @@ Route::get('get/molding/pengiriman', 'App\Http\Controllers\MoldingController@get
 Route::post('post/molding/pengiriman', 'App\Http\Controllers\MoldingController@postPengiriman');
 Route::post('post/molding/pengiriman/kirim', 'App\Http\Controllers\MoldingController@postPengirimanKirim');
 Route::get('approval/molding/pengiriman/{status}/{id}', 'App\Http\Controllers\MoldingController@approvalPengiriman');
+
+Route::get('index/visitor', 'App\Http\Controllers\GeneralController@indexVisitor');
+Route::get('index/visitor/input', 'App\Http\Controllers\GeneralController@indexVisitorInput');
+Route::get('index/visitor/check', 'App\Http\Controllers\GeneralController@indexVisitorCheck');
+Route::post('input/visitor', 'App\Http\Controllers\GeneralController@inputVisitor');
+Route::get('input/visitor/check', 'App\Http\Controllers\GeneralController@inputVisitorCheck');
+Route::post('search/visitor', 'App\Http\Controllers\GeneralController@inputVisitorCheck');
+
+Route::get('index/visitor/safety_induction', 'App\Http\Controllers\GeneralController@indexVisitorSafetyInduction');
+Route::post('input/visitor/safety_induction', 'App\Http\Controllers\GeneralController@inputVisitorSafetyInduction');

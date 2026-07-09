@@ -1171,4 +1171,224 @@ class GeneralController extends Controller
             ->with('message_jp','');
         }
     }
+
+    function indexVisitor()
+    {
+        return view('general.visitor.index');
+    }
+
+    function indexVisitorCheck()
+    {
+        return view('general.visitor.check');
+    }
+
+    function indexVisitorInput()
+    {
+        return view('general.visitor.input');
+    }
+
+    function inputVisitor(Request $request)
+    {
+        try {
+            $start_date = $request->input('start_date');
+            $start_time = $request->input('start_time');
+            $end_date = $request->input('end_date');
+            $end_time = $request->input('end_time');
+            $host = $request->input('host');
+            $purpose = $request->input('purpose');
+            $purpose_details = $request->input('purpose_details');
+            $data_consent = $request->input('data_consent');
+            $visitors = $request->input('visitors');
+            $email = $request->input('email');
+            $company = $request->input('company');
+
+            $visitor_id = 'YMPI-' . strtoupper(substr(md5(rand()), 0, 5));
+            $data_before = DB::table('visitors')->where('visitor_id', $visitor_id)->first();
+            while ($data_before) {
+                $visitor_id = 'YMPI-' . strtoupper(substr(md5(rand()), 0, 5));
+                $data_before = DB::table('visitors')->where('visitor_id', $visitor_id)->first();
+            }
+
+            $input = DB::table('visitors')->insertGetId([
+                'visitor_id' => $visitor_id,
+                'start_date' => $start_date,
+                'start_time' => $start_time,
+                'end_date' => $end_date,
+                'end_time' => $end_time,
+                'email' => $email,
+                'host' => $host,
+                'purpose' => $purpose,
+                'purpose_detail' => $purpose_details,
+                'company' => $company,
+                'data_consent' => $data_consent,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            for ($i = 0; $i < count($visitors); $i++) {
+                DB::table('visitor_details')->insert([
+                    'visitor_id' => $visitor_id,
+                    'name' => $visitors[$i]['full_name'],
+                    'card_id' => $visitors[$i]['id_name'],
+                    'phone' => $visitors[$i]['phone'],
+                    'origin' => $visitors[$i]['origin'],
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+
+            // $mail_to = [];
+            // $bcc = [];
+            // array_push($mail_to, $email);
+            // array_push($bcc, 'ympi-mis-ML@music.yamaha.com');
+
+            // $bodyHtml = '';
+
+            // $bodyHtml = '<!DOCTYPE html>';
+            // $bodyHtml .= '<html>';
+            // $bodyHtml .= '<head>';
+            // $bodyHtml .= '<meta charset="UTF-8">';
+            // $bodyHtml .= '<style>';
+            // $bodyHtml .= 'body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }';
+            // $bodyHtml .= '.container { max-width: 600px; margin: 0 auto; padding: 20px; }';
+            // $bodyHtml .= '.header { background-color: #003f7f; color: white; padding: 20px; text-align: center; }';
+            // $bodyHtml .= '.content { padding: 20px; background-color: #f9f9f9; }';
+            // $bodyHtml .= '.footer { background-color: #f0f0f0; padding: 10px; text-align: center; font-size: 12px; }';
+            // $bodyHtml .= 'ul { list-style-type: none; padding: 0; }';
+            // $bodyHtml .= 'li { padding: 8px 0; border-bottom: 1px solid #ddd; }';
+            // $bodyHtml .= '</style>';
+            // $bodyHtml .= '</head>';
+            // $bodyHtml .= '<body>';
+            // $bodyHtml .= '<div class="container">';
+            // $bodyHtml .= '<div class="header"><h1>Visitor Registration Confirmation</h1></div>';
+            // $bodyHtml .= '<div class="content">';
+            // $bodyHtml .= '<p>Dear ' . htmlspecialchars($visitors[0]['full_name']) . ',</p>';
+            // $bodyHtml .= '<p>Thank you for registering as a visitor at <strong>PT. Yamaha Musical Products Indonesia</strong>.</p>';
+            // $bodyHtml .= '<p>Here are your visitor details:</p>';
+            // $bodyHtml .= '<ul>';
+            // $bodyHtml .= '<li><strong>Visitor ID:</strong> ' . htmlspecialchars($visitor_id) . '</li>';
+            // $bodyHtml .= '<li><strong>Start Date:</strong> ' . htmlspecialchars($start_date) . '</li>';
+            // $bodyHtml .= '<li><strong>Start Time:</strong> ' . htmlspecialchars($start_time) . '</li>';
+            // $bodyHtml .= '<li><strong>End Date:</strong> ' . htmlspecialchars($end_date) . '</li>';
+            // $bodyHtml .= '<li><strong>End Time:</strong> ' . htmlspecialchars($end_time) . '</li>';
+            // $bodyHtml .= '<li><strong>Host:</strong> ' . htmlspecialchars($host) . '</li>';
+            // $bodyHtml .= '<li><strong>Purpose:</strong> ' . htmlspecialchars($purpose) . '</li>';
+            // $bodyHtml .= '<li><strong>Purpose Details:</strong> ' . htmlspecialchars($purpose_details) . '</li>';
+            // $bodyHtml .= '<li><strong>Company:</strong> ' . htmlspecialchars($company) . '</li>';
+            // $bodyHtml .= '</ul>';
+            // $bodyHtml .= '<p>Please present this email and your ID card upon arrival.</p>';
+            // $bodyHtml .= '</div>';
+            // $bodyHtml .= '<div class="footer">';
+            // $bodyHtml .= '<p>Best regards,<br><strong>PT. Yamaha Musical Products Indonesia</strong></p>';
+            // $bodyHtml .= '</div>';
+            // $bodyHtml .= '</div>';
+            // $bodyHtml .= '</body>';
+            // $bodyHtml .= '</html>';
+
+            // Mail::html($bodyHtml, function ($message) use ($mail_to, $bcc) {
+            //     $message
+            //         ->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+            //         ->to($mail_to)
+            //         ->bcc($bcc)
+            //         ->subject('Visitor Registration Confirmation - PT. Yamaha Musical Products Indonesia');
+            // });
+            $response = array(
+                'status' => 'success',
+                'message' => 'Visitor data successfully inputted.',
+                'visitor_id' => $visitor_id
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => 'error',
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputVisitorCheck(Request $request) {
+        try {
+            $visitor_id = $request->input('visitor_id');
+            $visitor = DB::table('visitors')->where('visitor_id', $visitor_id)->orWhere('email', $visitor_id)->first();
+            if ($visitor) {
+                $visitor_details = DB::table('visitor_details')->where('visitor_id', $visitor->visitor_id)->get();
+                $card_id = [];
+                foreach ($visitor_details as $detail) {
+                    $card_id[] = $detail->card_id;
+                }
+                $safety_induction = DB::table('visitor_safety_inductions')->whereIn('card_id', $card_id)->get();
+                $response = array(
+                    'status' => 'success',
+                    'data' => $visitor,
+                    'details' => $visitor_details,
+                    'safety_induction' => $safety_induction
+                );
+            } else {
+                $response = array(
+                    'status' => 'error',
+                    'message' => 'Visitor not found.'
+                );
+            }
+            return Response::json($response);
+        } catch (\Throwable $th) {
+            $response = array(
+                'status' => 'error',
+                'message' => $th->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function indexVisitorSafetyInduction() {
+        return view('general.visitor.safety_induction');
+    }
+
+    function inputVisitorSafetyInduction(Request $request) {
+        try {
+            $card_id = $request->input('card_id');
+            $name = $request->input('name');
+            $data_consent = $request->input('data_consent');
+            $start_induction = $request->input('start_induction');
+            $end_induction = $request->input('end_induction');
+
+            // Check if visitor is still in active period
+            $active_induction = DB::table('visitor_safety_inductions')
+                ->where('card_id', $card_id)
+                ->whereRaw("? BETWEEN start_induction AND end_induction", [now()])
+                ->first();
+
+            if ($active_induction) {
+                $response = array(
+                    'status' => false,
+                    'message' => 'Safety induction masih berlaku. Tidak perlu mengisi ulang.'
+                );
+                return Response::json($response);
+            }else{
+                DB::table('visitor_safety_inductions')->insert([
+                    'card_id' => $card_id,
+                    'name' => $name,
+                    'data_consent' => $data_consent,
+                    'start_induction' => $start_induction,
+                    'end_induction' => $end_induction,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+                $response = array(
+                    'status' => true,
+                    'message' => 'Safety induction completed successfully.'
+                );
+                return Response::json($response);
+            }
+
+            
+        } catch (\Throwable $th) {
+            $response = array(
+                'status' => 'error',
+                'message' => $th->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
 }
+
