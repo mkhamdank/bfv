@@ -303,10 +303,10 @@
 
         @csrf
         <div class="field">
-        <label>No. KTP/SIM</label>
+        <label>No. KTP</label>
         <div class="field-inner">
             <i class="f-icon">🆔</i>
-            <input type="text" name="identity_number" placeholder="Masukkan No. KTP/SIM" required  inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+            <input type="text" name="identity_number" placeholder="Masukkan No. KTP" required  inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
         </div>
         </div>
 

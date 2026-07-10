@@ -704,7 +704,7 @@
             <label>Data Pengunjung</label>
             <div id="first-visitor" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 80px; gap: 10px; margin-bottom: 12px; align-items: flex-end;">
                 <div>
-                    <input type="text" name="visitors[0][id_name]" id="visitors_0_id" placeholder="No. KTP/SIM" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="text" name="visitors[0][id_name]" id="visitors_0_id" placeholder="No. KTP" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
                 </div>
                 <div>
                     <input type="text" name="visitors[0][full_name]" id="visitors_0_name" placeholder="Nama Lengkap" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required onkeyup="this.value = this.value.replace(/[^a-zA-Z\s]/g, '');">
@@ -732,7 +732,7 @@
             newRow.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 80px; gap: 10px; margin-bottom: 12px; align-items: flex-end;';
             
             newRow.innerHTML = `
-                <input type="text" name="visitors[${visitorCount}][id_name]" id="visitors_${visitorCount}_id" placeholder="No. KTP/SIM" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" name="visitors[${visitorCount}][id_name]" id="visitors_${visitorCount}_id" placeholder="No. KTP" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
                 <input type="text" name="visitors[${visitorCount}][full_name]" id="visitors_${visitorCount}_name" placeholder="Nama Lengkap" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required onkeyup="this.value = this.value.replace(/[^a-zA-Z\s]/g, '');">
                 <input type="text" name="visitors[${visitorCount}][phone]" id="visitors_${visitorCount}_phone" placeholder="Nomor Telepon" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
                 <input type="text" name="visitors[${visitorCount}][origin]" id="visitors_${visitorCount}_origin" placeholder="Asal/Kota" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
@@ -1091,6 +1091,16 @@
             }
         }
 
+        function checkEmail(emails) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailPattern.test(emails);
+        }
+
+        function checkNoKtp(id_name) {
+            const ktpPattern = /^[0-9]{16}$/;
+            return ktpPattern.test(id_name);
+        }
+
         function confirmVisitor() {
             if (confirm('Apakah Anda yakin ingin mengirim data pengunjung?')) {
                 document.querySelector('.btn-submit').disabled = true;
@@ -1102,6 +1112,19 @@
                 document.querySelector('.btn-submit').style.pointerEvents = 'none';
                 document.querySelector('.btn-submit').style.opacity = '0.7';
                 document.querySelector('.btn-submit').style.transition = 'all 0.2s';
+
+                if(checkEmail($('input[name="email"]').val()) == false) {
+                    openErrorGritter('Kesalahan', 'Format email tidak valid.');
+                    document.querySelector('.btn-submit').disabled = false;
+                    document.querySelector('.btn-submit').innerText = 'Kirim';
+                    document.querySelector('.btn-submit').style.backgroundColor = '#168027';
+                    document.querySelector('.btn-submit').style.cursor = 'pointer';
+                    document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
+                    document.querySelector('.btn-submit').style.pointerEvents = 'auto';
+                    document.querySelector('.btn-submit').style.opacity = '1';
+                    return false;
+                }
+
 
                 // Kirim formulir
                 const formData = new FormData();
@@ -1120,6 +1143,7 @@
                 formData.append('data_consent', $('input[name="data_consent"]').is(':checked') ? 1 : 0);
 
                 // Tambahkan data pengunjung
+                var salah = 0;
                 $('.visitor-row, #first-visitor').each(function(index) {
                     const id_name = $(this).find(`input[name^="visitors"][name$="[id_name]"]`).val();
                     const full_name = $(this).find(`input[name^="visitors"][name$="[full_name]"]`).val();
@@ -1131,8 +1155,22 @@
                         formData.append(`visitors[${index}][full_name]`, full_name);
                         formData.append(`visitors[${index}][phone]`, phone);
                         formData.append(`visitors[${index}][origin]`, origin);
+                        if(checkNoKtp(id_name) == false) {
+                            salah = 1;
+                        }
                     }
                 });
+                // if(salah == 1) {
+                //     openErrorGritter('Kesalahan', 'Format No. KTP harus 16 digit angka.');
+                //     document.querySelector('.btn-submit').disabled = false;
+                //     document.querySelector('.btn-submit').innerText = 'Kirim';
+                //     document.querySelector('.btn-submit').style.backgroundColor = '#168027';
+                //     document.querySelector('.btn-submit').style.cursor = 'pointer';
+                //     document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
+                //     document.querySelector('.btn-submit').style.pointerEvents = 'auto';
+                //     document.querySelector('.btn-submit').style.opacity = '1';
+                //     return false;
+                // }
 
                 $.ajax({
                     url: '{{ url("input/visitor") }}',
@@ -1148,7 +1186,7 @@
                             openErrorGritter('Kesalahan', response.message);
                             document.querySelector('.btn-submit').disabled = false;
                             document.querySelector('.btn-submit').innerText = 'Kirim';
-                            document.querySelector('.btn-submit').style.backgroundColor = '#605ca8';
+                            document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                             document.querySelector('.btn-submit').style.cursor = 'pointer';
                             document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
                             document.querySelector('.btn-submit').style.pointerEvents = 'auto';
@@ -1159,7 +1197,7 @@
                         openErrorGritter('Kesalahan', 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.');
                         document.querySelector('.btn-submit').disabled = false;
                         document.querySelector('.btn-submit').innerText = 'Kirim';
-                        document.querySelector('.btn-submit').style.backgroundColor = '#605ca8';
+                        document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                         document.querySelector('.btn-submit').style.cursor = 'pointer';
                         document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
                         document.querySelector('.btn-submit').style.pointerEvents = 'auto';
