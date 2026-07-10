@@ -1016,6 +1016,7 @@
                     <p class="text-muted" style="font-size: 13px; margin-top: 15px; margin-bottom: 0;">Scan QR Code di atas untuk masuk ke halaman tes.</p>
                     {{-- <p class="text-muted" style="font-size: 11px; margin-top: 15px; margin-bottom: 0;">https://10.109.33.34/bfv/public/index/ympi_recruitment</p> --}}
                     <p class="text-muted" style="font-size: 11px; margin-top: 15px; margin-bottom: 0;">https://ympi.co.id/bfv/public/index/ympi_recruitment</p>
+                    <a href="https://ympi.co.id/bfv/public/index/ympi_recruitment" target="_blank" class="btn btn-primary mt-3">Buka Halaman Tes</a>
                 </div>
                 <div class="mf">
                     <button type="button" class="btn-mf btn-cancel" data-bs-dismiss="modal">Tutup</button>
