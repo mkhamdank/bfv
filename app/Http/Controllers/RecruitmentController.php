@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendEmail;
-use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +16,9 @@ use Response;
 use Yajra\DataTables\Facades\DataTables;
 // use DataTables;
 
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
+
 class RecruitmentController extends Controller
 {
     public function __construct()
@@ -28,8 +30,8 @@ class RecruitmentController extends Controller
                 die();
             }
         }
-        $this->column = ['aa','ab','ba','bb','ca','cb','da','db','ea','eb','fa','fb','ga','gb','ha','hb','ia','ib','ja','jb','ka','kb','la','lb','ma','mb','na','nb','oa','ob','pa','pb','qa','qb','ra','rb','sa','sb','ta','tb','ua','ub','va','vb','wa','wb','xa','xb','ya','yb'];
-        $this->row = [35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+        $this->column = ['aa', 'ab', 'ba', 'bb', 'ca', 'cb', 'da', 'db', 'ea', 'eb', 'fa', 'fb', 'ga', 'gb', 'ha', 'hb', 'ia', 'ib', 'ja', 'jb', 'ka', 'kb', 'la', 'lb', 'ma', 'mb', 'na', 'nb', 'oa', 'ob', 'pa', 'pb', 'qa', 'qb', 'ra', 'rb', 'sa', 'sb', 'ta', 'tb', 'ua', 'ub', 'va', 'vb', 'wa', 'wb', 'xa', 'xb', 'ya', 'yb'];
+        $this->row = [35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
     }
 
     public function index()
@@ -37,7 +39,7 @@ class RecruitmentController extends Controller
         $title = "Rekrutmen PT. YMPI";
         $title_jp = "Rekrutmen PT. YMPI";
 
-        $compact = ['title','title_jp'];
+        $compact = ['title', 'title_jp'];
         return view('recruitment.index', compact($compact));
     }
 
@@ -45,7 +47,7 @@ class RecruitmentController extends Controller
     {
         $participantId = $request->participant_id;
         $date = $request->test_date ?? date('Y-m-d');
-        $checkTest = DB::table('recruitment_kraepelin_answers')
+        $checkTest = DB::connection('bfv')->table('recruitment_kraepelin_answers')
             ->where('date', $date)
             ->where('participant_id', $participantId)
             ->whereIn('column_number', [50])
@@ -57,9 +59,9 @@ class RecruitmentController extends Controller
     public function checkOpeningTest(Request $request)
     {
         $type = 'opening_kraepelin_test';
-        $setting = DB::table('recruitment_settings')->where('type', $type)->first();
+        $setting = DB::connection('bfv')->table('recruitment_settings')->where('type', $type)->first();
         $status = 'close';
-        if($setting){
+        if ($setting) {
             $status = $setting->status;
         }
         return $status;
@@ -67,14 +69,14 @@ class RecruitmentController extends Controller
 
     public function kraepelinTest(Request $request)
     {
-        if(!session('session_ympi_recruitment')){
+        if (!session('session_ympi_recruitment')) {
             return redirect(url('index/ympi_recruitment'));
         }
 
         $title = "Tes Kraepelin";
         $title_jp = $title;
 
-        $getQuestion = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
+        $getQuestion = DB::connection('bfv')->table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
         $listQuestions = [];
         foreach ($getQuestion as $key => $val) {
             $listQuestions[$val->coordinate] = $val->coordinate_value;
@@ -86,7 +88,7 @@ class RecruitmentController extends Controller
         $request->test_date = date('Y-m-d');
         $testDone = $this->checkTest($request);
 
-        $compact = ['title','title_jp', 'columnQuestions','listQuestions', 'testDone'];
+        $compact = ['title', 'title_jp', 'columnQuestions', 'listQuestions', 'testDone'];
         return view('recruitment.kraepelin', compact($compact));
     }
 
@@ -108,11 +110,11 @@ class RecruitmentController extends Controller
         }
 
         DB::beginTransaction();
-        try{
+        try {
             $cardId = $request->card_id;
-            $checkParticipant = DB::table('recruitment_participants')->where('card_id', $cardId)->first();
+            $checkParticipant = DB::connection('bfv')->table('recruitment_participants')->where('card_id', $cardId)->first();
 
-            if($checkParticipant){
+            if ($checkParticipant) {
                 $name = $checkParticipant->name;
                 $address = $checkParticipant->address;
                 $phone = $checkParticipant->phone;
@@ -170,7 +172,7 @@ class RecruitmentController extends Controller
         }
 
         DB::beginTransaction();
-        try{
+        try {
             $cardId = $request->card_id;
             $name = $request->name;
             $birthPlace = $request->birth_place;
@@ -192,14 +194,14 @@ class RecruitmentController extends Controller
                 'school' => $school,
             ];
 
-            $checkParticipant = DB::table('recruitment_participants')->where('card_id', $cardId)->first();
-            if(!$checkParticipant){
+            $checkParticipant = DB::connection('bfv')->table('recruitment_participants')->where('card_id', $cardId)->first();
+            if (!$checkParticipant) {
                 $dataParticipant['created_at'] = date('Y-m-d H:i:s');
-                $insertParticipant = DB::table('recruitment_participants')->insertGetId($dataParticipant);
+                $insertParticipant = DB::connection('bfv')->table('recruitment_participants')->insertGetId($dataParticipant);
                 $participantId = $insertParticipant;
             } else {
                 $dataParticipant['updated_at'] = date('Y-m-d H:i:s');
-                $checkParticipant = DB::table('recruitment_participants')->where('card_id', $cardId)->update($dataParticipant);
+                $checkParticipant = DB::connection('bfv')->table('recruitment_participants')->where('card_id', $cardId)->update($dataParticipant);
                 $participantId = $checkParticipant->id;
             }
 
@@ -239,20 +241,20 @@ class RecruitmentController extends Controller
         }
 
         DB::beginTransaction();
-        try{
+        try {
             $testDate = $request->test_date;
             $testType = $request->test_type;
             $name = $request->name;
 
             $sessionIdTest = session('session_ympi_recruitment')['participant_id'];
-            $checkTest = DB::table('recruitment_participant_tests')
+            $checkTest = DB::connection('bfv')->table('recruitment_participant_tests')
                 ->where('test_date', $testDate)
                 ->where('test_type', $testType)
                 ->where('participant_id', $sessionIdTest)
                 ->first();
 
-            if($checkTest){
-                $checkTest = DB::table('recruitment_participant_tests')
+            if ($checkTest) {
+                $checkTest = DB::connection('bfv')->table('recruitment_participant_tests')
                     ->where('test_date', $testDate)
                     ->where('test_type', $testType)
                     ->where('participant_id', $sessionIdTest)
@@ -266,7 +268,7 @@ class RecruitmentController extends Controller
                     'created_by' => @$sessionIdTest,
                     'created_at' => date('Y-m-d H:i:s')
                 ];
-                $checkTest = DB::table('recruitment_participant_tests')->insert($dataParticipantTest);
+                $checkTest = DB::connection('bfv')->table('recruitment_participant_tests')->insert($dataParticipantTest);
             }
 
             DB::commit();
@@ -283,48 +285,48 @@ class RecruitmentController extends Controller
     {
         ini_set('max_execution_time', -1);
         DB::beginTransaction();
-        try{
+        try {
             $dataAnswer = $request->data_answer ? json_decode($request->data_answer) : [];
-            if(count($dataAnswer) > 0){
+            if (count($dataAnswer) > 0) {
                 foreach ($dataAnswer as $key => $val) {
-                    $thisAnswer = json_decode($val[0]);
+                    $thisAnswer = is_string($val[0]) ? json_decode($val[0]) : $val[0];
                     $dataResult = [];
                     foreach ($thisAnswer as $k => $item) {
-                        if($item->name == 'answer'){
+                        if ($item->name == 'answer') {
                             $answerValue = $item->value == '' ? '' : $item->value;
-                        } 
-                        if($item->name == 'coordinate'){
+                        }
+                        if ($item->name == 'coordinate') {
                             $coordinate = $item->value;
-                        } 
-                        if($item->name == 'column_number'){
+                        }
+                        if ($item->name == 'column_number') {
                             $columnNumber = $item->value;
                         }
-                        if($item->name == 'participant_id'){
+                        if ($item->name == 'participant_id') {
                             $participantId = $item->value;
                         }
-                        if($item->name == 'date'){
+                        if ($item->name == 'date') {
                             $date = $item->value;
                         }
                     }
 
                     $dataKraepelin = [
-                        'coordinate'        => $coordinate,
-                        'column_number'     => $columnNumber,
-                        'answer'            => $answerValue,
-                        'date'              => $date,
-                        'participant_id'    => $participantId,
+                        'coordinate' => $coordinate,
+                        'column_number' => $columnNumber,
+                        'answer' => $answerValue,
+                        'date' => $date,
+                        'participant_id' => $participantId,
                     ];
-                    
-                    $checkAnswer = DB::table('recruitment_kraepelin_answers')
+
+                    $checkAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
                         ->where('coordinate', $coordinate)
                         ->where('date', $date)
                         ->where('participant_id', $participantId)
                         ->first();
 
-                    if($checkAnswer){
+                    if ($checkAnswer) {
                         $dataKraepelin['updated_by'] = $participantId;
                         $dataKraepelin['updated_at'] = date('Y-m-d H:i:s');
-                        $storeAnswer = DB::table('recruitment_kraepelin_answers')
+                        $storeAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
                             ->where('coordinate', $coordinate)
                             ->where('date', $date)
                             ->where('participant_id', $participantId)
@@ -332,11 +334,11 @@ class RecruitmentController extends Controller
                     } else {
                         $dataKraepelin['created_by'] = $participantId;
                         $dataKraepelin['created_at'] = date('Y-m-d H:i:s');
-                        $storeAnswer = DB::table('recruitment_kraepelin_answers')->insert($dataKraepelin);
-                        if(!$storeAnswer){
+                        $storeAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')->insert($dataKraepelin);
+                        if (!$storeAnswer) {
                             continue;
                         }
-                    }    
+                    }
                     DB::commit();
                 }
             }
@@ -353,4 +355,5 @@ class RecruitmentController extends Controller
             return Response::json($response);
         }
     }
+
 }

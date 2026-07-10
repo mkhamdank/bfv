@@ -30,8 +30,8 @@ class RecruitmentHrController extends Controller
             }
         }
         $this->middleware('auth');
-        $this->column = ['aa','ab','ba','bb','ca','cb','da','db','ea','eb','fa','fb','ga','gb','ha','hb','ia','ib','ja','jb','ka','kb','la','lb','ma','mb','na','nb','oa','ob','pa','pb','qa','qb','ra','rb','sa','sb','ta','tb','ua','ub','va','vb','wa','wb','xa','xb','ya','yb'];
-        $this->row = [28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
+        $this->column = ['aa', 'ab', 'ba', 'bb', 'ca', 'cb', 'da', 'db', 'ea', 'eb', 'fa', 'fb', 'ga', 'gb', 'ha', 'hb', 'ia', 'ib', 'ja', 'jb', 'ka', 'kb', 'la', 'lb', 'ma', 'mb', 'na', 'nb', 'oa', 'ob', 'pa', 'pb', 'qa', 'qb', 'ra', 'rb', 'sa', 'sb', 'ta', 'tb', 'ua', 'ub', 'va', 'vb', 'wa', 'wb', 'xa', 'xb', 'ya', 'yb'];
+        $this->row = [28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
         // $this->row = [35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1];
     }
 
@@ -39,11 +39,11 @@ class RecruitmentHrController extends Controller
     {
         ini_set('max_execution_time', -1);
         DB::beginTransaction();
-        try{
+        try {
             $status = $request->status;
             $type = $request->type;
-            $updateSetting = DB::table('recruitment_settings')->where('type', $type)->update(['status'=>$status]);
-            $setting = DB::table('recruitment_settings')->where('type', $type)->first();
+            $updateSetting = DB::connection('bfv')->table('recruitment_settings')->where('type', $type)->update(['status' => $status]);
+            $setting = DB::connection('bfv')->table('recruitment_settings')->where('type', $type)->first();
 
             DB::commit();
             $response = ['status' => true, 'message' => 'Berhasil', 'data' => $setting];
@@ -59,7 +59,7 @@ class RecruitmentHrController extends Controller
     {
         $participantId = $request->participant_id;
         $date = $request->test_date ?? date('Y-m-d');
-        $checkTest = DB::table('recruitment_kraepelin_answers')
+        $checkTest = DB::connection('bfv')->table('recruitment_kraepelin_answers')
             ->where('date', $date)
             ->where('participant_id', $participantId)
             ->whereIn('column_number', [50])
@@ -74,8 +74,8 @@ class RecruitmentHrController extends Controller
         $education = $request->education;
         $value = $request->value;
 
-        $education = (in_array($education, ['S2','S3'])) ? 'D4/S1' : $education;
-        $getResult = DB::table('recruitment_kraepelin_answer_categories')
+        $education = (in_array($education, ['S2', 'S3'])) ? 'D4/S1' : $education;
+        $getResult = DB::connection('bfv')->table('recruitment_kraepelin_answer_categories')
             ->where('parameter', $parameter)
             ->where('education', $education)
             ->where(function ($q) use ($value) {
@@ -91,22 +91,22 @@ class RecruitmentHrController extends Controller
         $title = "Rekrutmen PT. YMPI";
         $title_jp = "Rekrutmen PT. YMPI";
 
-        $statusOpeningTest = DB::table('recruitment_settings')->where('type', 'opening_kraepelin_test')->first();
+        $statusOpeningTest = DB::connection('bfv')->table('recruitment_settings')->where('type', 'opening_kraepelin_test')->first();
 
-        if($request->ajax()){
+        if ($request->ajax()) {
             $date = $request->date;
             $ex = explode(' - ', $date);
             $start = @$ex[0];
             $end = @$ex[1];
 
-            $getAnswer = DB::table('recruitment_participant_tests as rpt')
+            $getAnswer = DB::connection('bfv')->table('recruitment_participant_tests as rpt')
                 ->leftJoin('recruitment_participants as rp', 'rpt.participant_id', '=', 'rp.id')
                 ->select('rpt.participant_id', 'rpt.test_type', 'rpt.test_date', 'rp.card_id', 'rp.name', 'rp.education', 'rp.birth_date', 'rp.school')
                 ->whereBetween('rpt.test_date', [$start, $end])
                 ->orderByDesc('rpt.test_date')
                 ->get();
 
-            if($getAnswer->count() > 0){
+            if ($getAnswer->count() > 0) {
                 foreach ($getAnswer as $k => $val) {
                     $getAnswer[$k]->age = Carbon::parse($val->birth_date)->age;
 
@@ -118,10 +118,10 @@ class RecruitmentHrController extends Controller
             }
             return DataTables::of($getAnswer)
                 ->addIndexColumn()
-                ->addColumn('action', function ($item){})
+                ->addColumn('action', function ($item) {})
                 ->make(true);
         }
-        $compact = ['title','title_jp', 'statusOpeningTest'];
+        $compact = ['title', 'title_jp', 'statusOpeningTest'];
         return view('recruitment.monitoring.monitoring', compact($compact));
     }
 
@@ -129,7 +129,7 @@ class RecruitmentHrController extends Controller
     {
         ini_set('max_execution_time', -1);
         DB::beginTransaction();
-        try{
+        try {
             $participantId = $request->participant_id;
             $testDate = $request->test_date;
             $testType = $request->test_type;
@@ -149,11 +149,11 @@ class RecruitmentHrController extends Controller
             $statusKurangSekali = [];
             $statusKurangSekaliKetelitian = [];
 
-            $participant = DB::table('recruitment_participants')->where('id', $participantId)->first();
+            $participant = DB::connection('bfv')->table('recruitment_participants')->where('id', $participantId)->first();
             $participant->age = Carbon::parse($participant->birth_date)->age;
             $participant->test_date = $testDate;
 
-            $getQuestion = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
+            $getQuestion = DB::connection('bfv')->table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
             $listQuestions = [];
             $columnQuestions = [];
             foreach ($getQuestion as $key => $val) {
@@ -161,24 +161,44 @@ class RecruitmentHrController extends Controller
                 $columnQuestions[$val->coordinate] = $val->column_number;
             }
 
-            $question = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->get();
+            $question = DB::connection('bfv')->table('recruitment_kraepelin_tests')->whereNull('deleted_at')->get();
             $answerByCoordinate = $question->pluck('answer', 'coordinate')->all();
-            $answer = DB::table('recruitment_kraepelin_answers')
+            $answer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
                 ->where('date', $testDate)
                 ->where('participant_id', $participantId)
                 ->orderBy('column_number')
                 ->get();
 
+            $waktuPengerjaan = '-';
+            if ($answer->count() > 0) {
+                $firstAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
+                    ->where('date', $testDate)
+                    ->where('participant_id', $participantId)
+                    ->orderBy('created_at', 'asc')
+                    ->value('created_at');
+
+                $lastAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
+                    ->where('date', $testDate)
+                    ->where('participant_id', $participantId)
+                    ->orderBy('created_at', 'desc')
+                    ->value('created_at');
+
+                if ($firstAnswer && $lastAnswer) {
+                    $diff = Carbon::parse($firstAnswer)->diff(Carbon::parse($lastAnswer));
+                    $waktuPengerjaan = sprintf('%02d:%02d:%02d', $diff->h, $diff->i, $diff->s);
+                }
+            }
+
             $nilai_y = [];
-            if($answer->count() > 0){
+            if ($answer->count() > 0) {
                 foreach ($answer as $k => $val) {
-                    if($val->answer == $answerByCoordinate[$val->coordinate]){
+                    if ($val->answer == $answerByCoordinate[$val->coordinate]) {
                         $benar[] = $val->coordinate;
                         $benarByColumn[$val->column_number][] = $val->coordinate;
-                        $resultAnswer[$val->coordinate] = ['value'=>$val->answer, 'status'=>'benar'];
+                        $resultAnswer[$val->coordinate] = ['value' => $val->answer, 'status' => 'benar'];
                     } else {
                         $salah[] = $val->coordinate;
-                        $resultAnswer[$val->coordinate] = ['value'=>$val->answer, 'status'=>'salah'];
+                        $resultAnswer[$val->coordinate] = ['value' => $val->answer, 'status' => 'salah'];
                     }
                     $countByColumn[$val->column_number][] = 1;
                 }
@@ -205,16 +225,19 @@ class RecruitmentHrController extends Controller
             $x0 = 0;
 
             $mean = 0;
-            $parameter['panker'] = ['nilai' => 0, 'category'=>''];
-            $parameter['tianker'] = ['nilai' => 0, 'category'=>''];
-            $parameter['hanker'] = ['nilai' => 0, 'category'=>''];
-            $parameter['janker'] = ['nilai' => 0, 'category'=>''];
+            $parameter['panker'] = ['nilai' => 0, 'category' => ''];
+            $parameter['tianker'] = ['nilai' => 0, 'category' => ''];
+            $parameter['hanker'] = ['nilai' => 0, 'category' => ''];
+            $parameter['janker'] = ['nilai' => 0, 'category' => ''];
             $y_tertinggi = 0;
             $y_terendah = 0;
 
-            if(count($benarByColumn) > 0){
-                foreach ($benarByColumn as $k => $val) {
-                    $urutanBenar[$jumlahBenar.count($val)][] = 1;
+            if (count($benarByColumn) > 0) {
+
+                foreach ($this->column as $idx => $colName) {
+                    $colNum = $idx + 1; // kolom 1–50
+                    $jumlah = isset($benarByColumn[$colNum]) ? count($benarByColumn[$colNum]) : 0;
+                    $urutanBenar[$jumlahBenar . $jumlah][] = 1;
                 }
                 //urutkan jumlah kolom yg benar dari yg paling bnyk benarnya
                 krsort($urutanBenar);
@@ -236,7 +259,7 @@ class RecruitmentHrController extends Controller
                 $mean = $jumlah_Sfy / $jumlah_Sf;
 
                 foreach ($hasilUrutan as $key => $val) {
-                    $this_d = abs($val['y']-$mean);
+                    $this_d = abs($val['y'] - $mean);
                     $hasilUrutan[$key]['d'] = $this_d;
                     $hasilUrutan[$key]['fd'] = $val['f'] * $this_d;
                     $Sfd[] = $val['f'] * $this_d;
@@ -244,27 +267,27 @@ class RecruitmentHrController extends Controller
                 $jumlah_Sfd = array_sum($Sfd);
                 $dilewati = count($answerByCoordinate) - (count($salah) + count($benar));
 
-                for ($i=1; $i <= count($this->column); $i++) { 
+                for ($i = 1; $i <= count($this->column); $i++) {
                     $jumlah_Sx += $i;
                     $Y = 0;
                     $chartLabel[] = $i;
 
-                    if(array_key_exists($i, $benarByColumn)){
+                    if (array_key_exists($i, $benarByColumn)) {
                         $Y = count($benarByColumn[$i]);
                         $jumlah_Sy += $Y;
                     }
-                    if(array_key_exists($i, $countByColumn)){
+                    if (array_key_exists($i, $countByColumn)) {
                         $jumlahByColumn[$i] = count($countByColumn[$i]);
                     } else {
                         $jumlahByColumn[$i] = 0;
                     }
-                 
+
                     $jumlah_Sx2 += pow($i, 2);
                     $jumlah_Sxy += ($i * $Y);
                 }
 
                 $b = (($N * $jumlah_Sxy) - ($jumlah_Sx * $jumlah_Sy)) / (($N * $jumlah_Sx2) - pow($jumlah_Sx, 2));
-                $a = (($jumlah_Sy / $N) - ($b * ($jumlah_Sx / $N)) );
+                $a = (($jumlah_Sy / $N) - ($b * ($jumlah_Sx / $N)));
                 $x50 = $a + ($b * 50);
                 $x0 = $a + ($b * 1);
 
@@ -306,38 +329,39 @@ class RecruitmentHrController extends Controller
                 $parameter['janker'] = [
                     'range' => $hankerRange,
                     'av_dev' => $hankerAvDev,
-                    'nilai' => $valueJanker, 
+                    'nilai' => $valueJanker,
                     'category' => ($resKeajegan) ? $resKeajegan->category : ''
                 ];
             }
 
-            if($parameter['panker']['category']=='Kurang Sekali'){
+            if ($parameter['panker']['category'] == 'Kurang Sekali') {
                 $statusKurangSekali[] = 1;
-            } else if($parameter['panker']['category']=='Kurang'){
+            } else if ($parameter['panker']['category'] == 'Kurang') {
                 $statusKurang[] = 1;
             }
-            if($parameter['tianker']['category']=='Kurang Sekali'){
+            if ($parameter['tianker']['category'] == 'Kurang Sekali') {
                 $statusKurangSekaliKetelitian[] = 1;
-            } else if($parameter['tianker']['category']=='Kurang'){
+            } else if ($parameter['tianker']['category'] == 'Kurang') {
                 $statusKurang[] = 1;
             }
-            if($parameter['hanker']['category']=='Kurang Sekali'){
+            if ($parameter['hanker']['category'] == 'Kurang Sekali') {
                 $statusKurangSekali[] = 1;
-            } else if($parameter['hanker']['category']=='Kurang'){
+            } else if ($parameter['hanker']['category'] == 'Kurang') {
                 $statusKurang[] = 1;
             }
-            if($parameter['janker']['category']=='Kurang Sekali'){
+            if ($parameter['janker']['category'] == 'Kurang Sekali') {
                 $statusKurangSekali[] = 1;
-            } else if($parameter['janker']['category']=='Kurang'){
+            } else if ($parameter['janker']['category'] == 'Kurang') {
                 $statusKurang[] = 1;
             }
 
             //Tidak lolos adalah yg memiliki status :
             //Kurang lebih dari 2 || Kurang Sekali lebih dari 2 || kurang sekali dari ketelitian lebih dari = 1 || kurang sekali 1 dan kurang 1
-            $result['summary']['hasil_tes'] = (count($statusKurang)>=2 || count($statusKurangSekali)>=2 || count($statusKurangSekaliKetelitian)>=1 || (count($statusKurangSekali)>=1 && count($statusKurang)>=1) ) ? 'Tidak Lolos' : 'Lolos';
+            $result['summary']['hasil_tes'] = (count($statusKurang) >= 2 || count($statusKurangSekali) >= 2 || count($statusKurangSekaliKetelitian) >= 1 || (count($statusKurangSekali) >= 1 && count($statusKurang) >= 1)) ? 'Tidak Lolos' : 'Lolos';
             $result['summary']['benar'] = count($benar);
             $result['summary']['salah'] = count($salah);
             $result['summary']['lewat'] = $dilewati;
+            $result['summary']['waktu'] = $waktuPengerjaan;
             $result['parameter'] = $parameter;
             $result['participant'] = $participant;
 
@@ -346,13 +370,13 @@ class RecruitmentHrController extends Controller
             $result['chart'] = $this->configChartKraepelin($dataChart);
 
             DB::commit();
-            $html = view('recruitment.monitoring.kraepelin_result', compact('result', 'listQuestions', 'columnQuestions', 'resultAnswer', 'type','row','column'))->render();
+            $html = view('recruitment.monitoring.kraepelin_result', compact('result', 'listQuestions', 'columnQuestions', 'resultAnswer', 'type', 'row', 'column'))->render();
 
-            if($type=='view'){
+            if ($type == 'view') {
                 $response = ['status' => true, 'message' => 'Berhasil', 'data' => $html];
                 return Response::json($response);
             } else {
-                $fileName = "Tes Kraepelin_".$participant->name.".pdf";
+                $fileName = "Tes Kraepelin_" . $participant->name . ".pdf";
                 $pdf = PDF::loadHTML($html)->setPaper('a4', 'landscape');
                 return $pdf->download($fileName);
             }
@@ -363,55 +387,57 @@ class RecruitmentHrController extends Controller
         }
     }
 
-    public function configChartKraepelin($parameter) {
-        $implodeLabel = '['.implode(',',$parameter["label"]).']';
-        $implodeValue = '['.implode(',',$parameter["data"]).']';
-        $chartConfig = '{
-            "type": "line",
-            "data": {
-                "labels": '.$implodeLabel.',
-                "datasets": [{
-                    data: '.$implodeValue.',
-                    fill: false,
-                    borderColor: "#A947FD",
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                legend: {
-                    display: false
-                },
-                scales: {
-                    yAxes: [{
-                        scaleLabel: {
-                          display: true,
-                          labelString: "Baris",
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            suggestedMin: 1,
-                            suggestedMax: 27
-                        }
-                    }],
-                    xAxes: [{
-                        scaleLabel: {
-                          display: true,
-                          labelString: "Kolom",
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            suggestedMin: 1,
-                            suggestedMax: 50
-                        }
-                    }]
-                }
-            }
-        }';
-        //memakai quickchart agar bisa menampilkan grafik yg sudah berupa image agar bisa ditaruh di pdf utk didownload
-        $urlEncode = 'https://quickchart.io/chart?w=auto&h=200&c='.urlencode($chartConfig);
-        $return = 'data:image/jpg;base64,'.base64_encode(file_get_contents($urlEncode));
-        return $return;
-    }
+    public function configChartKraepelin($parameter)
+    {
+        $labels = array_map(fn($i) => '"K' . $i . '"', $parameter['label']);
+        $implodeLabel = '[' . implode(',', $labels) . ']';
+        $implodeValue = '[' . implode(',', $parameter['data']) . ']';
 
+        $data = array_values($parameter['data']);
+        $mean = count($data) > 0 ? array_sum($data) / count($data) : 0;
+        $meanRounded = round($mean, 1);
+        $implodeMean = '[' . implode(',', array_fill(0, count($data), $meanRounded)) . ']';
+
+        $chartConfig = '{
+        "type": "line",
+        "data": {
+            "labels": ' . $implodeLabel . ',
+            "datasets": [
+                {
+                    "label": "Jawaban Benar per Kolom",
+                    "data": ' . $implodeValue . ',
+                    "fill": false,
+                    "borderColor": "rgba(100,149,237,1)",
+                    "backgroundColor": "rgba(100,149,237,1)",
+                    "borderWidth": 1,
+                    "pointRadius": 3,
+                    "pointHoverRadius": 4
+                },
+                {
+                    "label": "Rata-Rata Benar (' . $meanRounded . ')",
+                    "data": ' . $implodeMean . ',
+                    "fill": false,
+                    "borderColor": "rgba(100,100,100,0.8)",
+                    "backgroundColor": "rgba(100,100,100,0.8)",
+                    "borderWidth": 1,
+                    "borderDash": [5,5],
+                    "pointRadius": 0,
+                    "pointHoverRadius": 4
+                }
+            ]
+        },
+        "options": {
+            "responsive": true,
+            "legend": { "display": true, "position": "top" },
+            "tooltips": { "mode": "index", "intersect": false },
+            "scales": {
+                "yAxes": [{ "scaleLabel": { "display": true, "labelString": "Jumlah Benar" }, "ticks": { "stepSize": 1, "suggestedMin": 0, "suggestedMax": 27 } }],
+                "xAxes": [{ "scaleLabel": { "display": true, "labelString": "Kolom" } }]
+            }
+        }
+    }';
+
+        $urlEncode = 'https://quickchart.io/chart?w=900&h=300&c=' . urlencode($chartConfig);
+        return 'data:image/jpg;base64,' . base64_encode(file_get_contents($urlEncode));
+    }
 }

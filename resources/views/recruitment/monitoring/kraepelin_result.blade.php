@@ -36,24 +36,20 @@
     background-color: #bef3cb;
 }
 th, td {
-/*  padding: 5px;*/
   vertical-align: middle !important;
   text-align: left !important;
   border:1px solid;
-/*  border-top: 1px solid #dee2e6;*/
 }
 tr {
-/*    padding: 0.75rem;*/
     vertical-align: middle !important;
     border: 1px solid #dee2e6;
 }
 .result_kraepelin td {
     border:0px !important;
 }
-
 </style>
 <body>
-<table class="table table-hover datatable" >
+<table class="table datatable" >
     <tr>
         <td class="bold">Nama</td>
         <td class="bold" style="width:10px;">:</td>
@@ -68,68 +64,42 @@ tr {
         <td>{{ @$result['participant']->age }}</td>
         <td class="bold">Pendidikan</td>
         <td class="bold" >:</td>
-        <td>{{ @$result['participant']->education  }}</td>
+        <td>{{ @$result['participant']->education }}</td>
     </tr>
 </table>
 
-<table class="table table-hover datatable">
+<table class="table datatable">
     <tr class="background-gray">
         <td class="bold text-center" colspan="8">Hasil Tes Kraepelin</td>
     </tr>
-    <?php 
-        //$bg = ['Baik Sekali' => 'background-color:#b4fdb4;','Baik' => 'background-color:#53f353;','Sedang' => 'background-color:#dae56b;','Kurang' => 'background-color:#ffa6a6f5;','Kurang Sekali' => 'background-color:#fb5151f5;','' => ''];
-        $bg = ['Baik Sekali' => 'background-color:#b4fdb4;','Baik' => 'background-color:#b4fdb4;','Sedang' => 'background-color:#f7ffa4;','Kurang' => 'background-color:#ffa6a6f5;','Kurang Sekali' => 'background-color:#ffa6a6f5;','' => ''];
-    ?>
     @php
-        $res_panker = $result['parameter']['panker']['category'];
-        $res_tianker = $result['parameter']['tianker']['category'];
-        $res_janker = $result['parameter']['janker']['category'];
-        $res_hanker = $result['parameter']['hanker']['category'];
-        $hasilTes = $result['summary']['hasil_tes'];
-        $bgHasilTes = ($hasilTes=='Lolos') ? 'background-color:#b4fdb4;' : 'background-color:#dc3545;';
+        $totalSoal = $result['summary']['benar'] + $result['summary']['salah'] + $result['summary']['lewat'];
     @endphp
-    <tr class="">
-        <td class="bold" colspan="8" style="{{ $bgHasilTes }}">
-            <div class="row">
-                <div class="col-sm-12 text-center" >
-                    <span id="kesimpulan" >{{ $hasilTes }}</span>
-                </div>
-            </div>
-        </td>
-    </tr>
     @if($type=='view')
-    <tr class="">
+    <tr>
         <td class="bold text-center" colspan="8">
             <div class="row">
                 <div class="col-sm-2 col-md-2">
                     <table>
-                        <tr class="">
-                            <td class="bold" style="padding:5px!important;border: none!important;">Kecepatan</td>
-                            <td class="bold" style="{{ $bg[$res_panker] }}"> {{ $res_panker}}</td>
-                        </tr>
                         <tr>
-                            <td class="bold" style="padding:5px!important;border: none!important;">Ketelitian</td>
-                            <td class="bold" style="{{ $bg[$res_tianker] }}"> {{ $res_tianker}}</td>
-                        </tr>
-                        <tr>
-                            <td class="bold" style="padding:5px!important;border: none!important;">Keajegan</td>
-                            <td class="bold" style="{{ $bg[$res_janker] }}"> {{ $res_janker}}</td>
-                        </tr>
-                        <tr>
-                            <td class="bold" style="padding:5px!important;border: none!important;">Ketahanan</td>
-                            <td class="bold" style="{{ $bg[$res_hanker] }}"> {{ $res_hanker}}</td>
+                            <td class="bold" style="padding:5px!important;border: none!important;">Total Soal</td>
+                            <td class="bold">{{ $totalSoal }}</td>
                         </tr>
                         <tr>
                             <td class="bold" style="padding:5px!important;border: none!important;">Jawaban Benar</td>
-                            <td class="bold" style=""> {{ $result['summary']['benar'] }}</td>
+                            <td class="bold">{{ $result['summary']['benar'] }}</td>
                         </tr>
                         <tr>
                             <td class="bold" style="padding:5px!important;border: none!important;">Jawaban Salah</td>
-                            <td class="bold" style=""> {{ $result['summary']['salah'] }}</td>
+                            <td class="bold">{{ $result['summary']['salah'] }}</td>
                         </tr>
                         <tr>
-                            <td class="bold" style="padding:5px!important;border: none!important;">Jawaban Tidak diisi</td>
-                            <td class="bold" style=""> {{ $result['summary']['lewat'] }}</td>
+                            <td class="bold" style="padding:5px!important;border: none!important;">Tidak Diisi</td>
+                            <td class="bold">{{ $result['summary']['lewat'] }}</td>
+                        </tr>
+                        <tr>
+                            <td class="bold" style="padding:5px!important;border: none!important;">Waktu Pengerjaan</td>
+                            <td class="bold">{{ $result['summary']['waktu'] }}</td>
                         </tr>
                     </table>
                 </div>
@@ -140,36 +110,28 @@ tr {
         </td>
     </tr>
     @else
-    <tr class="">
+    <tr>
         <td class="bold text-center" colspan="3">
             <table>
-                <tr class="">
-                    <td class="bold" style="padding:5px!important;border: none!important;">Kecepatan</td>
-                    <td class="bold" style="{{ $bg[$res_panker] }}"> {{ $res_panker}}</td>
-                </tr>
                 <tr>
-                    <td class="bold" style="padding:5px!important;border: none!important;">Ketelitian</td>
-                    <td class="bold" style="{{ $bg[$res_tianker] }}"> {{ $res_tianker}}</td>
-                </tr>
-                <tr>
-                    <td class="bold" style="padding:5px!important;border: none!important;">Keajegan</td>
-                    <td class="bold" style="{{ $bg[$res_janker] }}"> {{ $res_janker}}</td>
-                </tr>
-                <tr>
-                    <td class="bold" style="padding:5px!important;border: none!important;">Ketahanan</td>
-                    <td class="bold" style="{{ $bg[$res_hanker] }}"> {{ $res_hanker}}</td>
+                    <td class="bold" style="padding:5px!important;border: none!important;">Total Soal</td>
+                    <td class="bold">{{ $totalSoal }}</td>
                 </tr>
                 <tr>
                     <td class="bold" style="padding:5px!important;border: none!important;">Jawaban Benar</td>
-                    <td class="bold" style=""> {{ $result['summary']['benar'] }}</td>
+                    <td class="bold">{{ $result['summary']['benar'] }}</td>
                 </tr>
                 <tr>
                     <td class="bold" style="padding:5px!important;border: none!important;">Jawaban Salah</td>
-                    <td class="bold" style=""> {{ $result['summary']['salah'] }}</td>
+                    <td class="bold">{{ $result['summary']['salah'] }}</td>
                 </tr>
                 <tr>
-                    <td class="bold" style="padding:5px!important;border: none!important;">Jawaban Tidak diisi</td>
-                    <td class="bold" style=""> {{ $result['summary']['lewat'] }}</td>
+                    <td class="bold" style="padding:5px!important;border: none!important;">Tidak Diisi</td>
+                    <td class="bold">{{ $result['summary']['lewat'] }}</td>
+                </tr>
+                <tr>
+                    <td class="bold" style="padding:5px!important;border: none!important;">Waktu Pengerjaan</td>
+                    <td class="bold">{{ $result['summary']['waktu'] }}</td>
                 </tr>
             </table>
         </td>
