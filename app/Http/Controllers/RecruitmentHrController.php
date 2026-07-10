@@ -42,8 +42,8 @@ class RecruitmentHrController extends Controller
         try {
             $status = $request->status;
             $type = $request->type;
-            $updateSetting = DB::connection('bfv')->table('recruitment_settings')->where('type', $type)->update(['status' => $status]);
-            $setting = DB::connection('bfv')->table('recruitment_settings')->where('type', $type)->first();
+            $updateSetting = DB::table('recruitment_settings')->where('type', $type)->update(['status' => $status]);
+            $setting = DB::table('recruitment_settings')->where('type', $type)->first();
 
             DB::commit();
             $response = ['status' => true, 'message' => 'Berhasil', 'data' => $setting];
@@ -59,7 +59,7 @@ class RecruitmentHrController extends Controller
     {
         $participantId = $request->participant_id;
         $date = $request->test_date ?? date('Y-m-d');
-        $checkTest = DB::connection('bfv')->table('recruitment_kraepelin_answers')
+        $checkTest = DB::table('recruitment_kraepelin_answers')
             ->where('date', $date)
             ->where('participant_id', $participantId)
             ->whereIn('column_number', [50])
@@ -75,7 +75,7 @@ class RecruitmentHrController extends Controller
         $value = $request->value;
 
         $education = (in_array($education, ['S2', 'S3'])) ? 'D4/S1' : $education;
-        $getResult = DB::connection('bfv')->table('recruitment_kraepelin_answer_categories')
+        $getResult = DB::table('recruitment_kraepelin_answer_categories')
             ->where('parameter', $parameter)
             ->where('education', $education)
             ->where(function ($q) use ($value) {
@@ -149,11 +149,11 @@ class RecruitmentHrController extends Controller
             $statusKurangSekali = [];
             $statusKurangSekaliKetelitian = [];
 
-            $participant = DB::connection('bfv')->table('recruitment_participants')->where('id', $participantId)->first();
+            $participant = DB::table('recruitment_participants')->where('id', $participantId)->first();
             $participant->age = Carbon::parse($participant->birth_date)->age;
             $participant->test_date = $testDate;
 
-            $getQuestion = DB::connection('bfv')->table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
+            $getQuestion = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->orderBy('coordinate')->get();
             $listQuestions = [];
             $columnQuestions = [];
             foreach ($getQuestion as $key => $val) {
@@ -161,9 +161,9 @@ class RecruitmentHrController extends Controller
                 $columnQuestions[$val->coordinate] = $val->column_number;
             }
 
-            $question = DB::connection('bfv')->table('recruitment_kraepelin_tests')->whereNull('deleted_at')->get();
+            $question = DB::table('recruitment_kraepelin_tests')->whereNull('deleted_at')->get();
             $answerByCoordinate = $question->pluck('answer', 'coordinate')->all();
-            $answer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
+            $answer = DB::table('recruitment_kraepelin_answers')
                 ->where('date', $testDate)
                 ->where('participant_id', $participantId)
                 ->orderBy('column_number')
@@ -171,13 +171,13 @@ class RecruitmentHrController extends Controller
 
             $waktuPengerjaan = '-';
             if ($answer->count() > 0) {
-                $firstAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
+                $firstAnswer = DB::table('recruitment_kraepelin_answers')
                     ->where('date', $testDate)
                     ->where('participant_id', $participantId)
                     ->orderBy('created_at', 'asc')
                     ->value('created_at');
 
-                $lastAnswer = DB::connection('bfv')->table('recruitment_kraepelin_answers')
+                $lastAnswer = DB::table('recruitment_kraepelin_answers')
                     ->where('date', $testDate)
                     ->where('participant_id', $participantId)
                     ->orderBy('created_at', 'desc')
