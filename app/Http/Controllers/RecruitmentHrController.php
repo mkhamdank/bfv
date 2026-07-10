@@ -91,7 +91,7 @@ class RecruitmentHrController extends Controller
         $title = "Rekrutmen PT. YMPI";
         $title_jp = "Rekrutmen PT. YMPI";
 
-        $statusOpeningTest = DB::connection('bfv')->table('recruitment_settings')->where('type', 'opening_kraepelin_test')->first();
+        $statusOpeningTest = DB::table('recruitment_settings')->where('type', 'opening_kraepelin_test')->first();
 
         if ($request->ajax()) {
             $date = $request->date;
