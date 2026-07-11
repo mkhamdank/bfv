@@ -1142,6 +1142,18 @@
                 formData.append('purpose_details', $('#purpose_details').val());
                 formData.append('data_consent', $('input[name="data_consent"]').is(':checked') ? 1 : 0);
 
+                if($('input[name="email"]').val() == '' || $('input[name="company"]').val() == '' || $('#start_date').val() == '' || $('#start_time').val() == '' || $('#end_date').val() == '' || $('#end_time').val() == '' || $('#host').val() == '' || $('#purpose').val() == '' || $('#purpose_details').val() == '') {
+                    openErrorGritter('Kesalahan', 'Semua kolom wajib diisi.');
+                    document.querySelector('.btn-submit').disabled = false;
+                    document.querySelector('.btn-submit').innerText = 'Kirim';
+                    document.querySelector('.btn-submit').style.backgroundColor = '#168027';
+                    document.querySelector('.btn-submit').style.cursor = 'pointer';
+                    document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
+                    document.querySelector('.btn-submit').style.pointerEvents = 'auto';
+                    document.querySelector('.btn-submit').style.opacity = '1';
+                    return false;
+                }
+
                 // Tambahkan data pengunjung
                 var salah = 0;
                 $('.visitor-row, #first-visitor').each(function(index) {
@@ -1155,11 +1167,12 @@
                         formData.append(`visitors[${index}][full_name]`, full_name);
                         formData.append(`visitors[${index}][phone]`, phone);
                         formData.append(`visitors[${index}][origin]`, origin);
-                        if(checkNoKtp(id_name) == false) {
-                            salah = 1;
-                        }
+                        // if(checkNoKtp(id_name) == false) {
+                        //     salah = 1;
+                        // }
                     }
                 });
+                
                 // if(salah == 1) {
                 //     openErrorGritter('Kesalahan', 'Format No. KTP harus 16 digit angka.');
                 //     document.querySelector('.btn-submit').disabled = false;

@@ -352,11 +352,17 @@
                 .then(data => {
                     if (data.status) {
                         // Tampilkan hasil
+                        statusVisit = 'Not Visited';
+                        if (data.data.data_updated == null) {
+                            statusVisit = 'Not Visited';
+                        } else if (data.data.data_updated != null) {
+                            statusVisit = 'Visited at ' + data.data.data_updated;
+                        }
                         resultContainer.innerHTML = `
                             <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f7ff 100%); border-radius: 14px; padding: 24px; color: #3d3a5c; border: 1px solid rgba(96, 92, 168, 0.2); box-shadow: 0 8px 32px rgba(96, 92, 168, 0.08);">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(96, 92, 168, 0.15);">
                                     <h3 style="font-size: 18px; font-weight: 700; color: #1e1b3a; margin: 0;">${data.data.visitor_id}</h3>
-                                    <span style="background: #10b981; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">${data.data.status || 'Aktif'}</span>
+                                    <span style="background: ${statusVisit === 'Not Visited' ? '#fce7f3' : '#10b981'}; color: ${statusVisit === 'Not Visited' ? '#ec4899' : 'white'}; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">${statusVisit || 'Not Visited'}</span>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                                     <div>
@@ -390,11 +396,24 @@
                                     <div style="background: rgba(96, 92, 168, 0.08); border-radius: 8px; padding: 14px; margin-top: 16px;">
                                         <p style="font-size: 12px; color: #8b87b5; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Peserta</strong></p>
                                         ${data.details.map((participant, index) => {
+                                            var inductionStart = null;
+                                            var inductionEnd = null;
+                                            var isInductionActive = false;
+                                            var activeInduction = null;
                                             const visitStart = new Date(data.data.start_date + ' ' + data.data.start_time);
                                             const visitEnd = new Date(data.data.end_date + ' ' + data.data.end_time);
-                                            const inductionStart = participant.start_induction ? new Date(participant.start_induction) : null;
-                                            const inductionEnd = participant.end_induction ? new Date(participant.end_induction) : null;
-                                            const isInductionActive = inductionStart && inductionEnd && visitStart >= inductionStart && visitEnd <= inductionEnd;
+                                            for(var i = 0; i < data.safety_induction.length; i++) {
+                                                if(data.safety_induction[i].card_id == participant.card_id) {
+                                                    inductionStart = new Date(data.safety_induction[i].start_induction);
+                                                    inductionEnd = new Date(data.safety_induction[i].end_induction);
+                                                    if(visitStart >= inductionStart && visitEnd <= inductionEnd) {
+                                                        isInductionActive = true;
+                                                        activeInduction = data.safety_induction[i];
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                            console.log(`Participant: ${participant.name}, Induction Active: ${isInductionActive}`, `Visit Start: ${visitStart}, Visit End: ${visitEnd}, Induction Start: ${inductionStart}, Induction End: ${inductionEnd}`);
                                             
                                             return `
                                                 <div style="margin-bottom: ${index < data.details.length - 1 ? '12px; padding-bottom: 12px; border-bottom: 1px solid rgba(96, 92, 168, 0.15);' : '0;'}">
@@ -405,7 +424,7 @@
                                                         <div><span style="color: #8b87b5;">Asal:</span> <span style="color: #1e1b3a;">${participant.origin || '-'}</span></div>
                                                     </div>
                                                     <div style="padding: 8px 10px; background: ${isInductionActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; border-radius: 6px; border-left: 3px solid ${isInductionActive ? '#10b981' : '#ef4444'};">
-                                                        <span style="font-size: 12px; font-weight: 600; color: ${isInductionActive ? '#10b981' : '#ef4444'};">Safety Induction: ${isInductionActive ? '✓ Aktif' : '✗ Belum'}</span>
+                                                        <span style="font-size: 12px; font-weight: 600; color: ${isInductionActive ? '#10b981' : '#ef4444'};">Safety Induction: ${isInductionActive ? '✓ Aktif ' + (activeInduction ? activeInduction.start_induction + ' - ' + activeInduction.end_induction : '') : '✗ Belum'}</span>
                                                     </div>
                                                 </div>
                                             `;
