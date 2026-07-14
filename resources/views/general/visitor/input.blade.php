@@ -1125,6 +1125,26 @@
                     return false;
                 }
 
+                // Validasi end_date tidak boleh lebih dari 1 minggu dari start_date
+                const startDate = new Date($('#start_date').val());
+                const endDate = new Date($('#end_date').val());
+                const maxEndDate = new Date(startDate);
+                maxEndDate.setDate(maxEndDate.getDate() + 7);
+                var suggestedEndDate = new Date(startDate);
+                suggestedEndDate.setDate(suggestedEndDate.getDate() + 7);
+
+                if (endDate > maxEndDate) {
+                    openErrorGritter('Kesalahan', 'Tanggal berakhir tidak boleh lebih dari 1 minggu dari tanggal mulai. Saran tanggal berakhir: ' + suggestedEndDate.toISOString().split('T')[0]);
+                    document.querySelector('.btn-submit').disabled = false;
+                    document.querySelector('.btn-submit').innerText = 'Kirim';
+                    document.querySelector('.btn-submit').style.backgroundColor = '#168027';
+                    document.querySelector('.btn-submit').style.cursor = 'pointer';
+                    document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
+                    document.querySelector('.btn-submit').style.pointerEvents = 'auto';
+                    document.querySelector('.btn-submit').style.opacity = '1';
+                    return false;
+                }
+
 
                 // Kirim formulir
                 const formData = new FormData();
