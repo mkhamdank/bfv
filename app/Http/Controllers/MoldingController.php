@@ -36,8 +36,13 @@ class MoldingController extends Controller
 
     function fetchMoldingDiagnoseList(Request $request) {
         $master_molding = DB::table('molding_diagnose_masters')
-        ->select('id', 'fixed_asset_number', 'fixed_asset_name', 'vendor', 'standard_shot', 'total_shot', 'status', 'status_kawasan')
-        ->orderBy(db::raw('FIELD(status, "Butuh Pemeriksaan", null, "OK", "Sedang Diperiksa", "Sudah Diperiksa")'))
+        ->select('id', 'fixed_asset_number', 'fixed_asset_name', 'vendor', 'standard_shot', 'total_shot', 'status', 'status_kawasan');
+
+        if(Auth::user()->username != 'ympimis'){
+            $master_molding = $master_molding->where('vendor', Auth::user()->vendor_name);
+        }
+
+        $master_molding = $master_molding->orderBy(db::raw('FIELD(status, "Butuh Pemeriksaan", null, "OK", "Sedang Diperiksa", "Sudah Diperiksa")'))
         ->get();
 
         return Response::json([
@@ -61,8 +66,13 @@ class MoldingController extends Controller
         ->leftJoin('molding_diagnose_masters', 'molding_diagnose_forms.fixed_asset_name', '=', 'molding_diagnose_masters.fixed_asset_name')
         ->leftJoin('molding_diagnose_product_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_product_forms.master_form_number')
         ->leftJoin('molding_diagnose_molding_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_molding_forms.master_form_number')
-        ->whereNull('molding_diagnose_forms.deleted_at')
-        ->select('molding_diagnose_forms.form_number', 'molding_diagnose_forms.fixed_asset_number', 'molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.id_molding_check', 'molding_diagnose_forms.id_product_check', 'molding_diagnose_forms.total_score', 'molding_diagnose_forms.rank', 'molding_diagnose_forms.status', 'molding_diagnose_product_forms.id as form_product_id', 'molding_diagnose_molding_forms.id as form_molding_id', db::raw('DATE_FORMAT(molding_diagnose_forms.created_at,"%Y %b") as month'), 'molding_diagnose_masters.vendor', 'molding_diagnose_masters.location')
+        ->whereNull('molding_diagnose_forms.deleted_at');
+
+        if(Auth::user()->username != 'ympimis'){
+            $master_molding = $master_molding->where('molding_diagnose_masters.vendor', Auth::user()->vendor_name);
+        }
+
+        $master_molding = $master_molding->select('molding_diagnose_forms.form_number', 'molding_diagnose_forms.fixed_asset_number', 'molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.id_molding_check', 'molding_diagnose_forms.id_product_check', 'molding_diagnose_forms.total_score', 'molding_diagnose_forms.rank', 'molding_diagnose_forms.status', 'molding_diagnose_product_forms.id as form_product_id', 'molding_diagnose_molding_forms.id as form_molding_id', db::raw('DATE_FORMAT(molding_diagnose_forms.created_at,"%Y %b") as month'), 'molding_diagnose_masters.vendor', 'molding_diagnose_masters.location')
         ->get();
 
         return Response::json([
@@ -1382,11 +1392,17 @@ class MoldingController extends Controller
         $week_end = $date->format("oW"); // ISO-8601 year + week number (mode 3)
 
         $data = DB::table('molding_diagnose_shots')
+        ->leftJoin('molding_diagnose_masters', 'molding_diagnose_shots.fixed_asset_number', '=', 'molding_diagnose_masters.fixed_asset_number')
         ->whereNull('molding_diagnose_shots.deleted_at')
         ->where('molding_diagnose_shots.created_at', '>=', $request->start_date)
-        ->where('molding_diagnose_shots.created_at', '<=', $request->end_date)
-        ->select('fixed_asset_number', 'molding_name', 'week_number', 'total_shot', 'accumulative_shot', 'created_by', 'created_at', db::raw('DATE_FORMAT(molding_diagnose_shots.created_at, "%Y-%m-%d") as create_date'), db::raw('DATE_FORMAT(molding_diagnose_shots.created_at, "%d %b %y") as tgl_buat'))
-        ->orderBy('created_at', 'desc')
+        ->where('molding_diagnose_shots.created_at', '<=', $request->end_date);
+
+        if(Auth::user()->username != 'ympimis'){
+            $data = $data->where('molding_diagnose_masters.vendor', Auth::user()->vendor_name);
+        }
+
+        $data = $data->select('molding_diagnose_shots.fixed_asset_number', 'molding_name', 'week_number', 'molding_diagnose_shots.total_shot', 'accumulative_shot', 'molding_diagnose_shots.created_by', 'molding_diagnose_shots.created_at', db::raw('DATE_FORMAT(molding_diagnose_shots.created_at, "%Y-%m-%d") as create_date'), db::raw('DATE_FORMAT(molding_diagnose_shots.created_at, "%d %b %y") as tgl_buat'))
+        ->orderBy('molding_diagnose_shots.created_at', 'desc')
         ->get();
 
         $response = [
