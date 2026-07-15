@@ -1,5 +1,79 @@
 @extends('layouts.app')
 
+@php
+    $lang = isset($lang) && $lang === 'en' ? 'en' : 'id';
+
+    $translations = [
+        'id' => [
+            'welcome' => 'Selamat Datang',
+            'system_title' => 'Sistem Manajemen Kunjungan',
+            'visit_id_or_email' => 'ID Kunjungan atau Email',
+            'search_placeholder' => 'YMPI-ABCDE / email@contoh.com',
+            'search' => 'Cari',
+            'back' => 'Kembali',
+            'not_found' => 'ID Kunjungan atau Email tidak ditemukan. Silakan cek input Anda dan coba lagi.',
+            'input_required' => 'Silakan masukkan ID Kunjungan atau Email.',
+            'not_visited' => 'Belum Berkunjung',
+            'visited_at' => 'Berkunjung pada',
+            'company' => 'Perusahaan',
+            'email' => 'Email',
+            'start' => 'Mulai',
+            'finish' => 'Selesai',
+            'purpose' => 'Tujuan',
+            'host' => 'PIC yang ditemui',
+            'participants' => 'Peserta',
+            'name' => 'Nama',
+            'phone' => 'Telepon',
+            'origin' => 'Asal',
+            'safety_induction' => 'Safety Induction',
+            'active' => 'Aktif',
+            'not_yet' => 'Belum',
+            'creating_qr' => 'Membuat Kode QR...',
+            'download_qr' => 'Unduh Kode QR',
+            'show_qr_security' => 'Tunjukkan kode QR ini di Security',
+            'qr_title_1' => 'Kode QR untuk verifikasi kedatangan',
+            'qr_title_2' => 'di Security YMPI',
+            'visitor_file' => 'Pengunjung',
+            'error' => 'Kesalahan',
+        ],
+        'en' => [
+            'welcome' => 'Welcome',
+            'system_title' => 'Visit Management System',
+            'visit_id_or_email' => 'Visit ID or Email',
+            'search_placeholder' => 'YMPI-ABCDE / email@example.com',
+            'search' => 'Search',
+            'back' => 'Back',
+            'not_found' => 'Visit ID or email was not found. Please check your input and try again.',
+            'input_required' => 'Please enter a Visit ID or Email.',
+            'not_visited' => 'Not Visited',
+            'visited_at' => 'Visited at',
+            'company' => 'Company',
+            'email' => 'Email',
+            'start' => 'Start',
+            'finish' => 'Finish',
+            'purpose' => 'Purpose',
+            'host' => 'Host / PIC',
+            'participants' => 'Participants',
+            'name' => 'Name',
+            'phone' => 'Phone',
+            'origin' => 'Origin',
+            'safety_induction' => 'Safety Induction',
+            'active' => 'Active',
+            'not_yet' => 'Not Completed',
+            'creating_qr' => 'Generating QR Code...',
+            'download_qr' => 'Download QR Code',
+            'show_qr_security' => 'Show this QR code to Security',
+            'qr_title_1' => 'QR Code for arrival verification',
+            'qr_title_2' => 'at YMPI Security',
+            'visitor_file' => 'Visitor',
+            'error' => 'Error',
+        ],
+    ];
+
+    $t = $translations[$lang];
+@endphp
+
+
 @section('styles')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -278,17 +352,98 @@
                 padding: 28px 18px;
             }
         }
+
+        .lang-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            display: inline-block;
+        }
+
+        .lang-switch input {
+            display: none;
+        }
+
+        .lang-switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2dff5;
+            border-radius: 50px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            box-shadow: 0 4px 14px rgba(96, 92, 168, 0.18);
+        }
+
+        .lang-switch-slider::before {
+            content: 'ID';
+            position: absolute;
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #605ca8;
+        }
+
+        .lang-switch-slider::after {
+            content: 'EN';
+            position: absolute;
+            right: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8b87b5;
+        }
+
+        .lang-switch input:checked + .lang-switch-slider {
+            background-color: #605ca8;
+        }
+
+        .lang-switch input:checked + .lang-switch-slider::before {
+            left: 32px;
+            background-color: white;
+            content: 'EN';
+            color: #605ca8;
+        }
+
+        .lang-switch input:checked + .lang-switch-slider::after {
+            content: 'ID';
+            left: 8px;
+            right: auto;
+            color: white;
+        }
+
     </style>
 @endsection
 
 @section('content')
+
+<div class="lang-switcher" style="position: absolute; top: 20px; right: 20px; z-index: 1000000;">
+    <label class="lang-switch" aria-label="Language switch">
+        <input type="checkbox" id="langToggle" {{ $lang === 'en' ? 'checked' : '' }}>
+        <span class="lang-switch-slider"></span>
+    </label>
+</div>
+
 <div class="login-page">
     <div class="login-card">
 
         {{-- Judul --}}
         <div class="form-heading">
-            <h1>Selamat Datang</h1>
-            <p>Sistem Manajemen Kunjungan</p>
+            <h1>{{ $t['welcome'] }}</h1>
+            <p>{{ $t['system_title'] }}</p>
         </div>
 
         <div class="divider"></div>
@@ -303,14 +458,14 @@
 
         @csrf
         <div class="field">
-        <label>ID Kunjungan atau Email</label>
+        <label>{{ $t['visit_id_or_email'] }}</label>
         <div class="field-inner">
             <i class="f-icon">🔍</i>
-            <input type="text" name="visit_id" id="visitInput" placeholder="YMPI-ABCDE / email@contoh.com" required>
+            <input type="text" name="visit_id" id="visitInput" placeholder="{{ $t['search_placeholder'] }}" required>
         </div>
         </div>
-        <button class="btn-submit" style="background-color: #168027;" onclick="checkVisitor()">Cari</button>
-        <button onclick="window.location.href='{{ url('index/visitor') }}'" class="btn-submit" style="display: inline-block; margin-top: 16px; text-align: center; text-decoration: none;">← Kembali</button>
+        <button class="btn-submit" style="background-color: #168027;" onclick="checkVisitor()">{{ $t['search'] }}</button>
+        <button onclick="window.location.href='{{ url('index/visitor') }}'" class="btn-submit" style="display: inline-block; margin-top: 16px; text-align: center; text-decoration: none;">← {{ $t['back'] }}</button>
 
         <div id="resultContainer" style="display: none; margin-top: 28px;">
             
@@ -318,7 +473,7 @@
         <div id="errorContainer" style="display: none; margin-top: 28px;">
             <div class="alert-box error">
                 <span class="alert-icon">&#9888;</span>
-                <span>ID Kunjungan atau Email tidak ditemukan. Silakan Cek input Anda dan coba lagi.</span>
+                <span>{{ $t['not_found'] }}</span>
             </div>
         </div>
 
@@ -333,8 +488,10 @@
 @section('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
+        const T = {!! json_encode($t) !!};
+
         jQuery(document).ready(function () {
-            $('#pageTitle').text('Sistem Manajemen Kunjungan');
+            $('#pageTitle').text(T.system_title);
         });
         function checkVisitor() {
             const visitInput = document.getElementById('visitInput').value.trim();
@@ -342,7 +499,7 @@
             const errorContainer = document.getElementById('errorContainer');
 
             if (visitInput === '') {
-                alert('Silakan masukkan ID Kunjungan atau Email.');
+                alert(T.input_required);
                 return;
             }
 
@@ -352,49 +509,49 @@
                 .then(data => {
                     if (data.status) {
                         // Tampilkan hasil
-                        statusVisit = 'Not Visited';
+                        statusVisit = T.not_visited;
                         if (data.data.data_updated == null) {
-                            statusVisit = 'Not Visited';
+                            statusVisit = T.not_visited;
                         } else if (data.data.data_updated != null) {
-                            statusVisit = 'Visited at ' + data.data.data_updated;
+                            statusVisit = T.visited_at + ' ' + data.data.data_updated;
                         }
                         resultContainer.innerHTML = `
                             <div style="background: linear-gradient(135deg, #ffffff 0%, #f8f7ff 100%); border-radius: 14px; padding: 24px; color: #3d3a5c; border: 1px solid rgba(96, 92, 168, 0.2); box-shadow: 0 8px 32px rgba(96, 92, 168, 0.08);">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(96, 92, 168, 0.15);">
                                     <h3 style="font-size: 18px; font-weight: 700; color: #1e1b3a; margin: 0;">${data.data.visitor_id}</h3>
-                                    <span style="background: ${statusVisit === 'Not Visited' ? '#fce7f3' : '#10b981'}; color: ${statusVisit === 'Not Visited' ? '#ec4899' : 'white'}; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">${statusVisit || 'Not Visited'}</span>
+                                    <span style="background: ${statusVisit === T.not_visited ? '#fce7f3' : '#10b981'}; color: ${statusVisit === T.not_visited ? '#ec4899' : 'white'}; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">${statusVisit || T.not_visited}</span>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                                     <div>
-                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Perusahaan</strong></p>
+                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.company}</strong></p>
                                         <p style="font-size: 14px; color: #1e1b3a; margin: 0;">${data.data.company}</p>
                                     </div>
                                     <div>
-                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Email</strong></p>
+                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.email}</strong></p>
                                         <p style="font-size: 14px; color: #1e1b3a; margin: 0;">${data.data.email}</p>
                                     </div>
                                     <div>
-                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Mulai</strong></p>
+                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.start}</strong></p>
                                         <p style="font-size: 14px; color: #1e1b3a; margin: 0;">${data.data.start_date} ${data.data.start_time}</p>
                                     </div>
                                     <div>
-                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Selesai</strong></p>
+                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.finish}</strong></p>
                                         <p style="font-size: 14px; color: #1e1b3a; margin: 0;">${data.data.end_date} ${data.data.end_time}</p>
                                     </div>
                                 </div>
                                 <div style="background: rgba(96, 92, 168, 0.08); border-left: 3px solid #605ca8; padding: 12px 14px; border-radius: 8px; margin-bottom: 16px;">
-                                    <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Tujuan</strong></p>
+                                    <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.purpose}</strong></p>
                                     <p style="font-size: 14px; color: #1e1b3a; margin: 0;">${data.data.purpose}<br>${data.data.purpose_detail}</p>
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
                                     <div>
-                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>PIC yang ditemui</strong></p>
+                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.host}</strong></p>
                                         <p style="font-size: 14px; color: #1e1b3a; margin: 0;">${data.data.host}</p>
                                     </div>
                                 </div>
                                 ${data.details && data.details.length > 0 ? `
                                     <div style="background: rgba(96, 92, 168, 0.08); border-radius: 8px; padding: 14px; margin-top: 16px;">
-                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>Peserta</strong></p>
+                                        <p style="font-size: 12px; color: #8b87b5; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;"><strong>${T.participants}</strong></p>
                                         ${data.details.map((participant, index) => {
                                             var inductionStart = null;
                                             var inductionEnd = null;
@@ -419,12 +576,12 @@
                                                 <div style="margin-bottom: ${index < data.details.length - 1 ? '12px; padding-bottom: 12px; border-bottom: 1px solid rgba(96, 92, 168, 0.15);' : '0;'}">
                                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; margin-bottom: 10px;">
                                                         <div><span style="color: #8b87b5;">ID:</span> <span style="color: #1e1b3a;">${participant.card_id || '-'}</span></div>
-                                                        <div><span style="color: #8b87b5;">Nama:</span> <span style="color: #1e1b3a;">${participant.name || '-'}</span></div>
-                                                        <div><span style="color: #8b87b5;">Telepon:</span> <span style="color: #1e1b3a;">xxx-${participant.phone ? participant.phone.slice(-4) : '----'}</span></div>
-                                                        <div><span style="color: #8b87b5;">Asal:</span> <span style="color: #1e1b3a;">${participant.origin || '-'}</span></div>
+                                                        <div><span style="color: #8b87b5;">${T.name}:</span> <span style="color: #1e1b3a;">${participant.name || '-'}</span></div>
+                                                        <div><span style="color: #8b87b5;">${T.phone}:</span> <span style="color: #1e1b3a;">xxx-${participant.phone ? participant.phone.slice(-4) : '----'}</span></div>
+                                                        <div><span style="color: #8b87b5;">${T.origin}:</span> <span style="color: #1e1b3a;">${participant.origin || '-'}</span></div>
                                                     </div>
                                                     <div style="padding: 8px 10px; background: ${isInductionActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; border-radius: 6px; border-left: 3px solid ${isInductionActive ? '#10b981' : '#ef4444'};">
-                                                        <span style="font-size: 12px; font-weight: 600; color: ${isInductionActive ? '#10b981' : '#ef4444'};">Safety Induction: ${isInductionActive ? '✓ Aktif ' + (activeInduction ? activeInduction.start_induction + ' - ' + activeInduction.end_induction : '') : '✗ Belum'}</span>
+                                                        <span style="font-size: 12px; font-weight: 600; color: ${isInductionActive ? '#10b981' : '#ef4444'};">${T.safety_induction}: ${isInductionActive ? '✓ ' + T.active + ' ' + (activeInduction ? activeInduction.start_induction + ' - ' + activeInduction.end_induction : '') : '✗ ' + T.not_yet}</span>
                                                     </div>
                                                 </div>
                                             `;
@@ -434,9 +591,9 @@
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
                                 <div id="QrCodeContainer" style="display: flex; justify-content: center; align-items: center; background: #f0eef9; border-radius: 14px; padding: 20px; min-height: 300px;">
-                                    <p style="color: #c4c0e0;">Membuat Kode QR...</p>
+                                    <p style="color: #c4c0e0;">${T.creating_qr}</p>
                                 </div>
-                                <button onclick="downloadQRCode()" style="background-color: #605ca8; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;">Unduh Kode QR</button>
+                                <button onclick="downloadQRCode()" style="background-color: #605ca8; color: white; border: none; border-radius: 10px; padding: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background-color 0.2s;">${T.download_qr}</button>
                             </div>
                         `;
                         resultContainer.style.display = 'block';
@@ -472,7 +629,7 @@
                 box-shadow: 0 10px 30px rgba(96, 92, 168, 0.12);
                 display:inline-block;
                 "></div>
-                <p style="margin-top:12px; font-size:12px; color:#8b87b5;">Tunjukkan kode QR ini di Security</p>
+                <p style="margin-top:12px; font-size:12px; color:#8b87b5;">${T.show_qr_security}</p>
                 <p style="margin-top:4px; font-size:13px; font-weight:700; color:#605ca8;">${visitorId}</p>
             </div>
             `;
@@ -527,7 +684,7 @@
                 ctx.fillStyle = '#1e1b3a';
                 ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
                 ctx.textAlign = 'center';
-                const lines = ['Kode QR untuk verifikasi kedatangan', 'di Security YMPI'];
+                const lines = [T.qr_title_1, T.qr_title_2];
                 lines.forEach((line, index) => {
                     ctx.fillText(line, paddedCanvas.width / 2, canvas.height + padding + 20 + (index * 18));
                 });
@@ -539,9 +696,19 @@
                 
                 const link = document.createElement('a');
                 link.href = paddedCanvas.toDataURL('image/png');
-                link.download = `Pengunjung ${currentVisitorId}.png`;
+                link.download = `${T.visitor_file} ${currentVisitorId}.png`;
                 link.click();
             }
         }
+
+        function updateLanguage(lang) {
+            window.location.href = '{{ url("index/visitor/check") }}/' + lang;
+        }
+
+        document.getElementById('langToggle').addEventListener('change', function() {
+            const newLang = this.checked ? 'en' : 'id';
+            updateLanguage(newLang);
+        });
+
     </script>
 @endsection

@@ -1,5 +1,155 @@
 @extends('layouts.app')
 
+@php
+    // Laravel 5.4 compatible bilingual text.
+    // $lang is supplied by the controller with value: id or en.
+    $lang = isset($lang) && $lang === 'en' ? 'en' : 'id';
+
+    $translations = [
+        'id' => [
+            'page_title' => 'Sistem Manajemen Pengunjung',
+            'welcome' => 'Selamat Datang',
+            'company' => 'Perusahaan',
+            'company_placeholder' => 'Nama Perusahaan...',
+            'email_label' => 'Masukkan alamat email Anda',
+            'email_placeholder' => 'Alamat Email...',
+            'start_date' => 'Tanggal Mulai',
+            'start_time' => 'Waktu Mulai',
+            'end_date' => 'Tanggal Berakhir',
+            'end_time' => 'Waktu Berakhir',
+            'select_date' => 'Pilih tanggal',
+            'host_label' => 'PIC YMPI / Karyawan yang ditemui',
+            'host_placeholder' => 'Pilih PIC YMPI / Karyawan yang ditemui...',
+            'host_short_placeholder' => 'Pilih PIC...',
+            'purpose' => 'Tujuan',
+            'purpose_placeholder' => 'Pilih Tujuan...',
+            'purpose_details_placeholder' => 'Jelaskan tujuan kunjungan Anda (min 5 karakter)',
+            'visitor_data' => 'Data Pengunjung',
+            'id_number' => 'No. KTP',
+            'full_name' => 'Nama Lengkap',
+            'phone_number' => 'Nomor Telepon',
+            'origin' => 'Asal/Kota',
+            'add' => 'Tambah',
+            'remove' => 'Hapus',
+            'consent_title' => 'Saya menyetujui penggunaan data pribadi saya',
+            'consent_description' => 'Data pribadi Anda akan digunakan untuk keperluan perusahaan dan dokumentasi keselamatan. Informasi ini tidak akan dibagikan kepada pihak ketiga dan akan ditangani sesuai dengan kebijakan perlindungan data.',
+            'submit' => 'Kirim',
+            'sending' => 'Mengirim...',
+            'back' => 'Kembali',
+            'registration_success' => 'Pendaftaran Pengunjung Berhasil',
+            'registration_success_description' => 'Pendaftaran pengunjung telah berhasil. Anda akan menerima email konfirmasi.',
+            'visitor_id' => 'ID Pengunjung',
+            'qr_security_title' => 'Keamanan QR',
+            'qr_security_description' => 'Tunjukkan kode QR ini di pos keamanan untuk verifikasi kedatangan.',
+            'generating_qr' => 'Membuat QR...',
+            'download_qr' => 'Unduh QR',
+            'close' => 'Tutup',
+            'confirm_submit' => 'Apakah Anda yakin ingin mengirim data pengunjung?',
+            'error' => 'Kesalahan',
+            'success' => 'Sukses',
+            'invalid_email' => 'Format email tidak valid.',
+            'end_date_limit' => 'Tanggal berakhir tidak boleh lebih dari 1 minggu dari tanggal mulai. Saran tanggal berakhir: ',
+            'all_required' => 'Semua kolom wajib diisi.',
+            'submit_error' => 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.',
+            'consent_required_title' => 'Persetujuan Diperlukan',
+            'consent_required_message' => 'Anda harus menyetujui penggunaan data pribadi sebelum mengirim.',
+            'data_refilled' => 'Data Diisi Ulang',
+            'data_refilled_message' => 'Data pengunjung telah diisi ulang berdasarkan kunjungan sebelumnya.',
+            'not_found' => 'Tidak Ditemukan',
+            'search_error' => 'Terjadi kesalahan saat mencari data pengunjung. Silakan coba lagi.',
+            'input_required' => 'Input Diperlukan',
+            'email_search_required' => 'Silakan masukkan email untuk mencari data pengunjung sebelumnya.',
+            'qr_line_1' => 'Kode QR untuk verifikasi kedatangan',
+            'qr_line_2' => 'di Security YMPI',
+            'download_filename' => 'Pengunjung',
+            'purpose_dinas' => 'DINAS',
+            'purpose_inspection' => 'INSPEKSI ATAU PENGECEKAN',
+            'purpose_project' => 'INSTALASI PROYEK',
+            'purpose_goods_delivery' => 'KIRIM BARANG',
+            'purpose_document_delivery' => 'KIRIM DOKUMEN',
+            'purpose_company_visit' => 'KUNJUNGAN PERUSAHAAN',
+            'purpose_mapat' => 'MAPAT BARANG',
+            'purpose_meeting' => 'MEETING',
+            'purpose_loading' => 'MUAT BARANG',
+            'purpose_waste_loading' => 'MUAT LIMBAH ATAU B3',
+            'purpose_scrap_loading' => 'MUAT SCRAP',
+            'purpose_service' => 'PERBAIKAN ATAU SERVICE',
+        ],
+        'en' => [
+            'page_title' => 'Visitor Management System',
+            'welcome' => 'Welcome',
+            'company' => 'Company',
+            'company_placeholder' => 'Company Name...',
+            'email_label' => 'Enter your email address',
+            'email_placeholder' => 'Email Address...',
+            'start_date' => 'Start Date',
+            'start_time' => 'Start Time',
+            'end_date' => 'End Date',
+            'end_time' => 'End Time',
+            'select_date' => 'Select date',
+            'host_label' => 'YMPI PIC / Employee to Meet',
+            'host_placeholder' => 'Select YMPI PIC / Employee to Meet...',
+            'host_short_placeholder' => 'Select PIC...',
+            'purpose' => 'Purpose',
+            'purpose_placeholder' => 'Select Purpose...',
+            'purpose_details_placeholder' => 'Describe the purpose of your visit (min. 5 characters)',
+            'visitor_data' => 'Visitor Data',
+            'id_number' => 'ID Card Number',
+            'full_name' => 'Full Name',
+            'phone_number' => 'Phone Number',
+            'origin' => 'Origin/City',
+            'add' => 'Add',
+            'remove' => 'Remove',
+            'consent_title' => 'I agree to the use of my personal data',
+            'consent_description' => 'Your personal data will be used for company purposes and safety documentation. This information will not be distributed to third parties and will be handled in accordance with the data protection policy.',
+            'submit' => 'Submit',
+            'sending' => 'Submitting...',
+            'back' => 'Back',
+            'registration_success' => 'Visitor Registration Successful',
+            'registration_success_description' => 'Your visit has been registered. Please save the QR code below.',
+            'visitor_id' => 'Visitor ID',
+            'qr_security_title' => '📱 QR Code for arrival verification at YMPI Security',
+            'qr_security_description' => 'Please show or scan this QR code at YMPI Security upon arrival to verify your visit.',
+            'generating_qr' => 'Generating QR Code...',
+            'download_qr' => 'Download QR',
+            'close' => 'Close',
+            'confirm_submit' => 'Are you sure you want to submit the visitor data?',
+            'error' => 'Error',
+            'success' => 'Success',
+            'invalid_email' => 'Invalid email format.',
+            'end_date_limit' => 'The end date cannot be more than 1 week after the start date. Suggested end date: ',
+            'all_required' => 'All fields are required.',
+            'submit_error' => 'An error occurred while submitting the data. Please try again.',
+            'consent_required_title' => 'Consent Required',
+            'consent_required_message' => 'You must agree to the use of personal data before submitting.',
+            'data_refilled' => 'Data Refilled',
+            'data_refilled_message' => 'Visitor data has been refilled based on the previous visit.',
+            'not_found' => 'Not Found',
+            'search_error' => 'An error occurred while searching for visitor data. Please try again.',
+            'input_required' => 'Input Required',
+            'email_search_required' => 'Please enter an email address to search for previous visitor data.',
+            'qr_line_1' => 'QR Code for arrival verification',
+            'qr_line_2' => 'at YMPI Security',
+            'download_filename' => 'Visitor',
+            'purpose_dinas' => 'BUSINESS TRIP',
+            'purpose_inspection' => 'INSPECTION OR CHECKING',
+            'purpose_project' => 'PROJECT INSTALLATION',
+            'purpose_goods_delivery' => 'GOODS DELIVERY',
+            'purpose_document_delivery' => 'DOCUMENT DELIVERY',
+            'purpose_company_visit' => 'COMPANY VISIT',
+            'purpose_mapat' => 'GOODS FITTING / MATCHING',
+            'purpose_meeting' => 'MEETING',
+            'purpose_loading' => 'GOODS LOADING',
+            'purpose_waste_loading' => 'WASTE OR B3 LOADING',
+            'purpose_scrap_loading' => 'SCRAP LOADING',
+            'purpose_service' => 'REPAIR OR SERVICE',
+        ],
+    ];
+
+    $text = $translations[$lang];
+@endphp
+
+
 @section('styles')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -398,17 +548,90 @@
             color: #605ca8 !important;
             font-weight: 700 !important;
         }
+        .lang-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+        }
+
+        .lang-switch input {
+            display: none;
+        }
+
+        .lang-switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2dff5;
+            border-radius: 50px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .lang-switch-slider::before {
+            content: 'ID';
+            position: absolute;
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: #605ca8;
+        }
+
+        .lang-switch-slider::after {
+            content: 'EN';
+            position: absolute;
+            right: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8b87b5;
+        }
+
+        .lang-switch input:checked + .lang-switch-slider {
+            background-color: #605ca8;
+        }
+
+        .lang-switch input:checked + .lang-switch-slider::before {
+            left: 32px;
+            background-color: white;
+            content: 'EN';
+            color: #605ca8;
+        }
+
+        .lang-switch input:checked + .lang-switch-slider::after {
+            content: 'ID';
+            color: white;
+        }
     </style>
 @endsection
 
 @section('content')
+<div class="lang-switcher" style="position: absolute; top: 20px; right: 20px; z-index: 1000000;">
+    <label class="lang-switch">
+        <input type="checkbox" id="langToggle">
+        <span class="lang-switch-slider"></span>
+    </label>
+</div>
 <div class="login-page">
     <div class="login-card">
 
         {{-- Judul --}}
         <div class="form-heading">
-            <h1>Selamat Datang</h1>
-            <p>Sistem Manajemen Pengunjung</p>
+            <h1>{{ $text['welcome'] }}</h1>
+            <p>{{ $text['page_title'] }}</p>
         </div>
 
         <div class="divider"></div>
@@ -434,10 +657,10 @@
         </div> --}}
 
         <div class="field" id="emailField">
-            <label>Perusahaan</label>
+            <label>{{ $text['company'] }}</label>
             <div class="field-inner">
                 <i class="f-icon">🏢</i>
-                <input type="text" name="company" id="company" placeholder="Nama Perusahaan..." value="{{ old('company') }}">
+                <input type="text" name="company" id="company" placeholder="{{ $text['company_placeholder'] }}" value="{{ old('company') }}">
             </div>
             @error('company')
                 <div class="field-error">{{ $message }}</div>
@@ -446,10 +669,10 @@
 
         {{-- Email atau Telepon --}}
         <div class="field" id="emailField">
-            <label>Masukkan alamat email Anda</label>
+            <label>{{ $text['email_label'] }}</label>
             <div class="field-inner">
                 <i class="f-icon">@</i>
-                <input type="email" name="email" id="email" placeholder="Alamat Email..." value="{{ old('email') }}">
+                <input type="email" name="email" id="email" placeholder="{{ $text['email_placeholder'] }}" value="{{ old('email') }}">
             </div>
             @error('email')
                 <div class="field-error">{{ $message }}</div>
@@ -459,17 +682,17 @@
         {{-- Tanggal & Waktu Mulai --}}
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="field">
-                <label>Tanggal Mulai</label>
+                <label>{{ $text['start_date'] }}</label>
                 <div class="field-inner">
                     <i class="f-icon">📅</i>
-                    <input type="text" name="start_date" id="start_date" class="datepicker" placeholder="Pilih tanggal" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" required>
+                    <input type="text" name="start_date" id="start_date" class="datepicker" placeholder="{{ $text['select_date'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" required>
                 </div>
                 @error('start_date')
                     <div class="field-error">{{ $message }}</div>
                 @enderror
             </div>
             <div class="field">
-                <label>Waktu Mulai</label>
+                <label>{{ $text['start_time'] }}</label>
                 <div class="field-inner">
                     <input type="text" class="timepicker" name="start_time" id="start_time" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" value="09:00" required>
                 </div>
@@ -482,17 +705,17 @@
         {{-- Tanggal & Waktu Berakhir --}}
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <div class="field">
-                <label>Tanggal Berakhir</label>
+                <label>{{ $text['end_date'] }}</label>
                 <div class="field-inner">
                     <i class="f-icon">📅</i>
-                    <input type="text" name="end_date" id="end_date" class="datepicker" placeholder="Pilih tanggal" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" required>
+                    <input type="text" name="end_date" id="end_date" class="datepicker" placeholder="{{ $text['select_date'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" required>
                 </div>
                 @error('end_date')
                     <div class="field-error">{{ $message }}</div>
                 @enderror
             </div>
             <div class="field">
-                <label>Waktu Berakhir</label>
+                <label>{{ $text['end_time'] }}</label>
                 <div class="field-inner">
                     <input type="text" class="timepicker" name="end_time" id="end_time" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" value="17:00" required>
                 </div>
@@ -504,11 +727,11 @@
 
         {{-- Host --}}
         <div class="field">
-            <label>PIC YMPI / Karyawan yang ditemui</label>
+            <label>{{ $text['host_label'] }}</label>
             <div class="field-inner">
                 <i class="f-icon">👤</i>
-                <select name="host" id="host" class="host-select" placeholder="Pilih nama PIC..." required style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;">
-                    <option value="">Pilih PIC YMPI / Karyawan yang ditemui...</option>
+                <select name="host" id="host" class="host-select" placeholder="{{ $text['host_short_placeholder'] }}" required style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;">
+                    <option value="">{{ $text['host_placeholder'] }}</option>
                     @foreach([
                         ['PI9801001', 'Abdul Majid', 'HR'],
                         ['PI9806001', 'Abdullah', 'HR'],
@@ -671,26 +894,26 @@
 
         {{-- Tujuan --}}
         <div class="field">
-            <label>Tujuan</label>
+            <label>{{ $text['purpose'] }}</label>
             <div class="field-inner">
                 <i class="f-icon">📋</i>
                 <select name="purpose" id="purpose" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px 11px 40px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: none;" required>
-                    <option value="">Pilih Tujuan...</option>
-                    <option value="DINAS">DINAS</option>
-                    <option value="INSPEKSI ATAU PENGECEKAN">INSPEKSI ATAU PENGECEKAN</option>
-                    <option value="INSTALASI PROYEK">INSTALASI PROYEK</option>
-                    <option value="KIRIM BARANG">KIRIM BARANG</option>
-                    <option value="KIRIM DOKUMEN">KIRIM DOKUMEN</option>
-                    <option value="KUNJUNGAN PERUSAHAAN">KUNJUNGAN PERUSAHAAN</option>
-                    <option value="MAPAT BARANG">MAPAT BARANG</option>
-                    <option value="MEETING">MEETING</option>
-                    <option value="MUAT BARANG">MUAT BARANG</option>
-                    <option value="MUAT LIMBAH ATAU B3">MUAT LIMBAH ATAU B3</option>
-                    <option value="MUAT SCRAP">MUAT SCRAP</option>
-                    <option value="PERBAIKAN ATAU SERVICE">PERBAIKAN ATAU SERVICE</option>
+                    <option value="">{{ $text['purpose_placeholder'] }}</option>
+                    <option value="DINAS">{{ $text['purpose_dinas'] }}</option>
+                    <option value="INSPEKSI ATAU PENGECEKAN">{{ $text['purpose_inspection'] }}</option>
+                    <option value="INSTALASI PROYEK">{{ $text['purpose_project'] }}</option>
+                    <option value="KIRIM BARANG">{{ $text['purpose_goods_delivery'] }}</option>
+                    <option value="KIRIM DOKUMEN">{{ $text['purpose_document_delivery'] }}</option>
+                    <option value="KUNJUNGAN PERUSAHAAN">{{ $text['purpose_company_visit'] }}</option>
+                    <option value="MAPAT BARANG">{{ $text['purpose_mapat'] }}</option>
+                    <option value="MEETING">{{ $text['purpose_meeting'] }}</option>
+                    <option value="MUAT BARANG">{{ $text['purpose_loading'] }}</option>
+                    <option value="MUAT LIMBAH ATAU B3">{{ $text['purpose_waste_loading'] }}</option>
+                    <option value="MUAT SCRAP">{{ $text['purpose_scrap_loading'] }}</option>
+                    <option value="PERBAIKAN ATAU SERVICE">{{ $text['purpose_service'] }}</option>
                 </select>
             </div>
-            <textarea name="purpose_details" id="purpose_details" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; resize: vertical; min-height: 80px; margin-top: 10px;" placeholder="Jelaskan tujuan kunjungan Anda (min 5 karakter)" required></textarea>
+            <textarea name="purpose_details" id="purpose_details" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff; resize: vertical; min-height: 80px; margin-top: 10px;" placeholder="{{ $text['purpose_details_placeholder'] }}" required></textarea>
             @error('purpose')
                 <div class="field-error">{{ $message }}</div>
             @enderror
@@ -701,22 +924,22 @@
 
         {{-- Data Pengunjung --}}
         <div class="field">
-            <label>Data Pengunjung</label>
+            <label>{{ $text['visitor_data'] }}</label>
             <div id="first-visitor" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 80px; gap: 10px; margin-bottom: 12px; align-items: flex-end;">
                 <div>
-                    <input type="text" name="visitors[0][id_name]" id="visitors_0_id" placeholder="No. KTP" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="text" name="visitors[0][id_name]" id="visitors_0_id" placeholder="{{ $text['id_number'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
                 </div>
                 <div>
-                    <input type="text" name="visitors[0][full_name]" id="visitors_0_name" placeholder="Nama Lengkap" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
+                    <input type="text" name="visitors[0][full_name]" id="visitors_0_name" placeholder="{{ $text['full_name'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
                 </div>
                 <div>
-                    <input type="text" name="visitors[0][phone]" id="visitors_0_phone" placeholder="Nomor Telepon" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+                    <input type="text" name="visitors[0][phone]" id="visitors_0_phone" placeholder="{{ $text['phone_number'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
                 </div>
                 <div>
-                    <input type="text" name="visitors[0][origin]" id="visitors_0_origin" placeholder="Asal/Kota" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
+                    <input type="text" name="visitors[0][origin]" id="visitors_0_origin" placeholder="{{ $text['origin'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
                 </div>
                 <div>
-                    <button type="button" class="btn-add" onclick="addVisitor()" style="background-color: #605ca8; color: white; border: none; border-radius: 8px; padding: 11px 14px; cursor: pointer; font-size: 14px; font-weight: 600; height: fit-content; width: 100%;">Tambah</button>
+                    <button type="button" class="btn-add" onclick="addVisitor()" style="background-color: #605ca8; color: white; border: none; border-radius: 8px; padding: 11px 14px; cursor: pointer; font-size: 14px; font-weight: 600; height: fit-content; width: 100%;">{{ $text['add'] }}</button>
                 </div>
             </div>
             <div id="visitors-container"></div>
@@ -732,11 +955,11 @@
             newRow.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 80px; gap: 10px; margin-bottom: 12px; align-items: flex-end;';
             
             newRow.innerHTML = `
-                <input type="text" name="visitors[${visitorCount}][id_name]" id="visitors_${visitorCount}_id" placeholder="No. KTP" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
-                <input type="text" name="visitors[${visitorCount}][full_name]" id="visitors_${visitorCount}_name" placeholder="Nama Lengkap" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
-                <input type="text" name="visitors[${visitorCount}][phone]" id="visitors_${visitorCount}_phone" placeholder="Nomor Telepon" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
-                <input type="text" name="visitors[${visitorCount}][origin]" id="visitors_${visitorCount}_origin" placeholder="Asal/Kota" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
-                <button type="button" class="btn-remove" onclick="removeVisitor(this)" style="background: #f04438; color: white; border: none; border-radius: 8px; padding: 11px 14px; cursor: pointer; font-size: 14px; font-weight: 600; height: fit-content; width: 100%;">Hapus</button>
+                <input type="text" name="visitors[${visitorCount}][id_name]" id="visitors_${visitorCount}_id" placeholder="{{ $text['id_number'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" name="visitors[${visitorCount}][full_name]" id="visitors_${visitorCount}_name" placeholder="{{ $text['full_name'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
+                <input type="text" name="visitors[${visitorCount}][phone]" id="visitors_${visitorCount}_phone" placeholder="{{ $text['phone_number'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+                <input type="text" name="visitors[${visitorCount}][origin]" id="visitors_${visitorCount}_origin" placeholder="{{ $text['origin'] }}" style="width: 100%; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 11px 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #1e1b3a; background: #faf9ff;" required>
+                <button type="button" class="btn-remove" onclick="removeVisitor(this)" style="background: #f04438; color: white; border: none; border-radius: 8px; padding: 11px 14px; cursor: pointer; font-size: 14px; font-weight: 600; height: fit-content; width: 100%;">{{ $text['remove'] }}</button>
             `;
             
             container.appendChild(newRow);
@@ -773,8 +996,8 @@
             <label style="display: flex; align-items: flex-start; gap: 10px; font-weight: 500; cursor: pointer; user-select: none; margin: 0;">
                 <input type="checkbox" name="data_consent" value="1" style="width: 18px; height: 18px; cursor: pointer; accent-color: #605ca8; margin-top: 3px; flex-shrink: 0;" required onchange="checkConsent(this)">
                 <div>
-                    <span style="color: #1e1b3a; font-size: 14px; display: block; margin-bottom: 6px;">Saya setuju dengan penggunaan data pribadi</span>
-                    <p style="font-size: 12px; color: #8b87b5; margin: 0; font-weight: 400; line-height: 1.4;">Data pribadi Anda akan digunakan untuk keperluan perusahaan dan dokumentasi keselamatan. Informasi ini tidak akan didistribusikan kepada pihak ketiga dan akan ditangani sesuai dengan kebijakan perlindungan data.</p>
+                    <span style="color: #1e1b3a; font-size: 14px; display: block; margin-bottom: 6px;">{{ $text['consent_title'] }}</span>
+                    <p style="font-size: 12px; color: #8b87b5; margin: 0; font-weight: 400; line-height: 1.4;">{{ $text['consent_description'] }}</p>
                 </div>
             </label>
             @error('data_consent')
@@ -783,8 +1006,8 @@
         </div>
 
         {{-- Tombol Kirim --}}
-        <button onclick="confirmVisitor()" disabled style="background-color: #168027;" class="btn-submit">Kirim</button>
-        <button onclick="window.location.href='{{ url('index/visitor') }}'" class="btn-back" style="display: inline-block; margin-top: 16px; text-align: center; text-decoration: none;">← Kembali</button>
+        <button onclick="confirmVisitor()" disabled style="background-color: #168027;" class="btn-submit">{{ $text['submit'] }}</button>
+        <button onclick="window.location.href='{{ url('index/visitor') }}'" class="btn-back" style="display: inline-block; margin-top: 16px; text-align: center; text-decoration: none;">← {{ $text['back'] }}</button>
 
         <!-- Modal Sukses dengan Kode QR -->
         <div id="successModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 9999; justify-content: center; align-items: center;">
@@ -793,35 +1016,35 @@
                 <div style="font-size: 60px; margin-bottom: 20px;">✓</div>
                 
                 <!-- Judul -->
-                <h2 style="color: #166534; font-size: 24px; margin-bottom: 10px; font-weight: 700;">Pendaftaran Pengunjung Berhasil</h2>
-                <p style="color: #8b87b5; font-size: 14px; margin-bottom: 30px;">Kunjungan Anda telah terdaftar. Silakan simpan kode QR di bawah ini.</p>
+                <h2 style="color: #166534; font-size: 24px; margin-bottom: 10px; font-weight: 700;">{{ $text['registration_success'] }}</h2>
+                <p style="color: #8b87b5; font-size: 14px; margin-bottom: 30px;">{{ $text['registration_success_description'] }}</p>
                 
                 <!-- ID Pengunjung -->
                 <div style="background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <p style="color: #8b87b5; font-size: 12px; margin: 0 0 5px 0;">ID Pengunjung</p>
+                    <p style="color: #8b87b5; font-size: 12px; margin: 0 0 5px 0;">{{ $text['visitor_id'] }}</p>
                     <p style="color: #166534; font-size: 20px; font-weight: 700; margin: 0; font-family: monospace;" id="visitorIdDisplay">-</p>
                 </div>
                 
                 <!-- Judul & Instruksi Kode QR -->
                 <div style="background: #fef3f2; border: 1px solid #fecdca; border-radius: 10px; padding: 12px; margin-bottom: 20px;">
-                    <p style="color: #b42318; font-size: 13px; font-weight: 600; margin: 0 0 6px 0;">📱 Kode QR untuk verifikasi kedatangan di Security YMPI</p>
-                    <p style="color: #8b87b5; font-size: 12px; margin: 0; line-height: 1.4;">Silakan tunjukkan atau pindai kode QR ini di Security YMPI saat tiba untuk memverifikasi kunjungan Anda.</p>
+                    <p style="color: #b42318; font-size: 13px; font-weight: 600; margin: 0 0 6px 0;">{{ $text['qr_security_title'] }}</p>
+                    <p style="color: #8b87b5; font-size: 12px; margin: 0; line-height: 1.4;">{{ $text['qr_security_description'] }}</p>
                 </div>
                 
                 <!-- Kontainer Kode QR -->
                 <div style="background: #faf9ff; border: 2px dashed #e2dff5; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
                     <div id="qrCodeContainer" style="display: flex; justify-content: center; align-items: center; min-height: 250px;">
-                        <p style="color: #c4c0e0;">Membuat Kode QR...</p>
+                        <p style="color: #c4c0e0;">{{ $text['generating_qr'] }}</p>
                     </div>
                 </div>
                 
                 <!-- Tombol -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <button onclick="downloadQRCode()" style="background-color: #605ca8; color: white; border: none; border-radius: 10px; padding: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        Unduh QR
+                        {{ $text['download_qr'] }}
                     </button>
                     <button onclick="closeSuccessModal()" style="background-color: #f0eef9; color: #605ca8; border: 1.5px solid #e2dff5; border-radius: 10px; padding: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-                        Tutup
+                        {{ $text['close'] }}
                     </button>
                 </div>
 
@@ -904,7 +1127,7 @@
                     ctx.fillStyle = '#1e1b3a';
                     ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
                     ctx.textAlign = 'center';
-                    const lines = ['Kode QR untuk verifikasi kedatangan', 'di Security YMPI'];
+                    const lines = [uiText.qr_line_1, uiText.qr_line_2];
                     lines.forEach((line, index) => {
                         ctx.fillText(line, paddedCanvas.width / 2, canvas.height + padding + 20 + (index * 18));
                     });
@@ -916,7 +1139,7 @@
                     
                     const link = document.createElement('a');
                     link.href = paddedCanvas.toDataURL('image/png');
-                    link.download = `Pengunjung ${currentVisitorId}.png`;
+                    link.download = `${uiText.download_filename} ${currentVisitorId}.png`;
                     link.click();
                 }
             }
@@ -936,14 +1159,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        var uiText = {!! json_encode($text) !!};
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
         jQuery(document).ready(function () {
+            // Set language toggle based on current language
+            const isEnglish = @json($lang === 'en');
+            document.getElementById('langToggle').checked = isEnglish;
             resetForm();
-            $('#pageTitle').text('Sistem Manajemen Pengunjung');
+            $('#pageTitle').text(@json($text['page_title']));
 
             $(".datepicker").datepicker({
                 dateFormat: "yy-mm-dd",
@@ -954,12 +1182,12 @@
             });
 
             $('#host').select2({
-                placeholder: "Pilih PIC...",
+                placeholder: @json($text['host_short_placeholder']),
                 allowClear: true,
                 width: '100%',
             });
             $('#purpose').select2({
-                placeholder: "Pilih Tujuan...",
+                placeholder: @json($text['purpose_placeholder']),
                 allowClear: true,
                 width: '100%',
             });
@@ -1070,12 +1298,12 @@
             if($('#returning_visitor').val() == '0') {
                 $('#returning_visitor').val('1');
                 $('#emailPhoneField').show();
-                $('#returning_visitor_btn').text('Batal Isi Ulang');
+                $('#returning_visitor_btn').text({!! json_encode($lang === 'en' ? 'Cancel Refill' : 'Batal Isi Ulang') !!});
                 $('#emailPhoneField input[name="email_old"]').focus();
             } else {
                 $('#returning_visitor').val('0');
                 $('#emailPhoneField').hide();
-                $('#returning_visitor_btn').text('Isi ulang dari kunjungan sebelumnya');
+                $('#returning_visitor_btn').text({!! json_encode($lang === 'en' ? 'Refill from previous visit' : 'Isi ulang dari kunjungan sebelumnya') !!});
             }
         }
         function checkConsent(checkbox) {
@@ -1087,7 +1315,7 @@
                 document.querySelector('.btn-submit').disabled = true;
                 document.querySelector('.btn-submit').style.backgroundColor = '#999999';
                 document.querySelector('.btn-submit').style.cursor = 'not-allowed';
-                openErrorGritter('Persetujuan Diperlukan', 'Anda harus menyetujui penggunaan data pribadi sebelum mengirim.');
+                openErrorGritter(uiText.consent_required_title, uiText.consent_required_message);
             }
         }
 
@@ -1102,9 +1330,9 @@
         }
 
         function confirmVisitor() {
-            if (confirm('Apakah Anda yakin ingin mengirim data pengunjung?')) {
+            if (confirm(uiText.confirm_submit)) {
                 document.querySelector('.btn-submit').disabled = true;
-                document.querySelector('.btn-submit').innerText = 'Mengirim...';
+                document.querySelector('.btn-submit').innerText = uiText.sending;
                 document.querySelector('.btn-submit').style.backgroundColor = '#999999';
                 document.querySelector('.btn-submit').style.cursor = 'not-allowed';
                 document.querySelector('.btn-submit').style.boxShadow = 'none';
@@ -1114,9 +1342,9 @@
                 document.querySelector('.btn-submit').style.transition = 'all 0.2s';
 
                 if(checkEmail($('input[name="email"]').val()) == false) {
-                    openErrorGritter('Kesalahan', 'Format email tidak valid.');
+                    openErrorGritter(uiText.error, uiText.invalid_email);
                     document.querySelector('.btn-submit').disabled = false;
-                    document.querySelector('.btn-submit').innerText = 'Kirim';
+                    document.querySelector('.btn-submit').innerText = uiText.submit;
                     document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                     document.querySelector('.btn-submit').style.cursor = 'pointer';
                     document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
@@ -1134,9 +1362,9 @@
                 suggestedEndDate.setDate(suggestedEndDate.getDate() + 7);
 
                 if (endDate > maxEndDate) {
-                    openErrorGritter('Kesalahan', 'Tanggal berakhir tidak boleh lebih dari 1 minggu dari tanggal mulai. Saran tanggal berakhir: ' + suggestedEndDate.toISOString().split('T')[0]);
+                    openErrorGritter(uiText.error, uiText.end_date_limit + suggestedEndDate.toISOString().split('T')[0]);
                     document.querySelector('.btn-submit').disabled = false;
-                    document.querySelector('.btn-submit').innerText = 'Kirim';
+                    document.querySelector('.btn-submit').innerText = uiText.submit;
                     document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                     document.querySelector('.btn-submit').style.cursor = 'pointer';
                     document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
@@ -1163,9 +1391,9 @@
                 formData.append('data_consent', $('input[name="data_consent"]').is(':checked') ? 1 : 0);
 
                 if($('input[name="email"]').val() == '' || $('input[name="company"]').val() == '' || $('#start_date').val() == '' || $('#start_time').val() == '' || $('#end_date').val() == '' || $('#end_time').val() == '' || $('#host').val() == '' || $('#purpose').val() == '' || $('#purpose_details').val() == '') {
-                    openErrorGritter('Kesalahan', 'Semua kolom wajib diisi.');
+                    openErrorGritter(uiText.error, uiText.all_required);
                     document.querySelector('.btn-submit').disabled = false;
-                    document.querySelector('.btn-submit').innerText = 'Kirim';
+                    document.querySelector('.btn-submit').innerText = uiText.submit;
                     document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                     document.querySelector('.btn-submit').style.cursor = 'pointer';
                     document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
@@ -1196,7 +1424,7 @@
                 // if(salah == 1) {
                 //     openErrorGritter('Kesalahan', 'Format No. KTP harus 16 digit angka.');
                 //     document.querySelector('.btn-submit').disabled = false;
-                //     document.querySelector('.btn-submit').innerText = 'Kirim';
+                //     document.querySelector('.btn-submit').innerText = uiText.submit;
                 //     document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                 //     document.querySelector('.btn-submit').style.cursor = 'pointer';
                 //     document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
@@ -1213,12 +1441,12 @@
                     contentType: false,
                     success: function(response) {
                         if (response.status === 'success') {
-                            openSuccessGritter('Sukses', response.message);
+                            openSuccessGritter(uiText.success, response.message);
                             showSuccessModal(response.visitor_id);
                         } else {
-                            openErrorGritter('Kesalahan', response.message);
+                            openErrorGritter(uiText.error, response.message);
                             document.querySelector('.btn-submit').disabled = false;
-                            document.querySelector('.btn-submit').innerText = 'Kirim';
+                            document.querySelector('.btn-submit').innerText = uiText.submit;
                             document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                             document.querySelector('.btn-submit').style.cursor = 'pointer';
                             document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
@@ -1227,9 +1455,9 @@
                         }
                     },
                     error: function(xhr) {
-                        openErrorGritter('Kesalahan', 'Terjadi kesalahan saat mengirim data. Silakan coba lagi.');
+                        openErrorGritter(uiText.error, uiText.submit_error);
                         document.querySelector('.btn-submit').disabled = false;
-                        document.querySelector('.btn-submit').innerText = 'Kirim';
+                        document.querySelector('.btn-submit').innerText = uiText.submit;
                         document.querySelector('.btn-submit').style.backgroundColor = '#168027';
                         document.querySelector('.btn-submit').style.cursor = 'pointer';
                         document.querySelector('.btn-submit').style.boxShadow = '0 4px 14px rgba(96, 92, 168, 0.35)';
@@ -1276,17 +1504,17 @@
                                     $(`#visitors_${i}_origin`).val(response.details[i].origin);
                                 }
                             }
-                            openSuccessGritter('Data Diisi Ulang', 'Data pengunjung telah diisi ulang berdasarkan kunjungan sebelumnya.');
+                            openSuccessGritter(uiText.data_refilled, uiText.data_refilled_message);
                         } else {
-                            openErrorGritter('Tidak Ditemukan', response.message);
+                            openErrorGritter(uiText.not_found, response.message);
                         }
                     },
                     error: function(xhr) {
-                        openErrorGritter('Kesalahan', 'Terjadi kesalahan saat mencari data pengunjung. Silakan coba lagi.');
+                        openErrorGritter(uiText.error, uiText.search_error);
                     }
                 });
             } else {
-                openErrorGritter('Input Diperlukan', 'Silakan masukkan email untuk mencari data pengunjung sebelumnya.');
+                openErrorGritter(uiText.input_required, uiText.email_search_required);
             }
         }
 
@@ -1296,7 +1524,7 @@
             $('#first-visitor input').val('');
             $('#returning_visitor').val('0');
             $('#emailPhoneField').hide();
-            $('#returning_visitor_btn').text('Isi ulang dari kunjungan sebelumnya');
+            $('#returning_visitor_btn').text({!! json_encode($lang === 'en' ? 'Refill from previous visit' : 'Isi ulang dari kunjungan sebelumnya') !!});
             $('#company').val('');
             $('#email').val('');
             $('#start_date').val('');
@@ -1333,5 +1561,13 @@
                 time: '3000'
             });
         }
+        function updateLanguage(lang) {
+            window.location.href = '{{ url("index/visitor/input") }}/' + lang;
+        }
+
+        document.getElementById('langToggle').addEventListener('change', function() {
+            const newLang = this.checked ? 'en' : 'id';
+            updateLanguage(newLang);
+        });
     </script>
 @endsection

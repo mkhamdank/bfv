@@ -714,8 +714,8 @@ Route::post('post/molding/pengiriman/kirim', 'App\Http\Controllers\MoldingContro
 Route::get('approval/molding/pengiriman/{status}/{id}', 'App\Http\Controllers\MoldingController@approvalPengiriman');
 
 Route::get('index/visitor', 'App\Http\Controllers\GeneralController@indexVisitor');
-Route::get('index/visitor/input', 'App\Http\Controllers\GeneralController@indexVisitorInput');
-Route::get('index/visitor/check', 'App\Http\Controllers\GeneralController@indexVisitorCheck');
+Route::get('index/visitor/input/{lang?}', 'App\Http\Controllers\GeneralController@indexVisitorInput');
+Route::get('index/visitor/check/{lang?}', 'App\Http\Controllers\GeneralController@indexVisitorCheck');
 Route::post('input/visitor', 'App\Http\Controllers\GeneralController@inputVisitor');
 Route::get('input/visitor/check', 'App\Http\Controllers\GeneralController@inputVisitorCheck');
 Route::post('search/visitor', 'App\Http\Controllers\GeneralController@inputVisitorCheck');

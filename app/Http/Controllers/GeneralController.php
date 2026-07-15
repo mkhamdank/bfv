@@ -1177,14 +1177,16 @@ class GeneralController extends Controller
         return view('general.visitor.index');
     }
 
-    function indexVisitorCheck()
+    function indexVisitorCheck($lang)
     {
-        return view('general.visitor.check');
+        return view('general.visitor.check')
+        ->with('lang',$lang);
     }
 
-    function indexVisitorInput()
+    function indexVisitorInput($lang)
     {
-        return view('general.visitor.input');
+        return view('general.visitor.input')
+        ->with('lang',$lang);
     }
 
     function inputVisitor(Request $request)
