@@ -1250,6 +1250,7 @@ class GeneralAffairController extends Controller
             $odometer = $request->get('odometer');
             $latitude = $request->get('latitude');
             $longitude = $request->get('longitude');
+            $receipt = $request->get('receipt');
 
             //GET FUEL NOW
             $curl = curl_init();
@@ -1363,6 +1364,7 @@ class GeneralAffairController extends Controller
                 'fuel_actual_after' => $fuel_actual_after,
                 'fuel_amount_liter' => $fuel_amount_liter,
                 'fuel_amount' => $fuel_amount,
+                'receipt' => $receipt,
                 'location' => $location,
                 'latitude' => $latitude,
                 'longitude' => $longitude,

@@ -323,7 +323,7 @@
 
             <div class="ff">
                 <label>Pengisian BBM (Liter) <span class="req">*</span></label>
-                <input type="number" id="fuel" name="fuel" placeholder="Jumlah liter" value="">
+                <input type="text" id="fuel" name="fuel" class="numpad" placeholder="Jumlah liter" value="" inputmode="decimal" pattern="[0-9.]*">
                 <span class="hint">
                     Gunakan titik <strong>(.)</strong> sebagai pemisah desimal, bukan koma.
                 </span>
@@ -342,16 +342,22 @@
             </div>
 
             <div class="g2">
-                <div class="ff" style="margin-bottom:0;">
+                <div class="ff" style="">
                     <label>Harga Per Liter <span class="req">*</span></label>
                     <input type="number" id="fuel_amount_liter" name="fuel_amount_liter" class="numpad"
                            placeholder="Harga per liter" value="" onchange="changeLiter(this.value)">
                 </div>
-                <div class="ff" style="margin-bottom:0;">
+                <div class="ff" style="">
                     <label>Harga Total <span class="req">*</span></label>
                     <input type="number" id="fuel_amount" name="fuel_amount" class="numpad"
                            placeholder="Harga total" value="">
                 </div>
+            </div>
+
+            <div class="ff">
+                <label>Harga pada Nota <span style="color: red;">(Isikan jika berbeda)</span> <span class="req">*</span></label>
+                <input type="number" id="receipt" name="receipt" class="numpad"
+                           placeholder="Harga pada Nota" value="">
             </div>
 
         </div>
@@ -658,6 +664,7 @@
         }
         $('#fuel_amount_liter').val(harga);
         $('#fuel_amount').val(parseFloat(harga) * parseFloat($('#fuel').val()));
+        $('#receipt').val(parseFloat(harga) * parseFloat($('#fuel').val()));
     }
 
     function changeLiter(amountLiter) {
@@ -668,6 +675,7 @@
             return false;
         }
         $('#fuel_amount').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
+        $('#receipt').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
     }
 
     /* ── Submit ── */
@@ -682,7 +690,7 @@
         }
         if ($('#fuel').val() == '' || $('#fuel_type').val() == '-' ||
             $('#odometer').val() == '' || $('#fuel_amount').val() == '' ||
-            $('#fuel_amount_liter').val() == '') {
+            $('#fuel_amount_liter').val() == '' || $('#receipt').val() == '') {
             openErrorGritter('Error!', 'Isikan BBM dan Odometer');
             return false;
         }
@@ -710,6 +718,7 @@
             times             : $('#hour').val() + ':' + $('#minute').val(),
             fuel_amount       : $('#fuel_amount').val(),
             fuel_amount_liter : $('#fuel_amount_liter').val(),
+            receipt           : $('#receipt').val(),
             location          : $('#location').val(),
             odometer          : $('#odometer').val(),
             id                : '{{ $id }}'
