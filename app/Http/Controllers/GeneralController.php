@@ -449,7 +449,7 @@ class GeneralController extends Controller
             ->where('id',$japanese_id)
             ->first();
 
-            $task_id = 'Daily_' . date('Ymd');
+            $task_id = 'Daily_' . date('Ymd').'_'.date('His').'_'.rand(1000,9999);
             $insert_driver_task = DB::table('driver_tasks')
             ->insertGetId([
                 'task_id' => $task_id,
