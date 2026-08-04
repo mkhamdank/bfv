@@ -302,11 +302,31 @@
         @endif
 
         @csrf
+
         <div class="field">
-        <label>No. KTP</label>
+        <label>Tipe Identitas</label>
+        <div class="field-inner">
+            <select name="identity_type" id="identity_type" required onchange="updateIdentityLabel(this.value)" style="width: 100%; padding: 10px 12px; border: 1.5px solid #e2dff5; border-radius: 8px; font-size: 14px; color: #1e1b3a; background: white; cursor: pointer;">
+                <option value="" >Pilih Tipe Identitas</option>
+                <option value="ktp">KTP</option>
+                <option value="passport">Paspor</option>
+            </select>
+        </div>
+        </div>
+
+        <div class="field" id="ktp_field" style="display: none;">
+        <label id="identity_label">No. KTP</label>
         <div class="field-inner">
             <i class="f-icon">🆔</i>
             <input type="text" name="identity_number" placeholder="Masukkan No. KTP" required  inputmode="numeric" pattern="[0-9]*" required onkeyup="this.value = this.value.replace(/[^0-9]/g, '');">
+        </div>
+        </div>
+
+        <div class="field" id="passport_field" style="display: none;">
+        <label id="identity_label_passport">No. Paspor</label>
+        <div class="field-inner">
+            <i class="f-icon">🆔</i>
+            <input type="text" name="passport_number" placeholder="Masukkan No. Paspor" required>
         </div>
         </div>
 
@@ -374,10 +394,14 @@
         jQuery(document).ready(function () {
             $('#pageTitle').text('Sistem Manajemen Kunjungan');
             clearForm();
+            $('#ktp_field').hide();
+            $('#passport_field').hide();
         });
 
         function clearForm() {
             document.querySelector('input[name="identity_number"]').value = '';
+            document.querySelector('input[name="passport_number"]').value = '';
+            $('#identity_type').val('').trigger('change');
             document.querySelector('input[name="name"]').value = '';
             document.querySelector('input[name="data_consent"]').checked = false;
             document.querySelector('.btn-submit').disabled = true;
@@ -386,7 +410,26 @@
         }
 
         function saveInduction() {
-            const identityNumber = document.querySelector('input[name="identity_number"]').value.trim();
+            if($('#identity_type').val() === '') {
+                alert('Harap pilih tipe identitas.');
+                return;
+            }
+            if($('#identity_type').val() == 'ktp' && document.querySelector('input[name="identity_number"]').value.trim() === '') {
+                alert('Harap masukkan No. KTP.');
+                return;
+            }
+            if($('#identity_type').val() == 'passport' && document.querySelector('input[name="passport_number"]').value.trim() === '') {
+                alert('Harap masukkan No. Paspor.');
+                return;
+            }
+            if($('#identity_type').val() == 'ktp') {
+                var identityNumber = document.querySelector('input[name="identity_number"]').value.trim();
+            } else if($('#identity_type').val() == 'passport') {
+                var identityNumber = document.querySelector('input[name="passport_number"]').value.trim();
+            } else {
+                alert('Tipe identitas tidak valid.');
+                return;
+            }
             const name = document.querySelector('input[name="name"]').value.trim();
             const dataConsent = document.querySelector('input[name="data_consent"]').checked;
 
@@ -433,6 +476,25 @@
                 document.querySelector('.btn-submit').style.backgroundColor = '#999999';
                 document.querySelector('.btn-submit').style.cursor = 'not-allowed';
                 alert('Persetujuan Diperlukan: Anda harus menyetujui penggunaan data pribadi sebelum mengirim.');
+            }
+        }
+
+        function updateIdentityLabel(value) {
+            if (value === 'ktp') {
+                $('#ktp_field').show();
+                $('#passport_field').hide();
+                document.querySelector('input[name="identity_number"]').required = true;
+                document.querySelector('input[name="passport_number"]').required = false;
+            } else if (value === 'passport') {
+                $('#ktp_field').hide();
+                $('#passport_field').show();
+                document.querySelector('input[name="identity_number"]').required = false;
+                document.querySelector('input[name="passport_number"]').required = true;
+            } else {
+                $('#ktp_field').hide();
+                $('#passport_field').hide();
+                document.querySelector('input[name="identity_number"]').required = false;
+                document.querySelector('input[name="passport_number"]').required = false;
             }
         }
     </script>
