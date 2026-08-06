@@ -1174,19 +1174,31 @@ class GeneralController extends Controller
 
     function indexVisitor()
     {
-        return view('general.visitor.index');
+        $title = 'Visitor Management System';
+        return view('general.visitor.index')
+        ->with('title',$title);
     }
 
     function indexVisitorCheck($lang)
     {
+        $title = 'Visitor Check';
+        if($lang == 'id'){
+            $title = 'Pengecekan Pengunjung';
+        }
         return view('general.visitor.check')
-        ->with('lang',$lang);
+        ->with('lang',$lang)
+        ->with('title',$title);
     }
 
     function indexVisitorInput($lang)
     {
+        $title = 'Visitor Input';
+        if($lang == 'id'){
+            $title = 'Input Pengunjung';
+        }
         return view('general.visitor.input')
-        ->with('lang',$lang);
+        ->with('lang',$lang)
+        ->with('title',$title);
     }
 
     function inputVisitor(Request $request)

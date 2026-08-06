@@ -15,7 +15,7 @@
         @if (isset($title))
             {{ $title }}
         @else
-            Bridge for Vendor
+            YMPICOID
         @endif
     </title>
 
