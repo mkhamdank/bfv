@@ -561,6 +561,8 @@
         /* validate & collect E-Toll */
         for (var i = 0; i < count_etoll; i++) {
             var val = $('#etoll_' + i).val();
+            var hasFile = $('#file_etoll_' + i).prop('files')[0] != undefined;
+            
             if (val != '' && val != undefined && val != 'undefined') {
                 var v = parseInt(val);
                 if (isNaN(v) || v < 100) {
@@ -568,7 +570,7 @@
                     openErrorGritter('Error!', 'E-Toll harus berupa nominal harga minimal 3 digit');
                     return false;
                 }
-                if ($('#file_etoll_' + i).prop('files')[0] == undefined) {
+                if (!hasFile) {
                     $('#loading').removeClass('show');
                     openErrorGritter('Error!', 'Isikan Foto Bukti E-Toll');
                     return false;
@@ -577,6 +579,10 @@
                 etoll_from.push($('#from_' + i).val());
                 etoll_to.push($('#to_' + i).val());
                 file_etoll.push($('#blah_etoll_' + i).attr('src'));
+            } else if (hasFile && (val == '' || val == undefined || val == 'undefined')) {
+                $('#loading').removeClass('show');
+                openErrorGritter('Error!', 'Isikan Nominal E-Toll');
+                return false;
             }
         }
 
@@ -628,7 +634,7 @@
                     $('#loading').removeClass('show');
                 }
             });
-            return;
+            // return;
         }
 
         /* save E-Toll */
