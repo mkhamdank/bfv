@@ -676,6 +676,20 @@
 <script src="{{ url('ckeditor/ckeditor.js') }}"></script>
 <script src="{{ url('js/compressImage.js') }}"></script>
 
+<!-- <script src="{{ asset('js/jquery-3.5.1.js') }}"></script> -->
+
+<script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('js/dataTables.bootstrap4.min.js') }}"></script>
+
+<script src="{{ asset('js/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('js/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('js/buttons.print.min.js') }}"></script>
+
+<script src="{{ asset('js/jszip.min.js') }}"></script>
+
+<script src="{{ asset('js/exceljs.min.js') }}"></script>
+<script src="{{ asset('js/FileSaver.min.js') }}"></script>
+
 <script>
     $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
 
@@ -955,6 +969,31 @@
                     html += '<td>' + jPill + '</td><td>' + (v.status || '—') + '</td></tr>';
                 });
                 $('#bodyTableDetail').html(html || '<tr><td colspan="10" style="color:#a0aec0;text-align:center;padding:24px;">Tidak ada data.</td></tr>');
+
+                var tableDetail = $('#tableDetail').DataTable({
+                    pageLength: 10,
+
+                    dom: 'Bfrtip',
+
+                    buttons: [
+                        {
+                            text: '<i class="fas fa-file-excel"></i> Export Excel',
+                            className: 'btn btn-success',
+                            action: function () {
+                                exportDetailExcel();
+                            }
+                        }
+                    ],
+
+                    columnDefs: [
+                        {
+                            targets: [5, 6, 7],
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+                });
+
                 $('#loading').removeClass('show');
             } else {
                 $('#loading').removeClass('show');
@@ -1040,6 +1079,221 @@
         });
         $('#moldings').html(isi);
     }
+
+    async function exportDetailExcel() {
+
+        const dt = $('#tableDetail').DataTable();
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Check Molding');
+
+        worksheet.mergeCells('A1:A2');
+        worksheet.mergeCells('B1:B2');
+        worksheet.mergeCells('C1:C2');
+        worksheet.mergeCells('D1:D2');
+        worksheet.mergeCells('E1:E2');
+        worksheet.mergeCells('F1:H1');
+        worksheet.mergeCells('I1:I2');
+        worksheet.mergeCells('J1:J2');
+
+        worksheet.getCell('A1').value = 'Id';
+        worksheet.getCell('B1').value = 'Tanggal';
+        worksheet.getCell('C1').value = 'Molding';
+        worksheet.getCell('D1').value = 'PIC';
+        worksheet.getCell('E1').value = 'Poin Cek';
+
+        worksheet.getCell('F1').value = 'Eviden';
+        worksheet.getCell('F2').value = 'Before';
+        worksheet.getCell('G2').value = 'After';
+        worksheet.getCell('H2').value = 'Aktifitas';
+
+        worksheet.getCell('I1').value = 'Judgement';
+        worksheet.getCell('J1').value = 'Status';
+
+        // INI YANG PENTING
+        const rows = dt
+            .rows({
+                search: 'applied'
+            })
+            .nodes()
+            .toArray();
+
+        for (let i = 0; i < rows.length; i++) {
+
+            const tr = rows[i];
+            const cells = $(tr).find('td');
+
+            const excelRow = worksheet.addRow([
+                $(cells[0]).text().trim(),
+                $(cells[1]).text().trim(),
+                $(cells[2]).text().trim(),
+                $(cells[3]).text().trim(),
+                $(cells[4]).text().trim(),
+                '',
+                '',
+                '',
+                $(cells[8]).text().trim(),
+                $(cells[9]).text().trim()
+            ]);
+
+            excelRow.height = 75;
+
+            await insertImagesToExcel(
+                workbook,
+                worksheet,
+                $(cells[5]).find('img'),
+                excelRow.number,
+                5
+            );
+
+            await insertImagesToExcel(
+                workbook,
+                worksheet,
+                $(cells[6]).find('img'),
+                excelRow.number,
+                6
+            );
+
+            await insertImagesToExcel(
+                workbook,
+                worksheet,
+                $(cells[7]).find('img'),
+                excelRow.number,
+                7
+            );
+        }
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        saveAs(
+            new Blob([buffer], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            }),
+            'Check_Molding.xlsx'
+        );
+    }
+
+    async function insertImagesToExcel(
+        workbook,
+        worksheet,
+        images,
+        rowNumber,
+        columnIndex
+    ) {
+
+        for (
+            let i = 0;
+            i < images.length;
+            i++
+        ) {
+
+            const imageUrl =
+                $(images[i]).attr('src');
+
+            if (!imageUrl) {
+                continue;
+            }
+
+            try {
+
+                const response =
+                    await fetch(imageUrl);
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Image tidak ditemukan'
+                    );
+                }
+
+                const blob =
+                    await response.blob();
+
+                const buffer =
+                    await blob.arrayBuffer();
+
+
+                /*
+                ===================================
+                DETEKSI FORMAT
+                ===================================
+                */
+
+                let extension = 'jpeg';
+
+                if (
+                    blob.type.includes('png')
+                ) {
+                    extension = 'png';
+                }
+
+
+                /*
+                ===================================
+                TAMBAHKAN IMAGE
+                ===================================
+                */
+
+                const imageId =
+                    workbook.addImage({
+                        buffer: buffer,
+                        extension: extension
+                    });
+
+
+                /*
+                ===================================
+                POSISI IMAGE
+                ===================================
+
+                columnIndex ExcelJS dimulai dari 0
+                A = 0
+                B = 1
+                ...
+                F = 5
+
+                */
+
+                const imageWidth = 65;
+
+                const imageHeight = 65;
+
+                const imageOffset =
+                    i * 0.55;
+
+
+                worksheet.addImage(
+                    imageId,
+                    {
+                        tl: {
+                            col:
+                                columnIndex +
+                                imageOffset,
+                            row:
+                                rowNumber -
+                                1 +
+                                0.1
+                        },
+
+                        ext: {
+                            width: imageWidth,
+                            height: imageHeight
+                        }
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Gagal export gambar:',
+                    imageUrl,
+                    error
+                );
+
+            }
+
+        }
+    }
+
     function findItem(arr, val) {
         for (var i = 0; i < arr.length; i++) { if (arr[i].part == val) return true; }
         return false;
