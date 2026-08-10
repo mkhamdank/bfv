@@ -326,12 +326,13 @@
                         <th>Jam</th>
                         <th>User</th>
                         <th>Kendaraan</th>
-                        <th style="width:130px;">Aksi</th>
+                        <th style="width: 150px;">Tujuan</th>
+                        <th style="width: 130px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="toll_parking_table">
                     <tr class="state-row">
-                        <td colspan="6">
+                        <td colspan="7">
                             <i class="fas fa-spinner fa-spin"></i>
                             Memuat data...
                         </td>
@@ -372,7 +373,7 @@
 
                 if (data.length === 0) {
                     $('#toll_parking_table').html(
-                        '<tr class="state-row"><td colspan="6"><i class="fas fa-inbox"></i>Tidak ada data penugasan.</td></tr>'
+                        '<tr class="state-row"><td colspan="7"><i class="fas fa-inbox"></i>Tidak ada data penugasan.</td></tr>'
                     );
                     return;
                 }
@@ -397,6 +398,7 @@
                     html += '<td data-label="Jam"><div class="time-range"><i class="fas fa-clock" style="color:#c4bfef;font-size:12px;"></i> ' + timeFrom + '<span class="time-sep">→</span>' + timeTo + '</div></td>';
                     html += '<td data-label="User"><div class="user-cell"><div class="user-avatar">' + initials + '</div><span class="user-name">' + item.created_by_name + '</span></div></td>';
                     html += '<td data-label="Kendaraan"><div class="car-plat">' + item.plat_no + '</div><div class="car-name">' + item.car + '</div></td>';
+                    html += '<td data-label="Tujuan">' + (item.destination || '') + '</td>';
                     html += '<td data-label="Aksi"><a class="btn-isi" href="' + actionUrl + '"><i class="fas fa-pen"></i> Isi Data</a></td>';
                     html += '</tr>';
                 });
@@ -405,7 +407,7 @@
             } else {
                 $('#row-count').text('0 data');
                 $('#toll_parking_table').html(
-                    '<tr class="state-row"><td colspan="6"><i class="fas fa-exclamation-circle" style="color:#fca5a5;"></i>' + (result.message || 'Gagal memuat data.') + '</td></tr>'
+                    '<tr class="state-row"><td colspan="7"><i class="fas fa-exclamation-circle" style="color:#fca5a5;"></i>' + (result.message || 'Gagal memuat data.') + '</td></tr>'
                 );
                 openErrorGritter('Error!', result.message);
             }
