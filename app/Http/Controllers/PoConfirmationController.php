@@ -220,8 +220,6 @@ class PoConfirmationController extends Controller
             // $notification = $this->sendPoNotificationEquipment($po_number);
 
             DB::commit();
-
-            die();
             $response = array(
                 'status' => true,
             );
