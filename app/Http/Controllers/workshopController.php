@@ -10,6 +10,15 @@ use Illuminate\Database\QueryException;
 use Carbon\Carbon;
 use Response;
 
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
+
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+
 class workshopController extends Controller
 {
 	public function indexCheckMolding()
@@ -687,5 +696,381 @@ class workshopController extends Controller
 			return Response::json($response);
 		}
 		
+	}
+
+	public function exportDetailExcel(Request $request)
+	{
+		$time = date('Ymd_His');
+
+		/*
+		|--------------------------------------------------------------------------
+		| QUERY DATA
+		|--------------------------------------------------------------------------
+		| Silakan ganti dengan query Anda yang sebenarnya
+		*/
+
+		$records = db::table('pe_molding_checks')
+			->leftJoin('pe_molding_check_details', 'pe_molding_checks.id', '=', 'pe_molding_check_details.check_id')
+			->whereBetween('pe_molding_checks.check_date', [
+				$request->date_from,
+				$request->date_to
+			])
+			->orderBy('pe_molding_checks.check_date', 'asc')
+			->get();
+
+
+		/*
+		|--------------------------------------------------------------------------
+		| ANONYMOUS EXPORT CLASS
+		|--------------------------------------------------------------------------
+		*/
+
+		$export = new class($records) implements
+			FromView,
+			WithDrawings,
+			WithEvents
+		{
+			private $records;
+
+			public function __construct($records)
+			{
+				$this->records = $records;
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| VIEW EXCEL
+			|--------------------------------------------------------------------------
+			*/
+
+			public function view(): \Illuminate\Contracts\View\View
+			{
+				return view(
+					'workshop.check_molding.check_excel',
+					[
+						'records' => $this->records
+					]
+				);
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| DRAWINGS / GAMBAR
+			|--------------------------------------------------------------------------
+			*/
+
+			public function drawings()
+			{
+				$drawings = [];
+
+				// Row 1 & 2 = header
+				// Data dimulai row 3
+				$row = 3;
+
+				foreach ($this->records as $record) {
+
+					// BEFORE 1
+					$this->addImage(
+						$drawings,
+						$record->photo_before1,
+						'F' . $row,
+						5
+					);
+
+					// BEFORE 2
+					$this->addImage(
+						$drawings,
+						$record->photo_before2,
+						'F' . $row,
+						80
+					);
+
+
+					// AFTER 1
+					$this->addImage(
+						$drawings,
+						$record->photo_after1,
+						'G' . $row,
+						5
+					);
+
+					// AFTER 2
+					$this->addImage(
+						$drawings,
+						$record->photo_after2,
+						'G' . $row,
+						80
+					);
+
+
+					// ACTIVITY 1
+					$this->addImage(
+						$drawings,
+						$record->photo_activity1,
+						'H' . $row,
+						5
+					);
+
+					// ACTIVITY 2
+					$this->addImage(
+						$drawings,
+						$record->photo_activity2,
+						'H' . $row,
+						80
+					);
+
+					$row++;
+				}
+
+				return $drawings;
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| HELPER IMAGE
+			|--------------------------------------------------------------------------
+			*/
+
+			private function addImage(
+				&$drawings,
+				$fileName,
+				$coordinate,
+				$offsetX = 5
+			) {
+
+				/*
+				|--------------------------------------------------------------
+				| NULL → SKIP
+				|--------------------------------------------------------------
+				*/
+
+				if (
+					empty($fileName) ||
+					$fileName === 'null' ||
+					$fileName === 'undefined'
+				) {
+					return;
+				}
+
+
+				/*
+				|--------------------------------------------------------------
+				| PATH GAMBAR
+				|--------------------------------------------------------------
+				|
+				| SESUAIKAN bagian ini dengan lokasi file sebenarnya.
+				|
+				*/
+
+				$imagePath = public_path(
+					'workshop/Audit_Molding/Check_Molding/check_att/' .
+					$fileName
+				);
+
+
+				/*
+				|--------------------------------------------------------------
+				| FILE TIDAK ADA → SKIP
+				|--------------------------------------------------------------
+				*/
+
+				if (!file_exists($imagePath)) {
+
+					\Log::warning(
+						'Image export tidak ditemukan: ' .
+						$imagePath
+					);
+
+					return;
+				}
+
+
+				try {
+
+					$drawing = new Drawing();
+
+					$drawing->setName('Evidence');
+					$drawing->setDescription('Evidence');
+
+					$drawing->setPath($imagePath);
+
+					// contoh F3
+					$drawing->setCoordinates(
+						$coordinate
+					);
+
+					// tinggi gambar
+					$drawing->setHeight(70);
+
+					// posisi
+					$drawing->setOffsetX(
+						$offsetX
+					);
+
+					$drawing->setOffsetY(5);
+
+					$drawings[] = $drawing;
+
+				} catch (\Exception $e) {
+
+					\Log::error(
+						'Gagal export gambar ' .
+						$fileName .
+						': ' .
+						$e->getMessage()
+					);
+				}
+			}
+
+
+			/*
+			|--------------------------------------------------------------------------
+			| FORMAT EXCEL
+			|--------------------------------------------------------------------------
+			*/
+
+			public function registerEvents(): array
+			{
+				return [
+
+					AfterSheet::class =>
+						function (AfterSheet $event) {
+
+							$sheet =
+								$event
+									->sheet
+									->getDelegate();
+
+
+							/*
+							|--------------------------------------------------
+							| COLUMN WIDTH
+							|--------------------------------------------------
+							*/
+
+							$sheet
+								->getColumnDimension('A')
+								->setWidth(10);
+
+							$sheet
+								->getColumnDimension('B')
+								->setWidth(15);
+
+							$sheet
+								->getColumnDimension('C')
+								->setWidth(30);
+
+							$sheet
+								->getColumnDimension('D')
+								->setWidth(25);
+
+							$sheet
+								->getColumnDimension('E')
+								->setWidth(40);
+
+							$sheet
+								->getColumnDimension('F')
+								->setWidth(25);
+
+							$sheet
+								->getColumnDimension('G')
+								->setWidth(25);
+
+							$sheet
+								->getColumnDimension('H')
+								->setWidth(25);
+
+							$sheet
+								->getColumnDimension('I')
+								->setWidth(15);
+
+							$sheet
+								->getColumnDimension('J')
+								->setWidth(15);
+
+
+							/*
+							|--------------------------------------------------
+							| ROW HEIGHT
+							|--------------------------------------------------
+							*/
+
+							$total =
+								count($this->records);
+
+							for (
+								$row = 3;
+								$row < ($total + 3);
+								$row++
+							) {
+
+								$sheet
+									->getRowDimension($row)
+									->setRowHeight(80);
+							}
+
+
+							/*
+							|--------------------------------------------------
+							| LAST ROW
+							|--------------------------------------------------
+							*/
+
+							$lastRow =
+								$total + 2;
+
+
+							/*
+							|--------------------------------------------------
+							| ALIGNMENT
+							|--------------------------------------------------
+							*/
+
+							$sheet
+								->getStyle(
+									'A1:J' . $lastRow
+								)
+								->getAlignment()
+								->setVertical(
+									Alignment::VERTICAL_CENTER
+								);
+
+							$sheet
+								->getStyle(
+									'A1:J' . $lastRow
+								)
+								->getAlignment()
+								->setWrapText(true);
+
+
+							/*
+							|--------------------------------------------------
+							| HEADER
+							|--------------------------------------------------
+							*/
+
+							$sheet
+								->getStyle('A1:J2')
+								->getFont()
+								->setBold(true);
+						}
+				];
+			}
+		};
+
+
+		/*
+		|--------------------------------------------------------------------------
+		| DOWNLOAD
+		|--------------------------------------------------------------------------
+		*/
+
+		return Excel::download(
+			$export,
+			'Check Molding ' . $time . '.xlsx'
+		);
 	}
 }
