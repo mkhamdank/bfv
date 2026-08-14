@@ -930,8 +930,8 @@
 
                     $('#loading').show();
 
-                    $('#tableDetail').DataTable().clear();
-                    $('#tableDetail').DataTable().destroy();
+                    // $('#tableDetail').DataTable().clear();
+                    // $('#tableDetail').DataTable().destroy();
                     $('#bodyDetail').html("");
                     no_item = [];
                     file_txt_driver_name = result.file_txt_driver_name;
@@ -994,27 +994,27 @@
                     }
 
                     $('#bodyDetail').append(tableData);
-                    $('#tableDetail').DataTable({
-                        'dom': 'Bfrtip',
-                        'responsive': true,
-                        'lengthMenu': [
-                            [-1],
-                            ['Show all']
-                        ],
-                        'buttons': {
-                            buttons: []
-                        },
-                        'paging': false,
-                        'lengthChange': false,
-                        'searching': false,
-                        'ordering': false,
-                        'info': false,
-                        'autoWidth': true,
-                        'sPaginationType': 'full_numbers',
-                        'bJQueryUI': true,
-                        'bAutoWidth': false,
-                        'processing': true
-                    });
+                    // $('#tableDetail').DataTable({
+                    //     'dom': 'Bfrtip',
+                    //     'responsive': true,
+                    //     'lengthMenu': [
+                    //         [-1],
+                    //         ['Show all']
+                    //     ],
+                    //     'buttons': {
+                    //         buttons: []
+                    //     },
+                    //     'paging': false,
+                    //     'lengthChange': false,
+                    //     'searching': false,
+                    //     'ordering': false,
+                    //     'info': false,
+                    //     'autoWidth': true,
+                    //     'sPaginationType': 'full_numbers',
+                    //     'bJQueryUI': true,
+                    //     'bAutoWidth': false,
+                    //     'processing': true
+                    // });
 
 
                     $('#main').show();
@@ -1024,33 +1024,33 @@
             });
 
         } else {
-            $('#tableDetail').DataTable().clear();
-            $('#tableDetail').DataTable().destroy();
+            // $('#tableDetail').DataTable().clear();
+            // $('#tableDetail').DataTable().destroy();
             $('#bodyDetail').html("");
-            var tableData = "";
+            // var tableData = "";
 
-            $('#bodyDetail').append(tableData);
-            $('#tableDetail').DataTable({
-                'dom': 'Bfrtip',
-                'responsive': true,
-                'lengthMenu': [
-                    [-1],
-                    ['Show all']
-                ],
-                'buttons': {
-                    buttons: []
-                },
-                'paging': false,
-                'lengthChange': false,
-                'searching': false,
-                'ordering': false,
-                'info': false,
-                'autoWidth': true,
-                'sPaginationType': 'full_numbers',
-                'bJQueryUI': true,
-                'bAutoWidth': false,
-                'processing': true
-            });
+            // $('#bodyDetail').append(tableData);
+            // $('#tableDetail').DataTable({
+            //     'dom': 'Bfrtip',
+            //     'responsive': true,
+            //     'lengthMenu': [
+            //         [-1],
+            //         ['Show all']
+            //     ],
+            //     'buttons': {
+            //         buttons: []
+            //     },
+            //     'paging': false,
+            //     'lengthChange': false,
+            //     'searching': false,
+            //     'ordering': false,
+            //     'info': false,
+            //     'autoWidth': true,
+            //     'sPaginationType': 'full_numbers',
+            //     'bJQueryUI': true,
+            //     'bAutoWidth': false,
+            //     'processing': true
+            // });
         }
 
     }
