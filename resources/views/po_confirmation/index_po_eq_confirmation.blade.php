@@ -24,7 +24,10 @@
         :root {
             --page-bg: #eef2f7;
             --surface: #fff;
+            --surface-soft: #f8fafc;
             --text: #1e293b;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
             --muted: #64748b;
             --border: #dfe7f0;
             --navy: #163a67;
@@ -32,6 +35,8 @@
             --purple-dark: #684574;
             --purple-soft: #f4eaf6;
             --green: #16a34a;
+            --green-dark: #15803d;
+            --green-soft: #ecfdf5;
             --orange: #f59e0b;
             --shadow: 0 14px 34px rgba(15, 23, 42, .10)
         }
@@ -339,35 +344,141 @@
         .btn-submit {
             background: var(--green)
         }
+        
+        .delivery-body {
+            padding: 34px;
 
-        .success-state {
-            padding: 36px 20px;
-            text-align: center
+            background-color: var(--surface);
         }
 
-        .success-icon {
+        .success-wrapper {
+            max-width: 680px;
+
+            margin: 0 auto;
+
+            text-align: center;
+        }
+
+        .success-card {
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 38px 30px;
+
+            border: 1px solid #bbf7d0;
+            border-radius: 18px;
+
+            background-color: var(--green-soft);
+        }
+
+        .success-icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 78px;
+            height: 78px;
+
+            margin: 0 auto 20px auto;
+
+            border: 7px solid #dcfce7;
+            border-radius: 50%;
+
+            background-color: var(--green);
+
+            color: #ffffff;
+
+            font-size: 31px;
+
+            box-shadow: 0 10px 24px rgba(22, 163, 74, 0.22);
+        }
+
+        .success-title {
+            margin: 0;
+
+            color: #166534;
+
+            font-size: 25px;
+            line-height: 34px;
+
+            font-weight: 800;
+        }
+
+        .success-message {
+            margin: 10px auto 0 auto;
+
+            max-width: 520px;
+
+            color: #475569;
+
+            font-size: 14px;
+            line-height: 23px;
+
+            font-weight: 600;
+        }
+
+        .success-divider {
+            width: 54px;
+            height: 4px;
+
+            margin: 20px auto;
+
+            border-radius: 999px;
+
+            background-color: #86efac;
+        }
+
+        .success-information {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 64px;
-            height: 64px;
-            margin-bottom: 14px;
-            border-radius: 50%;
-            background: #dcfce7;
-            color: var(--green);
-            font-size: 28px
+
+            gap: 7px;
+
+            padding: 8px 14px;
+
+            border: 1px solid #bbf7d0;
+            border-radius: 999px;
+
+            background-color: #ffffff;
+
+            color: #15803d;
+
+            font-size: 11px;
+            line-height: 17px;
+
+            font-weight: 800;
         }
 
-        .success-state h3 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 800
+        .success-information i {
+            font-size: 13px;
         }
 
-        .success-state p {
-            margin: 6px 0 0;
-            color: var(--muted);
-            font-size: 13px
+        /* =========================================================
+           FOOTER INFORMATION
+        ========================================================== */
+
+        .delivery-footer-info {
+            margin-top: 18px;
+
+            padding: 14px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background-color: var(--surface-soft);
+
+            color: var(--text-muted);
+
+            font-size: 12px;
+            line-height: 20px;
+
+            text-align: center;
+        }
+
+        .delivery-footer-info strong {
+            color: var(--text-main);
         }
 
         #loading {
@@ -788,10 +899,47 @@
                     </div>
                 </div>
                 <div id="already_filled" style="width:100%;display:none;">
-                    <div class="success-state">
-                        <div class="success-icon"><i class="fa fa-check"></i></div>
-                        <h3>Thank You</h3>
-                        <p>Thank you for the response. We will check it as soon as possible.</p>
+                    <div class="success-wrapper">
+
+                        <div class="success-card">
+
+                            <div class="success-icon-wrapper">
+                                <i class="fa fa-check"></i>
+                            </div>
+
+                            <h2 class="success-title">
+                                Thank You for Your Response
+                            </h2>
+
+                            <p class="success-message">
+                                Your PO confirmation has been successfully received.
+                                Our team will review the submitted information as soon as possible.
+                            </p>
+
+                            <div class="success-divider"></div>
+
+                            <div class="success-information">
+                                <i class="fa fa-info-circle"></i>
+
+                                Confirmation successfully recorded
+                            </div>
+
+                        </div>
+
+
+                        <div class="delivery-footer-info">
+
+                            <i class="fa fa-envelope-o"></i>
+
+                            &nbsp;
+
+                            This confirmation has been recorded by the
+                            <strong>
+                                PT. YMPI Control Delivery System
+                            </strong>.
+
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -1058,66 +1206,128 @@
 
     function save() {
 
-        var po_number = $("#po_number").val();
-        var data = [];
+        if(drivers.length > 0){
 
-        var salah = 0;
+            var formData = new FormData($('#formData')[0]);
 
-        for (var i = 0; i < no_item.length; i++) {
-            if ($('#check_' + no_item[i]).is(":checked")) {
-                var driver = [];
-                data.push({
-                    'no_item': no_item[i],
-                    'note': $('#note_' + no_item[i]).val(),
-                    'driver' : null
-                });
-                if(drivers.length > 0){
-                    if($('#driver_' + no_item[i]).val() == '' || $('#plat_no_' + no_item[i]).val() == '' || $('#car_' + no_item[i]).val() == '' || $('#driver_phone_' + no_item[i]).val() == ''){
-                        salah++;
+            var po_number = $("#po_number").val();
+            var ada_driver = false;
+
+            var salah = 0;
+
+            for (var i = 0; i < no_item.length; i++) {
+                if ($('#check_' + no_item[i]).is(":checked")) {
+                    var driver = [];
+                    formData.append('no_item_'+no_item[i], no_item[i]);
+                    formData.append('note_'+no_item[i], $('#note_' + no_item[i]).val());
+                    if(drivers.length > 0){
+                        if($('#driver_' + no_item[i]).val() == '' || $('#plat_no_' + no_item[i]).val() == '' || $('#car_' + no_item[i]).val() == '' || $('#driver_phone_' + no_item[i]).val() == ''){
+                            salah++;
+                        }
+                        formData.append('driver_detail_'+no_item[i], $('#driver_detail_' + no_item[i]).text());
+                        formData.append('driver_name_'+no_item[i], $('#driver_' + no_item[i]).val());
+                        formData.append('driver_plat_no_'+no_item[i], $('#plat_no_' + no_item[i]).val());
+                        formData.append('driver_car_'+no_item[i], $('#car_' + no_item[i]).val());
+                        formData.append('driver_phone_'+no_item[i], $('#driver_phone_' + no_item[i]).val());
+                        formData.append('driver_photo_'+no_item[i], $('#file_' + no_item[i])[0].files[0] ? $('#file_' + no_item[i])[0].files[0] : null);
+                        ada_driver = true;
                     }
-                    driver.push({
-                        'no_item': no_item[i],
-                        'driver_detail': $('#driver_detail_' + no_item[i]).text(),
-                        'driver_name': $('#driver_' + no_item[i]).val(),
-                        'driver_plat_no': $('#plat_no_' + no_item[i]).val(),
-                        'driver_car': $('#car_' + no_item[i]).val(),
-                        'driver_phone': $('#driver_phone_' + no_item[i]).val(),
-                    });
-                    data[i]['driver'] = driver;
-                }
-            } else {
-                openErrorGritter('Error!', 'Tick all column before submit');
-                return false;
-            }
-        }
-
-        if(salah > 0){
-            openErrorGritter('Error!', 'Fill all driver column before submit');
-            return false;
-        }
-
-        var x = {
-            po_number: po_number,
-            data: data,
-        }
-
-        if (confirm("Are you sure to confirm this PO?")) {
-            $("#loading").show();
-
-            $.post("{{ url('input/po_eq_confirmation') }}", x, function(result, status, xhr) {
-                if (result.status) {
-                    clearAll();
-                    $("#not_filled").hide();
-                    $("#already_filled").show();
-                    openSuccessGritter('Success', 'PO successfully confirmed');
-                    $("#loading").hide();
-
                 } else {
                     openErrorGritter('Error!', 'Tick all column before submit');
-                    console.log('Error : ' + result.message)
+                    return false;
+                }
+            }
+
+            if(salah > 0){
+                openErrorGritter('Error!', 'Fill all driver column before submit');
+                return false;
+            }
+
+            formData.append('po_number', po_number);
+            formData.append('no_item', no_item);
+            formData.append('ada_driver', ada_driver);
+
+            $.ajax({
+                url: "{{ url('input/po_eq_confirmation') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                beforeSend: function() {
+                    $("#loading").show();
+                },
+                success: function(result) {
+                    if (result.status) {
+                        clearAll();
+                        $("#not_filled").hide();
+                        $("#already_filled").show();
+                        openSuccessGritter('Success', 'PO successfully confirmed');
+                        $("#loading").hide();
+                    } else {
+                        openErrorGritter('Error!', result.message);
+                        $("#loading").hide();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    openErrorGritter('Error!', 'An error occurred while submitting the form.');
+                    console.log('Error : ' + error);
                     $("#loading").hide();
                 }
             });
+        }else{
+            var po_number = $("#po_number").val();
+            var data = [];
+            var ada_driver = false;
+
+            var salah = 0;
+
+            for (var i = 0; i < no_item.length; i++) {
+                if ($('#check_' + no_item[i]).is(":checked")) {
+                    var driver = [];
+                    data.push({
+                        'no_item': no_item[i],
+                        'note': $('#note_' + no_item[i]).val(),
+                        'driver' : null
+                    });
+                    if(drivers.length > 0){
+                        if($('#driver_' + no_item[i]).val() == '' || $('#plat_no_' + no_item[i]).val() == '' || $('#car_' + no_item[i]).val() == '' || $('#driver_phone_' + no_item[i]).val() == ''){
+                            salah++;
+                        }
+                    }
+                } else {
+                    openErrorGritter('Error!', 'Tick all column before submit');
+                    return false;
+                }
+            }
+
+            if(salah > 0){
+                openErrorGritter('Error!', 'Fill all driver column before submit');
+                return false;
+            }
+
+            var x = {
+                po_number: po_number,
+                data: data,
+                ada_driver: ada_driver
+            }
+            if (confirm("Are you sure to confirm this PO?")) {
+                $("#loading").show();
+
+                $.post("{{ url('input/po_eq_confirmation') }}", x, function(result, status, xhr) {
+                    if (result.status) {
+                        clearAll();
+                        $("#not_filled").hide();
+                        $("#already_filled").show();
+                        openSuccessGritter('Success', 'PO successfully confirmed');
+                        $("#loading").hide();
+
+                    } else {
+                        openErrorGritter('Error!', result.message);
+                        console.log('Error : ' + result.message);
+                        $("#loading").hide();
+                    }
+                });
+            }
         }
     }
 

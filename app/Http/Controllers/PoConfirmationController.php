@@ -108,31 +108,76 @@ class PoConfirmationController extends Controller
     }
     public function inputPoConfirmationEquipment(Request $request)
     {
-        $po_number = $request->get('po_number');
-        $data = $request->get('data');
-        $now = date('Y-m-d H:i:s');
+        $ada_driver = $request->get('ada_driver');
+        if($ada_driver == 'false'){
+            $po_number = $request->get('po_number');
+            $data = $request->get('data');
+            $now = date('Y-m-d H:i:s');
 
-        $po = db::table('equipment_plan_deliveries')
-        ->where('equipment_plan_deliveries.no_po', $po_number)
-        ->get();
+            $po = db::table('equipment_plan_deliveries')
+            ->where('equipment_plan_deliveries.no_po', $po_number)
+            ->get();
 
-        DB::beginTransaction();
+            DB::beginTransaction();
 
-        try {
-            $driver_data = [];
-            for ($i = 0; $i < count($po); $i++) {
-                for ($j = 0; $j < count($data); $j++) {
-                    if ($po[$i]->no_item == $data[$j]['no_item']) {
-                        $driver_name = null;
-                        $driver_plat_no = null;
-                        $driver_car = null;
-                        $driver_phone = null;
-                        if(isset($data[$j]['driver']) && $data[$j]['driver'] != null && count($data[$j]['driver']) > 0){
-                            $driver_detail = $data[$j]['driver'][0]['driver_detail'];
-                            $driver_name = $data[$j]['driver'][0]['driver_name'];
-                            $driver_plat_no = $data[$j]['driver'][0]['driver_plat_no'];
-                            $driver_car = $data[$j]['driver'][0]['driver_car'];
-                            $driver_phone = $data[$j]['driver'][0]['driver_phone'];
+            try {
+                for ($i = 0; $i < count($po); $i++) {
+                    for ($j = 0; $j < count($data); $j++) {
+                        if ($po[$i]->no_item == $data[$j]['no_item']) {
+                            $update = db::table('equipment_plan_deliveries')
+                            ->where('equipment_plan_deliveries.no_po', $po_number)
+                            ->where('equipment_plan_deliveries.no_item', $data[$j]['no_item'])
+                            ->update([
+                                'need_if' => 1,
+                                'po_confirm' => 1,
+                                'po_confirm_at' => $now,
+                                'note' => $data[$j]['note'],
+                            ]);
+
+                            break;
+                        }
+                    }
+                }
+
+                // $notification = $this->sendPoNotificationEquipment($po_number);
+
+                DB::commit();
+                $response = array(
+                    'status' => true,
+                );
+                return Response::json($response);
+
+            } catch (Exception $e) {
+                DB::rollback();
+
+                $response = array(
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                );
+                return Response::json($response);
+            }
+        }else{
+            $po_number = $request->get('po_number');
+            $no_item = explode(',', $request->get('no_item'));
+            $now = date('Y-m-d H:i:s');
+
+            $po = db::table('equipment_plan_deliveries')
+            ->where('equipment_plan_deliveries.no_po', $po_number)
+            ->get();
+
+            DB::beginTransaction();
+
+            try {
+                $driver_data = [];
+                for ($i = 0; $i < count($po); $i++) {
+                    for ($j = 0; $j < count($no_item); $j++) {
+                        if ($po[$i]->no_item == $no_item[$j]) {
+                            $driver_detail = $request->get('driver_detail_'.$no_item[$j]);
+                            $driver_name = $request->get('driver_name_'.$no_item[$j]);
+                            $driver_plat_no = $request->get('driver_plat_no_'.$no_item[$j]);
+                            $driver_car = $request->get('driver_car_'.$no_item[$j]);
+                            $driver_phone = $request->get('driver_phone_'.$no_item[$j]);
+
                             array_push($driver_data, [
                                 'driver_detail' => $driver_detail,
                                 'driver_name' => $driver_name,
@@ -140,99 +185,109 @@ class PoConfirmationController extends Controller
                                 'driver_car' => $driver_car,
                                 'driver_phone' => $driver_phone,
                             ]);
+                            $filename = null;
+                            if($request->file('driver_photo_'.$no_item[$j])){
+                                $file = $request->file('driver_photo_'.$no_item[$j]);
+                                $nama = $file->getClientOriginalName();
+                                $nama_file = pathinfo($nama, PATHINFO_FILENAME);
+                                $extension = pathinfo($nama, PATHINFO_EXTENSION);
+                                $filename = $no_item[$j] . '_' . date('YmdHis') . '.' . $extension;
+                                $file->move(public_path('driver'), $filename);
+                            }
+                            $update = db::table('equipment_plan_deliveries')
+                            ->where('equipment_plan_deliveries.no_po', $po_number)
+                            ->where('equipment_plan_deliveries.no_item', $no_item[$j])
+                            ->update([
+                                'need_if' => 1,
+                                'po_confirm' => 1,
+                                'po_confirm_at' => $now,
+                                'driver_name' => $driver_name,
+                                'driver_plat_no' => $driver_plat_no,
+                                'driver_car' => $driver_car,
+                                'driver_phone' => $driver_phone,
+                                'driver_photo' => $filename,
+                                'note' => $request->get('note_'.$no_item[$j]),
+                            ]);
+
+                            break;
                         }
-                        $update = db::table('equipment_plan_deliveries')
-                        ->where('equipment_plan_deliveries.no_po', $po_number)
-                        ->where('equipment_plan_deliveries.no_item', $data[$j]['no_item'])
-                        ->update([
-                            'need_if' => 1,
-                            'po_confirm' => 1,
-                            'po_confirm_at' => $now,
-                            'driver_name' => $driver_name,
-                            'driver_plat_no' => $driver_plat_no,
-                            'driver_car' => $driver_car,
-                            'driver_phone' => $driver_phone,
-                            'note' => $data[$j]['note'],
-                        ]);
-
-                        break;
                     }
                 }
-            }
 
 
-            // Save driver_data to XML file
-            if(count($driver_data) > 0) {
-                $this->saveDriverDataToTxt($po_number, $driver_data);
+                // Save driver_data to XML file
+                if(count($driver_data) > 0) {
+                    $this->saveDriverDataToTxt($po_number, $driver_data);
 
-                $mail_to = [];
-                $bcc = [];
-                array_push($mail_to, 'ali.murdani@music.yamaha.com');
-                array_push($mail_to, 'widura@music.yamaha.com');
-                array_push($bcc, 'ympi-mis-ML@music.yamaha.com');
+                    $mail_to = [];
+                    $bcc = [];
+                    array_push($mail_to, 'ali.murdani@music.yamaha.com');
+                    array_push($mail_to, 'widura@music.yamaha.com');
+                    array_push($bcc, 'ympi-mis-ML@music.yamaha.com');
 
-                $bodyHtml2 = "<html><body style='font-family: Arial, sans-serif; color: #333;'>";
-                $bodyHtml2 .= "<div style='max-width: 600px; margin: 0 auto; padding: 20px;'>";
-                $bodyHtml2 .= "<h2 style='color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px;'>PO Confirmation - Driver Details</h2>";
-                $bodyHtml2 .= "<p style='margin-top: 20px;'><strong>PO Number:</strong> " . htmlspecialchars($po_number) . "</p>";
-                $bodyHtml2 .= "<table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>";
-                $bodyHtml2 .= "<thead>";
-                $bodyHtml2 .= "<tr style='background-color: #f2f2f2; border-bottom: 2px solid #ddd;'>";
-                $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Surat Tugas</th>";
-                $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Driver Name</th>";
-                $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Plate Number</th>";
-                $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Car Type</th>";
-                $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Phone</th>";
-                $bodyHtml2 .= "</tr>";
-                $bodyHtml2 .= "</thead>";
-                $bodyHtml2 .= "<tbody>";
-                
-                if (is_array($driver_data) && count($driver_data) > 0) {
-                    foreach ($driver_data as $driver) {
-                        $bodyHtml2 .= "<tr>";
-                        $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_detail'] ?? '-') . "</td>";
-                        $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_name'] ?? '-') . "</td>";
-                        $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_plat_no'] ?? '-') . "</td>";
-                        $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_car'] ?? '-') . "</td>";
-                        $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_phone'] ?? '-') . "</td>";
-                        $bodyHtml2 .= "</tr>";
+                    $bodyHtml2 = "<html><body style='font-family: Arial, sans-serif; color: #333;'>";
+                    $bodyHtml2 .= "<div style='max-width: 600px; margin: 0 auto; padding: 20px;'>";
+                    $bodyHtml2 .= "<h2 style='color: #1a73e8; border-bottom: 2px solid #1a73e8; padding-bottom: 10px;'>PO Confirmation - Driver Details</h2>";
+                    $bodyHtml2 .= "<p style='margin-top: 20px;'><strong>PO Number:</strong> " . htmlspecialchars($po_number) . "</p>";
+                    $bodyHtml2 .= "<table style='width: 100%; border-collapse: collapse; margin-top: 20px;'>";
+                    $bodyHtml2 .= "<thead>";
+                    $bodyHtml2 .= "<tr style='background-color: #f2f2f2; border-bottom: 2px solid #ddd;'>";
+                    $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Surat Tugas</th>";
+                    $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Driver Name</th>";
+                    $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Plate Number</th>";
+                    $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Car Type</th>";
+                    $bodyHtml2 .= "<th style='text-align: left; padding: 12px; border: 1px solid #ddd;'>Phone</th>";
+                    $bodyHtml2 .= "</tr>";
+                    $bodyHtml2 .= "</thead>";
+                    $bodyHtml2 .= "<tbody>";
+                    
+                    if (is_array($driver_data) && count($driver_data) > 0) {
+                        foreach ($driver_data as $driver) {
+                            $bodyHtml2 .= "<tr>";
+                            $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_detail'] ?? '-') . "</td>";
+                            $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_name'] ?? '-') . "</td>";
+                            $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_plat_no'] ?? '-') . "</td>";
+                            $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_car'] ?? '-') . "</td>";
+                            $bodyHtml2 .= "<td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($driver['driver_phone'] ?? '-') . "</td>";
+                            $bodyHtml2 .= "</tr>";
+                        }
                     }
+                    
+                    $bodyHtml2 .= "</tbody>";
+                    $bodyHtml2 .= "</table>";
+                    $bodyHtml2 .= "<div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;'>";
+                    $bodyHtml2 .= "<p style='color: red; font-size: 12px; font-weight: bold;'>Data will be synced in the next hour at the 20-minute mark.</p>";
+                    $bodyHtml2 .= "<p>This is an automated email from PT. Yamaha Musical Products Indonesia MIS System.</p>";
+                    $bodyHtml2 .= "<p>Please do not reply to this email.</p>";
+                    $bodyHtml2 .= "</div>";
+                    $bodyHtml2 .= "</div>";
+                    $bodyHtml2 .= "</body></html>";
+                    Mail::send([], [], function ($message) use ($mail_to, $bcc, $po_number, $bodyHtml2) {
+                        $message->from('bridgeforvendor@ympi.co.id', 'PT. Yamaha Musical Products Indonesia');
+                        $message->to($mail_to);
+                        $message->bcc($bcc);
+                        $message->subject('[PO CONFIRMATION] : ' . $po_number);
+                        $message->html($bodyHtml2);
+                    });
                 }
-                
-                $bodyHtml2 .= "</tbody>";
-                $bodyHtml2 .= "</table>";
-                $bodyHtml2 .= "<div style='margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;'>";
-                $bodyHtml2 .= "<p style='color: red; font-size: 12px; font-weight: bold;'>Data will be synced in the next hour at the 20-minute mark.</p>";
-                $bodyHtml2 .= "<p>This is an automated email from PT. Yamaha Musical Products Indonesia MIS System.</p>";
-                $bodyHtml2 .= "<p>Please do not reply to this email.</p>";
-                $bodyHtml2 .= "</div>";
-                $bodyHtml2 .= "</div>";
-                $bodyHtml2 .= "</body></html>";
-                Mail::send([], [], function ($message) use ($mail_to, $bcc, $po_number, $bodyHtml2) {
-                    $message->from('bridgeforvendor@ympi.co.id', 'PT. Yamaha Musical Products Indonesia');
-                    $message->to($mail_to);
-                    $message->bcc($bcc);
-                    $message->subject('[PO CONFIRMATION] : ' . $po_number);
-                    $message->html($bodyHtml2);
-                });
+
+                // $notification = $this->sendPoNotificationEquipment($po_number);
+
+                DB::commit();
+                $response = array(
+                    'status' => true,
+                );
+                return Response::json($response);
+
+            } catch (Exception $e) {
+                DB::rollback();
+
+                $response = array(
+                    'status' => false,
+                    'message' => $e->getMessage(),
+                );
+                return Response::json($response);
             }
-
-            // $notification = $this->sendPoNotificationEquipment($po_number);
-
-            DB::commit();
-            $response = array(
-                'status' => true,
-            );
-            return Response::json($response);
-
-        } catch (Exception $e) {
-            DB::rollback();
-
-            $response = array(
-                'status' => false,
-                'message' => $e->getMessage(),
-            );
-            return Response::json($response);
         }
 
     }
