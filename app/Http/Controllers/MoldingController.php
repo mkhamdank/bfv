@@ -38,7 +38,7 @@ class MoldingController extends Controller
         $master_molding = DB::table('molding_diagnose_masters')
         ->select('id', 'fixed_asset_number', 'fixed_asset_name', 'vendor', 'standard_shot', 'total_shot', 'status', 'status_kawasan');
 
-        if(Auth::user()->username != 'ympimis'){
+        if(Auth::user()->username != 'ympimis' && Auth::user()->username != 'molding_ympi'){
             $master_molding = $master_molding->where('vendor', Auth::user()->vendor_name);
         }
 
@@ -68,7 +68,7 @@ class MoldingController extends Controller
         ->leftJoin('molding_diagnose_molding_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_molding_forms.master_form_number')
         ->whereNull('molding_diagnose_forms.deleted_at');
 
-        if(Auth::user()->username != 'ympimis'){
+        if(Auth::user()->username != 'ympimis' && Auth::user()->username != 'molding_ympi'){
             $master_molding = $master_molding->where('molding_diagnose_masters.vendor', Auth::user()->vendor_name);
         }
 
@@ -1397,7 +1397,7 @@ class MoldingController extends Controller
         ->where('molding_diagnose_shots.created_at', '>=', $request->start_date)
         ->where('molding_diagnose_shots.created_at', '<=', $request->end_date);
 
-        if(Auth::user()->username != 'ympimis'){
+        if(Auth::user()->username != 'ympimis' && Auth::user()->username != 'molding_ympi'){
             $data = $data->where('molding_diagnose_masters.vendor', Auth::user()->vendor_name);
         }
 
