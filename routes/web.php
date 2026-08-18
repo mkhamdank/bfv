@@ -640,6 +640,7 @@ Route::get('index/additional/driver/job/{id}', 'App\Http\Controllers\GeneralCont
 Route::post('input/additional/driver/job', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJob');
 Route::post('input/additional/driver/job/etoll', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJobEtoll');
 Route::post('input/additional/driver/job/parking', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJobParking');
+Route::post('input/additional/driver/job/parking_emoney', 'App\Http\Controllers\GeneralController@inputAdditionalDriverJobParkingEmoney');
 
 Route::get('index/confirmation/driver/daily_job/{id}', 'App\Http\Controllers\GeneralController@indexConfirmationDriverDailyJob');
 Route::post('input/confirmation/driver/daily_job', 'App\Http\Controllers\GeneralController@inputConfirmationDriverDailyJob');

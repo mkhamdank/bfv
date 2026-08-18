@@ -923,82 +923,21 @@ class GeneralController extends Controller
     function inputAdditionalDriverJob(Request $request)
     {
         try {
-            // $etoll = $request->get('etoll');
-            // $parking = $request->get('parking');
             $id = $request->get('id');
             $task_id = $request->get('task_id');
-
-            // //ETOLL
-            // if($etoll != null && $etoll != ''){
-
-            //     $data_foto = null;
-
-            //     for ($i = 0; $i < count($request->get('file_etoll')); ++$i) {
-            //         $tujuan_upload = 'images/driver/japanese/additional';
-
-            //         $file_etoll = $request->get('file_etoll')[$i];
-            //         $file_etoll1 = explode(',', $file_etoll)[1];
-            //         $file_etoll1 = str_replace(' ', '+', $file_etoll1);
-            //         $data = base64_decode($file_etoll1);
-            //         $file_etoll_name = 'Foto Etoll '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].png';
-            //         file_put_contents($tujuan_upload.'/'.$file_etoll_name, $data);
-            //         $data_foto[]=$file_etoll_name;
-            //     }
-            //     $file_upload_foto_etoll = join(',',$data_foto);
-
-            //     $update = DB::table('driver_tasks')
-            //     ->where('id',$id)
-            //     ->update([
-            //         'etoll' => $etoll,
-            //         'etoll_file' => $file_upload_foto_etoll,
-            //         'updated_at' => date('Y-m-d H:i:s')
-            //     ]);
-            // }
-
-            // if($etoll == null || $etoll == ''){
-                $update = DB::table('driver_tasks')
-                ->where('id',$id)
-                ->update([
-                    'etoll' => 0,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            // }
-
-            // //PARKING
-            // if($parking != null && $parking != ''){
-
-            //     $data_foto = null;
-
-            //     for ($i = 0; $i < count($request->get('file_parking')); ++$i) {
-            //         $tujuan_upload = 'images/driver/japanese/additional';
-
-            //         $file_parking = $request->get('file_parking')[$i];
-            //         $file_parking1 = explode(',', $file_parking)[1];
-            //         $file_parking1 = str_replace(' ', '+', $file_parking1);
-            //         $data = base64_decode($file_parking1);
-            //         $file_parking_name = 'Foto Parkir '.$id.' ('.date('d-M-y H-i-s').')['.$i.'].png';
-            //         file_put_contents($tujuan_upload.'/'.$file_parking_name, $data);
-            //         $data_foto[]=$file_parking_name;
-            //     }
-            //     $file_upload_foto_parking = join(',',$data_foto);
-
-            //     $update = DB::table('driver_tasks')
-            //     ->where('id',$id)
-            //     ->update([
-            //         'parking' => $parking,
-            //         'parking_file' => $file_upload_foto_parking,
-            //         'updated_at' => date('Y-m-d H:i:s')
-            //     ]);
-            // }
-
-            // if($parking == null || $parking == ''){
-                $update = DB::table('driver_tasks')
-                ->where('id',$id)
-                ->update([
-                    'parking' => 0,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            // }
+            $update = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                'etoll' => 0,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+            
+            $update = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                'parking' => 0,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             $update = DB::table('driver_tasks')
             ->where('id',$id)
@@ -1006,6 +945,8 @@ class GeneralController extends Controller
                 'closure_status' => 'closed',
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+
+            die();
 
             $response = array(
                 'status' => true,
@@ -1045,22 +986,10 @@ class GeneralController extends Controller
             ->where('id',$id)
             ->first();
 
-            $etoll_value = null;
-            $etoll_file = null;
-            $etoll_froms = null;
-            $etoll_tos = null;
-
-            if($get_etoll->etoll != null){
-                $etoll_value = $get_etoll->etoll.','.$etoll;
-                $etoll_file = $get_etoll->etoll_file.','.$file_etoll_name;
-                $etoll_froms = $get_etoll->etoll_from.','.$etoll_from;
-                $etoll_tos = $get_etoll->etoll_to.','.$etoll_to;
-            }else{
-                $etoll_value = $etoll;
-                $etoll_file = $file_etoll_name;
-                $etoll_froms = $etoll_from;
-                $etoll_tos = $etoll_to;
-            }
+            $etoll_value = $get_etoll->etoll ? $get_etoll->etoll.','.$etoll : $etoll;
+            $etoll_file = $get_etoll->etoll ? $get_etoll->etoll_file.','.$file_etoll_name : $file_etoll_name;
+            $etoll_froms = $get_etoll->etoll ? $get_etoll->etoll_from.','.$etoll_from : $etoll_from;
+            $etoll_tos = $get_etoll->etoll ? $get_etoll->etoll_to.','.$etoll_to : $etoll_to;
 
             $update = DB::table('driver_tasks')
             ->where('id',$id)
@@ -1071,6 +1000,8 @@ class GeneralController extends Controller
                 'etoll_file' => $etoll_file,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+
+            die();
 
             $response = array(
                 'status' => true,
@@ -1109,19 +1040,9 @@ class GeneralController extends Controller
             ->where('id',$id)
             ->first();
 
-            $parking_value = null;
-            $parking_file = null;
-            $parking_ats = null;
-
-            if($get_parking->parking != null){
-                $parking_value = $get_parking->parking.','.$parking;
-                $parking_file = $get_parking->parking_file.','.$file_parking_name;
-                $parking_ats = $get_parking->parking_at.','.$parking_at;
-            }else{
-                $parking_value = $parking;
-                $parking_file = $file_parking_name;
-                $parking_ats = $parking_at;
-            }
+            $parking_value = $get_parking->parking ? $get_parking->parking.','.$parking : $parking;
+            $parking_file = $get_parking->parking_file ? $get_parking->parking_file.','.$file_parking_name : $file_parking_name;
+            $parking_ats = $get_parking->parking_at ? $get_parking->parking_at.','.$parking_at : $parking_at;
 
             $update = DB::table('driver_tasks')
             ->where('id',$id)
@@ -1131,6 +1052,61 @@ class GeneralController extends Controller
                 'parking_at' => $parking_ats,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
+
+            die();
+
+            $response = array(
+                'status' => true,
+                'message' => 'Success Input Data Parking (駐車データの入力に成功しました)'
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function inputAdditionalDriverJobParkingEmoney(Request $request)
+    {
+        try {
+            $parking_emoney = $request->get('parking_emoney');
+            $file_parking_emoney = $request->get('file_parking_emoney');
+            $parking_at_emoney = $request->get('parking_at_emoney');
+            $index = $request->get('index');
+            $id = $request->get('id');
+            $task_id = $request->get('task_id');
+
+            $tujuan_upload = 'images/driver/japanese/additional';
+
+            $file_parking_emoney = $request->get('file_parking_emoney');
+            $file_parking_emoney1 = explode(',', $file_parking_emoney)[1];
+            $file_parking_emoney1 = str_replace(' ', '+', $file_parking_emoney1);
+            $data = base64_decode($file_parking_emoney1);
+            $file_parking_emoney_name = 'Foto Parking Emoney '.$id.' ('.date('d-M-y H-i-s').')['.$index.'].png';
+            file_put_contents($tujuan_upload.'/'.$file_parking_emoney_name, $data);
+
+            $get_parking = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->first();
+
+            $parking_value = $get_parking->parking_emoney ? $get_parking->parking_emoney.','.$parking_emoney : $parking_emoney;
+            $parking_file = $get_parking->parking_file_emoney ? $get_parking->parking_file_emoney.','.$file_parking_emoney_name : $file_parking_emoney_name;
+            $parking_ats = $get_parking->parking_at_emoney ? $get_parking->parking_at_emoney.','.$parking_at_emoney : $parking_at_emoney;
+
+            $update = DB::table('driver_tasks')
+            ->where('id',$id)
+            ->update([
+                'parking_emoney' => $parking_value,
+                'parking_file_emoney' => $parking_file,
+                'parking_at_emoney' => $parking_ats,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            var_dump($update);
+            die();
 
             $response = array(
                 'status' => true,

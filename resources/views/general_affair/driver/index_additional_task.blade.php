@@ -338,11 +338,11 @@
 
         {{-- E-Toll Card --}}
         <div class="section-table-card">
-            <div class="stc-header" style="background:#fafbff;border-bottom:1px solid #f0f2f7;">
+            <div class="stc-header" style="background:#dbeafe;border-bottom:1px solid #3b82f6;">
                 <div class="stc-title">
                     <span class="dot dot-blue"></span>
                     <i class="fas fa-credit-card" style="color:#3b82f6;font-size:14px;"></i>
-                    E-Toll
+                    E-Toll (E-Money)
                 </div>
                 <button type="button" class="btn-add btn-add-blue" onclick="addEtoll()">
                     <i class="fas fa-plus"></i> Tambah
@@ -386,11 +386,55 @@
 
         {{-- Parkir Card --}}
         <div class="section-table-card">
-            <div class="stc-header" style="background:#fafbff;border-bottom:1px solid #f0f2f7;">
+            <div class="stc-header" style="background:#fef3f2;border-bottom:1px solid #fecaca;">
+                <div class="stc-title">
+                    <span class="dot dot-amber"></span>
+                    <i class="fas fa-parking" style="color:#d97706;font-size:14px;"></i>
+                    Parkir (E-Money)
+                </div>
+                <button type="button" class="btn-add btn-add-amber" onclick="addParkingEmoney()">
+                    <i class="fas fa-plus"></i> Tambah
+                </button>
+            </div>
+            <div class="stc-body" id="bodyParkingEmoney">
+                {{-- Row 0 (default) --}}
+                <div class="entry-row" id="tr_parking_emoney_0">
+                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                        <div class="ff" style="margin:0;">
+                            <label>Lokasi Parkir (E-Money)</label>
+                            <input type="text" name="parking_emoney_at_0" id="parking_emoney_at_0" placeholder="Nama lokasi">
+                        </div>
+                        <div><!-- spacer --></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                        <div class="ff" style="margin:0;">
+                            <label>Biaya (E-Money) (Rp) <span style="color:#dc2626;">*</span></label>
+                            <input type="text" name="parking_emoney_0" id="parking_emoney_0"
+                                   class="cost-input" placeholder="Nominal (min. 100)"
+                                   inputmode="numeric" pattern="[0-9]*">
+                        </div>
+                        <div>&nbsp;</div>
+                    </div>
+                    <div class="photo-upload-wrap">
+                        <div class="photo-upload-label">
+                            <i class="fas fa-camera"></i> Foto Bukti Parkir (E-Money)
+                            <span style="color:#dc2626;">*</span>
+                        </div>
+                        <input type="file" name="file_parking_emoney_0" id="file_parking_emoney_0"
+                               accept="image/*" onchange="readURLParkingEmoney(this, 0);">
+                        <img id="blah_parking_emoney_0" class="photo-preview-img" src="" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Parkir Card --}}
+        <div class="section-table-card">
+            <div class="stc-header" style="background:#fff5f7;border-bottom:1px solid #fce7f3;">
                 <div class="stc-title">
                     <span class="dot dot-rose"></span>
                     <i class="fas fa-parking" style="color:#f43f5e;font-size:14px;"></i>
-                    Parkir
+                    Parkir (Tunai)
                 </div>
                 <button type="button" class="btn-add btn-add-rose" onclick="addParking()">
                     <i class="fas fa-plus"></i> Tambah
@@ -401,14 +445,14 @@
                 <div class="entry-row" id="tr_parking_0">
                     <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
                         <div class="ff" style="margin:0;">
-                            <label>Lokasi Parkir</label>
+                            <label>Lokasi Parkir (Tunai)</label>
                             <input type="text" name="parking_at_0" id="parking_at_0" placeholder="Nama lokasi">
                         </div>
                         <div><!-- spacer --></div>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
                         <div class="ff" style="margin:0;">
-                            <label>Biaya (Rp) <span style="color:#dc2626;">*</span></label>
+                            <label>Biaya (Tunai) (Rp) <span style="color:#dc2626;">*</span></label>
                             <input type="text" name="parking_0" id="parking_0"
                                    class="cost-input" placeholder="Nominal (min. 100)"
                                    inputmode="numeric" pattern="[0-9]*">
@@ -417,7 +461,7 @@
                     </div>
                     <div class="photo-upload-wrap">
                         <div class="photo-upload-label">
-                            <i class="fas fa-camera"></i> Foto Bukti Parkir
+                            <i class="fas fa-camera"></i> Foto Bukti Parkir (Tunai)
                             <span style="color:#dc2626;">*</span>
                         </div>
                         <input type="file" name="file_parking_0" id="file_parking_0"
@@ -499,10 +543,12 @@
     }
     function readURLEtoll(input, id)   { compressImage(input, 'blah_etoll_'   + id); }
     function readURLParking(input, id) { compressImage(input, 'blah_parking_' + id); }
+    function readURLParkingEmoney(input, id) { compressImage(input, 'blah_parking_emoney_' + id); }
 
     /* ── Counters ── */
     var count_etoll   = 1;
     var count_parking = 1;
+    var count_parking_emoney = 1;
 
     /* ── Add / Remove E-Toll ── */
     function addEtoll() {
@@ -545,10 +591,32 @@
 
     function removeParking(id) { $('#tr_parking_' + id).remove(); }
 
+    /* ── Add / Remove Parkir ── */
+    function addParkingEmoney() {
+        var i = count_parking_emoney;
+        var html = '<div class="entry-row" id="tr_parking_emoney_' + i + '">';
+        html += '<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">';
+        html += '<div class="ff" style="margin:0;"><label>Lokasi Parkir</label><input type="text" name="parking_emoney_at_' + i + '" id="parking_emoney_at_' + i + '" placeholder="Nama lokasi"></div>';
+        html += '<button class="btn-remove" style="align-self:flex-end;" onclick="removeParkingEmoney(' + i + ')"><i class="fas fa-trash"></i></button>';
+        html += '</div>';
+        html += '<div class="ff" style="margin:0;"><label>Biaya (Rp) <span style="color:#dc2626;">*</span></label><input type="text" name="parking_emoney_' + i + '" id="parking_emoney_' + i + '" class="cost-input" placeholder="Nominal (min. 100)" inputmode="numeric" pattern="[0-9]*"></div>';
+        html += '<div class="photo-upload-wrap">';
+        html += '<div class="photo-upload-label"><i class="fas fa-camera"></i> Foto Bukti Parkir <span style="color:#dc2626;">*</span></div>';
+        html += '<input type="file" name="file_parking_emoney_' + i + '" id="file_parking_emoney_' + i + '" accept="image/*" onchange="readURLParkingEmoney(this,' + i + ');">';
+        html += '<img id="blah_parking_emoney_' + i + '" class="photo-preview-img" src="" alt="">';
+        html += '</div></div>';
+        $('#bodyParkingEmoney').append(html);
+        count_parking_emoney++;
+    }
+
+    function removeParkingEmoney(id) { $('#tr_parking_emoney_' + id).remove(); }
+
     /* ── Submit ── */
     var etoll = [], etoll_from = [], etoll_to = [];
     var parking_arr = [], parking_at = [];
     var file_etoll = [], file_parking = [];
+    var parking_emoney_arr = [], parking_emoney_at = [];
+    var file_parking_emoney = [];
 
     function submitDriver() {
         $('#loading').addClass('show');
@@ -556,6 +624,8 @@
         etoll = []; etoll_from = []; etoll_to = [];
         parking_arr = []; parking_at = [];
         file_etoll = []; file_parking = [];
+        parking_emoney_arr = []; parking_emoney_at = [];
+        file_parking_emoney = [];
         var all_sudah = 0;
 
         /* validate & collect E-Toll */
@@ -607,7 +677,28 @@
             }
         }
 
-        var total = etoll.length + parking_arr.length;
+        /* validate & collect Parkir Emoney */
+        for (var i = 0; i < count_parking_emoney; i++) {
+            var val = $('#parking_emoney_' + i).val();
+            if (val != '' && val != undefined && val != 'undefined') {
+                var v = parseInt(val);
+                if (isNaN(v) || v < 100) {
+                    $('#loading').removeClass('show');
+                    openErrorGritter('Error!', 'Parkir Emoney harus berupa nominal harga minimal 3 digit');
+                    return false;
+                }
+                if ($('#file_parking_emoney_' + i).prop('files')[0] == undefined) {
+                    $('#loading').removeClass('show');
+                    openErrorGritter('Error!', 'Isikan Foto Bukti Parkir Emoney');
+                    return false;
+                }
+                parking_emoney_arr.push(v);
+                parking_emoney_at.push($('#parking_emoney_at_' + i).val());
+                file_parking_emoney.push($('#blah_parking_emoney_' + i).attr('src'));
+            }
+        }
+
+        var total = etoll.length + parking_arr.length + parking_emoney_arr.length;
 
         function onSaved() {
             all_sudah++;
@@ -658,6 +749,20 @@
                     id: $('#id').val(), task_id: $('#task_id').val(),
                     parking: parking_arr[idx], parking_at: parking_at[idx],
                     file_parking: file_parking[idx], index: idx
+                }, function (result) {
+                    if (result.status) { onSaved(); }
+                    else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
+                });
+            })(i);
+        }
+
+        /* save Parkir Emoney */
+        for (var i = 0; i < parking_emoney_arr.length; i++) {
+            (function (idx) {
+                $.post('{{ url("input/additional/driver/job/parking_emoney") }}', {
+                    id: $('#id').val(), task_id: $('#task_id').val(),
+                    parking_emoney: parking_emoney_arr[idx], parking_at_emoney: parking_emoney_at[idx],
+                    file_parking_emoney: file_parking_emoney[idx], index: idx
                 }, function (result) {
                     if (result.status) { onSaved(); }
                     else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
