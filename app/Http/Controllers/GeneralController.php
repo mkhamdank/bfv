@@ -946,7 +946,7 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            die();
+            
 
             $response = array(
                 'status' => true,
@@ -1001,7 +1001,7 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            die();
+            
 
             $response = array(
                 'status' => true,
@@ -1053,7 +1053,7 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            die();
+            
 
             $response = array(
                 'status' => true,
@@ -1105,8 +1105,7 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            var_dump($update);
-            die();
+            
 
             $response = array(
                 'status' => true,
