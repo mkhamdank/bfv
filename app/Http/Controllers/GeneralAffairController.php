@@ -1705,9 +1705,22 @@ class GeneralAffairController extends Controller
             AND driver_id = '".$driver_id."'
             ORDER BY
             date_from DESC");
+
+            $data_closed = DB::select("SELECT
+            *
+            FROM
+            driver_tasks
+            WHERE
+            remark IS NOT NULL
+            AND (closure_status = 'closed' OR closure_status = 'daily_japanese')
+            AND (etoll IS NOT NULL OR parking IS NOT NULL OR parking_emoney IS NOT NULL)
+            AND driver_id = '".$driver_id."'
+            ORDER BY
+            date_from DESC");
             $response = array(
                 'status' => true,
-                'data' => $data
+                'data' => $data,
+                'data_closed' => $data_closed
             );
             return Response::json($response);
         } catch (\Exception $e) {
