@@ -1347,7 +1347,7 @@
      * public/images/driver/japanese/additional
      */
     var additionalFileBaseUrl =
-        '{{ url("images/driver/japanese/additional") }}';
+        'https://new.bridgeforvendor.com/images/driver/japanese/additional';
 
 
     /*
