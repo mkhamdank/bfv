@@ -925,24 +925,31 @@ class GeneralController extends Controller
         try {
             $id = $request->get('id');
             $task_id = $request->get('task_id');
-            $update = DB::table('driver_tasks')
-            ->where('id',$id)
-            ->update([
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            
-            $update = DB::table('driver_tasks')
-            ->where('id',$id)
-            ->update([
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
 
-            $update = DB::table('driver_tasks')
+            $get = DB::table('driver_tasks')
             ->where('id',$id)
-            ->update([
-                'closure_status' => 'closed',
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
+            ->first();
+
+            $update = [];
+
+            if($get->etoll === null){
+                $update['etoll'] = 0;
+            }
+
+            if($get->parking === null){
+                $update['parking'] = 0;
+            }
+
+            if($get->parking_emoney === null){
+                $update['parking_emoney'] = 0;
+            }
+
+            $update['closure_status'] = 'closed';
+            $update['updated_at'] = date('Y-m-d H:i:s');
+
+            DB::table('driver_tasks')
+                ->where('id', $id)
+                ->update($update);
 
             $response = array(
                 'status' => true,
