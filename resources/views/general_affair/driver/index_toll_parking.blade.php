@@ -594,40 +594,156 @@
         font-size: 11px;
     }
 
+    /* ============================================================
+ * MULTIPLE FILE
+ * ============================================================ */
+.file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 160px;
+}
+
+.file-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px;
+
+    background: #fafbff;
+
+    border: 1px solid #edf0f5;
+    border-radius: 8px;
+}
+
+.file-thumb {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    object-fit: cover;
+
+    border-radius: 7px;
+
+    border: 1px solid #e2e8f0;
+
+    background: #f7fafc;
+
+    cursor: pointer;
+
+    transition: all .2s;
+}
+
+.file-thumb:hover {
+    transform: scale(1.05);
+
+    box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, .12);
+}
+
+.file-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 5px;
+}
+
+.file-name {
+    max-width: 150px;
+
+    font-size: 9px;
+    font-weight: 600;
+
+    color: #718096;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.btn-file {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 6px;
+
+    background: #f0f5ff;
+
+    color: #2d6bc4 !important;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-decoration: none !important;
+
+    white-space: nowrap;
+
+    transition: all .2s;
+}
+
+.btn-file:hover {
+    background: #e5edff;
+
+    color: #1f5fae !important;
+}
+
+
+/* Non image */
+.file-preview-document {
+    min-height: 52px;
+}
+
+.file-document-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #f0f2f7;
+
+    color: #718096;
+
+    font-size: 17px;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .file-list {
+        width: 100%;
+    }
+
     .file-preview {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+        width: 100%;
     }
 
-    .file-thumb {
-        width: 42px;
-        height: 42px;
-        object-fit: cover;
-        border-radius: 7px;
-        border: 1px solid #e2e8f0;
-        background: #f7fafc;
-        cursor: pointer;
+    .file-info {
+        flex: 1;
     }
 
-    .btn-file {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        padding: 5px 8px;
-        border-radius: 6px;
-        background: #f0f5ff;
-        color: #2d6bc4 !important;
-        font-size: 10px;
-        font-weight: 700;
-        text-decoration: none !important;
-        white-space: nowrap;
+    .file-name {
+        max-width: 100%;
     }
 
-    .btn-file:hover {
-        background: #e5edff;
-    }
+}
 
 
     /* ============================================================
@@ -2873,25 +2989,41 @@
      * ============================================================ */
     function renderFile(file) {
 
-        if (!file) {
-
-            return (
-                '<span class="status-empty">-</span>'
-            );
-
-        }
+    if (!file) {
+        return '<span class="status-empty">-</span>';
+    }
 
 
-        var fileName =
-            getFileName(file);
+    /*
+     * Support lebih dari 1 file.
+     * Contoh:
+     * file1.jpg,file2.jpg,file3.pdf
+     */
+    var files = String(file)
+        .split(',')
+        .map(function (item) {
+            return item.trim();
+        })
+        .filter(function (item) {
+            return item !== '';
+        });
+
+
+    if (!files.length) {
+        return '<span class="status-empty">-</span>';
+    }
+
+
+    var html = '<div class="file-list">';
+
+
+    files.forEach(function (fileItem, index) {
+
+        var fileName = getFileName(fileItem);
 
 
         if (!fileName) {
-
-            return (
-                '<span class="status-empty">-</span>'
-            );
-
+            return;
         }
 
 
@@ -2906,18 +3038,20 @@
 
 
         /*
-         * Jika image
+         * Image
          */
-        if (
+        var isImage =
             extension === 'jpg' ||
             extension === 'jpeg' ||
             extension === 'png' ||
             extension === 'webp' ||
             extension === 'gif' ||
-            extension === 'bmp'
-        ) {
+            extension === 'bmp';
 
-            return (
+
+        if (isImage) {
+
+            html +=
                 '<div class="file-preview">' +
 
                     '<img ' +
@@ -2925,7 +3059,12 @@
                             escapeAttribute(fileUrl) +
                         '" ' +
                         'class="file-thumb" ' +
-                        'alt="File" ' +
+                        'alt="' +
+                            escapeAttribute(fileName) +
+                        '" ' +
+                        'title="' +
+                            escapeAttribute(fileName) +
+                        '" ' +
                         'onclick="' +
                             "openImageModal('" +
                             escapeJsSingleQuote(fileUrl) +
@@ -2933,45 +3072,87 @@
                         '"' +
                     '>' +
 
-                    '<a ' +
-                        'href="' +
-                            escapeAttribute(fileUrl) +
-                        '" ' +
-                        'target="_blank" ' +
-                        'rel="noopener noreferrer" ' +
-                        'class="btn-file"' +
-                    '>' +
-                        '<i class="fas fa-external-link-alt"></i>' +
-                        ' Lihat' +
-                    '</a>' +
+                    '<div class="file-info">' +
 
-                '</div>'
-            );
+                        '<div class="file-name">' +
+                            escapeHtml(fileName) +
+                        '</div>' +
+
+                        '<a ' +
+                            'href="' +
+                                escapeAttribute(fileUrl) +
+                            '" ' +
+                            'target="_blank" ' +
+                            'rel="noopener noreferrer" ' +
+                            'class="btn-file"' +
+                        '>' +
+
+                            '<i class="fas fa-external-link-alt"></i>' +
+
+                            ' Lihat' +
+
+                        '</a>' +
+
+                    '</div>' +
+
+                '</div>';
+
+        } else {
+
+            /*
+             * Non-image
+             */
+            html +=
+                '<div class="file-preview file-preview-document">' +
+
+                    '<div class="file-document-icon">' +
+                        '<i class="fas fa-file"></i>' +
+                    '</div>' +
+
+                    '<div class="file-info">' +
+
+                        '<div class="file-name">' +
+                            escapeHtml(fileName) +
+                        '</div>' +
+
+                        '<a ' +
+                            'href="' +
+                                escapeAttribute(fileUrl) +
+                            '" ' +
+                            'target="_blank" ' +
+                            'rel="noopener noreferrer" ' +
+                            'class="btn-file"' +
+                        '>' +
+
+                            '<i class="fas fa-external-link-alt"></i>' +
+
+                            ' Lihat File' +
+
+                        '</a>' +
+
+                    '</div>' +
+
+                '</div>';
 
         }
 
+    });
 
-        /*
-         * Non-image
-         */
-        return (
-            '<a ' +
-                'href="' +
-                    escapeAttribute(fileUrl) +
-                '" ' +
-                'target="_blank" ' +
-                'rel="noopener noreferrer" ' +
-                'class="btn-file"' +
-            '>' +
 
-                '<i class="fas fa-file"></i>' +
+    html += '</div>';
 
-                ' Lihat File' +
 
-            '</a>'
-        );
-
+    /*
+     * Kalau semua entry kosong/tidak valid
+     */
+    if (html === '<div class="file-list"></div>') {
+        return '<span class="status-empty">-</span>';
     }
+
+
+    return html;
+
+}
 
 
     function getFileName(file) {
