@@ -618,156 +618,379 @@
     var parking_emoney_arr = [], parking_emoney_at = [];
     var file_parking_emoney = [];
 
-    function submitDriver() {
+    // function submitDriver() {
+    //     $('#loading').addClass('show');
+
+    //     etoll = []; etoll_from = []; etoll_to = [];
+    //     parking_arr = []; parking_at = [];
+    //     file_etoll = []; file_parking = [];
+    //     parking_emoney_arr = []; parking_emoney_at = [];
+    //     file_parking_emoney = [];
+    //     var all_sudah = 0;
+
+    //     /* validate & collect E-Toll */
+    //     for (var i = 0; i < count_etoll; i++) {
+    //         var val = $('#etoll_' + i).val();
+    //         var hasFile = $('#file_etoll_' + i).prop('files')[0] != undefined;
+            
+    //         if (val != '' && val != undefined && val != 'undefined') {
+    //             var v = parseInt(val);
+    //             if (isNaN(v) || v < 100) {
+    //                 $('#loading').removeClass('show');
+    //                 openErrorGritter('Error!', 'E-Toll harus berupa nominal harga minimal 3 digit');
+    //                 return false;
+    //             }
+    //             if (!hasFile) {
+    //                 $('#loading').removeClass('show');
+    //                 openErrorGritter('Error!', 'Isikan Foto Bukti E-Toll');
+    //                 return false;
+    //             }
+    //             etoll.push(v);
+    //             etoll_from.push($('#from_' + i).val());
+    //             etoll_to.push($('#to_' + i).val());
+    //             file_etoll.push($('#blah_etoll_' + i).attr('src'));
+    //         } else if (hasFile && (val == '' || val == undefined || val == 'undefined')) {
+    //             $('#loading').removeClass('show');
+    //             openErrorGritter('Error!', 'Isikan Nominal E-Toll');
+    //             return false;
+    //         }
+    //     }
+
+    //     /* validate & collect Parkir */
+    //     for (var i = 0; i < count_parking; i++) {
+    //         var val = $('#parking_' + i).val();
+    //         if (val != '' && val != undefined && val != 'undefined') {
+    //             var v = parseInt(val);
+    //             if (isNaN(v) || v < 100) {
+    //                 $('#loading').removeClass('show');
+    //                 openErrorGritter('Error!', 'Parkir harus berupa nominal harga minimal 3 digit');
+    //                 return false;
+    //             }
+    //             if ($('#file_parking_' + i).prop('files')[0] == undefined) {
+    //                 $('#loading').removeClass('show');
+    //                 openErrorGritter('Error!', 'Isikan Foto Bukti Parkir');
+    //                 return false;
+    //             }
+    //             parking_arr.push(v);
+    //             parking_at.push($('#parking_at_' + i).val());
+    //             file_parking.push($('#blah_parking_' + i).attr('src'));
+    //         }
+    //     }
+
+    //     /* validate & collect Parkir Emoney */
+    //     for (var i = 0; i < count_parking_emoney; i++) {
+    //         var val = $('#parking_emoney_' + i).val();
+    //         if (val != '' && val != undefined && val != 'undefined') {
+    //             var v = parseInt(val);
+    //             if (isNaN(v) || v < 100) {
+    //                 $('#loading').removeClass('show');
+    //                 openErrorGritter('Error!', 'Parkir Emoney harus berupa nominal harga minimal 3 digit');
+    //                 return false;
+    //             }
+    //             if ($('#file_parking_emoney_' + i).prop('files')[0] == undefined) {
+    //                 $('#loading').removeClass('show');
+    //                 openErrorGritter('Error!', 'Isikan Foto Bukti Parkir Emoney');
+    //                 return false;
+    //             }
+    //             parking_emoney_arr.push(v);
+    //             parking_emoney_at.push($('#parking_emoney_at_' + i).val());
+    //             file_parking_emoney.push($('#blah_parking_emoney_' + i).attr('src'));
+    //         }
+    //     }
+
+    //     var total = etoll.length + parking_arr.length + parking_emoney_arr.length;
+
+    //     function onSaved() {
+    //         all_sudah++;
+    //         if (all_sudah == total) {
+    //             $('#div_driver_3').show();
+    //             $('#div_driver_2').hide();
+    //             $('#div_driver_1').hide();
+    //             $('#loading').removeClass('show');
+    //             openSuccessGritter('Sukses', 'Data berhasil dikirim (データの入力に成功しました)');
+    //         }
+    //     }
+
+    //     if (total === 0) {
+    //         var data = { id: $('#id').val(), task_id: $('#task_id').val() };
+    //         $.post('{{ url("input/additional/driver/job") }}', data, function (result) {
+    //             if (result.status) {
+    //                 $('#div_driver_3').show();
+    //                 $('#div_driver_2').hide();
+    //                 $('#div_driver_1').hide();
+    //                 $('#loading').removeClass('show');
+    //                 openSuccessGritter('Sukses', 'Data berhasil dikirim');
+    //             } else {
+    //                 openErrorGritter('Error!', result.message);
+    //                 $('#loading').removeClass('show');
+    //             }
+    //         });
+    //         // return;
+    //     }
+
+    //     /* save E-Toll */
+    //     for (var i = 0; i < etoll.length; i++) {
+    //         (function (idx) {
+    //             $.post('{{ url("input/additional/driver/job/etoll") }}', {
+    //                 id: $('#id').val(), task_id: $('#task_id').val(),
+    //                 etoll: etoll[idx], etoll_from: etoll_from[idx],
+    //                 etoll_to: etoll_to[idx], file_etoll: file_etoll[idx], index: idx
+    //             }, function (result) {
+    //                 if (result.status) { onSaved(); }
+    //                 else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
+    //             });
+    //         })(i);
+    //     }
+
+    //     /* save Parkir */
+    //     for (var i = 0; i < parking_arr.length; i++) {
+    //         (function (idx) {
+    //             $.post('{{ url("input/additional/driver/job/parking") }}', {
+    //                 id: $('#id').val(), task_id: $('#task_id').val(),
+    //                 parking: parking_arr[idx], parking_at: parking_at[idx],
+    //                 file_parking: file_parking[idx], index: idx
+    //             }, function (result) {
+    //                 if (result.status) { onSaved(); }
+    //                 else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
+    //             });
+    //         })(i);
+    //     }
+
+    //     /* save Parkir Emoney */
+    //     for (var i = 0; i < parking_emoney_arr.length; i++) {
+    //         (function (idx) {
+    //             $.post('{{ url("input/additional/driver/job/parking_emoney") }}', {
+    //                 id: $('#id').val(), task_id: $('#task_id').val(),
+    //                 parking_emoney: parking_emoney_arr[idx], parking_at_emoney: parking_emoney_at[idx],
+    //                 file_parking_emoney: file_parking_emoney[idx], index: idx
+    //             }, function (result) {
+    //                 if (result.status) { onSaved(); }
+    //                 else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
+    //             });
+    //         })(i);
+    //     }
+    // }
+
+    async function submitDriver() {
+
         $('#loading').addClass('show');
 
-        etoll = []; etoll_from = []; etoll_to = [];
-        parking_arr = []; parking_at = [];
-        file_etoll = []; file_parking = [];
-        parking_emoney_arr = []; parking_emoney_at = [];
-        file_parking_emoney = [];
-        var all_sudah = 0;
+        etoll = [];
+        etoll_from = [];
+        etoll_to = [];
 
-        /* validate & collect E-Toll */
+        parking_arr = [];
+        parking_at = [];
+
+        parking_emoney_arr = [];
+        parking_emoney_at = [];
+
+        file_etoll = [];
+        file_parking = [];
+        file_parking_emoney = [];
+
+        /* ==========================
+        VALIDASI ETOLL
+        ========================== */
         for (var i = 0; i < count_etoll; i++) {
+
             var val = $('#etoll_' + i).val();
             var hasFile = $('#file_etoll_' + i).prop('files')[0] != undefined;
-            
-            if (val != '' && val != undefined && val != 'undefined') {
+
+            if (val != '' && val != undefined) {
+
                 var v = parseInt(val);
+
                 if (isNaN(v) || v < 100) {
                     $('#loading').removeClass('show');
-                    openErrorGritter('Error!', 'E-Toll harus berupa nominal harga minimal 3 digit');
+                    openErrorGritter('Error!', 'E-Toll harus berupa nominal minimal 100');
                     return false;
                 }
+
                 if (!hasFile) {
                     $('#loading').removeClass('show');
                     openErrorGritter('Error!', 'Isikan Foto Bukti E-Toll');
                     return false;
                 }
+
                 etoll.push(v);
                 etoll_from.push($('#from_' + i).val());
                 etoll_to.push($('#to_' + i).val());
                 file_etoll.push($('#blah_etoll_' + i).attr('src'));
-            } else if (hasFile && (val == '' || val == undefined || val == 'undefined')) {
+            }
+            else if (hasFile) {
                 $('#loading').removeClass('show');
                 openErrorGritter('Error!', 'Isikan Nominal E-Toll');
                 return false;
             }
         }
 
-        /* validate & collect Parkir */
+        /* ==========================
+        VALIDASI PARKING TUNAI
+        ========================== */
         for (var i = 0; i < count_parking; i++) {
+
             var val = $('#parking_' + i).val();
-            if (val != '' && val != undefined && val != 'undefined') {
+
+            if (val != '' && val != undefined) {
+
                 var v = parseInt(val);
+
                 if (isNaN(v) || v < 100) {
                     $('#loading').removeClass('show');
-                    openErrorGritter('Error!', 'Parkir harus berupa nominal harga minimal 3 digit');
+                    openErrorGritter('Error!', 'Parkir harus berupa nominal minimal 100');
                     return false;
                 }
+
                 if ($('#file_parking_' + i).prop('files')[0] == undefined) {
                     $('#loading').removeClass('show');
                     openErrorGritter('Error!', 'Isikan Foto Bukti Parkir');
                     return false;
                 }
+
                 parking_arr.push(v);
                 parking_at.push($('#parking_at_' + i).val());
                 file_parking.push($('#blah_parking_' + i).attr('src'));
             }
         }
 
-        /* validate & collect Parkir Emoney */
+        /* ==========================
+        VALIDASI PARKING EMONEY
+        ========================== */
         for (var i = 0; i < count_parking_emoney; i++) {
+
             var val = $('#parking_emoney_' + i).val();
-            if (val != '' && val != undefined && val != 'undefined') {
+
+            if (val != '' && val != undefined) {
+
                 var v = parseInt(val);
+
                 if (isNaN(v) || v < 100) {
                     $('#loading').removeClass('show');
-                    openErrorGritter('Error!', 'Parkir Emoney harus berupa nominal harga minimal 3 digit');
+                    openErrorGritter('Error!', 'Parkir E-Money harus berupa nominal minimal 100');
                     return false;
                 }
+
                 if ($('#file_parking_emoney_' + i).prop('files')[0] == undefined) {
                     $('#loading').removeClass('show');
-                    openErrorGritter('Error!', 'Isikan Foto Bukti Parkir Emoney');
+                    openErrorGritter('Error!', 'Isikan Foto Bukti Parkir E-Money');
                     return false;
                 }
+
                 parking_emoney_arr.push(v);
                 parking_emoney_at.push($('#parking_emoney_at_' + i).val());
                 file_parking_emoney.push($('#blah_parking_emoney_' + i).attr('src'));
             }
         }
 
-        var total = etoll.length + parking_arr.length + parking_emoney_arr.length;
+        try {
 
-        function onSaved() {
-            all_sudah++;
-            if (all_sudah == total) {
-                $('#div_driver_3').show();
-                $('#div_driver_2').hide();
-                $('#div_driver_1').hide();
-                $('#loading').removeClass('show');
-                openSuccessGritter('Sukses', 'Data berhasil dikirim (データの入力に成功しました)');
+            /* =====================================
+            SAVE ETOLL SATU PERSATU (SEQUENTIAL)
+            ===================================== */
+            for (let idx = 0; idx < etoll.length; idx++) {
+
+                let result = await $.ajax({
+                    type: 'POST',
+                    url: '{{ url("input/additional/driver/job/etoll") }}',
+                    data: {
+                        id: $('#id').val(),
+                        task_id: $('#task_id').val(),
+                        etoll: etoll[idx],
+                        etoll_from: etoll_from[idx],
+                        etoll_to: etoll_to[idx],
+                        file_etoll: file_etoll[idx],
+                        index: idx
+                    }
+                });
+
+                if (!result.status) {
+                    throw new Error(result.message);
+                }
             }
-        }
 
-        if (total === 0) {
-            var data = { id: $('#id').val(), task_id: $('#task_id').val() };
-            $.post('{{ url("input/additional/driver/job") }}', data, function (result) {
-                if (result.status) {
-                    $('#div_driver_3').show();
-                    $('#div_driver_2').hide();
-                    $('#div_driver_1').hide();
-                    $('#loading').removeClass('show');
-                    openSuccessGritter('Sukses', 'Data berhasil dikirim');
-                } else {
-                    openErrorGritter('Error!', result.message);
-                    $('#loading').removeClass('show');
+            /* =====================================
+            SAVE PARKING TUNAI SATU PERSATU
+            ===================================== */
+            for (let idx = 0; idx < parking_arr.length; idx++) {
+
+                let result = await $.ajax({
+                    type: 'POST',
+                    url: '{{ url("input/additional/driver/job/parking") }}',
+                    data: {
+                        id: $('#id').val(),
+                        task_id: $('#task_id').val(),
+                        parking: parking_arr[idx],
+                        parking_at: parking_at[idx],
+                        file_parking: file_parking[idx],
+                        index: idx
+                    }
+                });
+
+                if (!result.status) {
+                    throw new Error(result.message);
+                }
+            }
+
+            /* =====================================
+            SAVE PARKING EMONEY SATU PERSATU
+            ===================================== */
+            for (let idx = 0; idx < parking_emoney_arr.length; idx++) {
+
+                let result = await $.ajax({
+                    type: 'POST',
+                    url: '{{ url("input/additional/driver/job/parking_emoney") }}',
+                    data: {
+                        id: $('#id').val(),
+                        task_id: $('#task_id').val(),
+                        parking_emoney: parking_emoney_arr[idx],
+                        parking_at_emoney: parking_emoney_at[idx],
+                        file_parking_emoney: file_parking_emoney[idx],
+                        index: idx
+                    }
+                });
+
+                if (!result.status) {
+                    throw new Error(result.message);
+                }
+            }
+
+            /* =====================================
+            CLOSE TASK DI AKHIR
+            ===================================== */
+            let finish = await $.ajax({
+                type: 'POST',
+                url: '{{ url("input/additional/driver/job") }}',
+                data: {
+                    id: $('#id').val(),
+                    task_id: $('#task_id').val()
                 }
             });
-            // return;
-        }
 
-        /* save E-Toll */
-        for (var i = 0; i < etoll.length; i++) {
-            (function (idx) {
-                $.post('{{ url("input/additional/driver/job/etoll") }}', {
-                    id: $('#id').val(), task_id: $('#task_id').val(),
-                    etoll: etoll[idx], etoll_from: etoll_from[idx],
-                    etoll_to: etoll_to[idx], file_etoll: file_etoll[idx], index: idx
-                }, function (result) {
-                    if (result.status) { onSaved(); }
-                    else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
-                });
-            })(i);
-        }
+            if (!finish.status) {
+                throw new Error(finish.message);
+            }
 
-        /* save Parkir */
-        for (var i = 0; i < parking_arr.length; i++) {
-            (function (idx) {
-                $.post('{{ url("input/additional/driver/job/parking") }}', {
-                    id: $('#id').val(), task_id: $('#task_id').val(),
-                    parking: parking_arr[idx], parking_at: parking_at[idx],
-                    file_parking: file_parking[idx], index: idx
-                }, function (result) {
-                    if (result.status) { onSaved(); }
-                    else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
-                });
-            })(i);
-        }
+            $('#loading').removeClass('show');
 
-        /* save Parkir Emoney */
-        for (var i = 0; i < parking_emoney_arr.length; i++) {
-            (function (idx) {
-                $.post('{{ url("input/additional/driver/job/parking_emoney") }}', {
-                    id: $('#id').val(), task_id: $('#task_id').val(),
-                    parking_emoney: parking_emoney_arr[idx], parking_at_emoney: parking_emoney_at[idx],
-                    file_parking_emoney: file_parking_emoney[idx], index: idx
-                }, function (result) {
-                    if (result.status) { onSaved(); }
-                    else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
-                });
-            })(i);
+            $('#div_driver_1').hide();
+            $('#div_driver_2').hide();
+            $('#div_driver_3').show();
+
+            openSuccessGritter(
+                'Sukses',
+                'Data berhasil dikirim (データの入力に成功しました)'
+            );
+
+        }
+        catch (err) {
+
+            $('#loading').removeClass('show');
+
+            openErrorGritter(
+                'Error!',
+                err.message || 'Terjadi kesalahan saat menyimpan data'
+            );
         }
     }
 

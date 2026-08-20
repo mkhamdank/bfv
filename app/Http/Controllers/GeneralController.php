@@ -928,14 +928,12 @@ class GeneralController extends Controller
             $update = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
-                'etoll' => 0,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
             
             $update = DB::table('driver_tasks')
             ->where('id',$id)
             ->update([
-                'parking' => 0,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
@@ -945,8 +943,6 @@ class GeneralController extends Controller
                 'closure_status' => 'closed',
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
-
-            
 
             $response = array(
                 'status' => true,
