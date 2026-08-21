@@ -1691,32 +1691,124 @@ class GeneralAffairController extends Controller
 
     function fetchDriverTollParking(Request $request) {
         try {
+
+            $date_from = $request->get('date_from');
+            $date_to = $request->get('date_to');
+
+            if ($date_from == "") {
+                if ($date_to == "") {
+                    // Default: 3 bulan terakhir, termasuk bulan berjalan
+                    $first = date('Y-m-01');
+                    $last = date('Y-m-t');
+
+                    $firstTitle = date('d M Y', strtotime($first));
+                    $lastTitle = date('d M Y', strtotime($last));
+                } else {
+                    // date_from kosong, date_to ada
+                    // Ambil 3 bulan ke belakang berdasarkan date_to
+                    $first = date('Y-m-01', strtotime($date_to));
+                    $last = $date_to;
+
+                    $firstTitle = date('d M Y', strtotime($first));
+                    $lastTitle = date('d M Y', strtotime($last));
+                }
+            } else {
+                if ($date_to == "") {
+                    // date_from ada, date_to kosong
+                    // Sampai akhir bulan, 2 bulan setelah date_from
+                    $first = $date_from;
+                    $last = date('Y-m-t', strtotime($date_from));
+
+                    $firstTitle = date('d M Y', strtotime($first));
+                    $lastTitle = date('d M Y', strtotime($last));
+                } else {
+                    // Keduanya diisi
+                    $first = $date_from;
+                    $last = $date_to;
+
+                    $firstTitle = date('d M Y', strtotime($first));
+                    $lastTitle = date('d M Y', strtotime($last));
+                }
+            }
+
+            $whereClause = "AND date_from BETWEEN '".$first."' AND '".$last."'";
             $driver_id = $request->get('driver_id');
             $data = DB::select("SELECT
-            *
-            FROM
-            driver_tasks
-            WHERE
-            remark IS NOT NULL
-            AND closure_status != 'driver'
-            AND closure_status != 'closed'
-            AND etoll IS NULL
-            AND parking IS NULL
-            AND driver_id = '".$driver_id."'
-            ORDER BY
-            date_from DESC");
+                *
+                FROM
+                (
+                    (
+                    SELECT
+                        *
+                    FROM
+                        driver_tasks
+                    WHERE
+                        remark IS NOT NULL
+                        AND closure_status != 'driver'
+                        AND closure_status != 'closed'
+                        AND etoll IS NULL
+                        AND parking IS NULL
+                        AND parking_emoney IS NULL
+                        AND driver_id = '".$driver_id."'
+                        ".$whereClause."
+                    ORDER BY
+                        date_from DESC
+                    ) UNION ALL
+                    (
+                    SELECT
+                        *
+                    FROM
+                        driver_tasks
+                    WHERE
+                        remark IS NULL
+                        AND driver_id = '".$driver_id."'
+                        AND etoll IS NULL
+                        AND parking IS NULL
+                        AND parking_emoney IS NULL
+                        AND (LOWER(destination) LIKE '%pasuruan%' OR LOWER(destination) LIKE '%kebon%')
+                        ".$whereClause."
+                    ORDER BY
+                        date_from DESC
+                    )
+                ) a
+                ORDER BY
+                a.date_from DESC");
 
             $data_closed = DB::select("SELECT
             *
             FROM
-            driver_tasks
-            WHERE
-            remark IS NOT NULL
-            AND (closure_status = 'closed' OR closure_status = 'daily_japanese')
-            AND (etoll IS NOT NULL OR parking IS NOT NULL OR parking_emoney IS NOT NULL)
-            AND driver_id = '".$driver_id."'
+            (
+                (
+                SELECT
+                    *
+                FROM
+                    driver_tasks
+                WHERE
+                    remark IS NOT NULL
+                    AND (closure_status = 'closed' OR closure_status = 'daily_japanese')
+                    AND (etoll IS NOT NULL OR parking IS NOT NULL OR parking_emoney IS NOT NULL)
+                    AND driver_id = '".$driver_id."'
+                    ".$whereClause."
+                ORDER BY
+                    date_from DESC
+                ) UNION ALL
+                (
+                SELECT
+                    *
+                FROM
+                    driver_tasks
+                WHERE
+                    remark IS NULL
+                    AND driver_id = '".$driver_id."'
+                    AND (etoll IS NOT NULL OR parking IS NOT NULL OR parking_emoney IS NOT NULL)
+                    AND (LOWER(destination) LIKE '%pasuruan%' OR LOWER(destination) LIKE '%kebon%')
+                    ".$whereClause."
+                ORDER BY
+                    date_from DESC
+                )
+            ) a
             ORDER BY
-            date_from DESC");
+            a.date_from DESC");
             $response = array(
                 'status' => true,
                 'data' => $data,

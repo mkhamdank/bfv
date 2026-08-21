@@ -1116,6 +1116,420 @@
             grid-column: auto;
         }
     }
+
+    /* =========================================================
+    BOOTSTRAP DATEPICKER - COMPACT RESPONSIVE
+    ========================================================= */
+
+    .datepicker {
+        width: 230px !important;
+        max-width: calc(100vw - 24px) !important;
+
+        padding: 7px !important;
+
+        border: 1px solid #dfe7f0 !important;
+        border-radius: 10px !important;
+
+        background-color: #ffffff !important;
+
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14) !important;
+
+        color: #1e293b !important;
+
+        font-size: 11px !important;
+    }
+
+
+    /* =========================================================
+    TABLE
+    ========================================================= */
+
+    .datepicker table {
+        width: 100% !important;
+
+        border-collapse: separate !important;
+        border-spacing: 1px !important;
+
+        table-layout: fixed !important;
+    }
+
+
+    .datepicker table tr td,
+    .datepicker table tr th {
+        width: 28px !important;
+        height: 28px !important;
+
+        padding: 0 !important;
+
+        border: none !important;
+        border-radius: 6px !important;
+
+        text-align: center !important;
+        vertical-align: middle !important;
+
+        font-size: 11px !important;
+        line-height: 28px !important;
+    }
+
+
+    /* =========================================================
+    HEADER
+    ========================================================= */
+
+    .datepicker table thead tr:first-child th {
+        height: 30px !important;
+
+        background-color: #163a67 !important;
+
+        color: #ffffff !important;
+
+        font-size: 11px !important;
+        font-weight: 800 !important;
+
+        line-height: 30px !important;
+    }
+
+
+    .datepicker table thead tr:first-child th:hover {
+        background-color: #214d80 !important;
+        color: #ffffff !important;
+    }
+
+
+    .datepicker .datepicker-switch {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+
+        color: #ffffff !important;
+    }
+
+
+    .datepicker .prev,
+    .datepicker .next {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+
+        color: #ffffff !important;
+    }
+
+
+    /* =========================================================
+    DAY NAME
+    ========================================================= */
+
+    .datepicker table thead tr:nth-child(2) th {
+        height: 25px !important;
+
+        padding: 0 !important;
+
+        background-color: transparent !important;
+
+        color: #475569 !important;
+
+        font-size: 10px !important;
+        line-height: 25px !important;
+
+        font-weight: 800 !important;
+    }
+
+
+    /* =========================================================
+    NORMAL DAY
+    ========================================================= */
+
+    .datepicker table tr td.day {
+        background-color: #ffffff !important;
+
+        color: #334155 !important;
+
+        font-size: 11px !important;
+
+        font-weight: 600 !important;
+
+        cursor: pointer !important;
+    }
+
+
+    .datepicker table tr td.day:hover {
+        background-color: #f4eaf6 !important;
+
+        color: #684574 !important;
+    }
+
+
+    /* =========================================================
+    OLD / NEW MONTH
+    ========================================================= */
+
+    .datepicker table tr td.old,
+    .datepicker table tr td.new {
+        background-color: transparent !important;
+
+        color: #b8c1cc !important;
+    }
+
+
+    /* =========================================================
+    TODAY
+    ========================================================= */
+
+    .datepicker table tr td.today {
+        background-color: #fff4cc !important;
+
+        color: #92400e !important;
+
+        font-weight: 800 !important;
+    }
+
+
+    .datepicker table tr td.today:hover {
+        background-color: #fde68a !important;
+
+        color: #78350f !important;
+    }
+
+
+    /* =========================================================
+    ACTIVE / SELECTED
+    ========================================================= */
+
+    .datepicker table tr td.active,
+    .datepicker table tr td.active:hover,
+    .datepicker table tr td.active.disabled,
+    .datepicker table tr td.active.disabled:hover {
+        background-color: #2563eb !important;
+
+        color: #ffffff !important;
+
+        font-weight: 800 !important;
+
+        text-shadow: none !important;
+
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.22) !important;
+    }
+
+
+    /* =========================================================
+    DISABLED
+    ========================================================= */
+
+    .datepicker table tr td.disabled,
+    .datepicker table tr td.disabled:hover {
+        background-color: transparent !important;
+
+        color: #cbd5e1 !important;
+
+        cursor: not-allowed !important;
+    }
+
+
+    /* =========================================================
+    MONTH / YEAR VIEW
+    ========================================================= */
+
+    .datepicker table tr td span {
+        height: 34px !important;
+        line-height: 34px !important;
+
+        margin: 1% !important;
+
+        border-radius: 7px !important;
+
+        color: #334155 !important;
+
+        font-size: 11px !important;
+
+        font-weight: 700 !important;
+    }
+
+
+    .datepicker table tr td span:hover {
+        background-color: #f4eaf6 !important;
+
+        color: #684574 !important;
+    }
+
+
+    .datepicker table tr td span.active,
+    .datepicker table tr td span.active:hover {
+        background-color: #7e568b !important;
+
+        color: #ffffff !important;
+
+        text-shadow: none !important;
+    }
+
+
+    /* =========================================================
+    DROPDOWN ARROW
+    ========================================================= */
+
+    .datepicker-dropdown:before {
+        border-bottom-color: #dfe7f0 !important;
+    }
+
+
+    .datepicker-dropdown:after {
+        border-bottom-color: #ffffff !important;
+    }
+
+
+    /* =========================================================
+    INPUT
+    ========================================================= */
+
+    input.datepicker {
+        height: 36px !important;
+
+        padding: 7px 10px !important;
+
+        border: 1px solid #d8e0e8 !important;
+        border-radius: 7px !important;
+
+        background-color: #ffffff !important;
+
+        color: #334155 !important;
+
+        font-size: 12px !important;
+
+        box-shadow: none !important;
+    }
+
+
+    input.datepicker:focus {
+        border-color: #7e568b !important;
+
+        box-shadow: 0 0 0 3px rgba(126, 86, 139, 0.12) !important;
+    }
+
+
+    /* =========================================================
+    TABLET
+    ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .datepicker {
+            width: 215px !important;
+            max-width: calc(100vw - 20px) !important;
+
+            padding: 6px !important;
+
+            border-radius: 9px !important;
+        }
+
+
+        .datepicker table tr td,
+        .datepicker table tr th {
+            width: 27px !important;
+            height: 27px !important;
+
+            font-size: 10px !important;
+            line-height: 27px !important;
+        }
+
+
+        .datepicker table thead tr:first-child th {
+            height: 29px !important;
+
+            line-height: 29px !important;
+        }
+
+
+        .datepicker .datepicker-switch {
+            font-size: 11px !important;
+        }
+
+
+        .datepicker table thead tr:nth-child(2) th {
+            height: 24px !important;
+
+            font-size: 9px !important;
+            line-height: 24px !important;
+        }
+
+    }
+
+
+    /* =========================================================
+    MOBILE
+    ========================================================= */
+
+    @media (max-width: 480px) {
+
+        .datepicker {
+            width: 205px !important;
+            max-width: calc(100vw - 16px) !important;
+
+            padding: 5px !important;
+
+            border-radius: 8px !important;
+
+            font-size: 10px !important;
+        }
+
+
+        .datepicker table {
+            border-spacing: 0 !important;
+        }
+
+
+        .datepicker table tr td,
+        .datepicker table tr th {
+            width: 25px !important;
+            height: 25px !important;
+
+            border-radius: 5px !important;
+
+            font-size: 10px !important;
+            line-height: 25px !important;
+        }
+
+
+        .datepicker table thead tr:first-child th {
+            height: 28px !important;
+
+            font-size: 10px !important;
+            line-height: 28px !important;
+        }
+
+
+        .datepicker .datepicker-switch {
+            font-size: 11px !important;
+        }
+
+
+        .datepicker .prev,
+        .datepicker .next {
+            font-size: 11px !important;
+        }
+
+
+        .datepicker table thead tr:nth-child(2) th {
+            height: 22px !important;
+
+            font-size: 9px !important;
+            line-height: 22px !important;
+        }
+
+
+        .datepicker table tr td span {
+            height: 30px !important;
+            line-height: 30px !important;
+
+            font-size: 10px !important;
+        }
+
+
+        input.datepicker {
+            height: 34px !important;
+
+            padding: 6px 9px !important;
+
+            font-size: 11px !important;
+        }
+
+    }
 </style>
 
 @endsection
@@ -1189,9 +1603,11 @@
                 <label for="filter_date_from">Dari Tanggal</label>
 
                 <input
-                    type="date"
+                    type="text"
                     id="filter_date_from"
-                    class="filter-control"
+                    class="filter-control datepicker"
+                    readonly
+                    placeholder="Pilih tanggal"
                 >
             </div>
 
@@ -1200,9 +1616,11 @@
                 <label for="filter_date_to">Sampai Tanggal</label>
 
                 <input
-                    type="date"
+                    type="text"
                     id="filter_date_to"
-                    class="filter-control"
+                    class="filter-control datepicker"
+                    readonly
+                    placeholder="Pilih tanggal"
                 >
             </div>
 
@@ -1480,6 +1898,14 @@
         $('body').toggleClass('sidebar-collapse');
 
         $('#side_driver').addClass('menu-open');
+
+        $('.datepicker').datepicker({
+			<?php $tgl_max = date('Y-m-d') ?>
+			autoclose: true,
+			format: "yyyy-mm-dd",
+			todayHighlight: true,	
+			endDate: '<?php echo $tgl_max ?>'
+		});
 
 
         /*
