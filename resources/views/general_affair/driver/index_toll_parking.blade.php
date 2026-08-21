@@ -2887,39 +2887,75 @@
             typeof value === 'undefined' ||
             value === ''
         ) {
-
-            return (
-                '<span class="status-empty">-</span>'
-            );
-
+            return '<span class="status-empty">-</span>';
         }
 
 
-        var parsed =
-            parseFloat(
-                String(value)
-                    .replace(/,/g, '')
-            );
+        /*
+        * Support multiple nominal dipisahkan koma.
+        *
+        * Contoh:
+        * 10000,20000,15000
+        */
+        var values = String(value)
+            .split(',')
+            .map(function (item) {
+                return item.trim();
+            })
+            .filter(function (item) {
+                return item !== '';
+            });
 
 
-        if (isNaN(parsed)) {
-
-            return (
-                '<span class="money-value">' +
-                    escapeHtml(String(value)) +
-                '</span>'
-            );
-
+        if (!values.length) {
+            return '<span class="status-empty">-</span>';
         }
 
 
-        return (
-            '<span class="money-value">' +
-                'Rp ' +
-                formatNumber(parsed) +
-            '</span>'
-        );
+        var html = '<div class="money-list">';
 
+
+        values.forEach(function (item) {
+
+            /*
+            * Bersihkan karakter selain angka,
+            * minus, dan decimal point jika diperlukan.
+            */
+            var cleanValue = String(item)
+                .replace(/[^\d.-]/g, '');
+
+
+            var parsed = parseFloat(cleanValue);
+
+
+            if (isNaN(parsed)) {
+
+                html +=
+                    '<div class="money-item">' +
+                        '<span class="money-value">' +
+                            escapeHtml(item) +
+                        '</span>' +
+                    '</div>';
+
+                return;
+            }
+
+
+            html +=
+                '<div class="money-item">' +
+                    '<span class="money-value">' +
+                        'Rp ' +
+                        formatNumber(parsed) +
+                    '</span>' +
+                '</div>';
+
+        });
+
+
+        html += '</div>';
+
+
+        return html;
     }
 
 
