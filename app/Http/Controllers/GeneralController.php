@@ -897,9 +897,19 @@ class GeneralController extends Controller
     {
         $task_id = base64_decode($id);
         $driver_task = DB::table('driver_tasks')
-        ->where('task_id',$task_id)
-        ->where('closure_status','japanese')
-        ->first();
+        ->where('task_id',$task_id)->first();
+
+        if($driver_task->remark != null){
+            $driver_task = DB::table('driver_tasks')
+            ->where('task_id',$task_id)
+            ->where('closure_status','japanese')
+            ->first();
+        }else{
+            $driver_task = DB::table('driver_tasks')
+            ->where('task_id',$task_id)
+            ->where('closure_status','driver')
+            ->first();
+        }
 
         if($driver_task){
             return view('general_affair.driver.index_additional_task')
