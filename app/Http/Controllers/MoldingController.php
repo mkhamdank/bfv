@@ -31,6 +31,10 @@ class MoldingController extends Controller
 
     public function indexMoldingDiagnoseList()
     {
+        if(!Auth::check()){
+            return redirect()->route('login');
+        }
+
         return view('molding.index_list');
     }
 
@@ -53,12 +57,17 @@ class MoldingController extends Controller
 
     public function indexMoldingDiagnoseFormList($asset_number = null)
     {
+        if(!Auth::check()){
+            return redirect()->route('login');
+        }
+        
         $moldings = DB::table('molding_diagnose_masters')
         ->select('id', 'fixed_asset_number', 'fixed_asset_name')
         ->whereNull('deleted_at')
         ->get();
 
         return view('molding.index_form_list', compact('asset_number', 'moldings'));
+
     }
 
     function fetchMoldingDiagnoseFormList(Request $request)  {
