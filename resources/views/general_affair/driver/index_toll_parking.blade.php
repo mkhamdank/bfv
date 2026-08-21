@@ -1530,6 +1530,146 @@
         }
 
     }
+
+    /* =========================================================
+    ACTIVE FILTER PERIOD
+    ========================================================= */
+
+    .filter-period {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        margin-top: 14px;
+        padding: 10px 12px;
+
+        background-color: #f8fafc;
+
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+    }
+
+
+    /* ICON */
+
+    .filter-period-icon {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        background-color: #eef2ff;
+
+        border-radius: 7px;
+
+        color: #2563b8;
+
+        font-size: 14px;
+    }
+
+
+    /* CONTENT */
+
+    .filter-period-content {
+        min-width: 0;
+
+        display: flex;
+        align-items: center;
+
+        gap: 12px;
+    }
+
+
+    /* LABEL */
+
+    .filter-period-label {
+        color: #64748b;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+
+    /* DATE WRAPPER */
+
+    .filter-period-date {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+    }
+
+
+    /* DATE */
+
+    .filter-period-value {
+        display: inline-block;
+
+        padding: 4px 9px;
+
+        background-color: #ffffff;
+
+        border: 1px solid #dbe3ec;
+        border-radius: 6px;
+
+        color: #1e293b;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        white-space: nowrap;
+    }
+
+
+    /* SEPARATOR */
+
+    .filter-period-separator {
+        color: #94a3b8;
+
+        font-size: 11px;
+    }
+
+
+    /* =========================================================
+    MOBILE
+    ========================================================= */
+
+    @media (max-width: 480px) {
+
+        .filter-period {
+            align-items: flex-start;
+
+            padding: 9px 10px;
+        }
+
+        .filter-period-content {
+            display: block;
+        }
+
+        .filter-period-label {
+            display: block;
+
+            margin-bottom: 5px;
+        }
+
+        .filter-period-date {
+            gap: 5px;
+        }
+
+        .filter-period-value {
+            padding: 3px 6px;
+
+            font-size: 10px;
+        }
+
+    }
 </style>
 
 @endsection
@@ -1599,8 +1739,11 @@
 
         <div class="filter-row">
 
+            {{-- FROM DATE --}}
             <div class="filter-group">
-                <label for="filter_date_from">Dari Tanggal</label>
+                <label for="filter_date_from">
+                    Dari Tanggal
+                </label>
 
                 <input
                     type="text"
@@ -1612,8 +1755,11 @@
             </div>
 
 
+            {{-- TO DATE --}}
             <div class="filter-group">
-                <label for="filter_date_to">Sampai Tanggal</label>
+                <label for="filter_date_to">
+                    Sampai Tanggal
+                </label>
 
                 <input
                     type="text"
@@ -1625,6 +1771,7 @@
             </div>
 
 
+            {{-- ACTION --}}
             <div class="filter-action">
 
                 <button
@@ -1644,6 +1791,48 @@
                     <i class="fas fa-undo"></i>
                     Reset
                 </button>
+
+            </div>
+
+        </div>
+
+
+        {{-- ====================================================
+            ACTIVE PERIOD
+        ===================================================== --}}
+        <div class="filter-period">
+
+            <div class="filter-period-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+
+            <div class="filter-period-content">
+
+                <span class="filter-period-label">
+                    Periode Data
+                </span>
+
+                <div class="filter-period-date">
+
+                    <span
+                        id="filter_date_first_title"
+                        class="filter-period-value"
+                    >
+                        -
+                    </span>
+
+                    <span class="filter-period-separator">
+                        <i class="fas fa-long-arrow-alt-right"></i>
+                    </span>
+
+                    <span
+                        id="filter_date_last_title"
+                        class="filter-period-value"
+                    >
+                        -
+                    </span>
+
+                </div>
 
             </div>
 
@@ -2015,6 +2204,14 @@
 
 
                 if (result.status) {
+
+                    $('#filter_date_first_title').text(
+                        result.firstTitle || '-'
+                    );
+
+                    $('#filter_date_last_title').text(
+                        result.lastTitle || '-'
+                    );
 
                     outstandingData =
                         Array.isArray(result.data)

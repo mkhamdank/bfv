@@ -1812,7 +1812,9 @@ class GeneralAffairController extends Controller
             $response = array(
                 'status' => true,
                 'data' => $data,
-                'data_closed' => $data_closed
+                'data_closed' => $data_closed,
+                'firstTitle' => $firstTitle,
+                'lastTitle' => $lastTitle
             );
             return Response::json($response);
         } catch (\Exception $e) {
