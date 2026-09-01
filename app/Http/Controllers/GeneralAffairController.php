@@ -1731,7 +1731,7 @@ class GeneralAffairController extends Controller
                 }
             }
 
-            $whereClause = "AND date_from BETWEEN '".$first."' AND '".$last."'";
+            $whereClause = "AND DATE(date_from) BETWEEN '".$first."' AND '".$last."'";
             $driver_id = $request->get('driver_id');
             $data = DB::select("SELECT
                 *
