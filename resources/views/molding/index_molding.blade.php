@@ -230,7 +230,7 @@
             </a>
 
             {{-- Riwayat Kerusakan --}}
-            <a href="{{ route('user.molding_trouble') }}" class="mol-menu-btn">
+            {{-- <a href="{{ route('user.molding_trouble') }}" class="mol-menu-btn">
                 <div class="btn-icon red">
                     <i class="fas fa-hand-holding-medical"></i>
                 </div>
@@ -239,7 +239,7 @@
                     <span class="btn-desc">Catat dan lacak kerusakan molding</span>
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
-            </a>
+            </a> --}}
 
             {{-- Daftar Form --}}
             <a href="{{ route('user.molding_form') }}" class="mol-menu-btn">
@@ -254,13 +254,59 @@
             </a>
 
             {{-- Monitoring --}}
-            <a href="{{ route('user.molding_form') }}" class="mol-menu-btn">
+            <a href="{{ route('user.molding_monitoring') }}" class="mol-menu-btn">
                 <div class="btn-icon green">
                     <i class="fas fa-chart-bar"></i>
                 </div>
                 <div class="btn-content">
                     <span class="btn-title">Monitoring</span>
                     <span class="btn-desc">Dashboard pemantauan kondisi molding secara keseluruhan</span>
+                </div>
+                <i class="fas fa-chevron-right btn-arrow"></i>
+            </a>
+
+        </div>
+    </div>
+
+    <div class="menu-card">
+        <div class="menu-card-header">
+            <span class="dot"></span>
+            <h4><i class="far fa-calendar-check" style="color:#605ca8;"></i>&nbsp; Pengecekan Periodik</h4>
+        </div>
+        <div class="menu-card-body">
+
+            {{-- Daftar Molding --}}
+            <a href="{{ url('/index/diagnose_molding/molding_monitoring_new') }}" class="mol-menu-btn">
+                <div class="btn-icon purple">
+                    <i class="fas fa-cubes"></i>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">Jadwal Cek</span>
+                    <span class="btn-desc">Lihat jadwal pemeriksaan periodik molding</span>
+                </div>
+                <i class="fas fa-chevron-right btn-arrow"></i>
+            </a>
+
+            {{-- Daftar Form --}}
+            <a href="{{ url('/index/diagnose_molding/molding_form_periodic') }}" class="mol-menu-btn">
+                <div class="btn-icon amber">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">Daftar Form</span>
+                    <span class="btn-desc">Kelola form inspeksi dan pemeriksaan molding</span>
+                </div>
+                <i class="fas fa-chevron-right btn-arrow"></i>
+            </a>
+
+            {{-- Riwayat Kerusakan --}}
+            <a href="{{ route('user.molding_trouble') }}" class="mol-menu-btn">
+                <div class="btn-icon red">
+                    <i class="fas fa-hand-holding-medical"></i>
+                </div>
+                <div class="btn-content">
+                    <span class="btn-title">Master Part Molding</span>
+                    <span class="btn-desc"></span>
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>

@@ -70,6 +70,21 @@ class MoldingController extends Controller
 
     }
 
+    public function indexMoldingDiagnoseFormPeriodic($asset_number = null)
+    {
+        if(!Auth::check()){
+            return redirect()->route('login');
+        }
+        
+        $moldings = DB::table('molding_diagnose_masters')
+        ->select('id', 'fixed_asset_number', 'fixed_asset_name')
+        ->whereNull('deleted_at')
+        ->get();
+
+        return view('molding.index_form_periodic', compact('asset_number', 'moldings'));
+
+    }
+
     function fetchMoldingDiagnoseFormList(Request $request)  {
         $master_molding = DB::table('molding_diagnose_forms')
         ->leftJoin('molding_diagnose_masters', 'molding_diagnose_forms.fixed_asset_name', '=', 'molding_diagnose_masters.fixed_asset_name')
@@ -422,6 +437,105 @@ class MoldingController extends Controller
         }
 
         return redirect('/index/diagnose_molding/molding_form/'.$kode_baru);
+    }
+
+    public function openPeriodicForm(Request $request) {
+        $request->validate([
+            'asset_number' => ['required', 'string'],
+            'period' => ['required', 'date_format:Y-m'],
+            'form_type' => ['required', 'in:product,molding,evaluation'],
+        ]);
+
+        $assetNumber = $request->input('asset_number');
+        $period = $request->input('period') . '-01';
+        $formType = $request->input('form_type');
+
+        $formNumber = DB::transaction(function () use ($assetNumber, $period) {
+            $schedule = DB::table('molding_maintenance_schedules')
+                ->where('period', $period)
+                ->whereNull('deleted_at')
+                ->lockForUpdate()
+                ->first();
+
+            if (!$schedule) {
+                abort(404, 'Schedule molding tidak ditemukan untuk periode ini.');
+            }
+
+            $scheduledAsset = DB::table('molding_maintenance_schedule_items')
+                ->where('schedule_id', $schedule->id)
+                ->where('molding_id', $assetNumber)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (!$scheduledAsset) {
+                abort(404, 'Molding tidak ditemukan pada schedule periode ini.');
+            }
+
+            $existingForm = DB::table('molding_diagnose_forms')
+                ->where('fixed_asset_number', $assetNumber)
+                ->where('period', $period)
+                ->where('remark', 'periodic')
+                ->whereNull('deleted_at')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($existingForm) {
+                return $existingForm->form_number;
+            }
+
+            $asset = DB::table('molding_diagnose_masters')
+                ->where('fixed_asset_number', $assetNumber)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (!$asset) {
+                abort(404, 'Data molding tidak ditemukan.');
+            }
+
+            $prefix = 'MLD' . date('ym', strtotime($period));
+            $lastForm = DB::table('molding_diagnose_forms')
+                ->where('form_number', 'like', $prefix . '%')
+                ->orderBy('form_number', 'desc')
+                ->value('form_number');
+            $sequence = $lastForm ? (int) substr($lastForm, strlen($prefix)) + 1 : 1;
+            $formNumber = $prefix . str_pad((string) $sequence, 3, '0', STR_PAD_LEFT);
+            $now = date('Y-m-d H:i:s');
+
+            DB::table('molding_diagnose_forms')->insert([
+                'form_number' => $formNumber,
+                'fixed_asset_number' => $assetNumber,
+                'fixed_asset_name' => $asset->fixed_asset_name,
+                'vendor' => $asset->vendor,
+                'period' => $period,
+                'remark' => 'periodic',
+                'created_by' => 'System',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+            foreach ($this->approver as $approver) {
+                DB::table('molding_diagnose_approvers')->insert([
+                    'form_number' => $formNumber,
+                    'ordering' => $approver['no'],
+                    'approver_id' => $approver['approver_id'],
+                    'approver_name' => $approver['approver_name'],
+                    'approver_email' => $approver['approver_email'],
+                    'created_by' => 'System',
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+
+            return $formNumber;
+        });
+
+        $formRoutes = [
+            'product' => 'mold_product_check/create',
+            'molding' => 'mold_molding_check/create',
+            'evaluation' => 'evaluation/edit',
+        ];
+
+        return redirect('/index/diagnose_molding/' . $formRoutes[$formType] . '/' . $formNumber);
     }
 
     function saveMoldMoldingCheck(Request $request) {
@@ -1556,5 +1670,52 @@ class MoldingController extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    public function indexMoldingDiagnoseMonitoring()
+    {
+        if(!Auth::check()){
+            return redirect()->route('login');
+        }
+
+        return view('molding.index_monitoring');
+    }
+
+    public function fetchMoldingDiagnoseMonitoring()
+    {
+        
+    }
+
+    public function indexCheckMoldingNew()
+	{
+		$title = 'Monitoring Molding Vendor (ARISA)';
+		$title_jp = '??';
+
+		$molding = db::table('pe_molding_masters')
+			->select('id', 'molding_name', 'mold_number', 'molding_type')
+			->get();
+
+		return view(
+			'molding.index_monitoring_new',
+			array(
+				'title' => $title,
+				'title_jp' => $title_jp,
+				'moldings' => $molding,
+			)
+		)->with('page', 'Workshop Audit Molding');
+	}
+
+    public function fetchCheckMoldingNew(Request $request)
+    {
+        $schedules = db::table('molding_diagnose_schedules')
+        ->whereNull('deleted_at')
+        ->select(db::raw('DATE_FORMAT(period, "%Y %b") as period_name'), 'fixed_asset_number', 'molding_name', 'status')
+        ->orderBy('period', 'ASC')
+        ->get();
+        
+        return response()->json([
+            'status' => true,
+            'schedules' => $schedules
+        ]);
     }
 }

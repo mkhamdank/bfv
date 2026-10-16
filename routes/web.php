@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestPuppeteerController;
+use App\Http\Controllers\MoldingScheduleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -674,10 +675,14 @@ Route::get('fetch/passenger/attendance', 'App\Http\Controllers\GeneralAffairCont
 Route::post('input/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@inputPassengerAttendance');
 
 // Form Diagnosa Molding
+Route::middleware('auth')->group(function () {
 Route::get('molding', function() { return view('molding.index_molding'); });
 Route::get('index/diagnose_molding/molding_list', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseList')->name('user.molding_list');
 Route::get('fetch/diagnose_molding/molding_list', 'App\Http\Controllers\MoldingController@fetchMoldingDiagnoseList');
 Route::get('index/diagnose_molding/molding_form/{asset_number?}', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseFormList')->name('user.molding_form');
+    Route::get('index/diagnose_molding/molding_form_periodic', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseFormPeriodic');
+    Route::get('index/diagnose_molding/molding_monitoring', 'App\Http\Controllers\MoldingController@indexMoldingDiagnoseMonitoring')->name('user.molding_monitoring');
+    Route::get('fetch/diagnose_molding/monitoring', 'App\Http\Controllers\MoldingController@fetchMoldingDiagnoseMonitoring');
 Route::get('generate/diagnose_molding/mold_product_check/new', 'App\Http\Controllers\MoldingController@generateMoldProductCheckNew');
 Route::get('fetch/diagnose_molding/molding_form', 'App\Http\Controllers\MoldingController@fetchMoldingDiagnoseFormList');
 Route::get('index/diagnose_molding/mold_product_check/create/{form_number?}', 'App\Http\Controllers\MoldingController@indexMoldProductCheckCreate');
@@ -698,6 +703,27 @@ Route::get('index/diagnose_molding/shot_list/{month_range?}', 'App\Http\Controll
 Route::get('index/diagnose_molding/trouble_list', 'App\Http\Controllers\MoldingController@indexTroubleList')->name('user.molding_trouble');
 Route::get('approval/diagnose_molding/{status}/{approval}/{form_number}', 'App\Http\Controllers\MoldingController@approvalMoldingForm');
 Route::get('fetch/diagnose_molding/molding_shot', 'App\Http\Controllers\MoldingController@fetchMoldingShot');
+    Route::get('index/diagnose_molding/molding_monitoring_new', 'App\Http\Controllers\MoldingController@indexCheckMoldingNew');
+    Route::get('fetch/diagnose_molding/molding_monitoring_new', 'App\Http\Controllers\MoldingController@fetchCheckMoldingNew');
+});
+
+Route::get('workshop/check_molding_vendor/schedules/open-form', [
+    'App\\Http\\Controllers\\MoldingController', 'openPeriodicForm',
+])->middleware('auth')->name('workshop.molding-schedules.open-form');
+
+Route::middleware('auth')->prefix('workshop/check_molding_vendor/schedules')
+    ->name('workshop.molding-schedules.')
+    ->controller(MoldingScheduleController::class)
+    ->group(function () {
+        Route::get('/monitoring-summary', 'monitoringSummary')->name('monitoring-summary');
+        Route::get('/monitoring-forms', 'monitoringForms')->name('monitoring-forms');
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{id}', 'update')->whereNumber('id')->name('update');
+        Route::delete('/{id}', 'destroy')->whereNumber('id')->name('destroy');
+        Route::delete('/{scheduleId}/moldings/{itemId}', 'destroyMolding')
+            ->whereNumber('scheduleId')->whereNumber('itemId')->name('molding.destroy');
+    });
 
 Route::get('index/diagnose_molding/mold_product_check/report/{form_number}', 'App\Http\Controllers\MoldingController@indexMoldProductReport');
 // Route::get('index/diagnose_molding/mold_product_check/report/{form_number}', 'App\Http\Controllers\MoldingController@MoldProductReport');
