@@ -25,6 +25,23 @@
             padding: 10px;
             box-sizing: border-box;
         }
+        .report-header {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) max-content;
+            align-items: start;
+            column-gap: 8px;
+            margin-bottom: 12px;
+        }
+        .report-header-title {
+            min-width: 0;
+            padding-top: 4px;
+            font-size: 18px;
+        }
+        @media (max-width: 720px) {
+            .report-header {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
         .border-box-thin {
             border: 1px solid #000;
             box-sizing: border-box;
@@ -67,28 +84,15 @@
 <body>
     <div class="container">
         <!-- Header Section -->
-        <div class="flex justify-between items-start">
-            <div class="text-xl">Lembar Diagnosa Produk Molding</div>
-            <div class="flex items-start gap-4">
-                <!-- Point Box -->
-                <div class="flex flex-col">
-                    <div class="w-28 h-8 border-box-thick flex items-center justify-center text-sm" style="border-bottom: none;">Poin</div>
-                    <div class="w-28 h-10 flex items-center justify-center border-box-thick text-3xl" style="background-color: #daeef3; border-top-width: 1px">{{ $molding_name->points }}</div>
-                </div>
-                <!-- Dibuat Boxes -->
-                <div class="flex">
-                    <div class="flex flex-col">
-                        <div class="w-20 h-8 border-box-thick flex items-center justify-center text-sm" style="border-bottom: none;">Dibuat</div>
-                        <div class="w-20 h-10 border-box-thick flex items-center justify-center text-sm" style="border-top-width: 1px;">{{ $molding_name->check_by }}</div>
-                    </div>
-                </div>
-            </div>
+        <div class="report-header">
+            <div class="report-header-title">Lembar Diagnosa Produk Molding</div>
+            @include('molding.report.approval_strip', ['approvals' => $approvals, 'creator' => $molding_name->created_by, 'createdAt' => $molding_name->form_created_at, 'points' => $molding_name->points])
         </div>
 
         <!-- Nama Model / Mold Section -->
         <div>
             <div class="flex items-center">
-                <span class="text-lg mr-2">&diamond;</span>
+                <span class="text-lg mr-2">&#8900;</span>
                 <span class="text-lg ">Nama Model atau Nama Mold</span>
             </div>
             <div class="flex items-center ml-6 border-b border-black">
@@ -100,7 +104,7 @@
         <!-- Standar Diagnosa Section -->
         <div>
             <div class="text-lg">
-                <span class="text-lg  mr-2">&diamond;</span>
+                <span class="text-lg  mr-2">&#8900;</span>
                 <span class="text-lg ">Standar Diagnosa</span>
             </div>
             <div class="ml-4">
@@ -127,7 +131,7 @@
         <!-- Posisi NG Section -->
         <div>
             <div class="flex items-center">
-                <span class="text-lg font-bold mr-2">&diamond;</span>
+                <span class="text-lg font-bold mr-2">&#8900;</span>
                 <span>Posisi NG pada produk hasil injection serta item nya</span>
             </div>
             <div class="ml-6 text-sm">
@@ -145,7 +149,7 @@
         <!-- Item NG Injection Section -->
         <div>
             <div class="flex items-center mb-2">
-                <span class="text-lg font-bold mr-2">&diamond;</span>
+                <span class="text-lg font-bold mr-2">&#8900;</span>
                 <span>Item NG injection</span>
                 <div class="ml-4" style="flex: 1">
                     <table class="w-full">

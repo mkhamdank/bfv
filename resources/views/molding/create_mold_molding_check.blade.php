@@ -1512,6 +1512,8 @@
 
                             <th style="width:150px;">Foto Penanganan</th>
 
+                            <th style="width:14%;">Catatan Penanganan</th>
+
                             <th style="width:14%;">Rincian Lain</th>
 
                             <th style="width:60px;">Poin</th>
@@ -2024,6 +2026,13 @@
 
 
 
+                /* Catatan Penanganan */
+
+                tableData += '<td><textarea class="rincian-input" placeholder="Catatan penanganan..." id="handling_note_' +
+                    value.id + '"></textarea></td>';
+
+
+
                 /* Rincian Lain */
 
                 tableData += '<td><textarea class="rincian-input" placeholder="Rincian..." id="rincian_lain_' +
@@ -2131,28 +2140,32 @@
 
                     }
 
-                    if (value.photo_penanganan1) {
+                    if (value.handling_photo1) {
 
                         $("#img_photo_penanganan1_" + value.ng_id + "_" + value.item_number).show().attr('data-src',
-                            '{{ url('diagnose_molding/molding_check_photo') }}/' + value.photo_penanganan1);
+                            '{{ url('diagnose_molding/molding_check_photo') }}/' + value.handling_photo1);
 
                         $("#btn_photo_penanganan1_" + value.ng_id + "_" + value.item_number).css('display',
                             'inline-flex');
 
                     }
 
-                    if (value.photo_penanganan2) {
+                    if (value.handling_photo2) {
 
                         $("#img_photo_penanganan2_" + value.ng_id + "_" + value.item_number).show().attr('data-src',
-                            '{{ url('diagnose_molding/molding_check_photo') }}/' + value.photo_penanganan2);
+                            '{{ url('diagnose_molding/molding_check_photo') }}/' + value.handling_photo2);
 
                         $("#btn_photo_penanganan2_" + value.ng_id + "_" + value.item_number).css('display',
                             'inline-flex');
 
                     }
 
-                    if (value.rincian_lain) {
-                        $("#rincian_lain_" + value.ng_id).val(value.rincian_lain);
+                    if (value.handling_note) {
+                        $("#handling_note_" + value.ng_id).val(value.handling_note);
+                    }
+
+                    if (value.note) {
+                        $("#rincian_lain_" + value.ng_id).val(value.note);
                     }
 
                 });
@@ -2406,11 +2419,12 @@
                             id_items: key2,
                             item_name: value2,
                             rincian_lain: $('#rincian_lain_' + value.id).val(),
+                            handling_note: $('#handling_note_' + value.id).val(),
                             pengurangan,
                             photo1,
                             photo2,
-                            photo_penanganan1,
-                            photo_penanganan2
+                            handling_photo1: photo_penanganan1,
+                            handling_photo2: photo_penanganan2
                         });
 
                     }
@@ -2419,7 +2433,7 @@
 
 
 
-                if (!status_ng && (hasil_diagnosa === 'OK' || hasil_diagnosa === 'Part Tidak Ada')) {
+                if (!status_ng && hasil_diagnosa !== '') {
 
                     datas.push({
                         ng_id: value.id,
@@ -2429,11 +2443,12 @@
                         id_items: null,
                         item_name: null,
                         rincian_lain: $('#rincian_lain_' + value.id).val(),
-                        pengurangan: 0,
+                        handling_note: $('#handling_note_' + value.id).val(),
+                        pengurangan,
                         photo1: null,
                         photo2: null,
-                        photo_penanganan1: null,
-                        photo_penanganan2: null
+                        handling_photo1: null,
+                        handling_photo2: null
                     });
 
                 }

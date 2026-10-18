@@ -451,7 +451,7 @@
                         /* ── Action ── */
                         rows += '<td><div class="action-group">';
                         if (!v.status) {
-                            rows += '<button class="act-btn ab-send" onclick="saveAndSend(\'' + v.form_number + '\')"><i class="fas fa-save"></i> Simpan & Kirim</button>';
+                            rows += '<button class="act-btn ab-send" onclick="saveMoldingPdf(\'' + v.form_number + '\')"><i class="far fa-file-pdf"></i> Simpan PDF</button>';
                         } else if (v.status === 'Approval') {
                             rows += '<button class="act-btn ab-resend" onclick="resend(\'' + v.form_number + '\')"><i class="fas fa-paper-plane"></i> Resend</button>';
                         }
@@ -533,14 +533,14 @@
         window.location.href = '{{ url("generate/diagnose_molding/mold_product_check/new") }}?asset_number=' + asset_number;
     }
 
-    /* ── Save & Send ── */
-    function saveAndSend(formNumber) {
+    /* ── Save PDF ── */
+    function saveMoldingPdf(formNumber) {
         Swal.fire({
-            title: 'Simpan & Kirim?',
-            text: 'Apakah anda yakin ingin menyimpan dan mengirim form ini?',
+            title: 'Simpan PDF?',
+            text: 'Laporan akan disimpan ke folder public tanpa dikirim melalui email.',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: '<i class="fas fa-save"></i> Ya, Kirim',
+            confirmButtonText: '<i class="far fa-file-pdf"></i> Ya, Simpan',
             cancelButtonText: 'Batal',
             confirmButtonColor: '#15803d',
             cancelButtonColor: '#718096',
@@ -548,8 +548,13 @@
         }).then(function (result) {
             if (result.isConfirmed) {
                 $.get('{{ url("save_and_send/diagnose_molding/molding_form") }}', { formNumber: formNumber }, function (res) {
-                    if (res.status) { toastr.success(res.message); audio_success.play(); getData(); }
-                    else            { toastr.error(res.message);   audio_error.play(); }
+                    if (res.status) {
+                        audio_success.play();
+                        window.location.href = res.pdf_url;
+                    } else {
+                        toastr.error(res.message);
+                        audio_error.play();
+                    }
                 });
             }
         });

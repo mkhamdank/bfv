@@ -96,6 +96,12 @@ class MoldingController extends Controller
             $master_molding = $master_molding->where('molding_diagnose_masters.vendor', Auth::user()->vendor_name);
         }
 
+        if($request->type && $request->type == 'periodic'){
+            $master_molding = $master_molding->where('molding_diagnose_forms    .remark', $request->type);
+        } else {
+            $master_molding = $master_molding->whereNull('molding_diagnose_forms    .remark');
+        }
+
         $master_molding = $master_molding->select('molding_diagnose_forms.form_number', 'molding_diagnose_forms.fixed_asset_number', 'molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.id_molding_check', 'molding_diagnose_forms.id_product_check', 'molding_diagnose_forms.total_score', 'molding_diagnose_forms.rank', 'molding_diagnose_forms.status', 'molding_diagnose_product_forms.id as form_product_id', 'molding_diagnose_molding_forms.id as form_molding_id', db::raw('DATE_FORMAT(molding_diagnose_forms.created_at,"%Y %b") as month'), 'molding_diagnose_masters.vendor', 'molding_diagnose_masters.location')
         ->get();
 
@@ -105,7 +111,28 @@ class MoldingController extends Controller
         ]);
     }
 
+    private function isMoldingFormFullyApproved($formNumber)
+    {
+        $status = DB::table('molding_diagnose_forms')
+            ->where('form_number', $formNumber)
+            ->value('status');
+
+        return strtolower((string) $status) === 'approved';
+    }
+
+    private function approvedFormEditResponse()
+    {
+        return response()->json([
+            'status' => false,
+            'message' => 'Form sudah fully approved dan hanya dapat dilihat melalui report.',
+        ]);
+    }
+
     function indexMoldProductCheckCreate($form_number = null) {
+        if ($this->isMoldingFormFullyApproved($form_number)) {
+            return redirect('/index/diagnose_molding/mold_product_check/report/' . $form_number);
+        }
+
         $molding_name = DB::table('molding_diagnose_forms')
             ->where('form_number', $form_number)
             ->select('fixed_asset_name', 'photo_product')
@@ -128,6 +155,10 @@ class MoldingController extends Controller
 
     function uploadProductImage(Request $request) {
         try {
+            if ($this->isMoldingFormFullyApproved($request->form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
             $image = $request->file('image');
             $image_name = $request->form_number . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('workshop/molding/photo_product/main'), $image_name);
@@ -175,9 +206,29 @@ class MoldingController extends Controller
 
     function uploadPhotoNg(Request $request) {
         try {
-            $image1 = $request->file('photo_file_1');   
-            $image_name1 = $request->form_number.'_'.$request->nomor . '_1.' . $image1->getClientOriginalExtension();
-            $image1->move(public_path('workshop/molding/photo_product/ng'), $image_name1);
+            if ($this->isMoldingFormFullyApproved($request->form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
+            $image1 = $request->file('photo_file_1');
+            $existingNg = DB::table('molding_diagnose_product_ngs')
+                ->where('master_form_number', $request->form_number)
+                ->where('id_ng', $request->nomor)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (!$image1 && (!$existingNg || !$existingNg->photo1)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Foto 1 wajib diisi',
+                ]);
+            }
+
+            $image_name1 = null;
+            if ($image1) {
+                $image_name1 = $request->form_number.'_'.$request->nomor . '_1.' . $image1->getClientOriginalExtension();
+                $image1->move(public_path('workshop/molding/photo_product/ng'), $image_name1);
+            }
 
             $image_name2 = null;
 
@@ -193,24 +244,32 @@ class MoldingController extends Controller
             ->first();
 
             // insert or update database
-            DB::table('molding_diagnose_product_ngs')
-            ->updateOrInsert(
-                ['master_form_number' => $request->form_number, 'id_ng' => $request->nomor],
-                [
+            $ngData = [
                 'master_form_number' => $request->form_number,
                 'fixed_asset_number' => $moldings->fixed_asset_number,
                 'fixed_asset_name' => $moldings->fixed_asset_name,
                 'vendor' => $moldings->vendor,
                 'id_ng' => $request->nomor,
                 'ng_name' => $request->nama_ng,
-                'photo1' => $image_name1,
-                'photo2' => $image_name2,
                 'check_by' => Auth::user()->name,
                 'check_at' => date('Y-m-d H:i:s'),  
                 'created_by' => Auth::user()->name,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
-            ]);
+            ];
+
+            if ($image_name1) {
+                $ngData['photo1'] = $image_name1;
+            }
+
+            if ($image_name2) {
+                $ngData['photo2'] = $image_name2;
+            }
+
+            DB::table('molding_diagnose_product_ngs')->updateOrInsert(
+                ['master_form_number' => $request->form_number, 'id_ng' => $request->nomor],
+                $ngData
+            );
 
         return response()->json([
             'status' => true,
@@ -240,6 +299,14 @@ class MoldingController extends Controller
 
     function deleteProductNg(Request $request) {
         try {
+            $productNg = DB::table('molding_diagnose_product_ngs')
+                ->where('id', $request->id)
+                ->first();
+
+            if ($productNg && $this->isMoldingFormFullyApproved($productNg->master_form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
             DB::table('molding_diagnose_product_ngs')
             ->where('id', $request->id)
             ->update([
@@ -260,6 +327,10 @@ class MoldingController extends Controller
 
     function saveProductCheck(Request $request) {
         try {
+            if ($this->isMoldingFormFullyApproved($request->form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
             $mstr = DB::table('molding_diagnose_forms')
             ->where('form_number', $request->form_number)
             ->first();
@@ -356,6 +427,10 @@ class MoldingController extends Controller
     }
 
     function indexMoldMoldingCheckCreate($form_number = null) {
+        if ($this->isMoldingFormFullyApproved($form_number)) {
+            return redirect('/index/diagnose_molding/mold_molding_check/report/' . $form_number);
+        }
+
         $molding_name = DB::table('molding_diagnose_forms')
             ->where('form_number', $form_number)
             ->select('fixed_asset_name')
@@ -370,7 +445,7 @@ class MoldingController extends Controller
         ->leftJoin('molding_diagnose_molding_details', 'molding_diagnose_molding_forms.master_form_number', '=', 'molding_diagnose_molding_details.master_form_number')
         ->where('molding_diagnose_molding_forms.master_form_number', $form_number)
         ->whereNull('molding_diagnose_molding_forms.deleted_at')
-        ->select('molding_diagnose_molding_forms.id', 'molding_diagnose_molding_forms.master_form_number', 'molding_diagnose_molding_forms.fixed_asset_number', 'molding_diagnose_molding_forms.fixed_asset_name', 'molding_diagnose_molding_forms.points', 'check_by', 'check_at', 'ng_id', 'ng_name', 'diagnose_result', 'parts', 'photo1', 'photo2', 'item_number', 'item_name', 'note', 'deduction', 'molding_diagnose_molding_forms.created_at', 'molding_diagnose_molding_forms.updated_at')
+        ->select('molding_diagnose_molding_forms.id', 'molding_diagnose_molding_forms.master_form_number', 'molding_diagnose_molding_forms.fixed_asset_number', 'molding_diagnose_molding_forms.fixed_asset_name', 'molding_diagnose_molding_forms.points', 'check_by', 'check_at', 'ng_id', 'ng_name', 'diagnose_result', 'parts', 'photo1', 'photo2', 'handling_photo1', 'handling_photo2', 'handling_note', 'item_number', 'item_name', 'note', 'deduction', 'molding_diagnose_molding_forms.created_at', 'molding_diagnose_molding_forms.updated_at')
         ->get();
 
         $product_point = DB::table('molding_diagnose_product_forms')
@@ -540,6 +615,10 @@ class MoldingController extends Controller
 
     function saveMoldMoldingCheck(Request $request) {
         try {
+            if ($this->isMoldingFormFullyApproved($request->form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
             $mstr = DB::table('molding_diagnose_forms')
             ->where('form_number', $request->form_number)
             ->first();
@@ -620,34 +699,66 @@ class MoldingController extends Controller
                     $photo2->move(public_path('workshop/molding/photo_molding/ng'), $photo2_name);
                 }
 
+                $handling_photo1_name = null;
+                $handling_photo2_name = null;
+
+                $handling_photo1 = $request->file("data.$key.handling_photo1");
+                if($handling_photo1) {
+                    $handling_photo1_name = $request->form_number . '_handling_photo1_ng' . $value['ng_id'] . '_item' . $value['id_items'] . '.' . $handling_photo1->getClientOriginalExtension();
+                    $handling_photo1->move(public_path('workshop/molding/photo_molding/ng'), $handling_photo1_name);
+                }
+
+                $handling_photo2 = $request->file("data.$key.handling_photo2");
+                if($handling_photo2) {
+                    $handling_photo2_name = $request->form_number . '_handling_photo2_ng' . $value['ng_id'] . '_item' . $value['id_items'] . '.' . $handling_photo2->getClientOriginalExtension();
+                    $handling_photo2->move(public_path('workshop/molding/photo_molding/ng'), $handling_photo2_name);
+                }
+
                 // if item_number and item_name is "null" 
                 if($value['id_items'] == "null" && $value['item_name'] == "null") {
                     $value['id_items'] = null;
                     $value['item_name'] = null;
                 }
 
+                $detailData = [
+                    'master_form_number' => $request->form_number,
+                    'fixed_asset_number' => $mstr->fixed_asset_number,
+                    'fixed_asset_name' => $mstr->fixed_asset_name,
+                    'vendor' => $mstr->vendor,
+                    'ng_id' => $value['ng_id'],
+                    'ng_name' => $value['item_ng'],
+                    'diagnose_result' => $value['hasil_diagnosa'],
+                    'parts' => $value['part_checked'],
+                    'item_number' => $value['id_items'],
+                    'item_name' => $value['item_name'],
+                    'note' => $value['rincian_lain'],
+                    'handling_note' => $value['handling_note'],
+                    'deduction' => $value['pengurangan'],
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'created_by' => Auth::user()->name
+                ];
+
+                if($photo1_name) {
+                    $detailData['photo1'] = $photo1_name;
+                }
+
+                if($photo2_name) {
+                    $detailData['photo2'] = $photo2_name;
+                }
+
+                if($handling_photo1_name) {
+                    $detailData['handling_photo1'] = $handling_photo1_name;
+                }
+
+                if($handling_photo2_name) {
+                    $detailData['handling_photo2'] = $handling_photo2_name;
+                }
+
                 DB::table('molding_diagnose_molding_details')->updateOrInsert(
                     ['master_form_number' => $request->form_number, 'ng_id' => $value['ng_id'], 'item_number' => $value['id_items']],
-                    [
-                            'master_form_number' => $request->form_number,
-                            'fixed_asset_number' => $mstr->fixed_asset_number,
-                            'fixed_asset_name' => $mstr->fixed_asset_name,
-                            'vendor' => $mstr->vendor,
-                            'ng_id' => $value['ng_id'],
-                            'ng_name' => $value['item_ng'],
-                            'diagnose_result' => $value['hasil_diagnosa'],
-                            'parts' => $value['part_checked'],
-                            'item_number' => $value['id_items'],
-                            'item_name' => $value['item_name'],
-                            'note' => $value['rincian_lain'],
-                            'photo1' => $photo1_name,
-                            'photo2' => $photo2_name,
-                            'deduction' => $value['pengurangan'],
-                            'updated_at' => date('Y-m-d H:i:s'),
-                            'created_at' => date('Y-m-d H:i:s'),
-                            'created_by' => Auth::user()->name
-                        ]
-                    );
+                    $detailData
+                );
                 }
 
             return response()->json([
@@ -664,6 +775,10 @@ class MoldingController extends Controller
 
     function saveProductCheckReal(Request $request) {
         try {
+            if ($this->isMoldingFormFullyApproved($request->form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
             $mstr = DB::table('molding_diagnose_product_forms')
             ->where('master_form_number', $request->form_number)
             ->first();
@@ -715,11 +830,26 @@ class MoldingController extends Controller
         }
     }
 
+    private function reportApprovalSignatures($formNumber)
+    {
+        return DB::table('molding_diagnose_approvers')
+            ->where('form_number', $formNumber)
+            ->orderBy('ordering', 'desc')
+            ->select(
+                'ordering',
+                'status',
+                db::raw("SUBSTRING_INDEX(approver_name, ' ', 2) as app_name"),
+                db::raw('DATE_FORMAT(approve_at, "%d %b %Y") as app_at')
+            )
+            ->get();
+    }
+
     function indexMoldProductReport($form_number) {
         $molding_name = DB::table('molding_diagnose_forms')
             ->leftJoin('molding_diagnose_product_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_product_forms.master_form_number')
             ->where('molding_diagnose_forms.form_number', $form_number)
             ->select('molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.photo_product',
+            'molding_diagnose_forms.created_by', db::raw('DATE_FORMAT(molding_diagnose_forms.created_at, "%d %b %Y") as form_created_at'),
             'molding_diagnose_product_forms.points', 'molding_diagnose_product_forms.check_by', 'molding_diagnose_product_forms.check_at')
             ->first();
 
@@ -729,7 +859,9 @@ class MoldingController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        return view('molding.report.report_product_form', compact('form_number', 'molding_name', 'checklist'));
+        $approvals = $this->reportApprovalSignatures($form_number);
+
+        return view('molding.report.report_product_form', compact('form_number', 'molding_name', 'checklist', 'approvals'));
     }
 
     function indexMoldProductReportNg($form_number) {
@@ -748,7 +880,8 @@ class MoldingController extends Controller
         $molding_name = DB::table('molding_diagnose_forms')
             ->leftJoin('molding_diagnose_molding_forms', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_molding_forms.master_form_number')
             ->where('molding_diagnose_forms.form_number', $form_number)
-            ->select('molding_diagnose_forms.fixed_asset_name',
+            ->select('molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.created_by',
+            db::raw('DATE_FORMAT(molding_diagnose_forms.created_at, "%d %b %Y") as form_created_at'),
             'molding_diagnose_molding_forms.points', 'molding_diagnose_molding_forms.check_by', 'molding_diagnose_molding_forms.check_at')
             ->first();
 
@@ -756,15 +889,20 @@ class MoldingController extends Controller
             ->leftJoin(db::raw('(SELECT * FROM molding_diagnose_molding_details WHERE master_form_number = "' . $form_number . '") as details'), 'molding_diagnose_molding_masters.id', '=', 'details.ng_id')
             ->select('molding_diagnose_molding_masters.id','item_ng','grouping', 'details.diagnose_result', 'details.deduction as actual_deduction', 'molding_diagnose_molding_masters.daerah_ng', 'details.parts', 'molding_diagnose_molding_masters.item_check', db::raw('GROUP_CONCAT(details.item_name SEPARATOR ", ") as item_name'), 'details.note')
             ->groupBy('molding_diagnose_molding_masters.id','item_ng','grouping', 'details.diagnose_result', 'details.deduction', 'molding_diagnose_molding_masters.daerah_ng', 'details.parts', 'molding_diagnose_molding_masters.item_check', 'details.note')
+            ->addSelect('details.handling_note')
+            ->groupBy('details.handling_note')
             ->orderBy('id', 'asc')
             ->get();
 
-        return view('molding.report.report_mold_form', compact('form_number', 'molding_name', 'checklist'));
+        $approvals = $this->reportApprovalSignatures($form_number);
+
+        return view('molding.report.report_mold_form', compact('form_number', 'molding_name', 'checklist', 'approvals'));
     }
 
     function indexMoldMoldingReportNg($form_number) {
         $ngs = DB::table('molding_diagnose_molding_details')
             ->where('molding_diagnose_molding_details.master_form_number', $form_number)
+            ->whereIn('molding_diagnose_molding_details.diagnose_result', ['NG', 'OK Sementara'])
             ->select('molding_diagnose_molding_details.fixed_asset_name', 'molding_diagnose_molding_details.photo1', 'molding_diagnose_molding_details.photo2',
             'molding_diagnose_molding_details.ng_id', 'molding_diagnose_molding_details.ng_name')
             ->orderBy('ng_id', 'asc')
@@ -784,11 +922,125 @@ class MoldingController extends Controller
         ->leftJoin('molding_diagnose_approvers', 'molding_diagnose_forms.form_number', '=', 'molding_diagnose_approvers.form_number')
         ->where('molding_diagnose_forms.form_number', $form_number)
         ->select('molding_diagnose_forms.fixed_asset_name', 'molding_diagnose_forms.rank',
-        'molding_diagnose_forms.total_score', 'product_category', 'production_qty', 'production_date', 'production_period', 'penilaian_keseluruhan', 'pertimbangan_histori', 'tindakan_perbaikan', 'molding_diagnose_forms.created_by', db::raw('date_format(molding_diagnose_forms.created_at, "%d %b %Y") AS creat_at'), db::raw("SUBSTRING_INDEX(molding_diagnose_approvers.approver_name, ' ', 2) AS app_name"), db::raw('date_format(molding_diagnose_approvers.approve_at, "%d %b %Y") AS app_at'), db::raw('DATE_FORMAT(molding_diagnose_forms.production_date, "%d %b %Y") as prod_date'))
+        'molding_diagnose_forms.total_score', 'product_category', 'production_qty', 'production_date', 'production_period', 'penilaian_keseluruhan', 'pertimbangan_histori', 'tindakan_perbaikan', 'molding_diagnose_forms.created_by', db::raw('date_format(molding_diagnose_forms.created_at, "%d %b %Y") AS creat_at'), db::raw("SUBSTRING_INDEX(molding_diagnose_approvers.approver_name, ' ', 2) AS app_name"), db::raw('date_format(molding_diagnose_approvers.approve_at, "%d %b %Y") AS app_at'), 'molding_diagnose_approvers.status as approval_status', db::raw('DATE_FORMAT(molding_diagnose_forms.production_date, "%d %b %Y") as prod_date'))
         ->orderBy('molding_diagnose_approvers.id', 'asc')
         ->get();
 
         return view('molding.report.report_evaluasi', compact('form_number', 'data_master'));
+    }
+
+    private function generateMoldingReportPdf($formNumber)
+    {
+        $reports = [
+            $this->indexEvaluationReport($formNumber),
+            $this->indexMoldProductReport($formNumber),
+            $this->indexMoldProductReportNg($formNumber),
+            $this->indexMoldMoldingReport($formNumber),
+            $this->indexMoldMoldingReportNg($formNumber),
+        ];
+        $headAssets = [];
+        $sections = [];
+        $previousLibxmlErrorHandling = libxml_use_internal_errors(true);
+
+        try {
+            foreach ($reports as $report) {
+                $document = new \DOMDocument('1.0', 'UTF-8');
+                $document->loadHTML($report->render(), LIBXML_NONET);
+
+                foreach ($document->getElementsByTagName('head')->item(0)->childNodes as $node) {
+                    $isStyle = $node->nodeName === 'style';
+                    $isStylesheet = $node->nodeName === 'link' && strtolower($node->getAttribute('rel')) === 'stylesheet';
+                    $isTailwind = $node->nodeName === 'script' && strpos($node->getAttribute('src'), 'cdn.tailwindcss.com') !== false;
+
+                    if ($isStyle || $isStylesheet || $isTailwind) {
+                        $asset = $document->saveHTML($node);
+                        $headAssets[md5($asset)] = $asset;
+                    }
+                }
+
+                $body = $document->getElementsByTagName('body')->item(0);
+                $section = '';
+                foreach ($body->childNodes as $node) {
+                    if ($node->nodeName !== 'script') {
+                        $section .= $document->saveHTML($node);
+                    }
+                }
+
+                $sections[] = $section;
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousLibxmlErrorHandling);
+        }
+
+        $html = View::make('molding.report.report_pdf', [
+            'headAssets' => $headAssets,
+            'sections' => $sections,
+        ])->render();
+
+        $browsershot = Browsershot::html($html)
+            ->format('A4')
+            ->margins(2, 2, 2, 2)
+            ->timeout(60)
+            ->showBackground();
+
+        if (env('BROWSERSHOT_PATH')) {
+            $browsershot->setNodeBinary(env('BROWSERSHOT_PATH') . '/node');
+            $browsershot->setNpmBinary(env('BROWSERSHOT_PATH') . '/npm');
+        }
+
+        $browsershot->setChromePath(env('PUPPETEER_CHROME_PATH'));
+
+        $temporaryFile = tempnam(sys_get_temp_dir(), 'molding-report-');
+        if ($temporaryFile === false) {
+            throw new \RuntimeException('File sementara PDF tidak dapat dibuat.');
+        }
+
+        $temporaryPdf = $temporaryFile . '.pdf';
+        if (!rename($temporaryFile, $temporaryPdf)) {
+            unlink($temporaryFile);
+            throw new \RuntimeException('File sementara PDF tidak dapat disiapkan.');
+        }
+
+        try {
+            $browsershot->save($temporaryPdf);
+            $pdf = file_get_contents($temporaryPdf);
+            if ($pdf === false) {
+                throw new \RuntimeException('File PDF sementara tidak dapat dibaca.');
+            }
+
+            return $pdf;
+        } finally {
+            if (is_file($temporaryPdf)) {
+                unlink($temporaryPdf);
+            }
+        }
+    }
+
+    private function storeMoldingReportPdf($formNumber)
+    {
+        $safeFormNumber = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $formNumber);
+        if ($safeFormNumber === '') {
+            throw new \InvalidArgumentException('Nomor form tidak valid.');
+        }
+
+        $pdf = $this->generateMoldingReportPdf($formNumber);
+        if (substr($pdf, 0, 5) !== '%PDF-') {
+            throw new \RuntimeException('File PDF yang dihasilkan tidak valid.');
+        }
+
+        $directory = public_path('workshop/molding/reports');
+        if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+            throw new \RuntimeException('Folder laporan PDF tidak dapat dibuat.');
+        }
+
+        $fileName = 'Laporan_Diagnosa_Molding_' . $safeFormNumber . '.pdf';
+        $filePath = $directory . DIRECTORY_SEPARATOR . $fileName;
+        if (file_put_contents($filePath, $pdf, LOCK_EX) !== strlen($pdf)) {
+            throw new \RuntimeException('File laporan PDF gagal disimpan.');
+        }
+
+        return url('workshop/molding/reports/' . $fileName);
     }
 
     function MoldProductReport($form_number) {
@@ -925,6 +1177,9 @@ class MoldingController extends Controller
     }
 
     function indexEvaluationEdit($form_number) {
+        if ($this->isMoldingFormFullyApproved($form_number)) {
+            return redirect('/index/diagnose_molding/evaluation/report/' . $form_number);
+        }
 
 
         $data_master = DB::table('molding_diagnose_forms')
@@ -942,6 +1197,10 @@ class MoldingController extends Controller
 
     function saveEvaluation(Request $request) {
         try {
+            if ($this->isMoldingFormFullyApproved($request->form_number)) {
+                return $this->approvedFormEditResponse();
+            }
+
             DB::table('molding_diagnose_forms')
             ->where('form_number', $request->form_number)
             ->update([
@@ -1012,55 +1271,33 @@ class MoldingController extends Controller
 
     function saveAndSendMoldingForm(Request $request) {
         try {
-            $data_form_molding = DB::table('molding_diagnose_forms')
-            ->where('form_number', $request->formNumber)
-            ->select('molding_diagnose_forms.*', db::raw('DATE_FORMAT(molding_diagnose_forms.production_date, "%d %b %Y") as prod_date'))
-            ->first();
-
-            if($data_form_molding->status == 'Approval') {
+            $formNumber = $request->input('formNumber');
+            if (!$formNumber) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Form sudah pernah dikirim',
+                    'message' => 'Nomor form wajib diisi.',
                 ]);
             }
 
-            DB::table('molding_diagnose_forms')
-            ->where('form_number', $request->formNumber)
-            ->update([
-                'status' => 'Approval',
-            ]);
+            $data_form_molding = DB::table('molding_diagnose_forms')
+            ->where('form_number', $formNumber)
+            ->select('molding_diagnose_forms.*', db::raw('DATE_FORMAT(molding_diagnose_forms.production_date, "%d %b %Y") as prod_date'))
+            ->first();
 
-            DB::table('molding_diagnose_molding_forms')
-            ->where('master_form_number', $request->formNumber)
-            ->update([
-                'status' => 'Locked',
-            ]);
-
-            DB::table('molding_diagnose_product_forms')
-            ->where('master_form_number', $request->formNumber)
-            ->update([
-                'status' => 'Locked',
-            ]);
-
-            // $data_form_molding = DB::table('molding_diagnose_forms')
-            // ->where('form_number', $request->formNumber)
-            // ->first();
-
-            $data = [
-                'data_form_molding' => $data_form_molding,
-                'status' => 'approval_1',
-            ];
-
-            Mail::to($this->approver[0]['approver_email'])->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
-            
-
-            
-            return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil disimpan dan dikirim',
+            if (!$data_form_molding) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Form tidak ditemukan',
                 ]);
-                
-                // return view('molding.mails.mold_approval', compact('data_form_molding'));
+            }
+
+            $pdfUrl = $this->storeMoldingReportPdf($formNumber);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Laporan PDF berhasil disimpan. Email tidak dikirim.',
+                'pdf_url' => $pdfUrl,
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
@@ -1285,7 +1522,7 @@ class MoldingController extends Controller
                 }
 
 
-                $next_approver = ['yoga.karunia.perdana@music.yamaha.com', 'arief.asmo.saputro@music.yamaha.com'];
+                $next_approver = ['yoga.karunia.perdana@music.yamaha.com', 'arief.asmo.saputro@music.yamaha.com', 'andik.yayan@music.yamaha.com'];
                 $status_new = 'approval_5';
             }
 
@@ -1308,6 +1545,8 @@ class MoldingController extends Controller
                 'status' => $status_new,
                 'approval' => $app
             ];
+
+            $data['report_pdf'] = $this->generateMoldingReportPdf($form_number);
     
             Mail::to($next_approver)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
     
@@ -1467,37 +1706,94 @@ class MoldingController extends Controller
     public function sendMoldingForm(Request $request)
     {
         try {
-            $form_number = $request->formNumber;
-    
+            $form_number = $request->input('formNumber');
+            if (!$form_number) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Nomor form wajib diisi.',
+                ]);
+            }
+
             $data_form_molding = DB::table('molding_diagnose_forms')
             ->where('form_number', $form_number)
             ->select('molding_diagnose_forms.*', db::raw('DATE_FORMAT(molding_diagnose_forms.production_date, "%d %b %Y") as prod_date'))
             ->first();
-    
-            $get_app_pos = DB::table('molding_diagnose_approvers')
-            ->where('form_number', $form_number)
-            ->where(function ($query) use ($form_number) {
-                $query->whereNull('approve_at')
-                    ->orWhere(function ($query_or) use ($form_number) {
-                        $query_or->where('form_number', $form_number)
-                            ->whereIn('status', ['Holded']);
-                    });
-            })
-            ->orderBy('id', 'asc')
-            ->first();
-    
-            $data = [
-                'data_form_molding' => $data_form_molding,
-                'status' => 'approval_'. $get_app_pos->ordering,
-            ];
-    
-            Mail::to($get_app_pos->approver_email)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
-            
+
+            if (!$data_form_molding) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Form tidak ditemukan.',
+                ]);
+            }
+
+            $delivery = DB::transaction(function () use ($form_number, $data_form_molding) {
+                $get_app_pos = DB::table('molding_diagnose_approvers')
+                    ->where('form_number', $form_number)
+                    ->whereIn('status', ['Holded', 'Hold'])
+                    ->orderBy('ordering', 'asc')
+                    ->lockForUpdate()
+                    ->first();
+                $isHeld = (bool) $get_app_pos;
+
+                if (!$get_app_pos) {
+                    $get_app_pos = DB::table('molding_diagnose_approvers')
+                        ->where('form_number', $form_number)
+                        ->whereNull('approve_at')
+                        ->orderBy('ordering', 'asc')
+                        ->lockForUpdate()
+                        ->first();
+                }
+
+                if (!$get_app_pos) {
+                    return null;
+                }
+
+                if ($isHeld) {
+                    $now = date('Y-m-d H:i:s');
+                    DB::table('molding_diagnose_approvers')
+                        ->where('id', $get_app_pos->id)
+                        ->update([
+                            'status' => null,
+                            'approve_at' => null,
+                            'updated_at' => $now,
+                        ]);
+
+                    DB::table('molding_diagnose_forms')
+                        ->where('form_number', $form_number)
+                        ->update([
+                            'status' => 'Approval',
+                            'updated_at' => $now,
+                        ]);
+                }
+
+                $data = [
+                    'data_form_molding' => $data_form_molding,
+                    'status' => 'approval_' . $get_app_pos->ordering,
+                ];
+
+                Mail::to($get_app_pos->approver_email)
+                    ->bcc(['nasiqul.ibat@music.yamaha.com'])
+                    ->send(new SendEmail($data, 'molding_approval'));
+
+                return [
+                    'is_held' => $isHeld,
+                    'approver_name' => $get_app_pos->approver_name,
+                ];
+            });
+
+            if (!$delivery) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada approval yang menunggu untuk form ini.',
+                ]);
+            }
+
             return response()->json([
                 'status' => true,
-                'message' => 'Success',
+                'message' => $delivery['is_held']
+                    ? 'Email dikirim ulang ke ' . $delivery['approver_name'] . '. Status form kembali ke Approval.'
+                    : 'Email approval berhasil dikirim.',
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,

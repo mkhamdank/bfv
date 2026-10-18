@@ -49,9 +49,18 @@ class SendEmail extends Mailable
         }
 
         if ($this->remark == 'molding_approval') {
-            return $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
+            $mail = $this->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia')
                 ->subject('Molding Approval')
                 ->view('molding.mails.mold_approval');
+
+            if (!empty($this->data['report_pdf'])) {
+                $formNumber = $this->data['data_form_molding']->form_number;
+                $mail->attachData($this->data['report_pdf'], 'Laporan_Diagnosa_Molding_' . $formNumber . '.pdf', [
+                    'mime' => 'application/pdf',
+                ]);
+            }
+
+            return $mail;
         }
 
         if ($this->remark == 'reminder_shot_molding') {

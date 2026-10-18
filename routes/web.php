@@ -701,11 +701,12 @@ Route::get('save_and_send/diagnose_molding/molding_form', 'App\Http\Controllers\
 Route::get('resend/diagnose_molding/molding_form', 'App\Http\Controllers\MoldingController@sendMoldingForm');
 Route::get('index/diagnose_molding/shot_list/{month_range?}', 'App\Http\Controllers\MoldingController@indexShotList')->name('user.molding_input_shot');
 Route::get('index/diagnose_molding/trouble_list', 'App\Http\Controllers\MoldingController@indexTroubleList')->name('user.molding_trouble');
-Route::get('approval/diagnose_molding/{status}/{approval}/{form_number}', 'App\Http\Controllers\MoldingController@approvalMoldingForm');
 Route::get('fetch/diagnose_molding/molding_shot', 'App\Http\Controllers\MoldingController@fetchMoldingShot');
     Route::get('index/diagnose_molding/molding_monitoring_new', 'App\Http\Controllers\MoldingController@indexCheckMoldingNew');
     Route::get('fetch/diagnose_molding/molding_monitoring_new', 'App\Http\Controllers\MoldingController@fetchCheckMoldingNew');
 });
+
+Route::get('approval/diagnose_molding/{status}/{approval}/{form_number}', 'App\Http\Controllers\MoldingController@approvalMoldingForm');
 
 Route::get('workshop/check_molding_vendor/schedules/open-form', [
     'App\\Http\\Controllers\\MoldingController', 'openPeriodicForm',

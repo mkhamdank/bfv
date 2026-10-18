@@ -1594,6 +1594,13 @@
             color: #16834b;
         }
 
+        .form-list-btn.report {
+            background: #ffe4e5;
+            border-color: #fecaca;
+            color: #cf3546;
+            text-decoration: none;
+        }
+
         .form-list-btn:hover {
             filter: brightness(.96);
         }
@@ -1630,7 +1637,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 12px;
-            min-width: 1120px;
+            min-width: 1220px;
         }
 
         .form-list-table th {
@@ -1694,6 +1701,74 @@
         .form-list-pill.red {
             background: #ffe4e5;
             color: #cf3546;
+        }
+
+        .approval-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 210px;
+            text-align: left;
+        }
+
+        .approval-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            line-height: 1.25;
+        }
+
+        .approval-entry.green {
+            color: #118349;
+            background: #dcf9e7;
+        }
+
+        .approval-entry.red {
+            color: #cf3546;
+            background: #ffe4e5;
+        }
+
+        .approval-entry.yellow {
+            color: #9e6a00;
+            background: #fff2d1;
+        }
+
+        .approval-entry.gray {
+            color: #667085;
+            background: #f0f2f5;
+        }
+
+        .approval-name {
+            flex: 1;
+            overflow-wrap: anywhere;
+        }
+
+        .approval-entry.yellow .approval-name[title] {
+            cursor: help;
+        }
+
+        .approval-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 18px;
+            width: 18px;
+            height: 18px;
+            color: inherit;
+            font-size: 9px;
+            font-weight: 800;
+            background: rgba(255, 255, 255, .75);
+            border-radius: 5px;
+        }
+
+        .approval-state {
+            flex: 0 0 auto;
+            font-weight: 700;
+            white-space: nowrap;
         }
 
         .form-list-muted {
@@ -1954,12 +2029,13 @@
                             <th>Form Molding</th>
                             <th>Form Evaluasi</th>
                             <th>Status</th>
+                            <th>Approval</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="schedule_form_body">
                         <tr>
-                            <td colspan="10" class="form-list-empty"><i class="fas fa-spinner fa-spin"></i> Memuat
+                            <td colspan="11" class="form-list-empty"><i class="fas fa-spinner fa-spin"></i> Memuat
                                 daftar form...</td>
                         </tr>
                     </tbody>
@@ -2535,7 +2611,7 @@
 
         function loadScheduleForms(period) {
             $('#schedule_form_body').html(
-                '<tr><td colspan="10" class="form-list-empty"><i class="fas fa-spinner fa-spin"></i> Memuat daftar form...</td></tr>'
+                '<tr><td colspan="11" class="form-list-empty"><i class="fas fa-spinner fa-spin"></i> Memuat daftar form...</td></tr>'
                 );
             var params = scheduleFormShowAll ? {
                 all: '1'
@@ -2562,7 +2638,7 @@
                 })
                 .fail(function(xhr) {
                     $('#schedule_form_body').html(
-                        '<tr><td colspan="10" class="form-list-empty">Gagal memuat daftar form.</td></tr>');
+                        '<tr><td colspan="11" class="form-list-empty">Gagal memuat daftar form.</td></tr>');
                     openErrorGritter('Error', (xhr.responseJSON && xhr.responseJSON.message) ||
                         'Gagal memuat daftar form');
                 });
@@ -2595,6 +2671,9 @@
                 var fa = scheduleFormText(row.form_fixed_asset_number || row.molding_id);
                 var name = scheduleFormText(row.fixed_asset_name || row.molding_name);
                 var status = scheduleFormText(row.form_status || row.schedule_status);
+                var normalizedStatus = String(status).toLowerCase();
+                var statusClass = ['close', 'approved'].indexOf(normalizedStatus) !== -1 ? 'green' :
+                    normalizedStatus === 'open' ? 'red' : 'yellow';
                 html += '<tr>' +
                     '<td>' + (i + 1) + '</td>' +
                     '<td><span class="form-list-pill">' + escapeScheduleForm(scheduleFormMonth(row.period)) +
@@ -2603,20 +2682,218 @@
                         'Belum dibuat') + '</span></td>' +
                     '<td><span class="form-list-pill">' + escapeScheduleForm(fa) + '</span></td>' +
                     '<td class="name-cell">' + escapeScheduleForm(name) + '</td>' +
-                    '<td>' + escapeScheduleForm(scheduleFormText(row.product_status)) + '</td>' +
-                    '<td>' + escapeScheduleForm(scheduleFormText(row.molding_status)) + '</td>' +
-                    '<td>' + escapeScheduleForm(scheduleFormText(row.evaluation_status)) + '</td>' +
-                    '<td><span class="form-list-pill ' + (status === 'Close' ? 'green' : status === 'Open' ? 'red' :
-                        'yellow') + '">' + escapeScheduleForm(status) + '</span></td>' +
-                    '<td><button type="button" class="form-list-btn" onclick="openScheduleForm(' + i +
-                    ', \'product\')"><i class="fas fa-edit"></i> Produk</button>&nbsp;<button type="button" class="form-list-btn" onclick="openScheduleForm(' +
-                    i +
-                    ', \'molding\')"><i class="fas fa-edit"></i> Molding</button>&nbsp;<button type="button" class="form-list-btn" onclick="openScheduleForm(' +
-                    i + ', \'evaluation\')"><i class="fas fa-tasks"></i> Evaluasi</button></td>' +
+                    '<td>' + escapeScheduleForm(row.product_status) +
+                    scheduleFormActions(i, row, 'product') + '</td>' +
+                    '<td>' + escapeScheduleForm(row.molding_status) +
+                    scheduleFormActions(i, row, 'molding') + '</td>' +
+                    '<td>' + escapeScheduleForm(row.evaluation_status) +
+                    scheduleFormActions(i, row, 'evaluation') + '</td>' +
+                    '<td><span class="form-list-pill ' + statusClass + '">' + escapeScheduleForm(status) + '</span></td>' +
+                    '<td>' + scheduleFormApproval(row) + '</td>' +
+                    '<td style="text-align:center;white-space:nowrap;">' + scheduleFormEmailAction(i, row) + '</td>' +
                     '</tr>';
             });
             $('#schedule_form_body').html(html ||
-                '<tr><td colspan="10" class="form-list-empty">Tidak ada form pada periode ini.</td></tr>');
+                '<tr><td colspan="11" class="form-list-empty">Tidak ada form pada periode ini.</td></tr>');
+        }
+
+        function scheduleFormApproval(row) {
+            if (!row.form_number) {
+                return '<span class="form-list-muted">—</span>';
+            }
+            var approvals = row.approvals || [];
+            if (!approvals.length) {
+                return '<span class="form-list-muted">Belum ada approval</span>';
+            }
+            var formStatus = String(row.form_status || '').toLowerCase();
+            var waitingIndex = -1;
+            if (formStatus === 'approval') {
+                waitingIndex = approvals.findIndex(function(approver) {
+                    var approverStatus = String(approver.status || '').toLowerCase();
+                    return approverStatus !== 'approved' && approverStatus !== 'hold' && approverStatus !== 'holded' &&
+                        approverStatus !== 'rejected';
+                });
+            }
+            var html = '<div class="approval-list">';
+            $.each(approvals, function(index, approver) {
+                var approverStatus = String(approver.status || '').toLowerCase();
+                var label = 'Belum approve';
+                var color = 'gray';
+                if (approverStatus === 'approved') {
+                    label = 'Approved';
+                    color = 'green';
+                } else if (approverStatus === 'hold' || approverStatus === 'holded') {
+                    label = 'Hold';
+                    color = 'yellow';
+                } else if (approverStatus === 'rejected') {
+                    label = 'Ditolak';
+                    color = 'red';
+                } else if (index === waitingIndex) {
+                    label = 'Menunggu';
+                    color = 'red';
+                }
+                var isHeld = approverStatus === 'hold' || approverStatus === 'holded';
+                var holdTooltip = isHeld && approver.comment
+                    ? ' title="' + escapeScheduleForm('Alasan Hold: ' + approver.comment) + '"'
+                    : '';
+                html += '<div class="approval-entry ' + color + '"><span class="approval-number">' +
+                    escapeScheduleForm(approver.ordering || (index + 1)) + '</span><span class="approval-name"' +
+                    holdTooltip + '>' +
+                    escapeScheduleForm(approver.name) + '</span><span class="approval-state">' + label +
+                    '</span></div>';
+            });
+            return html + '</div>';
+        }
+
+        function scheduleFormEmailAction(index, row) {
+            if (!row.form_number) {
+                return '<button type="button" class="form-list-btn green" disabled>Belum ada form</button>';
+            }
+            var status = String(row.form_status || '').toLowerCase();
+            var heldApprover = (row.approvals || []).find(function(approver) {
+                var approverStatus = String(approver.status || '').toLowerCase();
+                return approverStatus === 'hold' || approverStatus === 'holded';
+            });
+            var canGeneratePdf = status !== 'approval' && status !== 'approved';
+            var actions = '';
+
+            if (canGeneratePdf) {
+                actions += '<button type="button" class="form-list-btn green" onclick="savePeriodicMoldingPdf(' + index +
+                    ', this)"><i class="far fa-file-pdf"></i> Simpan PDF</button>';
+            } else {
+                actions += '<button type="button" class="form-list-btn green" disabled>Sudah diproses</button>';
+            }
+
+            if ((status === 'hold' || status === 'holded') && heldApprover) {
+                actions += '<button type="button" class="form-list-btn green" onclick="sendPeriodicMoldingEmail(' + index +
+                    ', this)"><i class="fas fa-envelope"></i> Kirim Ulang</button>';
+            }
+
+            return '<div class="form-list-actions" style="justify-content:center;">' + actions + '</div>';
+        }
+
+        function savePeriodicMoldingPdf(index, button) {
+            var row = filteredScheduleForms()[index];
+            if (!row || !row.form_number) {
+                return;
+            }
+            if (!window.confirm('Simpan laporan PDF untuk form ' + row.form_number + ' tanpa mengirim email?')) {
+                return;
+            }
+
+            var $button = $(button).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan PDF...');
+            $.ajax({
+                url: '{{ url("save_and_send/diagnose_molding/molding_form") }}',
+                type: 'GET',
+                data: { formNumber: row.form_number },
+                success: function(response) {
+                    if (response.status) {
+                        window.location.href = response.pdf_url;
+                    } else {
+                        $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Simpan PDF');
+                        openErrorGritter('Gagal', response.message || 'Gagal menyimpan PDF.');
+                    }
+                },
+                error: function() {
+                    $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Simpan PDF');
+                    openErrorGritter('Error', 'Gagal menyimpan PDF.');
+                }
+            });
+        }
+
+        function sendPeriodicMoldingEmail(index, button) {
+            var row = filteredScheduleForms()[index];
+            if (!row || !row.form_number) {
+                return;
+            }
+            var status = String(row.form_status || '').toLowerCase();
+            var isHeld = status === 'hold' || status === 'holded';
+            var heldApprover = (row.approvals || []).find(function(approver) {
+                var approverStatus = String(approver.status || '').toLowerCase();
+                return approverStatus === 'hold' || approverStatus === 'holded';
+            });
+            if (isHeld && !heldApprover) {
+                openErrorGritter('Error', 'Approver dengan status Hold tidak ditemukan.');
+                return;
+            }
+            var confirmMessage = isHeld
+                ? 'Kirim ulang email approval ke ' + heldApprover.name + ' untuk form ' + row.form_number + '?'
+                : 'Kirim email approval untuk form ' + row.form_number + '?';
+            if (!window.confirm(confirmMessage)) {
+                return;
+            }
+            var $button = $(button).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Mengirim...');
+            $.ajax({
+                url: isHeld
+                    ? '{{ url("resend/diagnose_molding/molding_form") }}'
+                    : '{{ url("save_and_send/diagnose_molding/molding_form") }}',
+                type: 'GET',
+                data: { formNumber: row.form_number },
+                success: function(response) {
+                    if (response.status) {
+                        openSuccessGritter('Sukses', response.message || 'Email berhasil dikirim.');
+                        row.form_status = 'Approval';
+                        if (isHeld) {
+                            row.approvals.forEach(function(approver) {
+                                var approverStatus = String(approver.status || '').toLowerCase();
+                                if (approverStatus === 'hold' || approverStatus === 'holded') {
+                                    approver.status = null;
+                                }
+                            });
+                        }
+                        renderScheduleForms();
+                    } else {
+                        openErrorGritter('Gagal', response.message || 'Email gagal dikirim.');
+                        $button.prop('disabled', false).html('<i class="fas fa-envelope"></i> ' +
+                            (isHeld ? 'Kirim Ulang' : 'Kirim Email'));
+                    }
+                },
+                error: function() {
+                    $button.prop('disabled', false).html('<i class="fas fa-envelope"></i> ' +
+                        (isHeld ? 'Kirim Ulang' : 'Kirim Email'));
+                    openErrorGritter('Error', 'Gagal mengirim email.');
+                }
+            });
+        }
+
+        function scheduleFormActions(index, row, formType) {
+            var forms = {
+                product: {
+                    label: 'Produk',
+                    icon: 'fa-edit',
+                    report: '{{ url("index/diagnose_molding/mold_product_check/report") }}',
+                    ng: '{{ url("index/diagnose_molding/mold_product_check/report_ng") }}'
+                },
+                molding: {
+                    label: 'Molding',
+                    icon: 'fa-edit',
+                    report: '{{ url("index/diagnose_molding/mold_molding_check/report") }}',
+                    ng: '{{ url("index/diagnose_molding/mold_molding_check/report_ng") }}'
+                },
+                evaluation: {
+                    label: 'Evaluasi',
+                    icon: 'fa-tasks',
+                    report: '{{ url("index/diagnose_molding/evaluation/report") }}'
+                }
+            };
+            var form = forms[formType];
+            var formStatus = String(row.form_status || '').toLowerCase();
+            var isLocked = formStatus === 'approval' || formStatus === 'approved';
+            var html = '<div class="form-list-actions" style="justify-content:center;">';
+            if (!isLocked) {
+                html += '<button type="button" class="form-list-btn" onclick="openScheduleForm(' + index +
+                    ',&quot;' + formType + '&quot;)"><i class="fas ' + form.icon + '"></i> ' + form.label + '</button>';
+            }
+            if (row.form_number) {
+                var formNumber = encodeURIComponent(row.form_number);
+                html += '<a class="form-list-btn report" href="' + form.report + '/' + formNumber +
+                    '" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf"></i> Report</a>';
+                if (form.ng) {
+                    html += '<a class="form-list-btn report" href="' + form.ng + '/' + formNumber +
+                        '" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-pdf"></i> NG</a>';
+                }
+            }
+            return html + '</div>';
         }
 
         function openScheduleForm(index, formType) {

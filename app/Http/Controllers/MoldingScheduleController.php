@@ -81,6 +81,29 @@ class MoldingScheduleController extends Controller
             ->orderBy('si.molding_name')
             ->orderBy('f.id', 'desc')
             ->get();
+        $formNumbers = $rows->pluck('form_number')->filter()->unique()->values()->all();
+        $approvalSteps = collect();
+        if (count($formNumbers)) {
+            $approvalSteps = $db->table('molding_diagnose_approvers')
+                ->whereIn('form_number', $formNumbers)
+                ->orderBy('form_number')
+                ->orderBy('ordering')
+                ->select('form_number', 'approver_name', 'ordering', 'status', 'comment')
+                ->get()
+                ->groupBy('form_number');
+        }
+        $rows->transform(function ($formRow) use ($approvalSteps) {
+            $steps = $approvalSteps->get($formRow->form_number);
+            $formRow->approvals = $steps ? $steps->map(function ($step) {
+                return [
+                    'ordering' => $step->ordering,
+                    'name' => $step->approver_name,
+                    'status' => $step->status,
+                    'comment' => $step->comment,
+                ];
+            })->values() : collect();
+            return $formRow;
+        });
         return response()->json([
             'status' => true,
             'period' => $showAll ? null : $period,

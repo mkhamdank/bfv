@@ -89,22 +89,22 @@
                     <div class="flex flex-col">
                         <div class="w-28 h-8 border-box-thick flex items-center justify-center text-sm font-bold" style="border-bottom: none; border-right: none">Konfirmasi</div>
                         <div class="w-28 h-10 flex items-center justify-center border-box-thick text-sm" style="border-top-width: 1px; border-right: none;">{{ $data_master[3]->app_name }}</div>
-                        <div class="w-28 h-7 flex items-center justify-center border-box-thick text-sm" style="border-top: none; border-right: none;">{{ isset($data_master[3]->app_at) ? $data_master[3]->app_at : '' }}</div>
+                        <div class="w-28 h-7 flex items-center justify-center border-box-thick text-sm" style="border-top: none; border-right: none;">{{ in_array(strtolower((string) $data_master[3]->approval_status), ['hold', 'holded'], true) ? 'Hold' : ($data_master[3]->app_at ?? '') }}</div>
                     </div>
                     <div class="flex flex-col">
                         <div class="w-28 h-8 border-box-thick flex items-center justify-center text-sm font-bold" style="border-bottom: none; border-right: none">Konfirmasi</div>
                         <div class="w-28 h-10 flex items-center justify-center border-box-thick text-sm" style="border-top-width: 1px; border-right: none;">{{ $data_master[2]->app_name }}</div>
-                        <div class="w-28 h-7 flex items-center justify-center border-box-thick text-xs" style="border-top: none; border-right: none;">{{ isset($data_master[2]->app_at) ? $data_master[2]->app_at : '' }}</div>
+                        <div class="w-28 h-7 flex items-center justify-center border-box-thick text-xs" style="border-top: none; border-right: none;">{{ in_array(strtolower((string) $data_master[2]->approval_status), ['hold', 'holded'], true) ? 'Hold' : ($data_master[2]->app_at ?? '') }}</div>
                     </div>
                     <div class="flex flex-col">
                         <div class="w-28 h-8 border-box-thick flex items-center justify-center text-sm font-bold" style="border-bottom: none; border-right: none; border-left-width: 1px">Diperiksa</div>
                         <div class="w-28 h-10 border-box-thick flex items-center justify-center text-sm" style="border-top-width: 1px; border-right: none; border-left-width: 1px;">{{ $data_master[1]->app_name }}</div>
-                        <div class="w-28 h-7 border-box-thick flex items-center justify-center text-xs" style="border-top: none; border-right: none; border-left-width: 1px;">{{ isset($data_master[1]->app_at) ? $data_master[1]->app_at : '' }}</div>
+                        <div class="w-28 h-7 border-box-thick flex items-center justify-center text-xs" style="border-top: none; border-right: none; border-left-width: 1px;">{{ in_array(strtolower((string) $data_master[1]->approval_status), ['hold', 'holded'], true) ? 'Hold' : ($data_master[1]->app_at ?? '') }}</div>
                     </div>
                     <div class="flex flex-col">
                         <div class="w-28 h-8 border-box-thick flex items-center justify-center text-sm font-bold" style="border-bottom: none; border-right: none; border-left-width: 1px">Diperiksa</div>
                         <div class="w-28 h-10 border-box-thick flex items-center justify-center text-sm" style="border-top-width: 1px; border-right: none; border-left-width: 1px;">{{ $data_master[0]->app_name }}</div>
-                        <div class="w-28 h-7 border-box-thick flex items-center justify-center text-xs" style="border-top: none; border-right: none; border-left-width: 1px;">{{ isset($data_master[0]->app_at) ? $data_master[0]->app_at : '' }}</div>
+                        <div class="w-28 h-7 border-box-thick flex items-center justify-center text-xs" style="border-top: none; border-right: none; border-left-width: 1px;">{{ in_array(strtolower((string) $data_master[0]->approval_status), ['hold', 'holded'], true) ? 'Hold' : ($data_master[0]->app_at ?? '') }}</div>
                     </div>
                     <div class="flex flex-col">
                         <div class="w-20 h-8 border-box-thick flex items-center justify-center text-sm font-bold" style="border-bottom: none; border-left-width: 1px">Dibuat</div>

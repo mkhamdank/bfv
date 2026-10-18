@@ -237,16 +237,18 @@
             border-top: 1px solid #e5e7eb;
             text-align: center; /* Memusatkan tombol jika menggunakan block-level elements */
             
-            /* Menggunakan grid untuk tata letak modern yang tetap aman di klien email modern */
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
         }
         
         /* Media query untuk mobile - membuat tombol bertumpuk di layar kecil jika perlu */
         @media (max-width: 480px) {
             .action-buttons {
-                grid-template-columns: 1fr; /* 1 kolom di layar yang sangat kecil */
+                flex-direction: column;
+                align-items: center;
             }
         }
         
@@ -259,6 +261,7 @@
             text-align: center;
             text-decoration: none; /* Menghilangkan underline pada link */
             border-radius: 8px;
+            min-width: 180px;
             cursor: pointer;
             transition: background-color 0.3s, box-shadow 0.3s;
         }
@@ -396,19 +399,10 @@
                         <span class="detail-label">Jumlah Produksi</span>
                         <span class="detail-value detail-value-normal">: {{ number_format($data['data_form_molding']->production_qty, 0, ',', '.') }} Shot</span>
                     </div>
-                    <!-- Baris 2: Tgl Produksi (Genap, Kanan) -->
-                    <div class="detail-row detail-row-even">
-                        <span class="detail-label">Tanggal Produksi</span>
-                        <span class="detail-value detail-value-normal">: {{ $data['data_form_molding']->prod_date }}</span>
+                    <div class="detail-row detail-row-even" style="grid-column: 1 / -1; border-right: none; border-bottom: none;">
+                        <span class="detail-label">Periode Cek</span>
+                        <span class="detail-value detail-value-normal">: {{ $data['data_form_molding']->period ? date('m/Y', strtotime($data['data_form_molding']->period)) : '-' }}</span>
                     </div>
-                    
-                    <!-- Baris 3: Periode Produksi (Ganjil, Kiri) -->
-                    <div class="detail-row detail-row-odd">
-                        <span class="detail-label">Periode Produksi</span>
-                        <span class="detail-value detail-value-normal">: {{ $data['data_form_molding']->production_period }}</span>
-                    </div>
-                    <!-- Baris Kosong (Ganjil, Kanan, hanya terlihat di desktop) -->
-                    <div class="detail-row detail-row-even hidden-md-block" style="border-bottom: none;"></div>
                 </div>
 
             </div>
@@ -451,6 +445,16 @@
             </a>
             <!-- END BARU: Tombol Attachment -->
 
+            @if(($data['data_form_molding']->remark ?? null) === 'periodic')
+            <div style="margin: 16px 0;">
+                <strong>Report Form Periodik:</strong><br>
+                <a href="{{ url('index/diagnose_molding/mold_product_check/report/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">Report Produk</a> |
+                <a href="{{ url('index/diagnose_molding/mold_product_check/report_ng/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">NG Produk</a> |
+                <a href="{{ url('index/diagnose_molding/mold_molding_check/report/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">Report Molding</a> |
+                <a href="{{ url('index/diagnose_molding/mold_molding_check/report_ng/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">NG Molding</a>
+            </div>
+            @endif
+
              <!-- BARU: Tombol Aksi -->
             @if($data['status'] != 'approval_5' && $data['status'] != 'holded' && $data['status'] != 'rejected')
             <div class="action-buttons">
@@ -462,7 +466,9 @@
                 <a href="{{ url('approval/diagnose_molding/hold/'.$data['status'].'/'.$data['data_form_molding']->form_number) }}" class="btn btn-hold">Hold</a>
                 
                 <!-- Tombol Reject (Merah) -->
+                @if(($data['data_form_molding']->remark ?? null) !== 'periodic')
                 <a href="{{ url('approval/diagnose_molding/reject/'.$data['status'].'/'.$data['data_form_molding']->form_number) }}" class="btn btn-reject">Reject</a>
+                @endif
             </div>
             @endif
             <!-- END BARU: Tombol Aksi -->

@@ -44,9 +44,13 @@
         background: rgba(30, 20, 60, .45);
         backdrop-filter: blur(4px);
         z-index: 9999;
-        display: flex !important;
+        display: none;
         align-items: center;
         justify-content: center;
+    }
+
+    #loading.show {
+        display: flex !important;
     }
 
     .loading-box {
@@ -994,7 +998,7 @@
 
     <div class="container-fluid" style="padding: 0 24px;">
 
-        <div id="loading">
+        <div id="loading" class="show">
             <div class="loading-box">
                 <div class="loading-spinner"></div>
                 <p>Memproses...</p>
@@ -1195,7 +1199,7 @@
                     </div>
                 </div>
                 <div class="modal-ftr">
-                    <button type="button" class="btn-modal-cancel" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal" data-dismiss="modal">Batal</button>
                     <button type="button" class="btn-modal-save" onclick="savePhotoNg()"><i class="fas fa-save"></i>
                         Simpan</button>
                 </div>
@@ -1250,14 +1254,11 @@
             $("#wrapper").toggleClass("toggled");
             $('#side_diagnosa_molding').addClass('menu-open');
             $('body').addClass("sidebar-collapse");
-                @if($molding_name->photo_product) $('#form_diagnose_container').show(); getData(); @endif
+                    @if($molding_name->photo_product) $('#form_diagnose_container').show(); getData(); @endif
             $('#modal_info').modal('show');
             $('#photo_file_1').on('change', function () { selectPhoto(1); });
             $('#photo_file_2').on('change', function () { selectPhoto(2); });
-            var loading = document.getElementById('loading');
-            if (loading) {
-                loading.style.setProperty('display', 'none', 'important');
-            }
+            $('#loading').removeClass('show');
         });
 
         function updateFileLabel(input) {
@@ -1356,34 +1357,78 @@
 
         function uploadImage() {
             if ($('#customFile')[0].files.length == 0) { toastr.error('Mohon pilih file terlebih dahulu'); audio_error.play(); return; }
-            $('#loading').show();
+            $('#loading').addClass('show');
             var fd = new FormData();
             fd.append('image', $('#customFile')[0].files[0]);
             fd.append('form_number', $('#form_number').text());
             $.ajax({
                 url: '{{ url("upload/diagnose_molding/product_image") }}', type: 'POST', data: fd, processData: false, contentType: false,
-                success: function (r) { $('#loading').hide(); if (r.status) { toastr.success(r.message); location.reload(); } else { toastr.error(r.message); audio_error.play(); } },
-                error: function () { $('#loading').hide(); toastr.error('Terjadi kesalahan'); audio_error.play(); }
+                success: function (r) { $('#loading').removeClass('show'); if (r.status) { toastr.success(r.message); location.reload(); } else { toastr.error(r.message); audio_error.play(); } },
+                error: function () { $('#loading').removeClass('show'); toastr.error('Terjadi kesalahan'); audio_error.play(); }
             });
         }
 
-        function buatNG(id, nama_ng) { $('#modal_ng').modal('show'); $('#nomor').text(id); $('#nama_ng, #nama_ng_disp').text(nama_ng); }
+        function buatNG(id, nama_ng) {
+            $('#nomor').text(id);
+            $('#nama_ng, #nama_ng_disp').text(nama_ng);
+            $('#photo_file_1,#photo_file_2').val('');
+            resetPhotoPreview(1);
+            resetPhotoPreview(2);
+            $('#modal_ng').modal('show');
+            loadNgPhotos(id);
+        }
+
+        function resetPhotoPreview(id) {
+            $('#photo_ng_' + id).hide().attr('src', '').removeAttr('data-existing-src');
+            $('#dummy_photo_' + id).show();
+        }
+
+        function loadNgPhotos(id) {
+            $.get('{{ url("fetch/diagnose_molding/product_details") }}', {
+                id: id,
+                form_number: $('#form_number').text()
+            }, function (result) {
+                if (!result.status || !result.product_ng.length) return;
+
+                var saved = result.product_ng[0];
+                [saved.photo1, saved.photo2].forEach(function (photo, index) {
+                    if (!photo) return;
+
+                    var photoId = index + 1;
+                    var photoUrl = '{{ asset("workshop/molding/photo_product/ng") }}/' +
+                        encodeURIComponent(photo) + '?v=' + encodeURIComponent(saved.updated_at || Date.now());
+                    $('#photo_ng_' + photoId).attr('src', photoUrl)
+                        .attr('data-existing-src', photoUrl).show();
+                    $('#dummy_photo_' + photoId).hide();
+                });
+            });
+        }
 
         function savePhotoNg() {
-            if (!$('#photo_file_1')[0].files[0]) { toastr.error('Foto 1 wajib diisi'); return; }
-            $('#loading').show();
+            var photo1 = $('#photo_file_1')[0].files[0];
+            var photo2 = $('#photo_file_2')[0].files[0];
+            if (!photo1 && !$('#photo_ng_1').attr('data-existing-src')) {
+                toastr.error('Foto 1 wajib diisi');
+                return;
+            }
+            $('#loading').addClass('show');
             var fd = new FormData();
             fd.append('nomor', $('#nomor').text()); fd.append('nama_ng', $('#nama_ng').text());
-            fd.append('photo_file_1', $('#photo_file_1')[0].files[0]);
-            if ($('#photo_file_2')[0].files[0]) fd.append('photo_file_2', $('#photo_file_2')[0].files[0]);
+            if (photo1) fd.append('photo_file_1', photo1);
+            if (photo2) fd.append('photo_file_2', photo2);
             fd.append('form_number', $('#form_number').text());
             $.ajax({
                 url: '{{ url("upload/diagnose_molding/photo_ng") }}', type: 'POST', data: fd, processData: false, contentType: false,
                 success: function (r) {
-                    $('#loading').hide();
-                    if (r.status) { toastr.success(r.message); audio_success.play(); $('#modal_ng').modal('hide'); $('#photo_file_1,#photo_file_2').val(''); $('#photo_ng_1,#photo_ng_2').hide().attr('src', ''); $('#dummy_photo_1,#dummy_photo_2').show(); }
+                    $('#loading').removeClass('show');
+                    if (r.status) {
+                        toastr.success(r.message);
+                        audio_success.play();
+                        $('#photo_file_1,#photo_file_2').val('');
+                        loadNgPhotos($('#nomor').text());
+                    }
                     else { toastr.error(r.message); audio_error.play(); }
-                }, error: function () { $('#loading').hide(); toastr.error('Terjadi kesalahan'); audio_error.play(); }
+                }, error: function () { $('#loading').removeClass('show'); toastr.error('Terjadi kesalahan'); audio_error.play(); }
             });
         }
 
@@ -1400,8 +1445,9 @@
                 var rows = result.product_ng.length > 0 ? '' : '<tr><td colspan="5" style="text-align:center;color:#a0aec0;padding:16px;">Tidak ada data</td></tr>';
                 $.each(result.product_ng, function (k, v) {
                     rows += '<tr><td>' + (k + 1) + '</td><td>' + v.check_at.replace(' ', '<br>') + '</td>';
-                    rows += '<td><img src="{{ asset("workshop/molding/photo_product/ng/") }}/' + v.photo1 + '" style="max-width:110px;border-radius:6px;"></td>';
-                    rows += '<td>' + (v.photo2 ? '<img src="{{ asset("workshop/molding/photo_product/ng/") }}/' + v.photo2 + '" style="max-width:110px;border-radius:6px;">' : '—') + '</td>';
+                    var photoVersion = encodeURIComponent(v.updated_at || Date.now());
+                    rows += '<td><img src="{{ asset("workshop/molding/photo_product/ng/") }}/' + encodeURIComponent(v.photo1) + '?v=' + photoVersion + '" style="max-width:110px;border-radius:6px;"></td>';
+                    rows += '<td>' + (v.photo2 ? '<img src="{{ asset("workshop/molding/photo_product/ng/") }}/' + encodeURIComponent(v.photo2) + '?v=' + photoVersion + '" style="max-width:110px;border-radius:6px;">' : '—') + '</td>';
                     rows += '<td><button class="btn-del-sm" onclick="deleteProductNg(' + v.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
                 });
                 $('#tbody_detail').html(rows);
