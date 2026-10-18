@@ -235,7 +235,7 @@
         //document ready
         $(document).ready(function() {
            //open window print 
-           window.print();
+        //    window.print();
         });
 
         async function cetakSeluruhHTML() {

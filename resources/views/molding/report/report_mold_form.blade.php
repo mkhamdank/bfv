@@ -169,6 +169,7 @@
                                 <label class="checkbox-label inline-flex items-center mr-2"><input type="checkbox" name="diagnosis_{{ $loop->iteration }}[]" value="OK" class="mr-1 prevent-click" {{ $item->diagnose_result == 'OK' ? 'checked' : '' }}>OK</label>
                                 <label class="checkbox-label inline-flex items-center mr-2"><input type="checkbox" name="diagnosis_{{ $loop->iteration }}[]" value="NG" class="mr-1 prevent-click" {{ $item->diagnose_result == 'NG' ? 'checked' : '' }}>NG</label>
                                 <label class="checkbox-label inline-flex items-center mr-2"><input type="checkbox" name="diagnosis_{{ $loop->iteration }}[]" value="OK Sementara" class="mr-1 prevent-click" {{ $item->diagnose_result == 'OK Sementara' ? 'checked' : '' }}>OK Sementara</label>
+                                <label class="checkbox-label inline-flex items-center mr-2"><input type="checkbox" name="diagnosis_{{ $loop->iteration }}[]" value="Part Tidak Ada" class="mr-1 prevent-click" {{ $item->diagnose_result == 'Part Tidak Ada' ? 'checked' : '' }}>Part Tidak Ada</label>
                             </td>
                         </tr>
                         @if ($item->daerah_ng)
@@ -214,7 +215,7 @@
         //document ready
         $(document).ready(function() {
            //open window print 
-           window.print();
+        //    window.print();
 
         //    generatePDF();
         });
