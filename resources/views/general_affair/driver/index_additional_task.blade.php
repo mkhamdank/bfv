@@ -684,12 +684,16 @@
                     return false;
                 }
 
-                if (firstTransaction.lokasi) {
+                if (firstTransaction.asal) {
                     $('#from_' + id).val(firstTransaction.asal);
                     $('#from_' + id).prop('readonly', true);
                 }
 
                 if (lastTransaction.lokasi) {
+                    if (!firstTransaction.asal) {
+                        $('#from_' + id).val('-');
+                        $('#from_' + id).prop('readonly', true);
+                    }
                     $('#to_' + id).val(lastTransaction.lokasi);
                     $('#to_' + id).prop('readonly', true);
                 }
