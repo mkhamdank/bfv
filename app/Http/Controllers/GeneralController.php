@@ -907,7 +907,7 @@ class GeneralController extends Controller
         }else{
             $driver_task = DB::table('driver_tasks')
             ->where('task_id',$task_id)
-            ->where('closure_status','driver')
+            ->whereIn('closure_status', ['driver', 'japanese'])
             ->first();
         }
 
