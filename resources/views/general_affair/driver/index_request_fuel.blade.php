@@ -1942,12 +1942,12 @@
                     if (response && (response.status === true || response.success === true)) {
 
                         alert(response.message || 'Permintaan BBM berhasil disimpan.');
+                        window.location.href = '{{ url("index/driver/job") }}';
 
-                        if (response.redirect) {
+                        // if (response.redirect) {
 
-                            window.location.href = response.redirect;
 
-                        }
+                        // }
 
                     } else {
 
