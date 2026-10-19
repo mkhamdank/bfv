@@ -985,6 +985,7 @@ class GeneralController extends Controller
             $index = $request->get('index');
             $id = $request->get('id');
             $task_id = $request->get('task_id');
+            $json_etoll = $request->get('json_etoll');
 
             $tujuan_upload = 'images/driver/japanese/additional';
 
@@ -1014,7 +1015,16 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            
+            $input_ocr = DB::table('driver_task_ocrs')
+            ->insert([
+                'task_id' => $task_id,
+                'type' => 'etoll',
+                'json' => $json_etoll,
+                'created_by' => $get_etoll->driver_id,
+                'created_by_name' => $get_etoll->driver_name,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             $response = array(
                 'status' => true,
@@ -1039,6 +1049,7 @@ class GeneralController extends Controller
             $index = $request->get('index');
             $id = $request->get('id');
             $task_id = $request->get('task_id');
+            $json_parking = $request->get('json_parking');
 
             $tujuan_upload = 'images/driver/japanese/additional';
 
@@ -1066,7 +1077,16 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            
+            $input_ocr = DB::table('driver_task_ocrs')
+            ->insert([
+                'task_id' => $task_id,
+                'type' => 'parking',
+                'json' => $json_parking,
+                'created_by' => $get_parking->driver_id,
+                'created_by_name' => $get_parking->driver_name,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             $response = array(
                 'status' => true,
@@ -1091,6 +1111,7 @@ class GeneralController extends Controller
             $index = $request->get('index');
             $id = $request->get('id');
             $task_id = $request->get('task_id');
+            $json_parking_emoney = $request->get('json_parking_emoney');
 
             $tujuan_upload = 'images/driver/japanese/additional';
 
@@ -1118,7 +1139,16 @@ class GeneralController extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
 
-            
+            $input_ocr = DB::table('driver_task_ocrs')
+            ->insert([
+                'task_id' => $task_id,
+                'type' => 'parking_emoney',
+                'json' => $json_parking_emoney,
+                'created_by' => $get_parking->driver_id,
+                'created_by_name' => $get_parking->driver_name,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
 
             $response = array(
                 'status' => true,
@@ -1390,6 +1420,156 @@ class GeneralController extends Controller
                 'message' => $th->getMessage()
             );
             return Response::json($response);
+        }
+    }
+
+    public function ocrEtoll(Request $request)
+    {
+        try {
+
+            if (!$request->hasFile('image')) {
+                return response()->json([
+                    'detail' => 'File tidak ditemukan',
+                ], 400);
+            }
+
+            $file = $request->file('image');
+
+            if (!$file->isValid()) {
+                return response()->json([
+                    'detail' => 'File upload tidak valid',
+                ], 400);
+            }
+
+            $username = '1';
+            $name = 'BFV';
+
+            $user = $username . '|' . $name;
+
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, 'http://10.109.33.34/bfv/public/api/ocr/etoll');
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Accept: application/json',
+            ]);
+
+            $curlFile = curl_file_create(
+                $file->getRealPath(),
+                $file->getMimeType(),
+                $file->getClientOriginalName()
+            );
+
+            $postData = [
+                'imag   e' => $curlFile,
+            ];
+
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+
+            curl_close($ch);
+
+            if ($error) {
+                return response()->json([
+                    'detail' => $error,
+                ], 500);
+            }
+
+            $body = json_decode($response, true);
+
+            if ($httpCode >= 400) {
+                return response()->json($body ?: [
+                    'detail' => $response,
+                ], $httpCode);
+            }
+
+            return response()->json($body);
+
+        } catch (\Exception$e) {
+
+            return response()->json([
+                'detail' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function ocrParking(Request $request)
+    {
+        try {
+
+            if (!$request->hasFile('image')) {
+                return response()->json([
+                    'detail' => 'File tidak ditemukan',
+                ], 400);
+            }
+
+            $file = $request->file('image');
+
+            if (!$file->isValid()) {
+                return response()->json([
+                    'detail' => 'File upload tidak valid',
+                ], 400);
+            }
+
+            $username = '1';
+            $name = 'BFV';
+
+            $user = $username . '|' . $name;
+
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, 'http://10.109.33.34/bfv/public/api/ocr/parking');
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Accept: application/json',
+            ]);
+
+            $curlFile = curl_file_create(
+                $file->getRealPath(),
+                $file->getMimeType(),
+                $file->getClientOriginalName()
+            );
+
+            $postData = [
+                'imag   e' => $curlFile,
+            ];
+
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+
+            curl_close($ch);
+
+            if ($error) {
+                return response()->json([
+                    'detail' => $error,
+                ], 500);
+            }
+
+            $body = json_decode($response, true);
+
+            if ($httpCode >= 400) {
+                return response()->json($body ?: [
+                    'detail' => $response,
+                ], $httpCode);
+            }
+
+            return response()->json($body);
+
+        } catch (\Exception$e) {
+
+            return response()->json([
+                'detail' => $e->getMessage(),
+            ], 500);
         }
     }
 }

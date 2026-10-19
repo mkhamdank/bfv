@@ -751,3 +751,8 @@ Route::post('search/visitor', 'App\Http\Controllers\GeneralController@inputVisit
 
 Route::get('index/visitor/safety_induction', 'App\Http\Controllers\GeneralController@indexVisitorSafetyInduction');
 Route::post('input/visitor/safety_induction', 'App\Http\Controllers\GeneralController@inputVisitorSafetyInduction');
+
+
+Route::get('index/driver/request/fuel', 'App\Http\Controllers\GeneralAffairController@indexRequestFuel');
+Route::post('input/driver/request/fuel', 'App\Http\Controllers\GeneralAffairController@inputRequestFuel');
+Route::get('index/driver/request/e-money', 'App\Http\Controllers\GeneralAffairController@indexRequestEMoney');

@@ -183,11 +183,11 @@
     .btn-back-bottom {
         display: flex; align-items: center; justify-content: center; gap: 8px;
         width: 100%; padding: 12px; border-radius: 12px; margin-top: 12px;
-        background: #fff; border: 1.5px solid #e2e8f0;
-        color: #4a5568; font-size: 14px; font-weight: 600;
+        background: #dc2626; border: 1.5px solid #ef4444;
+        color: #fff; font-size: 14px; font-weight: 600;
         cursor: pointer; text-decoration: none; transition: all .18s;
     }
-    .btn-back-bottom:hover { background: #f5f3ff; border-color: #c4bfef; color: #605ca8; text-decoration: none; }
+    .btn-back-bottom:hover { background: #b91c1c; border-color: #991b1b; color: #fff; text-decoration: none; }
 
     /* ── MISC ── */
     .page-wrapper { padding-top: 0 !important; }
@@ -297,17 +297,17 @@
         <div class="sec-card-body">
 
             <div class="ff">
-                <label>Odometer (KM) <span class="req">*</span></label>
-                @if($data_vehicle != null)
+                <label>Odometer Akhir (KM) <span class="req">*</span></label>
+                {{-- @if($data_vehicle != null)
                     <input type="text" id="odometer" name="odometer" class="numpad" readonly
                            value="{{ $data_vehicle->odometer }}" placeholder="Odometer (KM)">
-                @else
+                @else --}}
                     <input type="number" id="odometer" name="odometer" class="numpad"
                            value="" placeholder="Odometer (KM)">
-                @endif
+                {{-- @endif --}}
             </div>
 
-            @if($data_vehicle != null && $data_vehicle_fuel != null)
+            {{-- @if($data_vehicle != null && $data_vehicle_fuel != null)
             <div class="ff">
                 <label>Kondisi BBM Sebelum Isi (Liter)</label>
                 @if($data_vehicle != null && $data_vehicle_fuel != null)
@@ -319,15 +319,9 @@
                            value="" placeholder="Kondisi BBM">
                 @endif
             </div>
-            @endif
+            @endif --}}
 
-            <div class="ff">
-                <label>Pengisian BBM (Liter) <span class="req">*</span></label>
-                <input type="text" id="fuel" name="fuel" class="numpad" placeholder="Jumlah liter" value="" inputmode="decimal" pattern="[0-9.]*">
-                <span class="hint">
-                    Gunakan titik <strong>(.)</strong> sebagai pemisah desimal, bukan koma.
-                </span>
-            </div>
+            <input type="hidden" id="fuel_actual" name="fuel_actual" value="0">
 
             <div class="ff">
                 <label>Jenis BBM <span class="req">*</span></label>
@@ -341,23 +335,22 @@
                 </div>
             </div>
 
-            <div class="g2">
-                <div class="ff" style="">
-                    <label>Harga Per Liter <span class="req">*</span></label>
-                    <input type="number" id="fuel_amount_liter" name="fuel_amount_liter" class="numpad"
-                           placeholder="Harga per liter" value="" onchange="changeLiter(this.value)">
-                </div>
-                <div class="ff" style="">
-                    <label>Harga Total <span class="req">*</span></label>
-                    <input type="number" id="fuel_amount" name="fuel_amount" class="numpad"
-                           placeholder="Harga total" value="">
-                </div>
+            <div class="ff">
+                <label>Harga pada Nota <span style="color: red;"></label>
+                <input type="number" id="receipt" name="receipt" class="numpad"
+                           placeholder="Harga pada Nota" value="" onchange="changeReceipt(this.value)">
+            </div>
+
+            <div class="ff" style="">
+                <label>Harga Per Liter <span class="req">*</span></label>
+                <input type="number" id="fuel_amount_liter" name="fuel_amount_liter"
+                        placeholder="Harga per liter" value="">
+                <input type="hidden" id="fuel_amount" name="fuel_amount" value="">
             </div>
 
             <div class="ff">
-                <label>Harga pada Nota <span style="color: red;">(Isikan jika berbeda)</span> <span class="req">*</span></label>
-                <input type="number" id="receipt" name="receipt" class="numpad"
-                           placeholder="Harga pada Nota" value="">
+                <label>Pengisian BBM (Liter) <span class="req">*</span></label>
+                <input type="text" id="fuel" name="fuel" placeholder="Jumlah liter" value="" inputmode="decimal" pattern="[0-9.]*">
             </div>
 
         </div>
@@ -416,9 +409,6 @@
         <button class="btn-submit" onclick="submitDriver();">
             <i class="fas fa-paper-plane"></i> Submit Pengisian BBM
         </button>
-        <a class="btn-back-bottom" href="{{ url('index/driver/job') }}">
-            <i class="fas fa-arrow-left"></i> Kembali ke Daftar Tugas
-        </a>
     </div>
 
 </div>
@@ -653,29 +643,36 @@
     var bbm = <?php echo json_encode($bbm2); ?>;
 
     function changeFuelType(fuel_type) {
-        if ($('#fuel').val() == '') {
-            $('#fuel_type').val('-');
-            openErrorGritter('Error!', 'Isi Jumlah Liter terlebih dahulu');
-            return false;
-        }
         var harga = 0;
         for (var i = 0; i < bbm.length; i++) {
             if (fuel_type == bbm[i].split('_')[0]) { harga = bbm[i].split('_')[1]; }
         }
         $('#fuel_amount_liter').val(harga);
-        $('#fuel_amount').val(parseFloat(harga) * parseFloat($('#fuel').val()));
-        $('#receipt').val(parseFloat(harga) * parseFloat($('#fuel').val()));
+        // $('#fuel_amount').val(parseFloat(harga) * parseFloat($('#fuel').val()));
+        $('#receipt').val('');
+        $('#fuel_amount').val('');
+        $('#fuel').val('');
     }
 
-    function changeLiter(amountLiter) {
-        if ($('#fuel').val() == '') {
-            openErrorGritter('Error!', 'Isikan Pengisian BBM (Liter) terlebih dahulu');
-            $('#fuel_amount_liter').val('');
-            $('#fuel_amount').val('');
+    // function changeLiter(amountLiter) {
+    //     if ($('#fuel').val() == '') {
+    //         openErrorGritter('Error!', 'Isikan Pengisian BBM (Liter) terlebih dahulu');
+    //         $('#fuel_amount_liter').val('');
+    //         $('#fuel_amount').val('');
+    //         return false;
+    //     }
+    //     $('#fuel_amount').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
+    //     $('#receipt').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
+    // }
+
+    function changeReceipt(receipt) {
+        if ($('#fuel_amount_liter').val() == '') {
+            openErrorGritter('Error!', 'Isikan Harga per Liter terlebih dahulu / pilih Jenis BBM');
+            $('#receipt').val('');
             return false;
         }
-        $('#fuel_amount').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
-        $('#receipt').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
+        $('#fuel_amount').val(parseFloat(receipt));
+        $('#fuel').val((parseFloat(receipt) / parseFloat($('#fuel_amount_liter').val())).toFixed(2));
     }
 
     /* ── Submit ── */

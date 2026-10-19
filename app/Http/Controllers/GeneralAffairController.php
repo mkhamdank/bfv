@@ -1007,97 +1007,101 @@ class GeneralAffairController extends Controller
         $driver_task = DB::table('driver_tasks')
         ->where('id',$id)
         ->first();
-        $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles',
-            CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_HTTPHEADER => array(
-                'Accept: application/json',
-                'Content-Type: application/x-www-form-urlencoded',
-                'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
-            ),
-        ));
-        $response = curl_exec($curl);
+        $car = DB::table('driver_lists')
+        ->where('plat_no', $driver_task->plat_no)
+        ->first();
+        // $curl = curl_init();
 
-        curl_close($curl);
+        // curl_setopt_array($curl, array(
+        //     CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles',
+        //     CURLOPT_SSL_VERIFYHOST => false,
+        //     CURLOPT_SSL_VERIFYPEER => false,
+        //     CURLOPT_RETURNTRANSFER => true,
+        //     CURLOPT_ENCODING => '',
+        //     CURLOPT_MAXREDIRS => 10,
+        //     CURLOPT_TIMEOUT => 0,
+        //     CURLOPT_FOLLOWLOCATION => true,
+        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //     CURLOPT_CUSTOMREQUEST => 'GET',
+        //     CURLOPT_HTTPHEADER => array(
+        //         'Accept: application/json',
+        //         'Content-Type: application/x-www-form-urlencoded',
+        //         'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+        //     ),
+        // ));
+        // $response = curl_exec($curl);
 
-        $datas = json_decode($response)->data;
+        // curl_close($curl);
+
+        // $datas = json_decode($response)->data;
 
         $id_vehicle = '';
 
-        for ($i=0; $i < count($datas); $i++) { 
-            if ($datas[$i]->licensePlate == $driver_task->plat_no) {
-                $id_vehicle = $datas[$i]->id;
-            }
-        }
+        // for ($i=0; $i < count($datas); $i++) { 
+        //     if ($datas[$i]->licensePlate == $driver_task->plat_no) {
+        //         $id_vehicle = $datas[$i]->id;
+        //     }
+        // }
 
         $ada_data = 'Tidak';
 
         $data_vehicle = null;
         $data_vehicle_fuel = null;
 
-        if ($id_vehicle != '') {
-            $curl = curl_init();
+        // if ($id_vehicle != '') {
+        //     $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'',
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-                CURLOPT_HTTPHEADER => array(
-                    'Accept: application/json',
-                    'Content-Type: application/x-www-form-urlencoded',
-                    'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
-                ),
-            ));
-            $response = curl_exec($curl);
+        //     curl_setopt_array($curl, array(
+        //         CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'',
+        //         CURLOPT_SSL_VERIFYHOST => false,
+        //         CURLOPT_SSL_VERIFYPEER => false,
+        //         CURLOPT_RETURNTRANSFER => true,
+        //         CURLOPT_ENCODING => '',
+        //         CURLOPT_MAXREDIRS => 10,
+        //         CURLOPT_TIMEOUT => 0,
+        //         CURLOPT_FOLLOWLOCATION => true,
+        //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //         CURLOPT_CUSTOMREQUEST => 'GET',
+        //         CURLOPT_HTTPHEADER => array(
+        //             'Accept: application/json',
+        //             'Content-Type: application/x-www-form-urlencoded',
+        //             'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+        //         ),
+        //     ));
+        //     $response = curl_exec($curl);
 
-            curl_close($curl);
+        //     curl_close($curl);
 
-            $data_vehicle = json_decode($response)->data;
+        //     $data_vehicle = json_decode($response)->data;
 
-            $curl = curl_init();
+        //     $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'/status',
-                CURLOPT_SSL_VERIFYHOST => false,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-                CURLOPT_HTTPHEADER => array(
-                    'Accept: application/json',
-                    'Content-Type: application/x-www-form-urlencoded',
-                    'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
-                ),
-            ));
-            $response = curl_exec($curl);
+        //     curl_setopt_array($curl, array(
+        //         CURLOPT_URL => 'https://vsms-v2-public.mceasy.com/v1/vehicles/'.$id_vehicle.'/status',
+        //         CURLOPT_SSL_VERIFYHOST => false,
+        //         CURLOPT_SSL_VERIFYPEER => false,
+        //         CURLOPT_RETURNTRANSFER => true,
+        //         CURLOPT_ENCODING => '',
+        //         CURLOPT_MAXREDIRS => 10,
+        //         CURLOPT_TIMEOUT => 0,
+        //         CURLOPT_FOLLOWLOCATION => true,
+        //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //         CURLOPT_CUSTOMREQUEST => 'GET',
+        //         CURLOPT_HTTPHEADER => array(
+        //             'Accept: application/json',
+        //             'Content-Type: application/x-www-form-urlencoded',
+        //             'Authorization: Bearer 64JivcpGchQSz2Hjb5Ze5yH1es6l49cY4esam51lyTB9d2jUdBbC8lj2sanbC68d04Na4w5a92AeQC6IQ2eu54b2S6IlaSe5mj8bu2QjFL8aRxe3Cd13eOZ51qzBeq3IEhEs861y235PO6VqK2Sbxzif33fhVJuRB1akQorjN4NeeYL5y1vITCElP6Odi2C148nZe44OV8q2G9zS65h1SlS89ru5N8JRj8f2B35F6hXDzpk4KhJOeS32LF41424e',
+        //         ),
+        //     ));
+        //     $response = curl_exec($curl);
 
-            curl_close($curl);
+        //     curl_close($curl);
 
-            $data_vehicle_fuel = json_decode($response)->data;
+        //     $data_vehicle_fuel = json_decode($response)->data;
 
-            // $ada_data = 'Ada';
-        }
+        //     // $ada_data = 'Ada';
+        // }
 
         $pertamax = DB::table('driver_gasoline_prices')->where('type','Pertamax')->first();
         $dex = DB::table('driver_gasoline_prices')->where('type','Dex')->first();
@@ -1113,6 +1117,7 @@ class GeneralAffairController extends Controller
                 'id' => $id,
                 'data_vehicle' => $data_vehicle,
                 'driver_task' => $driver_task,
+                'car' => $car,
                 'data_vehicle_fuel' => $data_vehicle_fuel,
                 'bbm' => $bbm,
                 'bbm2' => $bbm,
@@ -1824,5 +1829,175 @@ class GeneralAffairController extends Controller
             );
             return Response::json($response);
         }
+    }
+
+    function indexRequestFuel() {
+        $title = 'Permintaan Bahan Bakar';
+        $title_jp = '燃料のリクエスト';
+
+        $car = DB::table('driver_lists')
+        ->where('driver_id', Auth::user()->username)
+        ->first();
+        $pertamax = DB::table('driver_gasoline_prices')->where('type','Pertamax')->first();
+        $dex = DB::table('driver_gasoline_prices')->where('type','Dex')->first();
+
+        $bbm = [
+            'Pertamax_'.$pertamax->price,
+            'Pertamina Dex_'.$dex->price
+        ];
+        return view('general_affair.driver.index_request_fuel', [
+            'title' => $title,
+            'title_jp' => $title_jp,
+            'car' => $car,
+            'bbm' => $bbm
+        ]);
+    }
+
+    function inputRequestFuel(Request $request) {
+        try {
+            $odometer = $request->get('odometer');
+            $remaining_range = $request->get('remaining_range');
+            $fuel_location = $request->get('fuel_location');
+            $fuel_consumption = $request->get('fuel_consumption');
+            $fuel_capacity = $request->get('fuel_capacity');
+            $fuel_price_per_liter = $request->get('fuel_price_per_liter');
+            $fuel_type = $request->get('fuel_type');
+            $voucher_denomination = $request->get('voucher_denomination');
+            $voucher_count = $request->get('voucher_count');
+            $voucher_total = $request->get('voucher_total');
+            $voucher_difference = $request->get('voucher_difference');
+            $remaining_fuel_liter = $request->get('remaining_fuel_liter');
+            $fuel_to_buy_liter = $request->get('fuel_to_buy_liter');
+            $fuel_total_cost = $request->get('fuel_total_cost');
+            $latitude = $request->get('latitude');
+            $longitude = $request->get('longitude');
+            $driver_id = $request->get('driver_id');
+            $driver_name = $request->get('driver_name');
+            $date = $request->get('date');
+            $vehicle = $request->get('vehicle');
+            $plat_no = $request->get('plat_no');
+
+            $tujuan_upload = public_path('images/driver/request_fuel');
+
+            $fileDataOdoBefore = $request->file('fileDataOdoBefore');
+            $fileDataOdoBefore_file = $fileDataOdoBefore->getClientOriginalName();
+            $fileDataOdoBefore_ext = pathinfo($fileDataOdoBefore_file, PATHINFO_EXTENSION);
+
+            $fileDataOdoBefore_name = md5('fileDataOdoBefore' . date('YmdHis')) . '.' . $fileDataOdoBefore_ext;
+            $fileDataOdoBefore->move($tujuan_upload, $fileDataOdoBefore_name);
+
+            $path = public_path('images/driver/request_fuel').'/'.$fileDataOdoBefore_name;
+            $filebase64 = base64_encode(file_get_contents($path));
+
+            $input = DB::table('driver_fuel_requests')->insert([
+                'odometer' => $odometer,
+                'remaining_range' => $remaining_range,
+                'fuel_location' => $fuel_location,
+                'fuel_consumption' => $fuel_consumption,
+                'fuel_capacity' => $fuel_capacity,
+                'fuel_price_per_liter' => $fuel_price_per_liter,
+                'fuel_type' => $fuel_type,
+                'voucher_denomination' => $voucher_denomination,
+                'voucher_count' => $voucher_count,
+                'voucher_total' => $voucher_total,
+                'voucher_difference' => $voucher_difference,
+                'remaining_fuel_liter' => $remaining_fuel_liter,
+                'fuel_to_buy_liter' => $fuel_to_buy_liter,
+                'fuel_total_cost' => $fuel_total_cost,
+                'latitude' => $latitude,
+                'longitude' => $longitude,
+                'fileDataOdoBefore' => $fileDataOdoBefore_name,
+                'driver_id' => $driver_id,
+                'driver_name' => $driver_name,
+                'date' => $date,
+                'vehicle' => $vehicle,
+                'plat_no' => $plat_no,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            $fuelDetails = [
+                'Tanggal' => $date,
+                'Driver ID' => $driver_id,
+                'Nama Driver' => $driver_name,
+                'Kendaraan' => $vehicle,
+                'Nomor Polisi' => $plat_no,
+                'Odometer' => $odometer. ' Km',
+                'Sisa Jarak Tempuh' => $remaining_range . ' Km',
+                'Lokasi Pengisian' => $fuel_location,
+                'Konsumsi BBM' => $fuel_consumption . ' Km/Liter',
+                'Kapasitas BBM' => ROUND($fuel_capacity,2). ' Liter',
+                'Harga BBM' => 'Rp. ' . ROUND($fuel_price_per_liter,0). ' /Liter',
+                'Jenis BBM' => $fuel_type,
+                'Denominasi Voucher' => 'Rp. ' . $voucher_denomination,
+                'Jumlah Voucher' => "<b>" . $voucher_count . " Lembar</b>",
+                'Total Voucher' => "<b>Rp. " . $voucher_total . "</b>",
+                'Selisih Voucher' => 'Rp. ' . ROUND($voucher_difference,0),
+                'Sisa BBM' => "<b>" . ROUND($remaining_fuel_liter,2) . " Liter</b>",
+                'BBM yang Dibeli' => "<b>" . ROUND($fuel_to_buy_liter,2) . " Liter</b>",
+                'Total Biaya BBM' => "<b>Rp. " . ROUND($fuel_total_cost,0) . "</b>",
+                // 'Latitude (Derajat)' => $latitude,
+                // 'Longitude (Derajat)' => $longitude,
+            ];
+
+            $bodyHtml = '<!DOCTYPE html>';
+            $bodyHtml .= '<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+            $bodyHtml .= '<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Request Pengisian BBM</title></head>';
+            $bodyHtml .= '<body style="margin:0;padding:24px;background-color:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#334155;">';
+            $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:700px;margin:0 auto;background:#ffffff;border:1px solid #dbe3ee;border-collapse:collapse;">';
+            $bodyHtml .= '<tr><td style="padding:22px 28px;background:#3447a5;color:#ffffff;font-size:22px;font-weight:bold;">Request Pengisian BBM</td></tr>';
+            $bodyHtml .= '<tr><td style="padding:22px 28px 10px;font-size:14px;line-height:22px;">Terdapat request pengisian BBM dengan informasi sebagai berikut.</td></tr>';
+            $bodyHtml .= '<tr><td style="padding:0 28px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">';
+
+            foreach ($fuelDetails as $label => $value) {
+                // $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+                // $safeValue = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+                $safeLabel = $label;
+                $safeValue = $value;
+                $bodyHtml .= '<tr><th align="left" width="38%" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">' . $safeLabel . '</th>';
+                $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">' . $safeValue . '</td></tr>';
+            }
+
+            $fuelFileUrl = asset('images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name));
+            $safeFuelFileUrl = htmlspecialchars($fuelFileUrl, ENT_QUOTES, 'UTF-8');
+            $safeFuelFileName = htmlspecialchars($fileDataOdoBefore_name, ENT_QUOTES, 'UTF-8');
+            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Foto Odometer Sebelum</th>';
+            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><a href="' . $safeFuelFileUrl . '" style="color:#4056b5;text-decoration:underline;">Preview File (' . $safeFuelFileName . ')</a></td></tr>';
+            $driverControlUrl = 'http://10.109.52.4/mirai/public/index/ga_control/driver';
+            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Cek Penugasan Driver</th>';
+            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><a href="' . $driverControlUrl . '" style="color:#4056b5;text-decoration:underline;">Buka halaman penugasan driver</a></td></tr>';
+            $bodyHtml .= '</table></td></tr>';
+            $bodyHtml .= '<tr><td style="padding:0 28px 18px;font-size:13px;line-height:20px;color:#475569;">Data ini akan muncul maksimal 5 menit di tampilan MIRAI. Mohon ditunggu terlebih dahulu.</td></tr>';
+            $bodyHtml .= '<tr><td style="padding:14px 28px;border-top:1px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:11px;">Email ini dikirim otomatis.</td></tr>';
+            $bodyHtml .= '</table></body></html>';
+
+            Mail::html($bodyHtml, function ($message) {
+                $message->to('wachid.hasyim@music.yamaha.com');
+                $message->cc([
+                    'widura@music.yamaha.com',
+                    'maruli.sapta.adi@music.yamaha.com',
+                ]);
+                $message->bcc([
+                    'ympi-mis-ML@music.yamaha.com'
+                ]);
+                $message->subject('Request Pengisian BBM');
+            });
+
+            $response = array(
+                'status' => true,
+                'message' => 'Request fuel input successful'
+            );
+            return Response::json($response);
+        } catch (\Exception $e) {
+            $response = array(
+                'status' => false,
+                'message' => $e->getMessage().' Line '.$e->getLine()
+            );
+            return Response::json($response);
+        }
+    }
+
+    function indexRequestEMoney() {
+        return view('general_affair.driver.index_request_emoney');
     }
 }

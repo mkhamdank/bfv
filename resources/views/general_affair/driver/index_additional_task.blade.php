@@ -24,7 +24,18 @@
         z-index: 30001; align-items: center; justify-content: center;
     }
     #loading.show { display: flex !important; }
+    #loading_ocr {
+        display: none; position: fixed; inset: 0;
+        background: rgba(30,31,58,.42); backdrop-filter: blur(6px);
+        z-index: 30002; align-items: center; justify-content: center;
+    }
+    #loading_ocr.show { display: flex !important; }
     .loading-box {
+        background: #fff; border-radius: 20px; padding: 36px 52px;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 14px; box-shadow: 0 16px 48px rgba(0,0,0,.18);
+    }
+    .loading-box-ocr {
         background: #fff; border-radius: 20px; padding: 36px 52px;
         display: flex; flex-direction: column; align-items: center;
         gap: 14px; box-shadow: 0 16px 48px rgba(0,0,0,.18);
@@ -34,8 +45,16 @@
         border-top-color: #605ca8; border-radius: 50%;
         animation: spin .75s linear infinite;
     }
+    .loading-spinner-ocr {
+        width: 44px; height: 44px; border: 3px solid #ede9fe;
+        border-top-color: #605ca8; border-radius: 50%;
+        animation: spin .75s linear infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-box p { font-size: 13px; color: #718096; margin: 0; font-weight: 600; }
+    .loading-box-ocr p { font-size: 13px; color: #718096; margin: 0; font-weight: 600; }
+
+    
 
     /* ── PAGE HEADER ── */
     .page-header-modern {
@@ -266,6 +285,13 @@
     </div>
 </div>
 
+<div id="loading_ocr">
+    <div class="loading-box-ocr">
+        <div class="loading-spinner-ocr"></div>
+        <p>Membaca data dengan OCR...</p>
+    </div>
+</div>
+
 <div class="content-header" style="padding: 0 20px;">
 
     {{-- ── PAGE HEADER ── --}}
@@ -351,26 +377,6 @@
             <div class="stc-body" id="bodyEtoll">
                 {{-- Row 0 (default) --}}
                 <div class="entry-row" id="tr_etoll_0">
-                    <div class="entry-row-top">
-                        <div class="ff" style="margin:0;">
-                            <label>Dari</label>
-                            <input type="text" name="from_0" id="from_0" placeholder="Titik awal">
-                        </div>
-                        <div class="ff" style="margin:0;">
-                            <label>Ke</label>
-                            <input type="text" name="to_0" id="to_0" placeholder="Titik tujuan">
-                        </div>
-                        <div><!-- spacer for delete btn --></div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-                        <div class="ff" style="margin:0;">
-                            <label>Biaya (Rp) <span style="color:#dc2626;">*</span></label>
-                            <input type="text" name="etoll_0" id="etoll_0"
-                                   class="cost-input" placeholder="Nominal (min. 100)"
-                                   inputmode="numeric" pattern="[0-9]*">
-                        </div>
-                        <div style="padding-bottom:0;">&nbsp;</div>
-                    </div>
                     <div class="photo-upload-wrap">
                         <div class="photo-upload-label">
                             <i class="fas fa-camera"></i> Foto Bukti E-Toll
@@ -379,6 +385,29 @@
                         <input type="file" name="file_etoll_0" id="file_etoll_0"
                                accept="image/*" onchange="readURLEtoll(this, 0);">
                         <img id="blah_etoll_0" class="photo-preview-img" src="" alt="">
+                        <input type="hidden" name="json_etoll_0" id="json_etoll_0" value="">
+                    </div>
+                    <div id="div_etoll_0" style="display: none;">
+                        <div class="entry-row-top">
+                            <div class="ff" style="margin:0;">
+                                <label>Dari</label>
+                                <input type="text" name="from_0" id="from_0" placeholder="Titik awal">
+                            </div>
+                            <div class="ff" style="margin:0;">
+                                <label>Ke</label>
+                                <input type="text" name="to_0" id="to_0" placeholder="Titik tujuan">
+                            </div>
+                            <div><!-- spacer for delete btn --></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                            <div class="ff" style="margin:0;">
+                                <label>Biaya (Rp) <span style="color:#dc2626;">*</span></label>
+                                <input type="text" name="etoll_0" id="etoll_0"
+                                    class="cost-input" placeholder="Nominal (min. 100)"
+                                    inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <div style="padding-bottom:0;">&nbsp;</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -399,22 +428,6 @@
             <div class="stc-body" id="bodyParkingEmoney">
                 {{-- Row 0 (default) --}}
                 <div class="entry-row" id="tr_parking_emoney_0">
-                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-                        <div class="ff" style="margin:0;">
-                            <label>Lokasi Parkir (E-Money)</label>
-                            <input type="text" name="parking_emoney_at_0" id="parking_emoney_at_0" placeholder="Nama lokasi">
-                        </div>
-                        <div><!-- spacer --></div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-                        <div class="ff" style="margin:0;">
-                            <label>Biaya (E-Money) (Rp) <span style="color:#dc2626;">*</span></label>
-                            <input type="text" name="parking_emoney_0" id="parking_emoney_0"
-                                   class="cost-input" placeholder="Nominal (min. 100)"
-                                   inputmode="numeric" pattern="[0-9]*">
-                        </div>
-                        <div>&nbsp;</div>
-                    </div>
                     <div class="photo-upload-wrap">
                         <div class="photo-upload-label">
                             <i class="fas fa-camera"></i> Foto Bukti Parkir (E-Money)
@@ -423,6 +436,25 @@
                         <input type="file" name="file_parking_emoney_0" id="file_parking_emoney_0"
                                accept="image/*" onchange="readURLParkingEmoney(this, 0);">
                         <img id="blah_parking_emoney_0" class="photo-preview-img" src="" alt="">
+                        <input type="hidden" name="json_parking_emoney_0" id="json_parking_emoney_0" value="">
+                    </div>
+                    <div id="div_parking_emoney_0" style="display: none;">
+                        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                            <div class="ff" style="margin:0;">
+                                <label>Lokasi Parkir (E-Money)</label>
+                                <input type="text" name="parking_emoney_at_0" id="parking_emoney_at_0" placeholder="Nama lokasi">
+                            </div>
+                            <div><!-- spacer --></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                            <div class="ff" style="margin:0;">
+                                <label>Biaya (E-Money) (Rp) <span style="color:#dc2626;">*</span></label>
+                                <input type="text" name="parking_emoney_0" id="parking_emoney_0"
+                                    class="cost-input" placeholder="Nominal (min. 100)"
+                                    inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <div>&nbsp;</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -443,22 +475,6 @@
             <div class="stc-body" id="bodyParking">
                 {{-- Row 0 (default) --}}
                 <div class="entry-row" id="tr_parking_0">
-                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-                        <div class="ff" style="margin:0;">
-                            <label>Lokasi Parkir (Tunai)</label>
-                            <input type="text" name="parking_at_0" id="parking_at_0" placeholder="Nama lokasi">
-                        </div>
-                        <div><!-- spacer --></div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
-                        <div class="ff" style="margin:0;">
-                            <label>Biaya (Tunai) (Rp) <span style="color:#dc2626;">*</span></label>
-                            <input type="text" name="parking_0" id="parking_0"
-                                   class="cost-input" placeholder="Nominal (min. 100)"
-                                   inputmode="numeric" pattern="[0-9]*">
-                        </div>
-                        <div>&nbsp;</div>
-                    </div>
                     <div class="photo-upload-wrap">
                         <div class="photo-upload-label">
                             <i class="fas fa-camera"></i> Foto Bukti Parkir (Tunai)
@@ -467,6 +483,25 @@
                         <input type="file" name="file_parking_0" id="file_parking_0"
                                accept="image/*" onchange="readURLParking(this, 0);">
                         <img id="blah_parking_0" class="photo-preview-img" src="" alt="">
+                        <input type="hidden" name="json_parking_0" id="json_parking_0" value="">
+                    </div>
+                    <div id="div_parking_0" style="display: none;">
+                        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                            <div class="ff" style="margin:0;">
+                                <label>Lokasi Parkir (Tunai)</label>
+                                <input type="text" name="parking_at_0" id="parking_at_0" placeholder="Nama lokasi">
+                            </div>
+                            <div><!-- spacer --></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">
+                            <div class="ff" style="margin:0;">
+                                <label>Biaya (Tunai) (Rp) <span style="color:#dc2626;">*</span></label>
+                                <input type="text" name="parking_0" id="parking_0"
+                                    class="cost-input" placeholder="Nominal (min. 100)"
+                                    inputmode="numeric" pattern="[0-9]*">
+                            </div>
+                            <div>&nbsp;</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -541,9 +576,160 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
-    function readURLEtoll(input, id)   { compressImage(input, 'blah_etoll_'   + id); }
-    function readURLParking(input, id) { compressImage(input, 'blah_parking_' + id); }
-    function readURLParkingEmoney(input, id) { compressImage(input, 'blah_parking_emoney_' + id); }
+    function readURLEtoll(input, id)   { compressImage(input, 'blah_etoll_'   + id); ocrEtoll(input, id); }
+    function readURLParking(input, id) { compressImage(input, 'blah_parking_' + id); ocrParking(input, id); }
+    function readURLParkingEmoney(input, id) { compressImage(input, 'blah_parking_emoney_' + id); ocrParkingEmoney(input, id); }
+
+    function toggleOcrLoading(show) {
+        $('#loading_ocr').toggleClass('show', show);
+    }
+    
+    function ocrEtoll(input, id) {
+        var formData = new FormData();
+        formData.append('image', input.files[0]);
+        toggleOcrLoading(true);
+
+        $.ajax({
+            url: '{{ url("/api/ocr/etoll") }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                renderOcrResult(response, id, 'etoll');
+            },
+            error: function() {
+                openErrorGritter('Error!', 'Gagal memproses OCR E-Toll');
+            },
+            complete: function() {
+                toggleOcrLoading(false);
+            }
+        });
+    }
+
+    function ocrParking(input, id) {
+        var formData = new FormData();
+        formData.append('image', input.files[0]);
+        toggleOcrLoading(true);
+
+        $.ajax({
+            url: '{{ url("/api/ocr/parking") }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                renderOcrResult(response, id, 'parking');
+            },
+            error: function() {
+                openErrorGritter('Error!', 'Gagal memproses OCR Parkir');
+            },
+            complete: function() {
+                toggleOcrLoading(false);
+            }
+        });
+    }
+
+    function ocrParkingEmoney(input, id) {
+        var formData = new FormData();
+        formData.append('image', input.files[0]);
+        toggleOcrLoading(true);
+
+        $.ajax({
+            url: '{{ url("/api/ocr/parking") }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                renderOcrResult(response, id, 'parking_emoney');
+            },
+            error: function() {
+                openErrorGritter('Error!', 'Gagal memproses OCR Parkir E-Money');
+            },
+            complete: function() {
+                toggleOcrLoading(false);
+            }
+        });
+    }
+
+    function renderOcrResult(response, id, type) {
+        if (type === 'etoll') {
+            var salah = 0;
+            var selectedDate = ($('#date').val() || '').toString().replace(/\//g, '-');
+            if (selectedDate) {
+                var dateParts = selectedDate.split('-');
+                if (dateParts.length === 3 && dateParts[0].length !== 4) {
+                    selectedDate = dateParts[2] + '-' + dateParts[1].padStart(2, '0') + '-' + dateParts[0].padStart(2, '0');
+                }
+            }
+            var transactions = Array.isArray(response.transactions) ? response.transactions : [];
+            var json_etoll = '';
+            if (transactions.length > 0) {
+                var firstTransaction = transactions[0] || {};
+                var lastTransaction = transactions[transactions.length - 1] || {};
+                var totalAmount = 0;
+
+                $.each(transactions, function(_, transaction) {
+                    var transactionDate = (transaction.tanggal_jam || '').toString().split(' ')[0];
+                    totalAmount += parseInt(transaction.amount || 0, 10) || 0;
+                    if (selectedDate && transactionDate != selectedDate) {
+                        salah++;
+                    }
+                    json_etoll += JSON.stringify(transaction);
+                });
+
+                if(salah > 0) {
+                    openErrorGritter('Error!', 'Tanggal pada transaksi tidak sesuai dengan tanggal ' + selectedDate);
+                    return false;
+                }
+
+                if (firstTransaction.lokasi) {
+                    $('#from_' + id).val(firstTransaction.asal);
+                    $('#from_' + id).prop('readonly', true);
+                }
+
+                if (lastTransaction.lokasi) {
+                    $('#to_' + id).val(lastTransaction.lokasi);
+                    $('#to_' + id).prop('readonly', true);
+                }
+
+                if (totalAmount > 0) {
+                    $('#etoll_' + id).val(totalAmount);
+                    $('#etoll_' + id).prop('readonly', true);
+                }
+            }
+            $('#json_etoll_' + id).val(json_etoll);
+
+            $('#div_etoll_' + id).show();
+        } else if (type === 'parking') {
+            var json_parking = '';
+            if (response.location) {
+                $('#parking_at_' + id).val(response.location);
+            }
+
+            if (response.amount) {
+                $('#parking_' + id).val(parseInt(response.amount, 10) || 0);
+                $('#parking_' + id).prop('readonly', true);
+                json_parking += JSON.stringify(response);
+            }
+            $('#json_parking_' + id).val(json_parking);
+            $('#div_parking_' + id).show();
+        } else if (type === 'parking_emoney') {
+            var json_parking_emoney = '';
+            if (response.location) {
+                $('#parking_emoney_at_' + id).val(response.location);
+            }
+
+            if (response.amount) {
+                $('#parking_emoney_' + id).val(parseInt(response.amount, 10) || 0);
+                $('#parking_emoney_' + id).prop('readonly', true);
+                json_parking_emoney += JSON.stringify(response);
+            }
+            $('#json_parking_emoney_' + id).val(json_parking_emoney);
+            $('#div_parking_emoney_' + id).show();
+        }
+    }
 
     /* ── Counters ── */
     var count_etoll   = 1;
@@ -554,17 +740,24 @@
     function addEtoll() {
         var i = count_etoll;
         var html = '<div class="entry-row" id="tr_etoll_' + i + '">';
+        html += '<div class="photo-upload-wrap">';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">';
+        html += '<div class="photo-upload-label" style="margin-bottom:0;"><i class="fas fa-camera"></i> Foto Bukti E-Toll <span style="color:#dc2626;">*</span></div>';
+        html += '<button class="btn-remove" style="margin-right: 3px;" type="button" onclick="removeEtoll(' + i + ')"><i class="fas fa-trash"></i></button>';
+        html += '</div>';
+        html += '<input type="file" name="file_etoll_' + i + '" id="file_etoll_' + i + '" accept="image/*" onchange="readURLEtoll(this,' + i + ');">';
+        html += '<img id="blah_etoll_' + i + '" class="photo-preview-img" src="" alt="">';
+        html += '<input type="hidden" name="json_etoll_' + i + '" id="json_etoll_' + i + '" value="">';
+        html += '</div>';
+        html += '<div id="div_etoll_' + i + '" style="display: none;">';
         html += '<div class="entry-row-top">';
         html += '<div class="ff" style="margin:0;"><label>Dari</label><input type="text" name="from_' + i + '" id="from_' + i + '" placeholder="Titik awal"></div>';
         html += '<div class="ff" style="margin:0;"><label>Ke</label><input type="text" name="to_' + i + '" id="to_' + i + '" placeholder="Titik tujuan"></div>';
-        html += '<button class="btn-remove" style="align-self:flex-end;" onclick="removeEtoll(' + i + ')"><i class="fas fa-trash"></i></button>';
         html += '</div>';
         html += '<div class="ff" style="margin:0;"><label>Biaya (Rp) <span style="color:#dc2626;">*</span></label><input type="text" name="etoll_' + i + '" id="etoll_' + i + '" class="cost-input" placeholder="Nominal (min. 100)" inputmode="numeric" pattern="[0-9]*"></div>';
-        html += '<div class="photo-upload-wrap">';
-        html += '<div class="photo-upload-label"><i class="fas fa-camera"></i> Foto Bukti E-Toll <span style="color:#dc2626;">*</span></div>';
-        html += '<input type="file" name="file_etoll_' + i + '" id="file_etoll_' + i + '" accept="image/*" onchange="readURLEtoll(this,' + i + ');">';
-        html += '<img id="blah_etoll_' + i + '" class="photo-preview-img" src="" alt="">';
-        html += '</div></div>';
+        html += '</div>';
+        html += '</div>';
+        
         $('#bodyEtoll').append(html);
         count_etoll++;
     }
@@ -575,16 +768,22 @@
     function addParking() {
         var i = count_parking;
         var html = '<div class="entry-row" id="tr_parking_' + i + '">';
-        html += '<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">';
-        html += '<div class="ff" style="margin:0;"><label>Lokasi Parkir</label><input type="text" name="parking_at_' + i + '" id="parking_at_' + i + '" placeholder="Nama lokasi"></div>';
-        html += '<button class="btn-remove" style="align-self:flex-end;" onclick="removeParking(' + i + ')"><i class="fas fa-trash"></i></button>';
-        html += '</div>';
-        html += '<div class="ff" style="margin:0;"><label>Biaya (Rp) <span style="color:#dc2626;">*</span></label><input type="text" name="parking_' + i + '" id="parking_' + i + '" class="cost-input" placeholder="Nominal (min. 100)" inputmode="numeric" pattern="[0-9]*"></div>';
         html += '<div class="photo-upload-wrap">';
-        html += '<div class="photo-upload-label"><i class="fas fa-camera"></i> Foto Bukti Parkir <span style="color:#dc2626;">*</span></div>';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">';
+        html += '<div class="photo-upload-label" style="margin-bottom:0;"><i class="fas fa-camera"></i> Foto Bukti Parkir <span style="color:#dc2626;">*</span></div>';
+        html += '<button class="btn-remove" style="margin-right: 3px;" type="button" onclick="removeParking(' + i + ')"><i class="fas fa-trash"></i></button>';
+        html += '</div>';
         html += '<input type="file" name="file_parking_' + i + '" id="file_parking_' + i + '" accept="image/*" onchange="readURLParking(this,' + i + ');">';
         html += '<img id="blah_parking_' + i + '" class="photo-preview-img" src="" alt="">';
-        html += '</div></div>';
+        html += '<input type="hidden" name="json_parking_' + i + '" id="json_parking_' + i + '" value="">';
+        html += '</div>';
+        html += '<div id="div_parking_' + i + '" style="display: none;">';
+        html += '<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">';
+        html += '<div class="ff" style="margin:0;"><label>Lokasi Parkir</label><input type="text" name="parking_at_' + i + '" id="parking_at_' + i + '" placeholder="Nama lokasi"></div>';
+        html += '</div>';
+        html += '<div class="ff" style="margin:0;"><label>Biaya (Rp) <span style="color:#dc2626;">*</span></label><input type="text" name="parking_' + i + '" id="parking_' + i + '" class="cost-input" placeholder="Nominal (min. 100)" inputmode="numeric" pattern="[0-9]*"></div>';
+        html += '</div>';
+        html += '</div>';
         $('#bodyParking').append(html);
         count_parking++;
     }
@@ -595,16 +794,22 @@
     function addParkingEmoney() {
         var i = count_parking_emoney;
         var html = '<div class="entry-row" id="tr_parking_emoney_' + i + '">';
-        html += '<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">';
-        html += '<div class="ff" style="margin:0;"><label>Lokasi Parkir</label><input type="text" name="parking_emoney_at_' + i + '" id="parking_emoney_at_' + i + '" placeholder="Nama lokasi"></div>';
-        html += '<button class="btn-remove" style="align-self:flex-end;" onclick="removeParkingEmoney(' + i + ')"><i class="fas fa-trash"></i></button>';
-        html += '</div>';
-        html += '<div class="ff" style="margin:0;"><label>Biaya (Rp) <span style="color:#dc2626;">*</span></label><input type="text" name="parking_emoney_' + i + '" id="parking_emoney_' + i + '" class="cost-input" placeholder="Nominal (min. 100)" inputmode="numeric" pattern="[0-9]*"></div>';
         html += '<div class="photo-upload-wrap">';
-        html += '<div class="photo-upload-label"><i class="fas fa-camera"></i> Foto Bukti Parkir <span style="color:#dc2626;">*</span></div>';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">';
+        html += '<div class="photo-upload-label" style="margin-bottom:0;"><i class="fas fa-camera"></i> Foto Bukti Parkir <span style="color:#dc2626;">*</span></div>';
+        html += '<button class="btn-remove" style="margin-right: 3px;" type="button" onclick="removeParkingEmoney(' + i + ')"><i class="fas fa-trash"></i></button>';
+        html += '</div>';
         html += '<input type="file" name="file_parking_emoney_' + i + '" id="file_parking_emoney_' + i + '" accept="image/*" onchange="readURLParkingEmoney(this,' + i + ');">';
         html += '<img id="blah_parking_emoney_' + i + '" class="photo-preview-img" src="" alt="">';
-        html += '</div></div>';
+        html += '<input type="hidden" name="json_parking_emoney_' + i + '" id="json_parking_emoney_' + i + '" value="">';
+        html += '</div>';
+        html += '<div id="div_parking_emoney_' + i + '" style="display: none;">';
+        html += '<div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end;">';
+        html += '<div class="ff" style="margin:0;"><label>Lokasi Parkir</label><input type="text" name="parking_emoney_at_' + i + '" id="parking_emoney_at_' + i + '" placeholder="Nama lokasi"></div>';
+        html += '</div>';
+        html += '<div class="ff" style="margin:0;"><label>Biaya (Rp) <span style="color:#dc2626;">*</span></label><input type="text" name="parking_emoney_' + i + '" id="parking_emoney_' + i + '" class="cost-input" placeholder="Nominal (min. 100)" inputmode="numeric" pattern="[0-9]*"></div>';
+        html += '</div>';
+        html += '</div>';
         $('#bodyParkingEmoney').append(html);
         count_parking_emoney++;
     }
@@ -616,160 +821,11 @@
     var parking_arr = [], parking_at = [];
     var file_etoll = [], file_parking = [];
     var parking_emoney_arr = [], parking_emoney_at = [];
+    var json_etoll = [];
+    var json_parking = [];
+    var json_parking_emoney = [];
     var file_parking_emoney = [];
 
-    // function submitDriver() {
-    //     $('#loading').addClass('show');
-
-    //     etoll = []; etoll_from = []; etoll_to = [];
-    //     parking_arr = []; parking_at = [];
-    //     file_etoll = []; file_parking = [];
-    //     parking_emoney_arr = []; parking_emoney_at = [];
-    //     file_parking_emoney = [];
-    //     var all_sudah = 0;
-
-    //     /* validate & collect E-Toll */
-    //     for (var i = 0; i < count_etoll; i++) {
-    //         var val = $('#etoll_' + i).val();
-    //         var hasFile = $('#file_etoll_' + i).prop('files')[0] != undefined;
-            
-    //         if (val != '' && val != undefined && val != 'undefined') {
-    //             var v = parseInt(val);
-    //             if (isNaN(v) || v < 100) {
-    //                 $('#loading').removeClass('show');
-    //                 openErrorGritter('Error!', 'E-Toll harus berupa nominal harga minimal 3 digit');
-    //                 return false;
-    //             }
-    //             if (!hasFile) {
-    //                 $('#loading').removeClass('show');
-    //                 openErrorGritter('Error!', 'Isikan Foto Bukti E-Toll');
-    //                 return false;
-    //             }
-    //             etoll.push(v);
-    //             etoll_from.push($('#from_' + i).val());
-    //             etoll_to.push($('#to_' + i).val());
-    //             file_etoll.push($('#blah_etoll_' + i).attr('src'));
-    //         } else if (hasFile && (val == '' || val == undefined || val == 'undefined')) {
-    //             $('#loading').removeClass('show');
-    //             openErrorGritter('Error!', 'Isikan Nominal E-Toll');
-    //             return false;
-    //         }
-    //     }
-
-    //     /* validate & collect Parkir */
-    //     for (var i = 0; i < count_parking; i++) {
-    //         var val = $('#parking_' + i).val();
-    //         if (val != '' && val != undefined && val != 'undefined') {
-    //             var v = parseInt(val);
-    //             if (isNaN(v) || v < 100) {
-    //                 $('#loading').removeClass('show');
-    //                 openErrorGritter('Error!', 'Parkir harus berupa nominal harga minimal 3 digit');
-    //                 return false;
-    //             }
-    //             if ($('#file_parking_' + i).prop('files')[0] == undefined) {
-    //                 $('#loading').removeClass('show');
-    //                 openErrorGritter('Error!', 'Isikan Foto Bukti Parkir');
-    //                 return false;
-    //             }
-    //             parking_arr.push(v);
-    //             parking_at.push($('#parking_at_' + i).val());
-    //             file_parking.push($('#blah_parking_' + i).attr('src'));
-    //         }
-    //     }
-
-    //     /* validate & collect Parkir Emoney */
-    //     for (var i = 0; i < count_parking_emoney; i++) {
-    //         var val = $('#parking_emoney_' + i).val();
-    //         if (val != '' && val != undefined && val != 'undefined') {
-    //             var v = parseInt(val);
-    //             if (isNaN(v) || v < 100) {
-    //                 $('#loading').removeClass('show');
-    //                 openErrorGritter('Error!', 'Parkir Emoney harus berupa nominal harga minimal 3 digit');
-    //                 return false;
-    //             }
-    //             if ($('#file_parking_emoney_' + i).prop('files')[0] == undefined) {
-    //                 $('#loading').removeClass('show');
-    //                 openErrorGritter('Error!', 'Isikan Foto Bukti Parkir Emoney');
-    //                 return false;
-    //             }
-    //             parking_emoney_arr.push(v);
-    //             parking_emoney_at.push($('#parking_emoney_at_' + i).val());
-    //             file_parking_emoney.push($('#blah_parking_emoney_' + i).attr('src'));
-    //         }
-    //     }
-
-    //     var total = etoll.length + parking_arr.length + parking_emoney_arr.length;
-
-    //     function onSaved() {
-    //         all_sudah++;
-    //         if (all_sudah == total) {
-    //             $('#div_driver_3').show();
-    //             $('#div_driver_2').hide();
-    //             $('#div_driver_1').hide();
-    //             $('#loading').removeClass('show');
-    //             openSuccessGritter('Sukses', 'Data berhasil dikirim (データの入力に成功しました)');
-    //         }
-    //     }
-
-    //     if (total === 0) {
-    //         var data = { id: $('#id').val(), task_id: $('#task_id').val() };
-    //         $.post('{{ url("input/additional/driver/job") }}', data, function (result) {
-    //             if (result.status) {
-    //                 $('#div_driver_3').show();
-    //                 $('#div_driver_2').hide();
-    //                 $('#div_driver_1').hide();
-    //                 $('#loading').removeClass('show');
-    //                 openSuccessGritter('Sukses', 'Data berhasil dikirim');
-    //             } else {
-    //                 openErrorGritter('Error!', result.message);
-    //                 $('#loading').removeClass('show');
-    //             }
-    //         });
-    //         // return;
-    //     }
-
-    //     /* save E-Toll */
-    //     for (var i = 0; i < etoll.length; i++) {
-    //         (function (idx) {
-    //             $.post('{{ url("input/additional/driver/job/etoll") }}', {
-    //                 id: $('#id').val(), task_id: $('#task_id').val(),
-    //                 etoll: etoll[idx], etoll_from: etoll_from[idx],
-    //                 etoll_to: etoll_to[idx], file_etoll: file_etoll[idx], index: idx
-    //             }, function (result) {
-    //                 if (result.status) { onSaved(); }
-    //                 else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
-    //             });
-    //         })(i);
-    //     }
-
-    //     /* save Parkir */
-    //     for (var i = 0; i < parking_arr.length; i++) {
-    //         (function (idx) {
-    //             $.post('{{ url("input/additional/driver/job/parking") }}', {
-    //                 id: $('#id').val(), task_id: $('#task_id').val(),
-    //                 parking: parking_arr[idx], parking_at: parking_at[idx],
-    //                 file_parking: file_parking[idx], index: idx
-    //             }, function (result) {
-    //                 if (result.status) { onSaved(); }
-    //                 else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
-    //             });
-    //         })(i);
-    //     }
-
-    //     /* save Parkir Emoney */
-    //     for (var i = 0; i < parking_emoney_arr.length; i++) {
-    //         (function (idx) {
-    //             $.post('{{ url("input/additional/driver/job/parking_emoney") }}', {
-    //                 id: $('#id').val(), task_id: $('#task_id').val(),
-    //                 parking_emoney: parking_emoney_arr[idx], parking_at_emoney: parking_emoney_at[idx],
-    //                 file_parking_emoney: file_parking_emoney[idx], index: idx
-    //             }, function (result) {
-    //                 if (result.status) { onSaved(); }
-    //                 else { openErrorGritter('Error!', result.message); $('#loading').removeClass('show'); }
-    //             });
-    //         })(i);
-    //     }
-    // }
 
     async function submitDriver() {
 
@@ -788,6 +844,10 @@
         file_etoll = [];
         file_parking = [];
         file_parking_emoney = [];
+
+        json_etoll = [];
+        json_parking = [];
+        json_parking_emoney = [];
 
         /* ==========================
         VALIDASI ETOLL
@@ -817,6 +877,13 @@
                 etoll_from.push($('#from_' + i).val());
                 etoll_to.push($('#to_' + i).val());
                 file_etoll.push($('#blah_etoll_' + i).attr('src'));
+                json_etoll.push($('#json_etoll_' + i).val());
+
+                if($('#from_' + i).val() == '' || $('#to_' + i).val() == ''){
+                    $('#loading').removeClass('show');
+                    openErrorGritter('Error!', 'Isikan Lokasi Awal dan Akhir E-Toll');
+                    return false;
+                }
             }
             else if (hasFile) {
                 $('#loading').removeClass('show');
@@ -851,6 +918,13 @@
                 parking_arr.push(v);
                 parking_at.push($('#parking_at_' + i).val());
                 file_parking.push($('#blah_parking_' + i).attr('src'));
+                json_parking.push($('#json_parking_' + i).val());
+
+                if($('#parking_at_' + i).val() == ''){
+                    $('#loading').removeClass('show');
+                    openErrorGritter('Error!', 'Isikan Lokasi Parkir');
+                    return false;
+                }
             }
         }
 
@@ -880,6 +954,13 @@
                 parking_emoney_arr.push(v);
                 parking_emoney_at.push($('#parking_emoney_at_' + i).val());
                 file_parking_emoney.push($('#blah_parking_emoney_' + i).attr('src'));
+                json_parking_emoney.push($('#json_parking_emoney_' + i).val());
+
+                if($('#parking_emoney_at_' + i).val() == ''){
+                    $('#loading').removeClass('show');
+                    openErrorGritter('Error!', 'Isikan Lokasi Parkir E-Money');
+                    return false;
+                }
             }
         }
 
@@ -900,6 +981,7 @@
                         etoll_from: etoll_from[idx],
                         etoll_to: etoll_to[idx],
                         file_etoll: file_etoll[idx],
+                        json_etoll: json_etoll[idx],
                         index: idx
                     }
                 });
@@ -923,6 +1005,7 @@
                         parking: parking_arr[idx],
                         parking_at: parking_at[idx],
                         file_parking: file_parking[idx],
+                        json_parking: json_parking[idx],
                         index: idx
                     }
                 });
@@ -946,6 +1029,7 @@
                         parking_emoney: parking_emoney_arr[idx],
                         parking_at_emoney: parking_emoney_at[idx],
                         file_parking_emoney: file_parking_emoney[idx],
+                        json_parking_emoney: json_parking_emoney[idx],
                         index: idx
                     }
                 });
