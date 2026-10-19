@@ -178,6 +178,69 @@
         transform: translateX(4px);
         color: #605ca8;
     }
+    .driver-menu-dropdown {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fafbff;
+        transition: all .2s ease;
+    }
+    .driver-menu-dropdown[open] {
+        border-color: #605ca8;
+        box-shadow: 0 4px 14px rgba(96,92,168,.12);
+    }
+    .driver-menu-dropdown summary {
+        list-style: none;
+    }
+    .driver-menu-dropdown summary::-webkit-details-marker { display: none; }
+    .driver-menu-dropdown summary .btn-arrow {
+        transition: transform .2s ease, color .2s ease;
+    }
+    .driver-menu-dropdown[open] summary .btn-arrow {
+        transform: rotate(90deg);
+        color: #605ca8;
+    }
+    .driver-menu-submenu {
+        padding: 10px 12px 12px;
+        display: grid;
+        gap: 10px;
+        border-top: 1px solid #edf0f7;
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9ff 100%);
+    }
+    .driver-menu-subitem {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #475569;
+        background: #fff;
+        border: 1px solid #edf2f7;
+        transition: all .2s ease;
+    }
+    .driver-menu-subitem i {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #ede9fe;
+        color: #7c3aed;
+        flex-shrink: 0;
+    }
+    .driver-menu-subitem span {
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .driver-menu-subitem:hover {
+        background: #f3f0ff;
+        border-color: #d8d3f7;
+        color: #4a4690;
+        text-decoration: none;
+        transform: translateX(2px);
+    }
 </style>
 @stop
 
@@ -214,6 +277,29 @@
                 </div>
                 <i class="fas fa-chevron-right btn-arrow"></i>
             </a>
+
+            <details class="driver-menu-dropdown">
+                <summary class="driver-menu-btn">
+                    <div class="btn-icon purple">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div class="btn-content">
+                        <span class="btn-title">Permintaan Tugas</span>
+                        <span class="btn-desc">Ajukan kebutuhan tugas driver dengan cepat</span>
+                    </div>
+                    <i class="fas fa-chevron-right btn-arrow"></i>
+                </summary>
+                <div class="driver-menu-submenu">
+                    <a href="{{url('index/driver/request/fuel')}}" class="driver-menu-subitem">
+                        <i class="fas fa-gas-pump"></i>
+                        <span>Pengisian BBM</span>
+                    </a>
+                    {{-- <a href="{{url('index/driver/request/e-money')}}" class="driver-menu-subitem">
+                        <i class="fas fa-wallet"></i>
+                        <span>Pengisian E-Money</span>
+                    </a> --}}
+                </div>
+            </details>
 
             {{-- Rekam Kehadiran --}}
             <a href="{{ url('index/driver/attendance/report') }}" class="driver-menu-btn">
