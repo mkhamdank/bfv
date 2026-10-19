@@ -1972,6 +1972,7 @@ class GeneralAffairController extends Controller
             $bodyHtml .= '</table></body></html>';
 
             Mail::html($bodyHtml, function ($message) {
+                $message->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia');
                 $message->to('wachid.hasyim@music.yamaha.com');
                 $message->cc([
                     'widura@music.yamaha.com',
