@@ -1448,7 +1448,7 @@ class GeneralController extends Controller
 
             $ch = curl_init();
 
-            curl_setopt($ch, CURLOPT_URL, 'http://10.109.33.34/bfv/public/api/ocr/etoll');
+            curl_setopt($ch, CURLOPT_URL, 'https://new.bridgeforvendor.com/public/api/ocr/etoll');
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_TIMEOUT, 120);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1523,7 +1523,7 @@ class GeneralController extends Controller
 
             $ch = curl_init();
 
-            curl_setopt($ch, CURLOPT_URL, 'http://10.109.33.34/bfv/public/api/ocr/parking');
+            curl_setopt($ch, CURLOPT_URL, 'https://new.bridgeforvendor.com/public/api/ocr/parking');
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_TIMEOUT, 120);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
