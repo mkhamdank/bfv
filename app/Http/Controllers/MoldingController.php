@@ -38,6 +38,118 @@ class MoldingController extends Controller
         return view('molding.index_list');
     }
 
+    public function indexMoldingMasterPart()
+    {
+        $masterParts = DB::table('molding_diagnose_molding_masters')
+            ->select(
+                'id',
+                'item_ng as item_diagnosa',
+                'daerah_ng as area',
+                'item_check as jenis_ng',
+                'grouping'
+            )
+            ->orderBy('grouping')
+            ->orderBy('item_ng')
+            ->orderBy('daerah_ng')
+            ->get();
+
+        $groupings = DB::table('molding_diagnose_molding_masters')
+            ->whereNotNull('grouping')
+            ->where('grouping', '<>', '')
+            ->distinct()
+            ->orderBy('grouping')
+            ->pluck('grouping');
+
+        return view('molding.index_master_part', compact('masterParts', 'groupings'));
+    }
+
+    public function storeMoldingMasterPart(Request $request)
+    {
+        $data = $request->validate([
+            'item_diagnosa' => ['required', 'string', 'max:255'],
+            'area' => ['required', 'string', 'max:255'],
+            'jenis_ng' => ['required', 'string', 'max:255'],
+            'grouping' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        DB::table('molding_diagnose_molding_masters')->insert([
+            'item_ng' => $data['item_diagnosa'],
+            'daerah_ng' => $data['area'],
+            'item_check' => $data['jenis_ng'],
+            'grouping' => $data['grouping'] ?? null,
+        ]);
+
+        return redirect()->route('user.molding_master_part')->with('success', 'Master part molding berhasil ditambahkan.');
+    }
+
+    public function updateMoldingMasterPart(Request $request, $id)
+    {
+        $data = $request->validate([
+            'item_diagnosa' => ['required', 'string', 'max:255'],
+            'area' => ['required', 'string', 'max:255'],
+            'jenis_ng' => ['required', 'string', 'max:255'],
+            'grouping' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        DB::table('molding_diagnose_molding_masters')->where('id', $id)->update([
+            'item_ng' => $data['item_diagnosa'],
+            'daerah_ng' => $data['area'],
+            'item_check' => $data['jenis_ng'],
+            'grouping' => $data['grouping'] ?? null,
+        ]);
+
+        return redirect()->route('user.molding_master_part')->with('success', 'Master part molding berhasil diperbarui.');
+    }
+
+    public function updateAllMoldingMasterParts(Request $request)
+    {
+        $data = $request->validate([
+            'parts' => ['required', 'array', 'min:1'],
+            'parts.*.item_diagnosa' => ['required', 'string', 'max:255'],
+            'parts.*.area' => ['nullable', 'string', 'max:255'],
+            'parts.*.jenis_ng' => ['nullable', 'string', 'max:255'],
+            'parts.*.grouping' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        try {
+            DB::transaction(function () use ($data) {
+                foreach ($data['parts'] as $id => $part) {
+                    DB::table('molding_diagnose_molding_masters')->where('id', $id)->update([
+                        'item_ng' => $part['item_diagnosa'],
+                        'daerah_ng' => $part['area'] ?? '',
+                        'item_check' => $part['jenis_ng'] ?? '',
+                        'grouping' => $part['grouping'] ?? null,
+                    ]);
+                }
+            });
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return redirect()->back()->withInput()->withErrors(
+                'Gagal menyimpan perubahan master part. Silakan coba kembali.'
+            );
+        }
+
+        return redirect()->route('user.molding_master_part')->with('success', 'Semua master part berhasil diperbarui.');
+    }
+
+    public function deleteMoldingMasterPart($id)
+    {
+        $hasDiagnoses = DB::table('molding_diagnose_molding_details')
+            ->where('ng_id', $id)
+            ->exists();
+
+        if ($hasDiagnoses) {
+            return redirect()->route('user.molding_master_part')->withErrors(
+                'Master part sudah digunakan pada data diagnosa dan tidak dapat dihapus.'
+            );
+        }
+
+        DB::table('molding_diagnose_molding_masters')->where('id', $id)->delete();
+
+        return redirect()->route('user.molding_master_part')->with('success', 'Master part molding berhasil dihapus.');
+    }
+
     function fetchMoldingDiagnoseList(Request $request) {
         $master_molding = DB::table('molding_diagnose_masters')
         ->select('id', 'fixed_asset_number', 'fixed_asset_name', 'vendor', 'standard_shot', 'total_shot', 'status', 'status_kawasan');
@@ -1043,6 +1155,23 @@ class MoldingController extends Controller
         return url('workshop/molding/reports/' . $fileName);
     }
 
+    private function getOrCreateMoldingReportPdfUrl($formNumber)
+    {
+        $safeFormNumber = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $formNumber);
+        if ($safeFormNumber === '') {
+            throw new \InvalidArgumentException('Nomor form tidak valid.');
+        }
+
+        $fileName = 'Laporan_Diagnosa_Molding_' . $safeFormNumber . '.pdf';
+        $filePath = public_path('workshop/molding/reports/' . $fileName);
+
+        if (!is_file($filePath)) {
+            return $this->storeMoldingReportPdf($formNumber);
+        }
+
+        return url('workshop/molding/reports/' . $fileName);
+    }
+
     function MoldProductReport($form_number) {
         // -------------------- PRODUCT NG -------------
         // $ngs = DB::table('molding_diagnose_product_ngs')
@@ -1546,7 +1675,7 @@ class MoldingController extends Controller
                 'approval' => $app
             ];
 
-            $data['report_pdf'] = $this->generateMoldingReportPdf($form_number);
+            $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
     
             Mail::to($next_approver)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
     
@@ -1632,6 +1761,8 @@ class MoldingController extends Controller
                     'comment' => $request->comment
                 ];
 
+                $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
+
                 $next_approver = ['yoga.karunia.perdana@music.yamaha.com', 'arief.asmo.saputro@music.yamaha.com'];
         
                 Mail::to($next_approver)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
@@ -1687,6 +1818,8 @@ class MoldingController extends Controller
                 'approval' => $reject->approver_name,
                 'comment' => $request->comment
             ];
+
+            $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
     
             Mail::to($next_approver)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
     
@@ -1726,7 +1859,9 @@ class MoldingController extends Controller
                 ]);
             }
 
-            $delivery = DB::transaction(function () use ($form_number, $data_form_molding) {
+            $reportPdfUrl = $this->getOrCreateMoldingReportPdfUrl($form_number);
+
+            $delivery = DB::transaction(function () use ($form_number, $data_form_molding, $reportPdfUrl) {
                 $get_app_pos = DB::table('molding_diagnose_approvers')
                     ->where('form_number', $form_number)
                     ->whereIn('status', ['Holded', 'Hold'])
@@ -1769,6 +1904,7 @@ class MoldingController extends Controller
                 $data = [
                     'data_form_molding' => $data_form_molding,
                     'status' => 'approval_' . $get_app_pos->ordering,
+                    'report_pdf_url' => $reportPdfUrl,
                 ];
 
                 Mail::to($get_app_pos->approver_email)
@@ -1792,7 +1928,7 @@ class MoldingController extends Controller
                 'status' => true,
                 'message' => $delivery['is_held']
                     ? 'Email dikirim ulang ke ' . $delivery['approver_name'] . '. Status form kembali ke Approval.'
-                    : 'Email approval berhasil dikirim.',
+                    : 'Email approval berhasil dikirim ke ' . $delivery['approver_name'] . '.',
             ]);
         } catch (\Exception $e) {
             return response()->json([

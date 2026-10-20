@@ -2754,14 +2754,23 @@
                 var approverStatus = String(approver.status || '').toLowerCase();
                 return approverStatus === 'hold' || approverStatus === 'holded';
             });
+            var outstandingApprover = scheduleOutstandingApprover(row);
             var canGeneratePdf = status !== 'approval' && status !== 'approved';
             var actions = '';
+
+            if ((status === 'open' || status === 'approval') && outstandingApprover) {
+                actions += '<button type="button" class="form-list-btn green" title="Approver: ' +
+                    escapeScheduleForm(outstandingApprover.name) + '" onclick="sendPeriodicMoldingEmail(' + index +
+                    ', this)"><i class="fas fa-envelope"></i> Kirim Email</button>';
+            }
 
             if (canGeneratePdf) {
                 actions += '<button type="button" class="form-list-btn green" onclick="savePeriodicMoldingPdf(' + index +
                     ', this)"><i class="far fa-file-pdf"></i> Simpan PDF</button>';
             } else {
-                actions += '<button type="button" class="form-list-btn green" disabled>Sudah diproses</button>';
+                if (status === 'approved') {
+                    actions += '<button type="button" class="form-list-btn green" disabled>Sudah diproses</button>';
+                }
             }
 
             if ((status === 'hold' || status === 'holded') && heldApprover) {
@@ -2770,6 +2779,13 @@
             }
 
             return '<div class="form-list-actions" style="justify-content:center;">' + actions + '</div>';
+        }
+
+        function scheduleOutstandingApprover(row) {
+            return (row.approvals || []).find(function(approver) {
+                var status = String(approver.status || '').toLowerCase();
+                return status !== 'approved' && status !== 'hold' && status !== 'holded' && status !== 'rejected';
+            });
         }
 
         function savePeriodicMoldingPdf(index, button) {
@@ -2812,21 +2828,20 @@
                 var approverStatus = String(approver.status || '').toLowerCase();
                 return approverStatus === 'hold' || approverStatus === 'holded';
             });
-            if (isHeld && !heldApprover) {
-                openErrorGritter('Error', 'Approver dengan status Hold tidak ditemukan.');
+            var outstandingApprover = scheduleOutstandingApprover(row);
+            var recipient = isHeld ? heldApprover : outstandingApprover;
+            if (!recipient) {
+                openErrorGritter('Error', 'Approver outstanding tidak ditemukan. Muat ulang daftar form.');
                 return;
             }
-            var confirmMessage = isHeld
-                ? 'Kirim ulang email approval ke ' + heldApprover.name + ' untuk form ' + row.form_number + '?'
-                : 'Kirim email approval untuk form ' + row.form_number + '?';
+            var confirmMessage = (isHeld ? 'Kirim ulang email approval ke ' : 'Kirim email approval ke ') +
+                recipient.name + ' untuk form ' + row.form_number + '?';
             if (!window.confirm(confirmMessage)) {
                 return;
             }
             var $button = $(button).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Mengirim...');
             $.ajax({
-                url: isHeld
-                    ? '{{ url("resend/diagnose_molding/molding_form") }}'
-                    : '{{ url("save_and_send/diagnose_molding/molding_form") }}',
+                url: '{{ url("resend/diagnose_molding/molding_form") }}',
                 type: 'GET',
                 data: { formNumber: row.form_number },
                 success: function(response) {

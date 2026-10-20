@@ -300,7 +300,7 @@
             </a>
 
             {{-- Riwayat Kerusakan --}}
-            <a href="{{ route('user.molding_trouble') }}" class="mol-menu-btn">
+            <a href="{{ route('user.molding_master_part') }}" class="mol-menu-btn">
                 <div class="btn-icon red">
                     <i class="fas fa-hand-holding-medical"></i>
                 </div>
