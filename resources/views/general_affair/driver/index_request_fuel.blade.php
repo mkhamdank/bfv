@@ -850,6 +850,38 @@
 
         <div class="sec-card">
 
+            <div class="sec-card-header"><span class="dot dot-green"></span> Foto Odometer yang Menampilkan Sisa Jarak</div>
+
+            <div class="sec-card-body">
+
+                <div class="photo-card">
+
+                    <span class="photo-label">
+
+                        <i class="fas fa-tachometer-alt"></i>
+
+                        Foto Odometer &amp; Indikator Sebelum Pengisian <span class="req">*</span>
+
+                    </span>
+
+                    <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore" accept="image/*"
+
+                        capture="environment" required>
+
+                    <div class="photo-preview" id="previewOdoBefore">
+
+                        <img id="blahOdoBefore" src="" alt="Preview odometer sebelum pengisian">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="sec-card">
+
             <div class="sec-card-header"><span class="dot dot-yellow"></span> Parameter &amp; Perhitungan BBM</div>
 
             <div class="sec-card-body">
@@ -1045,7 +1077,7 @@
 
         </div>
 
-        <div class="sec-card">
+        {{-- <div class="sec-card">
 
             <div class="sec-card-header"><span class="dot dot-blue"></span> Lokasi GPS</div>
 
@@ -1063,45 +1095,15 @@
 
             </div>
 
-        </div>
+        </div> --}}
 
-        <div class="sec-card">
-
-            <div class="sec-card-header"><span class="dot dot-green"></span> Foto Dokumentasi</div>
-
-            <div class="sec-card-body">
-
-                <div class="photo-card">
-
-                    <span class="photo-label">
-
-                        <i class="fas fa-tachometer-alt"></i>
-
-                        Foto Odometer &amp; Indikator Sebelum Pengisian <span class="req">*</span>
-
-                    </span>
-
-                    <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore" accept="image/*"
-
-                        capture="environment" required>
-
-                    <div class="photo-preview" id="previewOdoBefore">
-
-                        <img id="blahOdoBefore" src="" alt="Preview odometer sebelum pengisian">
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
+        
 
         <div style="margin-bottom:40px;">
 
             <button type="button" class="btn-submit" id="submitButton" onclick="submitDriver()">
 
-                <i class="fas fa-paper-plane"></i> Submit Request Fuel
+                <i class="fas fa-paper-plane"></i> Simpan Pengajuan BBM
 
             </button>
 
@@ -1717,7 +1719,7 @@
 
                 $('#locText').text('Lokasi diperoleh: ' + lat.toFixed(5) + ', ' + lng.toFixed(5));
 
-                initMap(lat, lng);
+                // initMap(lat, lng);
 
             }, function() {
 

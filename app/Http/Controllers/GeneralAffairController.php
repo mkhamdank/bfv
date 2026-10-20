@@ -1832,8 +1832,8 @@ class GeneralAffairController extends Controller
     }
 
     function indexRequestFuel() {
-        $title = 'Permintaan Bahan Bakar';
-        $title_jp = '燃料のリクエスト';
+        $title = 'Permintaan Pengisian BBM';
+        $title_jp = '燃料の補充リクエスト';
 
         $car = DB::table('driver_lists')
         ->where('driver_id', Auth::user()->username)
@@ -1916,6 +1916,20 @@ class GeneralAffairController extends Controller
                 'updated_at' => date('Y-m-d H:i:s'),
             ]);
 
+            $cars = DB::SELECT("SELECT
+            plat_no,
+            lower(car) as cars,
+            fuel_capacity,
+            fuel_consumption
+            FROM
+            driver_lists
+            WHERE
+            fuel_capacity IS NOT NULL
+            ORDER BY
+            lower(car)");
+
+            $isHiaceVehicle = preg_match('/hiace|hi-ace|hi ace/i', $vehicle);
+
             $fuelDetails = [
                 'Tanggal' => $date,
                 'Driver ID' => $driver_id,
@@ -1923,21 +1937,19 @@ class GeneralAffairController extends Controller
                 'Kendaraan' => $vehicle,
                 'Nomor Polisi' => $plat_no,
                 'Odometer' => $odometer. ' Km',
-                'Sisa Jarak Tempuh' => $remaining_range . ' Km',
+                'Sisa Jarak Tempuh' => '<span style="color:#dc2626;font-weight:bold;">' . $remaining_range . ' Km</span>',
                 'Lokasi Pengisian' => $fuel_location,
                 'Konsumsi BBM' => $fuel_consumption . ' Km/Liter',
                 'Kapasitas BBM' => ROUND($fuel_capacity,2). ' Liter',
                 'Harga BBM' => 'Rp. ' . ROUND($fuel_price_per_liter,0). ' /Liter',
                 'Jenis BBM' => $fuel_type,
                 'Denominasi Voucher' => 'Rp. ' . $voucher_denomination,
-                'Jumlah Voucher' => "<b>" . $voucher_count . " Lembar</b>",
-                'Total Voucher' => "<b>Rp. " . $voucher_total . "</b>",
+                'Jumlah Voucher' => '<span style="color:#dc2626;font-weight:bold;">' . $voucher_count . ' Lembar</span>',
+                'Total Voucher' => '<span style="color:#dc2626;font-weight:bold;">Rp. ' . $voucher_total . '</span>',
                 'Selisih Voucher' => 'Rp. ' . ROUND($voucher_difference,0),
                 'Sisa BBM' => "<b>" . ROUND($remaining_fuel_liter,2) . " Liter</b>",
                 'BBM yang Dibeli' => "<b>" . ROUND($fuel_to_buy_liter,2) . " Liter</b>",
                 'Total Biaya BBM' => "<b>Rp. " . ROUND($fuel_total_cost,0) . "</b>",
-                // 'Latitude (Derajat)' => $latitude,
-                // 'Longitude (Derajat)' => $longitude,
             ];
 
             $bodyHtml = '<!DOCTYPE html>';
@@ -1950,6 +1962,20 @@ class GeneralAffairController extends Controller
             $bodyHtml .= '<tr><td style="padding:0 28px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">';
 
             foreach ($fuelDetails as $label => $value) {
+                if ($label == 'Sisa Jarak Tempuh') {
+                    $fuelFileUrl = asset('images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name));
+                    // $fuelFileUrl = 'http://new.bridgeforvendor.com/images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name);
+                    $safeFuelFileUrl = htmlspecialchars($fuelFileUrl, ENT_QUOTES, 'UTF-8');
+                    $safeFuelFileName = htmlspecialchars($fileDataOdoBefore_name, ENT_QUOTES, 'UTF-8');
+                    $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Foto Odometer Sebelum</th>';
+                    $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><div style="margin-bottom:8px;"><img src="' . $safeFuelFileUrl . '" alt="Foto Odometer Sebelum" style="max-width:100%;width:320px;height:auto;border:1px solid #cbd5e1;border-radius:4px;display:block;"></div><div><a href="' . $safeFuelFileUrl . '" style="color:#4056b5;text-decoration:underline;">Preview File (' . $safeFuelFileName . ')</a></div></td></tr>';
+                    if ($isHiaceVehicle) {
+                        $hiaceImageUrl = htmlspecialchars(asset('images/Hiace.png'), ENT_QUOTES, 'UTF-8');
+                        // $hiaceImageUrl = 'http://new.bridgeforvendor.com/images/Hiace.png';
+                        $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Panduan Pengecekan Hiace</th>';
+                        $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><img src="' . $hiaceImageUrl . '" alt="Panduan Pengecekan Hiace" style="max-width:100%;width:320px;height:auto;border:1px solid #cbd5e1;border-radius:4px;display:block;"></td></tr>';
+                    }
+                }
                 // $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
                 // $safeValue = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
                 $safeLabel = $label;
@@ -1957,16 +1983,31 @@ class GeneralAffairController extends Controller
                 $bodyHtml .= '<tr><th align="left" width="38%" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">' . $safeLabel . '</th>';
                 $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">' . $safeValue . '</td></tr>';
             }
-
-            $fuelFileUrl = asset('images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name));
-            $safeFuelFileUrl = htmlspecialchars($fuelFileUrl, ENT_QUOTES, 'UTF-8');
-            $safeFuelFileName = htmlspecialchars($fileDataOdoBefore_name, ENT_QUOTES, 'UTF-8');
-            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Foto Odometer Sebelum</th>';
-            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><a href="' . $safeFuelFileUrl . '" style="color:#4056b5;text-decoration:underline;">Preview File (' . $safeFuelFileName . ')</a></td></tr>';
             $driverControlUrl = 'http://10.109.52.4/mirai/public/index/ga_control/driver';
             $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Cek Penugasan Driver</th>';
             $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><a href="' . $driverControlUrl . '" style="color:#4056b5;text-decoration:underline;">Buka halaman penugasan driver</a></td></tr>';
+
+            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Data Kendaraan</th>';
+            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">';
+            $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">';
+            $bodyHtml .= '<tr><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Nomor Polisi</th><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Kendaraan</th><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Kapasitas BBM</th><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Konsumsi BBM</th></tr>';
+
+            if (!empty($cars)) {
+                foreach ($cars as $carData) {
+                    $carPlatNo = htmlspecialchars($carData->plat_no ?? '', ENT_QUOTES, 'UTF-8');
+                    $carName = ucwords(strtolower($carData->cars ?? ''));
+                    $carFuelCapacity = isset($carData->fuel_capacity) ? round((float) $carData->fuel_capacity, 2) . ' Liter' : '-';
+                    $carFuelConsumption = isset($carData->fuel_consumption) ? round((float) $carData->fuel_consumption, 2) . ' Km/Liter' : '-';
+                    $bodyHtml .= '<tr><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carPlatNo . '</td><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carName . '</td><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carFuelCapacity . '</td><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carFuelConsumption . '</td></tr>';
+                }
+            } else {
+                $bodyHtml .= '<tr><td colspan="4" style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">Tidak ada data kendaraan.</td></tr>';
+            }
+
+            $bodyHtml .= '</table>';
+            $bodyHtml .= '</td></tr>';
             $bodyHtml .= '</table></td></tr>';
+
             $bodyHtml .= '<tr><td style="padding:0 28px 18px;font-size:13px;line-height:20px;color:#475569;">Data ini akan muncul maksimal 5 menit di tampilan MIRAI. Mohon ditunggu terlebih dahulu.</td></tr>';
             $bodyHtml .= '<tr><td style="padding:14px 28px;border-top:1px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:11px;">Email ini dikirim otomatis.</td></tr>';
             $bodyHtml .= '</table></body></html>';
