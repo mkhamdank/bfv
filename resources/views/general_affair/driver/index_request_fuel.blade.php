@@ -8,11 +8,7 @@
 
     <link href="{{ url('css/jquery.gritter.css') }}" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-
-        integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="">
-
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
 
         rel="stylesheet">
 
@@ -462,56 +458,6 @@
 
         }
 
-        #map {
-
-            width: 100%;
-
-            height: 280px;
-
-            border-radius: 12px;
-
-            border: 1.5px solid #e2e8f0;
-
-            z-index: 1;
-
-        }
-
-        .location-status {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            margin-top: 10px;
-
-            font-size: 12px;
-
-            color: #718096;
-
-        }
-
-        .loc-dot {
-
-            width: 8px;
-
-            height: 8px;
-
-            border-radius: 50%;
-
-            background: #a0aec0;
-
-        }
-
-        .loc-dot.got {
-
-            background: #22c55e;
-
-            box-shadow: 0 0 6px rgba(34, 197, 94, .5);
-
-        }
-
         .photo-card {
 
             border: 1.5px dashed #c4bfef;
@@ -734,6 +680,120 @@
 
         }
 
+        .ui-accordion-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin:8px 0;border:1px solid #cbd5e1;border-radius:10px;background:#f8fafc;color:#1e293b;font-weight:700;font-size:13px;text-align:left;cursor:pointer}
+
+        .ui-accordion-toggle .accordion-chevron{transition:transform .2s ease;flex-shrink:0}
+
+        .ui-accordion-toggle[aria-expanded="true"] .accordion-chevron{transform:rotate(180deg)}
+
+        .ui-accordion-panel{display:none;padding-top:8px}
+
+        .ui-accordion-panel.is-open{display:block}
+
+        .photo-preview{display:none}
+
+        .photo-preview\.is-open{display:block}
+
+        .required-field input:not([type=file]),.required-field select,#fileDataOdoBefore{border:2px solid #2563eb!important;background:#eff6ff!important;border-radius:8px!important}
+
+        .readonly-field input{background:#e5e7eb!important;border:1px solid #9ca3af!important;color:#374151!important}
+
+        @media(max-width:767px){
+
+            .page-header-modern{padding:10px 12px!important;margin-bottom:10px!important}
+
+            .page-header-modern h1{font-size:18px!important;margin:0!important}
+
+            .sec-card{margin-bottom:10px!important;border-radius:10px!important}
+
+            .sec-card-header{padding:9px 12px!important;font-size:13px!important}
+
+            .sec-card-body{padding:10px!important}
+
+            .g2{gap:8px!important}
+
+            .ff{margin-bottom:9px!important}
+
+            .ff label{font-size:12px!important;margin-bottom:4px!important}
+
+            .hint{font-size:10px!important;line-height:1.25!important}
+
+            .ui-accordion-toggle{padding:8px 10px;margin:5px 0;font-size:12px}
+
+            .result-grid{gap:7px!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
+
+            .result-item{padding:8px!important}
+
+            .result-item .result-value{font-size:14px!important}
+
+            .btn-submit{padding:11px!important;margin-top:4px!important}
+
+        }
+
+
+
+        /* Tampilan ringkas khusus mobile */
+
+        .photo-preview\.is-open { display:block !important; }
+
+        .photo-preview:not(.is-open) { display:none !important; }
+
+        @media (max-width:767px) {
+
+            .content-header { padding:0 8px!important; }
+
+            .page-header-modern { padding:9px 11px!important; margin:7px 0 9px!important; border-radius:9px!important; gap:7px!important; }
+
+            .badge-tag { font-size:9px!important; padding:3px 7px!important; margin-bottom:4px!important; }
+
+            .header-left h1 { font-size:16px!important; line-height:1.2!important; }
+
+            .header-left p { font-size:10px!important; }
+
+            .btn-header-back { padding:7px 9px!important; font-size:11px!important; }
+
+            .sec-card { margin-bottom:8px!important; border-radius:9px!important; }
+
+            .sec-card-header { padding:7px 10px!important; font-size:12px!important; }
+
+            .sec-card-body { padding:8px!important; }
+
+            .vehicle-info-grid,.g2 { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:6px 8px!important; }
+
+            .ff { gap:3px!important; margin-bottom:5px!important; }
+
+            .ff label { font-size:10px!important; letter-spacing:0!important; }
+
+            .ff input,.ff select { min-height:34px!important; padding:6px 8px!important; font-size:12px!important; }
+
+            .hint { font-size:9px!important; line-height:1.2!important; }
+
+            .photo-card { padding:8px!important; margin-bottom:7px!important; }
+
+            .photo-label { font-size:10px!important; margin-bottom:5px!important; }
+
+            .photo-card input[type=file] { padding:5px!important; font-size:11px!important; }
+
+            .ui-accordion-toggle { padding:7px 8px!important; margin:4px 0!important; font-size:11px!important; }
+
+            .result-grid { grid-template-columns:repeat(2,minmax(0,1fr))!important; gap:6px!important; }
+
+            .result-item { padding:7px!important; }
+
+            .result-item .result-label { font-size:9px!important; margin-bottom:3px!important; }
+
+            .result-item .result-value { font-size:13px!important; }
+
+            .result-item small { font-size:9px!important; }
+
+            .calculation-note { padding:7px!important; font-size:10px!important; margin-top:7px!important; }
+
+            .btn-submit { padding:10px!important; font-size:13px!important; }
+
+            .photo-preview img { max-height:160px!important; }
+
+        }
+
     </style>
 
 @endsection
@@ -783,6 +843,10 @@
             <div class="sec-card-header"><span class="dot dot-purple"></span> Informasi Kendaraan</div>
 
             <div class="sec-card-body">
+                <button type="button" class="ui-accordion-toggle" id="vehicleInfoToggle" aria-expanded="false" aria-controls="vehicleInfoPanel" onclick="toggleFuelAccordion(this, 'vehicleInfoPanel')">
+                    <span><i class="fas fa-car"></i> Lihat Informasi Kendaraan</span><i class="fas fa-chevron-down accordion-chevron"></i>
+                </button>
+                <div id="vehicleInfoPanel" class="ui-accordion-panel">
 
                 <div class="vehicle-info-grid">
 
@@ -843,6 +907,7 @@
                     </div>
 
                 </div>
+                </div>
 
             </div>
 
@@ -850,7 +915,7 @@
 
         <div class="sec-card">
 
-            <div class="sec-card-header"><span class="dot dot-green"></span> Foto Odometer yang Menampilkan Sisa Jarak</div>
+            <div class="sec-card-header"><span class="dot dot-yellow"></span> Parameter &amp; Perhitungan BBM</div>
 
             <div class="sec-card-body">
 
@@ -868,6 +933,12 @@
 
                         capture="environment" required>
 
+                    <button type="button" class="ui-accordion-toggle" id="photoPreviewToggle" aria-expanded="false" aria-controls="previewOdoBefore" style="display:none" onclick="toggleFuelAccordion(this, 'previewOdoBefore')">
+
+                        <span><i class="fas fa-image"></i> Lihat Preview Foto</span><i class="fas fa-chevron-down accordion-chevron"></i>
+
+                    </button>
+
                     <div class="photo-preview" id="previewOdoBefore">
 
                         <img id="blahOdoBefore" src="" alt="Preview odometer sebelum pengisian">
@@ -876,19 +947,9 @@
 
                 </div>
 
-            </div>
-
-        </div>
-
-        <div class="sec-card">
-
-            <div class="sec-card-header"><span class="dot dot-yellow"></span> Parameter &amp; Perhitungan BBM</div>
-
-            <div class="sec-card-body">
-
                 <div class="g2">
 
-                    <div class="ff">
+                    <div class="ff required-field">
 
                         <label for="odometer">Odometer Saat Ini (KM) <span class="req">*</span></label>
 
@@ -900,9 +961,9 @@
 
                     </div>
 
-                    <div class="ff">
+                    <div class="ff required-field">
 
-                        <label for="remainingRange">Range Tersisa di Odometer (KM) <span class="req">*</span></label>
+                        <label for="remainingRange">Sisa Jarak Odo (KM) <span class="req">*</span></label>
 
                         <input type="text" readonly style="background: white;" class="numpad" id="remainingRange"
 
@@ -912,11 +973,21 @@
 
                         @if(str_contains(strtolower($car->car), 'hiace') || str_contains(strtolower($car->car), 'hi-ace') || str_contains(strtolower($car->car), 'hi ace'))
 
-                        <div id="remainingRangeGuidance" style="margin-bottom: 10px;">
+                        <button type="button" class="ui-accordion-toggle" aria-expanded="false" aria-controls="remainingRangeGuidancePanel" onclick="toggleFuelAccordion(this, 'remainingRangeGuidancePanel')">
 
-                            <span class="hint">Untuk <b>Hiace</b>, gunakan indikator jarak tersisa dari odometer dengan panduan seperti di bawah ini.</span>
+                            <span><i class="fas fa-book-open"></i> Lihat Panduan HiAce</span><i class="fas fa-chevron-down accordion-chevron"></i>
 
-                            <img src="{{ asset('images/Hiace.png') }}" alt="Panduan Jarak Tersisa Hiace" style="max-width: 100%; height: auto;">
+                        </button>
+
+                        <div id="remainingRangeGuidancePanel" class="ui-accordion-panel">
+
+                            <div id="remainingRangeGuidance" style="margin-bottom:10px;">
+
+                                <span class="hint">Untuk <b>Hiace</b>, gunakan indikator jarak tersisa dari odometer dengan panduan seperti di bawah ini.</span>
+
+                                <img src="{{ asset('images/Hiace.png') }}" alt="Panduan Jarak Tersisa Hiace" style="max-width:100%;height:auto;">
+
+                            </div>
 
                         </div>
 
@@ -926,7 +997,7 @@
 
                 </div>
 
-                <div class="ff">
+                <div class="ff required-field">
 
                     <label for="fuelLocation">Lokasi Pengisian BBM</label>
 
@@ -944,7 +1015,7 @@
 
                 </div>
 
-                <div class="ff">
+                <div class="ff required-field">
 
                     <label for="fuelPrice">Harga BBM per Liter (Rp)</label>
 
@@ -958,9 +1029,9 @@
 
                                 $parts = explode('_', $bbmOption);
 
-                                $type = $parts[0];
+                                $type = $parts[0] ?? '';
 
-                                $price = $parts[1];
+                                $price = $parts[1] ?? 0;
 
                             @endphp
 
@@ -989,6 +1060,14 @@
                     <span class="hint">Default Rp100.000 per voucher.</span>
 
                 </div>
+
+                <button type="button" class="ui-accordion-toggle" aria-expanded="false" aria-controls="fuelCalculationPanel" onclick="toggleFuelAccordion(this, 'fuelCalculationPanel')">
+
+                    <span><i class="fas fa-calculator"></i> Lihat Hasil Perhitungan BBM</span><i class="fas fa-chevron-down accordion-chevron"></i>
+
+                </button>
+
+                <div id="fuelCalculationPanel" class="ui-accordion-panel">
 
                 <div class="result-grid" aria-live="polite">
 
@@ -1042,14 +1121,13 @@
 
                     </div>
 
-                    <div class="result-item voucher-related" style="display: none;">
+                    <div class="result-item voucher-related">
 
                         <span class="result-label">Sisa Nilai Voucher</span>
 
                         <span class="result-value" id="voucherDifferenceResult">-</span>
 
                         <small>Total voucher − estimasi biaya</small>
-                        <small>Abaikan jika negatif, supaya tidak ada voucher yang tersisa.</small>
 
                     </div>
 
@@ -1058,6 +1136,8 @@
                 <div class="calculation-note" id="calculationNote">
 
                     Masukkan odometer dan range tersisa untuk menghitung kebutuhan BBM secara otomatis.
+
+                </div>
 
                 </div>
 
@@ -1077,33 +1157,11 @@
 
         </div>
 
-        {{-- <div class="sec-card">
-
-            <div class="sec-card-header"><span class="dot dot-blue"></span> Lokasi GPS</div>
-
-            <div class="sec-card-body">
-
-                <div id="map"></div>
-
-                <div class="location-status">
-
-                    <div class="loc-dot" id="locDot"></div>
-
-                    <span id="locText">Mendapatkan lokasi...</span>
-
-                </div>
-
-            </div>
-
-        </div> --}}
-
-        
-
-        <div style="margin-bottom:40px;">
+<div style="margin-bottom:40px;">
 
             <button type="button" class="btn-submit" id="submitButton" onclick="submitDriver()">
 
-                <i class="fas fa-paper-plane"></i> Simpan Pengajuan BBM
+                <i class="fas fa-paper-plane"></i> Submit Request Fuel
 
             </button>
 
@@ -1119,11 +1177,35 @@
 
     <script src="{{ url('js/jquery.gritter.min.js') }}"></script>
 
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+<script>
 
-        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+        function toggleFuelAccordion(button, panelId) {
 
-    <script>
+            var panel = document.getElementById(panelId);
+
+            if (!panel) return;
+
+            var isOpen = button.getAttribute('aria-expanded') === 'true';
+
+            var shouldOpen = !isOpen;
+
+            button.setAttribute('aria-expanded', String(shouldOpen));
+
+            if (panelId === 'previewOdoBefore') {
+
+                panel.style.display = shouldOpen ? 'block' : 'none';
+
+                panel.classList.toggle('is-open', shouldOpen);
+
+            } else {
+
+                panel.classList.toggle('is-open', shouldOpen);
+
+                panel.style.display = shouldOpen ? 'block' : 'none';
+
+            }
+
+        }
 
         $.ajaxSetup({
 
@@ -1529,7 +1611,7 @@
 
                     'Periksa range, konsumsi BBM, kapasitas maks tangki, dan jenis BBM. Untuk lokasi yang menggunakan voucher, pastikan nominal voucher valid.'
 
-                    );
+                );
 
                 lastCalculation = null;
 
@@ -1665,41 +1747,11 @@
 
         }
 
-        function initMap(lat, lng) {
-
-            if (!map) {
-
-                map = L.map('map').setView([lat, lng], 15);
-
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-
-                    attribution: '&copy; OpenStreetMap contributors'
-
-                }).addTo(map);
-
-            } else {
-
-                map.setView([lat, lng], 15);
-
-            }
-
-            if (marker) map.removeLayer(marker);
-
-            marker = L.marker([lat, lng]).addTo(map).bindPopup('<b>Lokasi Anda</b>').openPopup();
-
-            setTimeout(function() {
-
-                map.invalidateSize();
-
-            }, 100);
-
-        }
-
         function getLocation() {
 
             if (!navigator.geolocation) {
 
-                $('#locText').text('Browser tidak mendukung geolokasi.');
+
 
                 return;
 
@@ -1717,13 +1769,11 @@
 
                 $('#locDot').addClass('got');
 
-                $('#locText').text('Lokasi diperoleh: ' + lat.toFixed(5) + ', ' + lng.toFixed(5));
 
-                // initMap(lat, lng);
 
             }, function() {
 
-                $('#locText').text('Gagal mendapatkan lokasi. Pastikan izin lokasi diaktifkan.');
+
 
             }, {
 
@@ -1783,7 +1833,7 @@
 
                     $('#' + imgId).attr('src', canvas.toDataURL('image/jpeg', 0.75));
 
-                    $('#' + previewId).show();
+                    $('#' + previewId).removeClass('is-open').hide();
 
                 };
 
@@ -1867,13 +1917,7 @@
 
             }
 
-            if (!$('#latitude').val() || !$('#longitude').val()) {
-
-                if (!confirm('Lokasi GPS belum tersedia. Tetap lanjutkan pengajuan?')) return;
-
-            }
-
-            const formData = new FormData();
+const formData = new FormData();
 
             formData.append('odometer', odometerValue);
 
@@ -1944,12 +1988,12 @@
                     if (response && (response.status === true || response.success === true)) {
 
                         alert(response.message || 'Permintaan BBM berhasil disimpan.');
-                        window.location.href = '{{ url("index/driver") }}';
 
-                        // if (response.redirect) {
+                        if (response.redirect) {
 
+                            window.location.href = response.redirect;
 
-                        // }
+                        }
 
                     } else {
 
@@ -1996,6 +2040,10 @@
             $('#fileDataOdoBefore').on('change', function() {
 
                 previewImage(this, 'blahOdoBefore', 'previewOdoBefore');
+
+                $('#previewOdoBefore').removeClass('is-open');
+
+                $('#photoPreviewToggle').attr('aria-expanded', 'false').toggle(!!(this.files && this.files.length));
 
             });
 
