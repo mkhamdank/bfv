@@ -674,6 +674,23 @@ Route::get('index/passenger/attendance', 'App\Http\Controllers\GeneralAffairCont
 Route::get('fetch/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@fetchPassengerAttendance');
 Route::post('input/passenger/attendance', 'App\Http\Controllers\GeneralAffairController@inputPassengerAttendance');
 
+Route::middleware(['auth', 'can:manage quotas'])
+    ->prefix('admin/api-quotas')
+    ->name('admin.api-quotas.')
+    ->controller(\App\Http\Controllers\QuotaAdminController::class)
+    ->group(function () {
+        Route::get('/policies', 'policies')->name('policies');
+        Route::post('/policies', 'storePolicy')->name('policies.store');
+        Route::put('/policies', 'updatePolicy')->name('policies.update');
+        Route::delete('/policies', 'deletePolicy')->name('policies.delete');
+        Route::get('/status', 'status')->name('status');
+        Route::get('/usage', 'usage')->name('usage');
+        Route::get('/summaries/daily', 'dailySummary')->name('summaries.daily');
+        Route::get('/summaries/employees', 'employeeSummary')->name('summaries.employees');
+        Route::get('/summaries/hourly', 'hourlyPattern')->name('summaries.hourly');
+        Route::get('/recent-calls', 'recentCalls')->name('recent-calls');
+    });
+
 // Form Diagnosa Molding
 Route::middleware('auth')->group(function () {
     Route::get('molding', function() { return view('molding.index_molding'); });

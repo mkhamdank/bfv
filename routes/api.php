@@ -20,5 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::post('ocr/etoll', [OCRController::class, 'extractEtoll'])->name('ocr.etoll');
+Route::post('ocr/etoll', [OCRController::class, 'extractEtoll'])
+    ->middleware('quota:ocr/etoll')
+    ->name('ocr.etoll');
 Route::post('ocr/parking', [OCRController::class, 'extractParking'])->name('ocr.parking');
