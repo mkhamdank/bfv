@@ -118,6 +118,27 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'quota' => [
+            'driver' => 'mysql',
+            'url' => env('DB_QUOTA_URL'),
+            'host' => env('DB_QUOTA_HOST', env('DB_HOST', '127.0.0.1')),
+            'port' => env('DB_QUOTA_PORT', env('DB_PORT', '3306')),
+            'database' => env('DB_QUOTA_DATABASE', env('DB_DATABASE', 'bfv')),
+            'username' => env('DB_QUOTA_USERNAME', env('DB_USERNAME', 'root')),
+            'password' => env('DB_QUOTA_PASSWORD', env('DB_PASSWORD', '')),
+            'unix_socket' => env('DB_QUOTA_SOCKET', env('DB_SOCKET', '')),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => 'InnoDB',
+            'timezone' => '+00:00',
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('DB_QUOTA_MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
     ],
 
     /*

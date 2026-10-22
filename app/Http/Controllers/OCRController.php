@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\GeminiService;
+use App\Services\QuotaService;
 use DateTimeImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,11 +44,13 @@ Return confidence as a number from 0 to 1 reflecting legibility. Return warnings
 Do not include markdown or explanatory text outside the JSON.
 PROMPT;
 
-    public function extractEtoll(Request $request, GeminiService $gemini): JsonResponse
+    public function extractEtoll(Request $request, GeminiService $gemini, QuotaService $quota): JsonResponse
     {
         $result = $this->extractImage($request, $gemini, self::ETOLL_PROMPT);
+        $normalized = $this->normalizeEtollResult($result);
+        $quota->recordUsage('ocr/etoll');
 
-        return response()->json($this->normalizeEtollResult($result));
+        return response()->json($normalized);
     }
 
     public function extractParking(Request $request, GeminiService $gemini): JsonResponse
