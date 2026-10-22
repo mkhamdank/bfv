@@ -963,7 +963,7 @@
 
                     <div class="ff required-field">
 
-                        <label for="remainingRange">Sisa Jarak Odo (KM) <span class="req">*</span></label>
+                        <label for="remainingRange">Sisa Jarak Tempuh (KM) <span class="req">*</span></label>
 
                         <input type="text" readonly style="background: white;" class="numpad" id="remainingRange"
 
