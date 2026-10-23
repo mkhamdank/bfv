@@ -18,8 +18,8 @@ class MoldingController extends Controller
     protected $approver = [
         ['no' => 1, 'approver_id' => 'PI1108003', 'approver_name' => 'Andik Yayan Setyawan', 'approver_email' => 'andik.yayan@music.yamaha.com'],
         ['no' => 2, 'approver_id' => 'PI1106001', 'approver_name' => 'Darma Bagus Prasetya', 'approver_email' => 'darma.bagus@music.yamaha.com'],
-        ['no' => 3, 'approver_id' => 'PI2307060', 'approver_name' => 'Seiya Sekino', 'approver_email' => 'seiya.sekino@music.yamaha.com'],
-        ['no' => 4, 'approver_id' => 'PI0703002', 'approver_name' => 'Susilo Basri Prasetyo', 'approver_email' => 'susilo.basri@music.yamaha.com'],
+        // ['no' => 3, 'approver_id' => 'PI2307060', 'approver_name' => 'Seiya Sekino', 'approver_email' => 'seiya.sekino@music.yamaha.com'],
+        // ['no' => 4, 'approver_id' => 'PI0703002', 'approver_name' => 'Susilo Basri Prasetyo', 'approver_email' => 'susilo.basri@music.yamaha.com'],
     ];
 
     protected $rank = [
