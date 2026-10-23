@@ -598,6 +598,7 @@
     <script src="{{ url('js/jquery.gritter.min.js') }}"></script>
 <script>
     var bbm = <?php echo json_encode($bbm); ?>;
+    var car = <?php echo json_encode($car); ?>;
         function toggleFuelAccordion(button, panelId) {
             var panel = document.getElementById(panelId);
             if (!panel) return;
@@ -783,12 +784,21 @@
             document.getElementById('fuelConsumption').value = fuelConsumption + ' km/liter';
             document.getElementById('fuelCapacity').value = fuelCapacity + ' liter';
             var type = '';
+            for (let i = 0; i < car.length; i++) {
+                const carOption = car[i];
+                if (carOption.plat_no === platNo) {
+                    type = carOption.fuelType || '';
+                    break;
+                }
+            }
             var price = 0;
             for (let i = 0; i < bbm.length; i++) {
                 const bbmOption = bbm[i];
                 const parts = bbmOption.split('_');
-                type = parts[0] || '';
-                price = parts[1] || 0;
+                if (parts[0] === type) {
+                    price = parts[1] || 0;
+                    break;
+                }
             }
             const isHiace = /hi\s*-?\s*ace/i.test(carName);
             document.getElementById('hiaceGuidanceWrapper').style.display = isHiace ? 'block' : 'none';
