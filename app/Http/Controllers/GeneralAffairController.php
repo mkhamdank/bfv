@@ -1835,9 +1835,13 @@ class GeneralAffairController extends Controller
         $title = 'Permintaan Pengisian BBM';
         $title_jp = '燃料の補充リクエスト';
 
-        $car = DB::table('driver_lists')
+        $driver = DB::table('driver_lists')
         ->where('driver_id', Auth::user()->username)
         ->first();
+        
+        $car = DB::table('driver_lists')
+        ->select('car','plat_no','fuel_capacity','fuel_consumption','fuel_type')
+        ->get();
         $pertamax = DB::table('driver_gasoline_prices')->where('type','Pertamax')->first();
         $dex = DB::table('driver_gasoline_prices')->where('type','Dex')->first();
 
@@ -1848,6 +1852,7 @@ class GeneralAffairController extends Controller
         return view('general_affair.driver.index_request_fuel', [
             'title' => $title,
             'title_jp' => $title_jp,
+            'driver' => $driver,
             'car' => $car,
             'bbm' => $bbm
         ]);
