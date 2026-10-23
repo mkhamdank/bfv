@@ -787,7 +787,7 @@
             for (let i = 0; i < car.length; i++) {
                 const carOption = car[i];
                 if (carOption.plat_no === platNo) {
-                    type = carOption.fuelType || '';
+                    type = carOption.fuel_type || '';
                     break;
                 }
             }
