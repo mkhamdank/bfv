@@ -979,11 +979,11 @@
                 $('#fuelLocation').focus();
                 return;
             }
-            if (!$('#fuelPrice').val()) {
-                alert('Jenis BBM wajib dipilih.');
-                $('#fuelPrice').focus();
-                return;
-            }
+            // if (!$('#fuelPrice').val()) {
+            //     alert('Jenis BBM wajib dipilih.');
+            //     $('#fuelPrice').focus();
+            //     return;
+            // }
             // Pastikan kalkulasi terbaru sesuai lokasi yang dipilih.
             calculateFuel();
             if (!lastCalculation) {
@@ -1000,7 +1000,7 @@ const formData = new FormData();
             formData.append('fuel_location', fuelLocation);
             formData.append('fuel_consumption', fuelConsumption);
             formData.append('fuel_capacity', fuelCapacity);
-            formData.append('fuel_price_per_liter', $('#fuelPrice').val());
+            formData.append('fuel_price_per_liter', $('#fuelPriceHidden').val());
             formData.append('fuel_type', $('#fuelTypeHidden').val());
             formData.append('voucher_denomination', isNoVoucher ? 0 : lastCalculation.voucher_denomination);
             formData.append('voucher_count', isNoVoucher ? 0 : lastCalculation.voucher_count);
