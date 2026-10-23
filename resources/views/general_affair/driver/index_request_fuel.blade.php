@@ -1020,9 +1020,7 @@ const formData = new FormData();
                     $('#submitButton').prop('disabled', false);
                     if (response && (response.status === true || response.success === true)) {
                         alert(response.message || 'Permintaan BBM berhasil disimpan.');
-                        if (response.redirect) {
-                            window.location.href = response.redirect;
-                        }
+                        window.location.href = '{{ url('index/driver') }}';
                     } else {
                         alert((response && response.message) ||
                             'Data belum dapat disimpan. Periksa respons server.');

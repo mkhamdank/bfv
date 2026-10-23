@@ -1951,7 +1951,7 @@ class GeneralAffairController extends Controller
                 'Denominasi Voucher' => 'Rp. ' . $voucher_denomination,
                 'Jumlah Voucher' => '<span style="color:#dc2626;font-weight:bold;">' . $voucher_count . ' Lembar</span>',
                 'Total Voucher' => '<span style="color:#dc2626;font-weight:bold;">Rp. ' . $voucher_total . '</span>',
-                'Selisih Voucher' => 'Rp. ' . ROUND($voucher_difference,0),
+                // 'Selisih Voucher' => 'Rp. ' . ROUND($voucher_difference,0),
                 'Sisa BBM' => "<b>" . ROUND($remaining_fuel_liter,2) . " Liter</b>",
                 'BBM yang Dibeli' => "<b>" . ROUND($fuel_to_buy_liter,2) . " Liter</b>",
                 'Total Biaya BBM' => "<b>Rp. " . ROUND($fuel_total_cost,0) . "</b>",

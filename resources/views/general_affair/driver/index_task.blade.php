@@ -1,24 +1,18 @@
 @extends('layouts.master')
-
 @section('title', 'VFI')
-
 @section('styles')
 <link href="{{ url("css/jquery.numpad.css") }}" rel="stylesheet">
 <link href="{{ url("css/jquery.gritter.css") }}" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-      integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <style>
     /* ── BASE ── */
     body { background: #f0f2f7 !important; }
-    body p, body span:not([class*="fa"]):not([class*="glyphicon"]):not([class*="leaflet"]):not([class*="select2"]),
-    body div:not([class*="leaflet"]), body label, body input, body select, body textarea,
+    body p, body span:not([class*="fa"]):not([class*="glyphicon"]):not([class*="select2"]),
+    body div, body label, body input, body select, body textarea,
     body button, body a, body td, body th,
     body h1, body h2, body h3, body h4, body h5, body h6, body li {
         font-family: 'Plus Jakarta Sans', sans-serif !important;
     }
-
     /* ── LOADING ── */
     #loading {
         display: none; position: fixed; inset: 0;
@@ -38,7 +32,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     .loading-box p { font-size: 13px; color: #718096; margin: 0; font-weight: 600; }
-
     /* ── PAGE HEADER ── */
     .page-header-modern {
         background: linear-gradient(135deg, #2d2b4e 0%, #4a4690 50%, #605ca8 100%);
@@ -71,7 +64,6 @@
         cursor: pointer; text-decoration: none; transition: background .18s;
     }
     .btn-header-back:hover { background: rgba(255,255,255,.25); color: #fff; text-decoration: none; }
-
     /* ── SECTION CARD ── */
     .sec-card {
         background: #fff; border-radius: 16px;
@@ -89,7 +81,6 @@
     .dot-blue   { background: #3b82f6; }
     .dot-green  { background: #22c55e; }
     .sec-card-body { padding: 20px 22px; }
-
     /* ── FORM FIELDS (ff) ── */
     .ff { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
     .ff:last-child { margin-bottom: 0; }
@@ -114,11 +105,9 @@
         font-weight: 600 !important; border-color: #c4bfef !important; cursor: default;
     }
     .ff .hint { font-size: 11px; color: #a0aec0; margin-top: 1px; }
-
     /* ── GRID HELPERS ── */
     .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
     .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 16px; }
-
     /* ── SELECT ARROW ── */
     .select-wrap { position: relative; }
     .select-wrap::after {
@@ -127,7 +116,6 @@
         color: #a0aec0; font-size: 11px; pointer-events: none;
     }
     .select-wrap select { padding-right: 36px !important; }
-
     /* ── PHOTO CARD ── */
     .photo-card {
         border: 1.5px dashed #c4bfef; border-radius: 12px;
@@ -152,25 +140,7 @@
         width: 100%; max-height: 220px; object-fit: cover;
         border-radius: 10px; border: 2px solid #ede9fe; display: block;
     }
-
-    /* ── MAP ── */
-    #map {
-        width: 100%; height: 280px; border-radius: 12px;
-        border: 1.5px solid #e2e8f0; overflow: hidden;
-        display: block; position: relative; z-index: 1;
-    }
-    .location-status {
-        display: flex; align-items: center; gap: 8px;
-        margin-top: 10px; font-size: 12.5px; color: #718096;
-    }
-    .loc-dot {
-        width: 8px; height: 8px; border-radius: 50%;
-        background: #a0aec0; flex-shrink: 0;
-        transition: background .3s;
-    }
-    .loc-dot.got { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,.5); }
-
-    /* ── BUTTONS ── */
+/* ── BUTTONS ── */
     .btn-submit {
         display: flex; align-items: center; justify-content: center; gap: 8px;
         width: 100%; padding: 14px; border: none; border-radius: 12px;
@@ -188,7 +158,6 @@
         cursor: pointer; text-decoration: none; transition: all .18s;
     }
     .btn-back-bottom:hover { background: #b91c1c; border-color: #991b1b; color: #fff; text-decoration: none; }
-
     /* ── MISC ── */
     .page-wrapper { padding-top: 0 !important; }
     input::-webkit-outer-spin-button,
@@ -202,11 +171,53 @@
     .datepicker-centuries > table > thead > tr > th {
         background-color: white; color: #696969 !important;
     }
+    /* ── COMPACT SINGLE-SCREEN LAYOUT ── */
+    .content-header { padding: 0 12px !important; }
+    .page-header-modern { padding: 12px 18px; margin: 8px 0 10px; border-radius: 12px; gap: 8px; }
+    .header-left h1 { font-size: 19px !important; }
+    .header-left p { font-size: 11px; }
+    .header-left .badge-tag { margin-bottom: 4px; padding: 3px 9px; font-size: 9px; }
+    .btn-header-back { padding: 7px 12px; font-size: 11px; }
+    .sec-card { margin-bottom: 8px; border-radius: 10px; }
+    .sec-card-header { padding: 8px 12px; font-size: 12px; }
+    .sec-card-body { padding: 10px 12px; }
+    .ff { gap: 3px; margin-bottom: 7px; min-width: 0; }
+    .ff label { font-size: 9px; }
+    .ff input, .ff select { padding: 6px 9px !important; font-size: 12px !important; min-height: 32px; }
+    .g2 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 10px; }
+    .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 10px; }
+    .compact-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 10px; }
+    .required-field input, .required-field select, .required-field input[type="file"] { border: 2px solid #f59e0b !important; background: #fffbeb !important; }
+    .required-field input:focus, .required-field select:focus { border-color: #d97706 !important; box-shadow: 0 0 0 2px rgba(245,158,11,.16) !important; }
+    .required-field .photo-label { color: #92400e; }
+    .photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .photo-card { margin: 0; padding: 8px; border-radius: 9px; min-width: 0; }
+    .photo-label { font-size: 9px; margin-bottom: 5px; line-height: 1.35; }
+    .photo-card input[type="file"] { padding: 5px !important; font-size: 10px !important; }
+    .photo-preview img { max-height: 160px; object-fit: contain; }
+    .preview-accordion { margin-top: 5px; font-size: 11px; }
+    .preview-accordion summary, .info-accordion summary { cursor: pointer; color: #605ca8; font-weight: 700; padding: 4px 0; }
+    .info-accordion { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 8px; }
+    .info-accordion summary { padding: 8px 12px; font-size: 12px; list-style-position: inside; }
+    .info-accordion .sec-card-body { padding-top: 4px; }
+    .location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
+    .location-status { margin: 0 0 7px; font-size: 10px; }
+    .btn-submit { padding: 10px; font-size: 13px; border-radius: 9px; }
+    .action-wrap { margin: 8px 0 12px !important; }
+    @media (max-width: 900px) { .g2, .compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 600px) {
+        .content-header { padding: 0 7px !important; }
+        .page-header-modern { padding: 10px 12px; margin: 6px 0 8px; }
+        .header-left h1 { font-size: 16px !important; }
+        .g2, .g3, .compact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 8px; }
+        .photo-grid { grid-template-columns: 1fr; }
+        .photo-card { padding: 7px; }
+        .photo-preview img { max-height: 130px; }
+        .sec-card-body { padding: 8px; }
+    }
 </style>
 @stop
-
 @section('content')
-
 {{-- Loading Overlay --}}
 <div id="loading">
     <div class="loading-box">
@@ -214,14 +225,11 @@
         <p>Menyimpan data...</p>
     </div>
 </div>
-
 {{-- Hidden Fields --}}
 <input type="hidden" id="id"        value="{{ $id }}">
 <input type="hidden" id="latitude"  name="latitude">
 <input type="hidden" id="longitude" name="longitude">
-
 <div class="content-header" style="padding: 0 20px;">
-
     {{-- ── PAGE HEADER ── --}}
     <div class="page-header-modern">
         <div class="header-left">
@@ -235,12 +243,9 @@
             </a>
         </div>
     </div>
-
     {{-- ── INFORMASI KENDARAAN ── --}}
-    <div class="sec-card">
-        <div class="sec-card-header">
-            <span class="dot dot-purple"></span> Informasi Kendaraan
-        </div>
+    <details class="info-accordion">
+        <summary><i class="fas fa-car"></i> Informasi Kendaraan (buka jika diperlukan)</summary>
         <div class="sec-card-body">
             <div class="g2">
                 <div class="ff">
@@ -273,157 +278,127 @@
                 </div>
             </div>
         </div>
-    </div>
-
+    </details>
     {{-- ── LOKASI GPS ── --}}
-    <div class="sec-card">
-        <div class="sec-card-header">
-            <span class="dot dot-blue"></span> Lokasi GPS
-        </div>
+    <div class="sec-card" style="display: none;">
+        <div class="sec-card-header"><span class="dot dot-blue"></span> Lokasi GPS</div>
         <div class="sec-card-body">
-            <div id="map"></div>
-            <div class="location-status">
-                <div class="loc-dot" id="locDot"></div>
-                <span id="locText">Mendapatkan lokasi...</span>
+            <div class="location-status"><span id="locText">Mendapatkan lokasi...</span></div>
+            <div class="location-grid">
+                <div class="ff" style="margin-bottom:0;"><label>Latitude</label><input type="text" id="latitudeDisplay" readonly placeholder="Menunggu GPS"></div>
+                <div class="ff" style="margin-bottom:0;"><label>Longitude</label><input type="text" id="longitudeDisplay" readonly placeholder="Menunggu GPS"></div>
             </div>
         </div>
     </div>
-
     {{-- ── ODOMETER & BBM ── --}}
     <div class="sec-card">
         <div class="sec-card-header">
             <span class="dot dot-yellow"></span> Odometer &amp; Pengisian BBM
         </div>
         <div class="sec-card-body">
-
+            <div class="compact-grid">
             <div class="ff">
                 <label>Odometer Akhir (KM) <span class="req">*</span></label>
-                {{-- @if($data_vehicle != null)
-                    <input type="text" id="odometer" name="odometer" class="numpad" readonly
-                           value="{{ $data_vehicle->odometer }}" placeholder="Odometer (KM)">
-                @else --}}
-                    <input type="number" id="odometer" name="odometer" class="numpad"
-                           value="" placeholder="Odometer (KM)">
-                {{-- @endif --}}
+                    <input type="number" id="odometer" name="odometer"
+                           value="{{$driver_task->odometer}}" placeholder="Odometer (KM)">
             </div>
-
-            {{-- @if($data_vehicle != null && $data_vehicle_fuel != null)
-            <div class="ff">
-                <label>Kondisi BBM Sebelum Isi (Liter)</label>
-                @if($data_vehicle != null && $data_vehicle_fuel != null)
-                    <input type="text" id="fuel_actual" name="fuel_actual" readonly
-                           value="{{ ($data_vehicle_fuel->fuelFiltered/100)*$data_vehicle_fuel->fuelCapacity }}"
-                           placeholder="Kondisi BBM">
-                @else
-                    <input type="number" id="fuel_actual" name="fuel_actual" class="numpad"
-                           value="" placeholder="Kondisi BBM">
-                @endif
-            </div>
-            @endif --}}
-
             <input type="hidden" id="fuel_actual" name="fuel_actual" value="0">
-
             <div class="ff">
                 <label>Jenis BBM <span class="req">*</span></label>
                 <div class="select-wrap">
                     <select id="fuel_type" name="fuel_type" onchange="changeFuelType(this.value)">
                         <option value="-">Pilih Jenis BBM</option>
                         @foreach($bbm as $bbms)
+                        @if($driver_task->fuel_type == explode('_',$bbms)[0])
+                            <option value="{{ explode('_',$bbms)[0] }}" selected>{{ explode('_',$bbms)[0] }}</option>
+                        @else
                             <option value="{{ explode('_',$bbms)[0] }}">{{ explode('_',$bbms)[0] }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
             </div>
-
-            <div class="ff">
-                <label>Harga pada Nota <span style="color: red;"></label>
+            <div class="ff required-field">
+                <label>Harga pada Nota <span class="req">*</span></label>
                 <input type="number" id="receipt" name="receipt" class="numpad"
-                           placeholder="Harga pada Nota" value="" onchange="changeReceipt(this.value)">
+                           placeholder="Harga pada Nota" style="border: 2px solid orange !important; background: #fffbeb !important;" value="" onchange="changeReceipt(this.value)">
             </div>
-
             <div class="ff" style="">
                 <label>Harga Per Liter <span class="req">*</span></label>
                 <input type="number" id="fuel_amount_liter" name="fuel_amount_liter"
                         placeholder="Harga per liter" value="">
                 <input type="hidden" id="fuel_amount" name="fuel_amount" value="">
             </div>
-
             <div class="ff">
                 <label>Pengisian BBM (Liter) <span class="req">*</span></label>
                 <input type="text" id="fuel" name="fuel" placeholder="Jumlah liter" value="" inputmode="decimal" pattern="[0-9.]*">
             </div>
-
+            </div>
         </div>
     </div>
-
     {{-- ── FOTO DOKUMENTASI ── --}}
     <div class="sec-card">
         <div class="sec-card-header">
             <span class="dot dot-green"></span> Foto Dokumentasi
         </div>
         <div class="sec-card-body">
-
+            <div class="photo-grid">
             {{-- Nota --}}
-            <div class="photo-card">
+            <div class="photo-card required-field">
                 <span class="photo-label">
                     <i class="fas fa-receipt" style="margin-right:5px;"></i>
                     Foto Nota Pengisian <span class="req">*</span>
                 </span>
                 <input type="file" id="fileData" name="fileData"  onchange="readURL(this);">
-                <div class="photo-preview" id="previewNota">
-                    <img id="blah" src="" alt="Preview Nota">
-                </div>
+                <details class="preview-accordion">
+                    <summary>Preview foto nota</summary>
+                    <div class="photo-preview" id="previewNota"><img id="blah" src="" alt="Preview Nota"></div>
+                </details>
             </div>
-
             {{-- Odometer Before --}}
-            <div class="photo-card">
+            <div class="photo-card required-field">
                 <span class="photo-label">
                     <i class="fas fa-tachometer-alt" style="margin-right:5px;"></i>
                     Foto Odometer &amp; Indikator <strong>Sebelum</strong> Pengisian <span class="req">*</span>
                 </span>
                 <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore"
                         onchange="readURLOdoBefore(this);">
-                <div class="photo-preview" id="previewOdoBefore">
-                    <img id="blahOdoBefore" src="" alt="Preview Odo Before">
-                </div>
+                <details class="preview-accordion">
+                    <summary>Preview foto sebelum</summary>
+                    <div class="photo-preview" id="previewOdoBefore"><img id="blahOdoBefore" src="" alt="Preview Odo Before"></div>
+                </details>
             </div>
-
             {{-- Odometer After --}}
-            <div class="photo-card">
+            <div class="photo-card required-field">
                 <span class="photo-label">
                     <i class="fas fa-tachometer-alt" style="margin-right:5px;"></i>
                     Foto Odometer &amp; Indikator <strong>Setelah</strong> Pengisian <span class="req">*</span>
                 </span>
                 <input type="file" id="fileDataOdoAfter" name="fileDataOdoAfter"
                         onchange="readURLOdoAfter(this);">
-                <div class="photo-preview" id="previewOdoAfter">
-                    <img id="blahOdoAfter" src="" alt="Preview Odo After">
-                </div>
+                <details class="preview-accordion">
+                    <summary>Preview foto setelah</summary>
+                    <div class="photo-preview" id="previewOdoAfter"><img id="blahOdoAfter" src="" alt="Preview Odo After"></div>
+                </details>
             </div>
-
+            </div>
         </div>
     </div>
-
     {{-- ── ACTION BUTTONS ── --}}
-    <div style="margin-bottom: 40px;">
+    <div class="action-wrap">
         <button class="btn-submit" onclick="submitDriver();">
             <i class="fas fa-paper-plane"></i> Submit Pengisian BBM
         </button>
     </div>
-
 </div>
 @endsection
-
 @section('scripts')
 <script src="{{ url("js/jquery.numpad.js") }}"></script>
 <script src="{{ url("js/jquery.gritter.min.js") }}"></script>
-<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-        integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
 <script>
     $.ajaxSetup({
         headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
     });
-
     /* ── Numpad config ── */
     var isSmall = screen.width < 400;
     var btnW  = isSmall ? '62px'  : '76px';
@@ -432,7 +407,6 @@
     var dispH = isSmall ? '70px'  : '86px';
     var dispFS= isSmall ? '30px'  : '38px';
     var padW  = isSmall ? '220px' : '270px';
-
     var numBtnStyle = [
         'background:#fff',
         'color:#2d3748',
@@ -448,7 +422,6 @@
         'cursor:pointer',
         'font-family:Plus Jakarta Sans,sans-serif'
     ].join(';');
-
     var funcBtnStyle = [
         'border-radius:12px',
         'font-size:13px',
@@ -460,7 +433,6 @@
         'transition:all .15s',
         'font-family:Plus Jakarta Sans,sans-serif'
     ].join(';');
-
     $.fn.numpad.defaults.gridTpl = [
         '<table style="',
             'background:#f7f8fc;',
@@ -479,9 +451,7 @@
             'overflow:hidden;',
         '"></table>'
     ].join('');
-
     $.fn.numpad.defaults.backgroundTpl = '<div class="modal-backdrop in" style="opacity:.55;background:#2d2b4e;z-index:30099;"></div>';
-
     $.fn.numpad.defaults.displayTpl = [
         '<input type="text" style="',
             'background:linear-gradient(135deg,#2d2b4e,#605ca8);',
@@ -499,16 +469,13 @@
             'font-family:Plus Jakarta Sans,sans-serif;',
         '"/>'
     ].join('');
-
     $.fn.numpad.defaults.buttonNumberTpl  = '<button type="button" style="'+numBtnStyle+'"></button>';
     $.fn.numpad.defaults.buttonFunctionTpl= '<button type="button" style="'+funcBtnStyle+'"></button>';
-
     $.fn.numpad.defaults.onKeypadCreate = function() {
         var $table = $(this);
         if ($table.find('.numpad-title').length === 0) {
             $table.prepend('<tr class="numpad-title"><td colspan="3" style="padding:0; border:none;"></td></tr>');
         }
-
         $table.find('.done').css({
             'background': 'linear-gradient(135deg,#15803d,#16a34a)',
             'color':       '#fff',
@@ -520,7 +487,6 @@
             'font-weight': '700',
             'font-family': 'Plus Jakarta Sans,sans-serif'
         });
-
         $table.find('.cancel').css({
             'background':    '#fee2e2',
             'color':         '#dc2626',
@@ -532,7 +498,6 @@
             'font-weight':   '700',
             'font-family':   'Plus Jakarta Sans,sans-serif'
         });
-
         $table.find('.clear').css({
             'background':    '#fef3c7',
             'color':         '#b45309',
@@ -544,7 +509,6 @@
             'font-weight':   '700',
             'font-family':   'Plus Jakarta Sans,sans-serif'
         });
-
         $table.find('.del').css({
             'background':    '#f1f5f9',
             'color':         '#475569',
@@ -555,7 +519,6 @@
             'font-size':     '18px',
             'font-family':   'Plus Jakarta Sans,sans-serif'
         });
-
         $table.find('.sep').css({
             'background':    '#ebf2ff',
             'color':         '#2d6bc4',
@@ -567,32 +530,12 @@
             'font-weight':   '700',
             'font-family':   'Plus Jakarta Sans,sans-serif'
         });
-
         $table.find('button').not('.done,.cancel,.clear,.del,.sep').on('mouseenter', function(){
             $(this).css({'background':'#ede9fe','border-color':'#605ca8','color':'#4a4690'});
         }).on('mouseleave', function(){
             $(this).css({'background':'#fff','border-color':'#e2e8f0','color':'#2d3748'});
         });
     };
-
-    /* ── Leaflet Map ── */
-    var map    = null;
-    var marker = null;
-
-    function initMap(lat, lng) {
-        if (!map) {
-            map = L.map('map').setView([lat, lng], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-        } else {
-            map.setView([lat, lng], 15);
-        }
-        if (marker) { map.removeLayer(marker); }
-        marker = L.marker([lat, lng]).addTo(map)
-            .bindPopup('<b>Lokasi Anda</b>').openPopup();
-    }
-
     /* ── Geolocation ── */
     function getLocation() {
         if (navigator.geolocation) {
@@ -603,17 +546,15 @@
             $('#locText').text('Browser tidak mendukung geolokasi.');
         }
     }
-
     function showPosition(position) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
         $('#latitude').val(lat);
         $('#longitude').val(lng);
-        $('#locDot').addClass('got');
-        $('#locText').text('Lokasi diperoleh: ' + lat.toFixed(5) + ', ' + lng.toFixed(5));
-        initMap(lat, lng);
+        $('#latitudeDisplay').val(lat.toFixed(6));
+        $('#longitudeDisplay').val(lng.toFixed(6));
+        $('#locText').text('Lokasi GPS berhasil diperoleh.');
     }
-
     /* ── Image compress helper ── */
     function compressAndPreview(input, imgId, previewId) {
         if (input.files && input.files[0]) {
@@ -634,14 +575,11 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
-
     function readURL(input)          { compressAndPreview(input, 'blah',         'previewNota'); }
     function readURLOdoBefore(input) { compressAndPreview(input, 'blahOdoBefore','previewOdoBefore'); }
     function readURLOdoAfter(input)  { compressAndPreview(input, 'blahOdoAfter', 'previewOdoAfter'); }
-
     /* ── BBM helpers ── */
     var bbm = <?php echo json_encode($bbm2); ?>;
-
     function changeFuelType(fuel_type) {
         var harga = 0;
         for (var i = 0; i < bbm.length; i++) {
@@ -653,7 +591,6 @@
         $('#fuel_amount').val('');
         $('#fuel').val('');
     }
-
     // function changeLiter(amountLiter) {
     //     if ($('#fuel').val() == '') {
     //         openErrorGritter('Error!', 'Isikan Pengisian BBM (Liter) terlebih dahulu');
@@ -664,7 +601,6 @@
     //     $('#fuel_amount').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
     //     $('#receipt').val(parseFloat($('#fuel').val()) * parseInt(amountLiter));
     // }
-
     function changeReceipt(receipt) {
         if ($('#fuel_amount_liter').val() == '') {
             openErrorGritter('Error!', 'Isikan Harga per Liter terlebih dahulu / pilih Jenis BBM');
@@ -674,7 +610,6 @@
         $('#fuel_amount').val(parseFloat(receipt));
         $('#fuel').val((parseFloat(receipt) / parseFloat($('#fuel_amount_liter').val())).toFixed(2));
     }
-
     /* ── Submit ── */
     function submitDriver() {
         if (!$('#latitude').val()) {
@@ -703,9 +638,7 @@
             openErrorGritter('Error!', 'Isikan Foto Odometer Setelah Pengisian');
             return false;
         }
-
         $('#loading').addClass('show');
-
         var data = {
             latitude          : $('#latitude').val(),
             longitude         : $('#longitude').val(),
@@ -720,7 +653,6 @@
             odometer          : $('#odometer').val(),
             id                : '{{ $id }}'
         };
-
         $.post('{{ url("input/driver/job_new") }}', data, function (result) {
             if (result.status) {
                 openSuccessGritter('Sukses', 'Berhasil kerjakan tugas');
@@ -733,7 +665,6 @@
             }
         });
     }
-
     function saveImage1() {
         $('#loading').addClass('show');
         $.post('{{ url("input/driver/job_image1") }}',
@@ -749,7 +680,6 @@
             }
         );
     }
-
     function saveImage2() {
         $('#loading').addClass('show');
         $.post('{{ url("input/driver/job_image2") }}',
@@ -765,7 +695,6 @@
             }
         );
     }
-
     function saveImage3() {
         $('#loading').addClass('show');
         $.post('{{ url("input/driver/job_image3") }}',
@@ -781,7 +710,6 @@
             }
         );
     }
-
     /* ── Ready ── */
     $(document).ready(function () {
         $('body').toggleClass('sidebar-collapse');
@@ -789,26 +717,25 @@
         $('.numpad').numpad({ hidePlusMinusButton: true, decimalSeparator: '.' });
         $('.select2').select2({ allowClear: true });
         getLocation();
-    });
 
+        setTimeout(function () {
+            changeFuelType($('#fuel_type').val());
+        }, 2000);
+    });
     /* ── Utilities ── */
     var audio_error = new Audio('{{ url("sounds/error.mp3") }}');
-
     function addZero(i) { return i < 10 ? '0' + i : i; }
-
     function getActualFullDate() {
         var d = new Date(), z = addZero;
         return z(d.getFullYear()) + '-' + z(d.getMonth()+1) + '-' + z(d.getDate())
              + ' ' + z(d.getHours()) + ':' + z(d.getMinutes()) + ':' + z(d.getSeconds());
     }
-
     function openSuccessGritter(title, message) {
         jQuery.gritter.add({
             title: title, text: message, class_name: 'growl-success',
             image: '{{ url("images/image-screen.png") }}', sticky: false, time: '3000'
         });
     }
-
     function openErrorGritter(title, message) {
         jQuery.gritter.add({
             title: title, text: message, class_name: 'growl-danger',
