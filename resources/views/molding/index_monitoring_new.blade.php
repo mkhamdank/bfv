@@ -1779,6 +1779,24 @@
             padding: 30px !important;
             color: #8793a6 !important;
         }
+
+        /* mold list modal */
+        .mold-list-body {
+            padding: 22px 24px;
+        }
+
+        .mold-list-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #4a5568;
+        }
+
+        .mold-list-meta b {
+            color: #1a202c;
+        }
     </style>
 
 @stop
@@ -2747,7 +2765,7 @@
 
         function scheduleFormEmailAction(index, row) {
             if (!row.form_number) {
-                return '<button type="button" class="form-list-btn green" disabled>Belum ada form</button>';
+                return '';
             }
             var status = String(row.form_status || '').toLowerCase();
             var heldApprover = (row.approvals || []).find(function(approver) {
@@ -2755,7 +2773,6 @@
                 return approverStatus === 'hold' || approverStatus === 'holded';
             });
             var outstandingApprover = scheduleOutstandingApprover(row);
-            var canGeneratePdf = status !== 'approval' && status !== 'approved';
             var actions = '';
 
             if ((status === 'open' || status === 'approval') && outstandingApprover) {
@@ -2764,14 +2781,8 @@
                     ', this)"><i class="fas fa-envelope"></i> Kirim Email</button>';
             }
 
-            if (canGeneratePdf) {
-                actions += '<button type="button" class="form-list-btn green" onclick="savePeriodicMoldingPdf(' + index +
-                    ', this)"><i class="far fa-file-pdf"></i> Simpan PDF</button>';
-            } else {
-                if (status === 'approved') {
-                    actions += '<button type="button" class="form-list-btn green" disabled>Sudah diproses</button>';
-                }
-            }
+            actions += '<button type="button" class="form-list-btn report" onclick="savePeriodicMoldingPdf(' + index +
+                ', this)"><i class="far fa-file-pdf"></i> Report PDF</button>';
 
             if ((status === 'hold' || status === 'holded') && heldApprover) {
                 actions += '<button type="button" class="form-list-btn green" onclick="sendPeriodicMoldingEmail(' + index +
@@ -2793,9 +2804,18 @@
             if (!row || !row.form_number) {
                 return;
             }
-            if (!window.confirm('Simpan laporan PDF untuk form ' + row.form_number + ' tanpa mengirim email?')) {
+            if (!window.confirm('Buka Report PDF untuk form ' + row.form_number + '?')) {
                 return;
             }
+
+            var pdfWindow = window.open('about:blank', '_blank');
+            if (!pdfWindow) {
+                openErrorGritter('Popup diblokir', 'Izinkan popup untuk membuka laporan PDF di tab baru.');
+                return;
+            }
+            pdfWindow.opener = null;
+            pdfWindow.document.write('<!doctype html><title>Menyiapkan PDF</title><p>Menyiapkan laporan PDF...</p>');
+            pdfWindow.document.close();
 
             var $button = $(button).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Menyimpan PDF...');
             $.ajax({
@@ -2803,15 +2823,20 @@
                 type: 'GET',
                 data: { formNumber: row.form_number },
                 success: function(response) {
-                    if (response.status) {
-                        window.location.href = response.pdf_url;
+                    if (response.status && response.pdf_url) {
+                        if (!pdfWindow.closed) {
+                            pdfWindow.location.href = response.pdf_url;
+                        }
+                        $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Report PDF');
                     } else {
-                        $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Simpan PDF');
+                        pdfWindow.close();
+                        $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Report PDF');
                         openErrorGritter('Gagal', response.message || 'Gagal menyimpan PDF.');
                     }
                 },
                 error: function() {
-                    $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Simpan PDF');
+                    pdfWindow.close();
+                    $button.prop('disabled', false).html('<i class="far fa-file-pdf"></i> Report PDF');
                     openErrorGritter('Error', 'Gagal menyimpan PDF.');
                 }
             });
@@ -3202,7 +3227,7 @@
 
                                     click: function() {
 
-                                        filter_data(this.category, this.series.name);
+                                        // showMoldingModal(this.category, this.series.name);
 
                                     }
 
@@ -3369,6 +3394,54 @@
                 '<tr><td colspan="8" style="text-align:center;color:#a0aec0;padding:40px;">Tidak ada data.</td></tr>');
 
         }
+
+        // /* ── Normalisasi bulan ── */
+
+        // function monthKey(str) {
+        //     if (!str) return '';
+        //     str = String(str).trim();
+        //     var m = str.match(/^(\d{4})-(\d{2})/);
+        //     if (m) return m[1] + '-' + m[2];
+        //     var names = {
+        //         jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+        //         jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12'
+        //     };
+        //     m = str.match(/^(\d{4})\s+([A-Za-z]{3})/);
+        //     if (m && names[m[2].toLowerCase()]) return m[1] + '-' + names[m[2].toLowerCase()];
+        //     return str;
+        // }
+
+        // /* ── MODAL LIST MOLDING (klik batang grafik) ── */
+        // function showMoldingModal(category, stat) {
+        //     var key = monthKey(category);
+        //     var list = $.grep(data_all, function (v) {
+        //         return v.status === stat && monthKey(v.check_date) === key;
+        //     });
+
+        //     var moldNames = {};
+        //     var body = '';
+        //     $.each(list, function (i, v) {
+        //         moldNames[v.molding_name] = true;
+        //         body += '<tr>';
+        //         body += '<td>' + (i + 1) + '</td>';
+        //         body += '<td>' + v.check_date + '</td>';
+        //         body += '<td style="font-weight:600;">' + v.molding_name + '</td>';
+        //         body += '<td>' + v.part_name + '</td>';
+        //         body += '<td style="max-width:240px;white-space:normal;">' + (v.problem || '-') + '</td>';
+        //         body += '<td>' + (v.pic || '-') + '</td>';
+        //         body += '<td style="text-align:center;">' + statusPill(v.status) + '</td>';
+        //         body += '</tr>';
+        //     });
+
+        //     $('#mlm_title').text('Daftar Molding — ' + stat);
+        //     $('#mlm_periode').text(category);
+        //     $('#mlm_status_pill').html(statusPill(stat));
+        //     $('#mlm_total').text(list.length);
+        //     $('#mlm_total_mold').text(Object.keys(moldNames).length);
+        //     $('#mlm_body').html(body ||
+        //         '<tr><td colspan="7" style="text-align:center;color:#a0aec0;padding:30px;">Tidak ada data molding.</td></tr>');
+        //     $('#modal_list_molding').modal('show');
+        // }
 
         /* ── SIMPAN PENANGANAN ── */
 
