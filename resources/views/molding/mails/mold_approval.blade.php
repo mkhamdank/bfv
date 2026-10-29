@@ -439,19 +439,11 @@
                 </div>
             </div>
             
-            <!-- BARU: Tombol Attachment -->
-            <a href='http://10.109.52.27:3000/generate-pdf?url=http://10.109.33.30/miraidev/public/report/molding/molding_diagnosa_vendor/{{ $data["data_form_molding"]->form_number }}&options={"format":"A4","landscape":false,"scale":1,"printBackground":true,"displayHeaderFooter":false,"margin":{"top":"mm","right":"mm","bottom":"mm","left":"mm"}}&loading=true' class="btn btn-attachment" style="margin-top: 40px; margin-bottom: 20px;">
-                📃 Report Evaluasi Molding (PDF)
-            </a>
-            <!-- END BARU: Tombol Attachment -->
-
-            @if(($data['data_form_molding']->remark ?? null) === 'periodic')
-            <div style="margin: 16px 0;">
-                <strong>Report Form Periodik:</strong><br>
-                <a href="{{ url('index/diagnose_molding/mold_product_check/report/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">Report Produk</a> |
-                <a href="{{ url('index/diagnose_molding/mold_product_check/report_ng/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">NG Produk</a> |
-                <a href="{{ url('index/diagnose_molding/mold_molding_check/report/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">Report Molding</a> |
-                <a href="{{ url('index/diagnose_molding/mold_molding_check/report_ng/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer">NG Molding</a>
+            @if(!empty($data['report_pdf_url']))
+            <div style="margin: 24px 0;">
+                <a href="{{ url('index/diagnose_molding/report_web/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer" class="btn btn-attachment">
+                    Report Diagnosa Molding
+                </a>
             </div>
             @endif
 

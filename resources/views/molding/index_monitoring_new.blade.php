@@ -2780,7 +2780,10 @@
             if (!row.form_number) {
                 return '';
             }
-            var status = String(row.form_status || '').toLowerCase();
+
+            var status = String(
+                row.form_status || row.schedule_status || ''
+            ).trim().toLowerCase();
             var heldApprover = (row.approvals || []).find(function(approver) {
                 var approverStatus = String(approver.status || '').toLowerCase();
                 return approverStatus === 'hold' || approverStatus === 'holded';
