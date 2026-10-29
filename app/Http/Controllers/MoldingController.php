@@ -557,7 +557,7 @@ class MoldingController extends Controller
         ->leftJoin('molding_diagnose_molding_details', 'molding_diagnose_molding_forms.master_form_number', '=', 'molding_diagnose_molding_details.master_form_number')
         ->where('molding_diagnose_molding_forms.master_form_number', $form_number)
         ->whereNull('molding_diagnose_molding_forms.deleted_at')
-        ->select('molding_diagnose_molding_forms.id', 'molding_diagnose_molding_forms.master_form_number', 'molding_diagnose_molding_forms.fixed_asset_number', 'molding_diagnose_molding_forms.fixed_asset_name', 'molding_diagnose_molding_forms.points', 'check_by', 'check_at', 'ng_id', 'ng_name', 'diagnose_result', 'parts', 'photo1', 'photo2', 'handling_photo1', 'handling_photo2', 'handling_note', 'item_number', 'item_name', 'note', 'deduction', 'molding_diagnose_molding_forms.created_at', 'molding_diagnose_molding_forms.updated_at')
+        ->select('molding_diagnose_molding_forms.id', 'molding_diagnose_molding_forms.master_form_number', 'molding_diagnose_molding_forms.fixed_asset_number', 'molding_diagnose_molding_forms.fixed_asset_name', 'molding_diagnose_molding_forms.points', 'check_by', 'check_at', 'ng_id', 'ng_name', 'diagnose_result', 'final_diagnose_result', 'parts', 'photo1', 'photo2', 'photo_process', 'handling_photo1', 'handling_photo2', 'handling_note', 'item_number', 'item_name', 'note', 'deduction', 'molding_diagnose_molding_forms.created_at', 'molding_diagnose_molding_forms.updated_at')
         ->get();
 
         $product_point = DB::table('molding_diagnose_product_forms')
@@ -731,9 +731,31 @@ class MoldingController extends Controller
                 return $this->approvedFormEditResponse();
             }
 
+            $request->validate([
+                'data' => ['nullable', 'array'],
+                'data.*.diagnosa_final' => ['nullable', 'in:OK,NG,OK Sementara'],
+            ]);
+
             $mstr = DB::table('molding_diagnose_forms')
             ->where('form_number', $request->form_number)
             ->first();
+
+            $finalDiagnoses = [];
+            foreach ((array) $request->input('data', []) as $value) {
+                $finalDiagnosis = $value['diagnosa_final'] ?? null;
+                if (in_array($finalDiagnosis, ['OK', 'NG', 'OK Sementara'], true)) {
+                    $finalDiagnoses[$value['ng_id']] = $finalDiagnosis;
+                }
+            }
+
+            $groupings = DB::table('molding_diagnose_molding_masters')
+                ->whereIn('id', array_keys($finalDiagnoses))
+                ->pluck('grouping', 'id');
+            $totalMoldingPoints = 100;
+            foreach ($finalDiagnoses as $ngId => $finalDiagnosis) {
+                $totalMoldingPoints -= $this->moldingDiagnosisDeduction($finalDiagnosis, $groupings[$ngId] ?? null);
+            }
+            $totalMoldingPoints = max(0, $totalMoldingPoints);
 
             DB::table('molding_diagnose_molding_forms')->updateOrInsert(
                 ['master_form_number' => $request->form_number],
@@ -742,7 +764,7 @@ class MoldingController extends Controller
                     'fixed_asset_number' => $mstr->fixed_asset_number,
                     'fixed_asset_name' => $mstr->fixed_asset_name,
                     'vendor' => $mstr->vendor,
-                    'points' => $request->total_poin,
+                    'points' => $totalMoldingPoints,
                     'check_by' => Auth::user()->name,
                     'check_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s'),
@@ -759,71 +781,55 @@ class MoldingController extends Controller
             // dd($get_cek_product);
 
             if($get_cek_product) {
-                if($request->total_poin < $get_cek_product->points) {
-                    $act_rank = null;
-                    foreach ($this->rank as $key => $value) {
-                        if($request->total_poin >= $value['point']) {
-                            $act_rank = $value['rank'];
-                        }
+                $moldingScore = $totalMoldingPoints;
+                $totalScore = min($moldingScore, $get_cek_product->points);
+                $act_rank = 'C';
+                foreach ($this->rank as $value) {
+                    if ($totalScore >= $value['point']) {
+                        $act_rank = $value['rank'];
+                        break;
                     }
-
-                    DB::table('molding_diagnose_forms')
-                    ->where('form_number', $request->form_number)
-                    ->update([
-                        'mold_score' => $request->total_poin,
-                        'total_score' => $request->total_poin,
-                        'rank' => $act_rank,
-                        'updated_at' => date('Y-m-d H:i:s'),
-                    ]);
-                } else {
-                    $act_rank = null;
-                    foreach ($this->rank as $key => $value) {
-                        if($get_cek_product->points >= $value['point']) {
-                            $act_rank = $value['rank'];
-                        }
-                    }
-
-                    DB::table('molding_diagnose_forms')
-                    ->where('form_number', $request->form_number)
-                    ->update([
-                        'mold_score' => $request->total_poin,
-                        'total_score' => $get_cek_product->points,
-                        'rank' => $act_rank,
-                        'updated_at' => date('Y-m-d H:i:s'),
-                    ]);
                 }
+
+                DB::table('molding_diagnose_forms')
+                    ->where('form_number', $request->form_number)
+                    ->update([
+                        'mold_score' => $moldingScore,
+                        'total_score' => $totalScore,
+                        'rank' => $act_rank,
+                        'updated_at' => date('Y-m-d H:i:s'),
+                    ]);
             }
                 
 
-            foreach ($request->data as $key => $value) {
+            foreach ((array) $request->input('data', []) as $key => $value) {
                 $photo1_name = null;
                 $photo2_name = null;
-                
-                $photo1 = $request->file("data.$key.photo1");
-                if($photo1) {
-                    $photo1_name = $request->form_number . '_photo1_ng' . $value['ng_id'] . '_item' . $value['id_items'] . '.' . $photo1->getClientOriginalExtension();
-                    $photo1->move(public_path('workshop/molding/photo_molding/ng'), $photo1_name);
+                $photo_process_name = null;
+
+                $photoNg1 = $request->file("data.$key.photo_ng_1");
+                if ($photoNg1) {
+                    $photo1_name = $request->form_number . '_photo1_ng' . $value['ng_id'] . '_item' . ($value['id_items'] ?? 'null') . '.' . $photoNg1->getClientOriginalExtension();
+                    $photoNg1->move(public_path('workshop/molding/photo_molding/ng'), $photo1_name);
                 }
 
-                $photo2 = $request->file("data.$key.photo2");
-                if($photo2) {
-                    $photo2_name = $request->form_number . '_photo2_ng' . $value['ng_id'] . '_item' . $value['id_items'] . '.' . $photo2->getClientOriginalExtension();
-                    $photo2->move(public_path('workshop/molding/photo_molding/ng'), $photo2_name);
+                $photoNg2 = $request->file("data.$key.photo_ng_2");
+                if ($photoNg2) {
+                    $photo2_name = $request->form_number . '_photo2_ng' . $value['ng_id'] . '_item' . ($value['id_items'] ?? 'null') . '.' . $photoNg2->getClientOriginalExtension();
+                    $photoNg2->move(public_path('workshop/molding/photo_molding/ng'), $photo2_name);
+                }
+
+                $photoProcess = $request->file("data.$key.photo_process");
+                if ($photoProcess) {
+                    $photo_process_name = $request->form_number . '_process_ng' . $value['ng_id'] . '_item' . ($value['id_items'] ?? 'null') . '.' . $photoProcess->getClientOriginalExtension();
+                    $photoProcess->move(public_path('workshop/molding/photo_molding/ng'), $photo_process_name);
                 }
 
                 $handling_photo1_name = null;
-                $handling_photo2_name = null;
-
-                $handling_photo1 = $request->file("data.$key.handling_photo1");
-                if($handling_photo1) {
-                    $handling_photo1_name = $request->form_number . '_handling_photo1_ng' . $value['ng_id'] . '_item' . $value['id_items'] . '.' . $handling_photo1->getClientOriginalExtension();
-                    $handling_photo1->move(public_path('workshop/molding/photo_molding/ng'), $handling_photo1_name);
-                }
-
-                $handling_photo2 = $request->file("data.$key.handling_photo2");
-                if($handling_photo2) {
-                    $handling_photo2_name = $request->form_number . '_handling_photo2_ng' . $value['ng_id'] . '_item' . $value['id_items'] . '.' . $handling_photo2->getClientOriginalExtension();
-                    $handling_photo2->move(public_path('workshop/molding/photo_molding/ng'), $handling_photo2_name);
+                $handlingPhoto = $request->file("data.$key.photo_handling");
+                if ($handlingPhoto) {
+                    $handling_photo1_name = $request->form_number . '_handling_ng' . $value['ng_id'] . '_item' . ($value['id_items'] ?? 'null') . '.' . $handlingPhoto->getClientOriginalExtension();
+                    $handlingPhoto->move(public_path('workshop/molding/photo_molding/ng'), $handling_photo1_name);
                 }
 
                 // if item_number and item_name is "null" 
@@ -840,12 +846,13 @@ class MoldingController extends Controller
                     'ng_id' => $value['ng_id'],
                     'ng_name' => $value['item_ng'],
                     'diagnose_result' => $value['hasil_diagnosa'],
+                    'final_diagnose_result' => $value['diagnosa_final'] ?? null,
                     'parts' => $value['part_checked'],
                     'item_number' => $value['id_items'],
                     'item_name' => $value['item_name'],
                     'note' => $value['rincian_lain'],
                     'handling_note' => $value['handling_note'],
-                    'deduction' => $value['pengurangan'],
+                    'deduction' => $this->moldingDiagnosisDeduction($value['diagnosa_final'] ?? null, $groupings[$value['ng_id']] ?? null),
                     'updated_at' => date('Y-m-d H:i:s'),
                     'created_at' => date('Y-m-d H:i:s'),
                     'created_by' => Auth::user()->name
@@ -859,12 +866,12 @@ class MoldingController extends Controller
                     $detailData['photo2'] = $photo2_name;
                 }
 
-                if($handling_photo1_name) {
-                    $detailData['handling_photo1'] = $handling_photo1_name;
+                if($photo_process_name) {
+                    $detailData['photo_process'] = $photo_process_name;
                 }
 
-                if($handling_photo2_name) {
-                    $detailData['handling_photo2'] = $handling_photo2_name;
+                if($handling_photo1_name) {
+                    $detailData['handling_photo1'] = $handling_photo1_name;
                 }
 
                 DB::table('molding_diagnose_molding_details')->updateOrInsert(
@@ -883,6 +890,19 @@ class MoldingController extends Controller
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function moldingDiagnosisDeduction($diagnosis, $grouping)
+    {
+        if ($diagnosis === 'NG') {
+            return $grouping === 'Main' ? 10 : 5;
+        }
+
+        if ($diagnosis === 'OK Sementara') {
+            return $grouping === 'Main' ? 3 : 1;
+        }
+
+        return 0;
     }
 
     function saveProductCheckReal(Request $request) {
@@ -1014,10 +1034,11 @@ class MoldingController extends Controller
     function indexMoldMoldingReportNg($form_number) {
         $ngs = DB::table('molding_diagnose_molding_details')
             ->where('molding_diagnose_molding_details.master_form_number', $form_number)
-            ->whereIn('molding_diagnose_molding_details.diagnose_result', ['NG', 'OK Sementara'])
-            ->select('molding_diagnose_molding_details.fixed_asset_name', 'molding_diagnose_molding_details.photo1', 'molding_diagnose_molding_details.photo2',
-            'molding_diagnose_molding_details.ng_id', 'molding_diagnose_molding_details.ng_name')
+            // ->whereIn('molding_diagnose_molding_details.diagnose_result', ['NG', 'OK Sementara'])
+            ->select('molding_diagnose_molding_details.fixed_asset_name', 'molding_diagnose_molding_details.photo1', 'molding_diagnose_molding_details.photo2', 'molding_diagnose_molding_details.photo_process', 'molding_diagnose_molding_details.handling_photo1',
+            'molding_diagnose_molding_details.ng_id', 'molding_diagnose_molding_details.ng_name', 'molding_diagnose_molding_details.item_number', 'molding_diagnose_molding_details.item_name', 'molding_diagnose_molding_details.final_diagnose_result')
             ->orderBy('ng_id', 'asc')
+            ->orderBy('item_number', 'asc')
             ->get()
             ->toArray();
 
@@ -2115,7 +2136,7 @@ class MoldingController extends Controller
 
     public function fetchMoldingDiagnoseMonitoring()
     {
-        
+
     }
 
     public function indexCheckMoldingNew()
