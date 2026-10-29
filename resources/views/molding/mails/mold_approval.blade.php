@@ -439,13 +439,11 @@
                 </div>
             </div>
             
-            @if(!empty($data['report_pdf_url']))
             <div style="margin: 24px 0;">
                 <a href="{{ url('index/diagnose_molding/report_web/'.$data['data_form_molding']->form_number) }}" target="_blank" rel="noopener noreferrer" class="btn btn-attachment">
                     Report Diagnosa Molding
                 </a>
             </div>
-            @endif
 
              <!-- BARU: Tombol Aksi -->
             @if($data['status'] != 'approval_5' && $data['status'] != 'holded' && $data['status'] != 'rejected')
