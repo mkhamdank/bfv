@@ -1797,6 +1797,19 @@
         .mold-list-meta b {
             color: #1a202c;
         }
+
+        .form-list-btn.web-report {
+            background: #e8f1ff;
+            border-color: #b9d4ff;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .form-list-btn.web-report:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+            color: #1d4ed8;
+        }
     </style>
 
 @stop
@@ -2784,6 +2797,9 @@
             actions += '<button type="button" class="form-list-btn report" onclick="savePeriodicMoldingPdf(' + index +
                 ', this)"><i class="far fa-file-pdf"></i> Report PDF</button>';
 
+            actions += '<button type="button" class="form-list-btn web-report" onclick="openPeriodicMoldingWeb(' + index +
+                ')"><i class="fas fa-eye"></i> Report Web</button>';
+
             if ((status === 'hold' || status === 'holded') && heldApprover) {
                 actions += '<button type="button" class="form-list-btn green" onclick="sendPeriodicMoldingEmail(' + index +
                     ', this)"><i class="fas fa-envelope"></i> Kirim Ulang</button>';
@@ -3685,6 +3701,24 @@
 
             });
 
+        }
+
+        function openPeriodicMoldingWeb(index) {
+            var row = filteredScheduleForms()[index];
+
+            if (!row || !row.form_number) {
+                openErrorGritter(
+                    'Error',
+                    'Form number tidak ditemukan.'
+                );
+                return;
+            }
+
+            var formNumber = encodeURIComponent(row.form_number);
+
+            var url = '{{ url("index/diagnose_molding/report_web") }}/' + formNumber;
+
+            window.open(url, '_blank');
         }
 
         /* ── GRITTER ── */

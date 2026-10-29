@@ -1150,6 +1150,80 @@ class MoldingController extends Controller
         }
     }
 
+    public function indexMoldingReportWeb($formNumber)
+    {
+        $reports = [
+            $this->indexEvaluationReport($formNumber),
+            $this->indexMoldProductReport($formNumber),
+            $this->indexMoldProductReportNg($formNumber),
+            $this->indexMoldMoldingReport($formNumber),
+            $this->indexMoldMoldingReportNg($formNumber),
+        ];
+
+        $headAssets = [];
+        $sections = [];
+
+        $previousLibxmlErrorHandling = libxml_use_internal_errors(true);
+
+        try {
+            foreach ($reports as $report) {
+                $document = new \DOMDocument('1.0', 'UTF-8');
+
+                $document->loadHTML(
+                    $report->render(),
+                    LIBXML_NONET
+                );
+
+                $head = $document->getElementsByTagName('head')->item(0);
+
+                if ($head) {
+                    foreach ($head->childNodes as $node) {
+
+                        $isStyle = $node->nodeName === 'style';
+
+                        $isStylesheet =
+                            $node->nodeName === 'link' &&
+                            strtolower($node->getAttribute('rel')) === 'stylesheet';
+
+                        $isTailwind =
+                            $node->nodeName === 'script' &&
+                            strpos(
+                                $node->getAttribute('src'),
+                                'cdn.tailwindcss.com'
+                            ) !== false;
+
+                        if ($isStyle || $isStylesheet || $isTailwind) {
+                            $asset = $document->saveHTML($node);
+                            $headAssets[md5($asset)] = $asset;
+                        }
+                    }
+                }
+
+                $body = $document->getElementsByTagName('body')->item(0);
+
+                $section = '';
+
+                if ($body) {
+                    foreach ($body->childNodes as $node) {
+                        if ($node->nodeName !== 'script') {
+                            $section .= $document->saveHTML($node);
+                        }
+                    }
+                }
+
+                $sections[] = $section;
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousLibxmlErrorHandling);
+        }
+
+        return view('molding.report.report_pdf', [
+            'headAssets' => $headAssets,
+            'sections' => $sections,
+        ]);
+    }
+
     private function storeMoldingReportPdf($formNumber)
     {
         $safeFormNumber = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $formNumber);

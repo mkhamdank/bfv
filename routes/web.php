@@ -552,6 +552,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
 
     Route::get('approval/fixed_asset/audit/approval/{location}/{period}/{stat}/{position}', 'GeneralController@approvalFixedAssetCheck');
     Route::get('generate/fixed_asset/report', 'AccountingController@generateAssetPDF');
+    Route::get('index/diagnose_molding/report_web/{form_number}','App\Http\Controllers\MoldingController@indexMoldingReportWeb')->name('molding.report.web');
 
     Route::get('index/fixed_asset/report', 'AccountingController@indexFixedAssetReport')->name("user.fixed_asset_report");
     Route::get('check/fixed_asset/report', 'AccountingController@checkFixedAssetReport');
