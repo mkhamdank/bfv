@@ -254,7 +254,7 @@
             </a>
 
             {{-- Monitoring --}}
-            <a href="{{ route('user.molding_monitoring') }}" class="mol-menu-btn">
+            <a href="{{ url('index/workshop/check_molding_vendor') }}" class="mol-menu-btn">
                 <div class="btn-icon green">
                     <i class="fas fa-chart-bar"></i>
                 </div>
@@ -312,7 +312,7 @@
             </a>
 
             {{-- Maintenance Molding Vendor --}}
-            <a href="{{ url('/index/workshop/check_molding_vendor') }}" class="mol-menu-btn">
+            <a href="{{ url('index/diagnose_molding/molding_monitoring_new') }}" class="mol-menu-btn">
                 <div class="btn-icon red">
                     <i class="fas fa-wrench"></i>
                 </div>
