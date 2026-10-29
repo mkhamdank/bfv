@@ -77,10 +77,46 @@ class workshopController extends Controller
 				->groupBy('period', 'status')
 				->get();
 
+			// Ambil detail molding mana saja dan statusnya per periode
+			$molding_details = db::table('pe_molding_schedules')
+				->leftJoin('pe_molding_masters', 'pe_molding_schedules.molding_id', '=', 'pe_molding_masters.id')
+				->select(
+					db::raw('DATE_FORMAT(pe_molding_schedules.period,"%Y %b") as period'),
+					'pe_molding_schedules.molding_id',
+					'pe_molding_schedules.molding_name',
+					'pe_molding_schedules.status',
+					'pe_molding_masters.mold_number',
+					'pe_molding_masters.molding_type',
+					'pe_molding_masters.molding_category'
+				)
+				->orderBy('pe_molding_schedules.period', 'DESC')
+				->get();
+
+			// Ambil detail part dengan judgement dari pe_molding_checks join pe_molding_check_details
+			$molding_parts = db::table('pe_molding_schedules')
+				->leftJoin('pe_molding_checks', function($join) {
+					$join->on('pe_molding_schedules.molding_name', '=', 'pe_molding_checks.molding_name')
+						->whereRaw('DATE_FORMAT(pe_molding_schedules.period, "%Y-%m") = DATE_FORMAT(pe_molding_checks.check_date, "%Y-%m")');
+				})
+				->leftJoin('pe_molding_check_details', 'pe_molding_checks.id', '=', 'pe_molding_check_details.check_id')
+				->select(
+					db::raw('DATE_FORMAT(pe_molding_schedules.period,"%Y %b") as period'),
+					'pe_molding_schedules.molding_id',
+					'pe_molding_schedules.molding_name',
+					db::raw('SPLIT_STRING(pe_molding_checks.pic, " - ", 2) as pic'),
+					'pe_molding_check_details.part_name',
+					'pe_molding_check_details.judgement'
+				)
+				->whereNotNull('pe_molding_check_details.part_name')
+				->orderBy('pe_molding_schedules.period', 'DESC')
+				->get();
+
 			$response = array(
 				'status' => true,
 				'datas' => $datas2,
 				'data_all' => $data_all,
+				'molding_details' => $molding_details,
+				'molding_parts' => $molding_parts,
 			);
 			return Response::json($response);
 		} catch (Exception $e) {
