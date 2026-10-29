@@ -1954,7 +1954,8 @@ class MoldingController extends Controller
                 ]);
             }
 
-            $reportPdfUrl = $this->getOrCreateMoldingReportPdfUrl($form_number);
+            // $reportPdfUrl = $this->getOrCreateMoldingReportPdfUrl($form_number);
+            $reportPdfUrl = [];
 
             $delivery = DB::transaction(function () use ($form_number, $data_form_molding, $reportPdfUrl) {
                 $get_app_pos = DB::table('molding_diagnose_approvers')
