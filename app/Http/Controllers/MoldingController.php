@@ -1685,7 +1685,8 @@ class MoldingController extends Controller
                     ]);
                 }
 
-                $next_approver = $this->approver[2]['approver_email'];
+                // $next_approver = $this->approver[2]['approver_email'];
+                $next_approver = ['yoga.karunia.perdana@music.yamaha.com', 'arief.asmo.saputro@music.yamaha.com', 'andik.yayan@music.yamaha.com'];
                 $status_new = 'approval_3';
             } else if ($approval == 'approval_3') {
                 $cek = DB::table('molding_diagnose_approvers')
