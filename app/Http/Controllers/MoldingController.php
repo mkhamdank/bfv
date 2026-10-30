@@ -1770,7 +1770,7 @@ class MoldingController extends Controller
                 'approval' => $app
             ];
 
-            $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
+            // $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
     
             Mail::to($next_approver)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
     
@@ -1856,7 +1856,7 @@ class MoldingController extends Controller
                     'comment' => $request->comment
                 ];
 
-                $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
+                // $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
 
                 $next_approver = ['yoga.karunia.perdana@music.yamaha.com', 'arief.asmo.saputro@music.yamaha.com'];
         
@@ -1914,7 +1914,7 @@ class MoldingController extends Controller
                 'comment' => $request->comment
             ];
 
-            $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
+            // $data['report_pdf_url'] = $this->getOrCreateMoldingReportPdfUrl($form_number);
     
             Mail::to($next_approver)->bcc(['nasiqul.ibat@music.yamaha.com'])->send(new SendEmail($data, 'molding_approval'));
     
