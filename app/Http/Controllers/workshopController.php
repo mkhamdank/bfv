@@ -1109,4 +1109,75 @@ class workshopController extends Controller
 			'Check Molding ' . $time . '.xlsx'
 		);
 	}
+
+	function report_view(Request $request) {
+		$title = 'Report Molding';
+		$title_jp = '';
+
+		$period = $request->query('period');
+		$date_format = Carbon::createFromFormat('Y M d', $period . ' 01')->format('Y-m-d');
+
+		$molding_id = $request->query('molding_id');
+
+		$data_molding = DB::table('pe_molding_masters')
+			->where('id', $molding_id)
+			->first();
+			
+		$schedule = DB::table('pe_molding_schedules')
+			->where('molding_id', $molding_id)
+			->where('period', $date_format)
+			->first();
+
+		$finding = DB::table('pe_molding_findings')
+			// ->where('molding_id', $molding_id)
+			->where('check_id', $schedule->id)
+			->get();
+
+		$data_check = DB::table('pe_molding_checks')
+		->leftJoin(
+			'pe_molding_check_details',
+			'pe_molding_checks.id',
+			'=',
+			'pe_molding_check_details.check_id'
+		)
+		->select(
+			'pe_molding_checks.*',
+			'pe_molding_check_details.part_name',
+			'pe_molding_check_details.point_check',
+			'pe_molding_check_details.standard',
+			'pe_molding_check_details.how_check',
+			'pe_molding_check_details.handle',
+			'pe_molding_check_details.photo_before1',
+			'pe_molding_check_details.photo_before2',
+			'pe_molding_check_details.photo_activity1',
+			'pe_molding_check_details.photo_activity2',
+			'pe_molding_check_details.photo_after1',
+			'pe_molding_check_details.photo_after2',
+			'pe_molding_check_details.judgement'
+		)
+		->where('pe_molding_checks.schedule_id', $schedule->id)
+		->get();
+
+		$approvers = [
+			'created_by_name' => $schedule->created_by_name ?? '-',
+			'approval_1_name' => $schedule->approval_1_name ?? '-',
+			'approval_2_name' => $schedule->approval_2_name ?? '-',
+			'created_at' => $schedule->created_at ?? '-',
+			'approval_1_date' => $schedule->approval_1_date ?? '-',
+			'approval_2_date' => $schedule->approval_2_date ?? '-'
+		];
+
+		return view(
+			'molding.report.report_maintenance_molding',
+			array(
+				'title' => $title,
+				'title_jp' => $title_jp,
+				'period' => date('Y F', strtotime($period)),
+				'data_molding' => $data_molding,
+				'data_check' => $data_check,
+				'data_finding' => $finding,
+				'approver' => $approvers
+			)
+		)->with('page', 'Workshop Audit Molding');
+	}
 }

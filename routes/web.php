@@ -406,6 +406,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'App\Http\Controllers'], 
     Route::get('fetch/workshop/check_molding_vendor/penanganan/log', 'workshopController@fetchHandlingLog');
     Route::post('post/workshop/check_molding_vendor/penanganan', 'workshopController@postHandling');
     Route::get('get/workshop/check_molding_vendor/export', 'workshopController@exportDetailExcel');
+    Route::get('index/workshop/check_molding_vendor/report', 'workshopController@report_view');
     // });
 
     Route::get('index/outgoing/ng_rate/{vendor}', 'OutgoingController@indexNgRate');
