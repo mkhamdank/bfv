@@ -294,10 +294,10 @@
                         <i class="fas fa-gas-pump"></i>
                         <span>Pengisian BBM</span>
                     </a>
-                    {{-- <a href="{{url('index/driver/request/e-money')}}" class="driver-menu-subitem">
+                    <a href="{{url('index/driver/request/e-money')}}" class="driver-menu-subitem">
                         <i class="fas fa-wallet"></i>
                         <span>Pengisian E-Money</span>
-                    </a> --}}
+                    </a>
                 </div>
             </details>
 
