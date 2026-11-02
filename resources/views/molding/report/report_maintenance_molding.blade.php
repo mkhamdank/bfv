@@ -363,44 +363,26 @@
             <table class="approval-table">
                 <thead>
                     <tr>
-                        <th>Dibuat Oleh</th>
-                        <th>Approval 1</th>
-                        <th>Approval 2</th>
+                        <th>Check By</th>
+                        <th>Approve By</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        @foreach ($approver as $app)
                         <td class="approval-name">
-                            {{ $approver['created_by_name'] ?? '-' }}
+                            {{ $app->approver_name ?? '-' }}
                         </td>
-
-                        <td class="approval-name">
-                            {{ $approver['approval_1_name'] ?? '-' }}
-                        </td>
-
-                        <td class="approval-name">
-                            {{ $approver['approval_2_name'] ?? '-' }}
-                        </td>
+                        @endforeach
                     </tr>
-
                     <tr>
+                        @foreach ($approver as $app)
                         <td class="approval-date">
-                            {{ $approver['created_at']
-                                ? date('d M Y', strtotime($approver['created_at']))
+                            {{ $app->approve_at
+                                ? date('d M Y', strtotime($app->approve_at))
                                 : '-' }}
                         </td>
-
-                        <td class="approval-date">
-                            {{ $approver['approval_1_date']
-                                ? date('d M Y', strtotime($approver['approval_1_date']))
-                                : '-' }}
-                        </td>
-
-                        <td class="approval-date">
-                            {{ $approver['approval_2_date']
-                                ? date('d M Y', strtotime($approver['approval_2_date']))
-                                : '-' }}
-                        </td>
+                        @endforeach
                     </tr>
                 </tbody>
             </table>

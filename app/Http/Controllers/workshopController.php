@@ -1158,14 +1158,10 @@ class workshopController extends Controller
 		->where('pe_molding_checks.schedule_id', $schedule->id)
 		->get();
 
-		$approvers = [
-			'created_by_name' => $schedule->created_by_name ?? '-',
-			'approval_1_name' => $schedule->approval_1_name ?? '-',
-			'approval_2_name' => $schedule->approval_2_name ?? '-',
-			'created_at' => $schedule->created_at ?? '-',
-			'approval_1_date' => $schedule->approval_1_date ?? '-',
-			'approval_2_date' => $schedule->approval_2_date ?? '-'
-		];
+		$approvers = DB::table('pe_molding_approvers')
+			->where('schedule_id', $schedule->id)
+			->orderBy('approver_order', 'asc')
+			->get();
 
 		return view(
 			'molding.report.report_maintenance_molding',
