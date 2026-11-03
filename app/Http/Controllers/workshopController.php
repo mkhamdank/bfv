@@ -74,6 +74,7 @@ class workshopController extends Controller
 				->get();
 
 				$datas2 = $datas2->select(db::raw('DATE_FORMAT(period,"%Y %b") as check_date'),'status', db::raw('COUNT(id) as jml') )
+				->whereNull('deleted_at')
 				->groupBy('period', 'status')
 				->get();
 
