@@ -452,6 +452,27 @@
         .always-visible-section:first-of-type:after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:5px;background:#cbd5e1;border-top:1px solid #94a3b8;border-bottom:1px solid #e2e8f0;border-radius:3px}
         .simulation-submit-wrap{margin:8px 0 10px!important}
         @media(max-width:767px){.always-visible-section:first-of-type{margin-bottom:16px!important}.always-visible-section:first-of-type:after{bottom:-10px;height:4px}.simulation-submit-wrap{margin:7px 0 9px!important}}
+
+        /* Perbaikan proporsi simulasi tangki pada file terbaru */
+        .simulation-layout{grid-template-columns:96px minmax(0,1fr)!important;gap:8px!important;align-items:center!important}
+        .tank-summary{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;min-width:0!important;padding:0!important}
+        .tank-total{margin:0 0 4px!important;line-height:1.2!important}
+        .simulation-card .tank-shell{width:68px!important;height:98px!important;margin:0 auto!important;padding:3px!important;box-sizing:border-box!important;display:block!important;overflow:hidden!important;border-width:3px!important}
+        .simulation-card .tank-fill{width:100%!important;height:100%!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;overflow:hidden!important}
+        .simulation-card .tank-part{width:100%!important;min-height:0!important;flex:none!important;flex-shrink:0!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;font-size:10px!important;line-height:1!important}
+        .simulation-card .tank-to-buy{order:1!important}
+        .simulation-card .tank-remaining{order:2!important}
+        .tank-legend{margin-top:4px!important;line-height:1.25!important}
+        .tank-odo{margin-top:4px!important;line-height:1.2!important;white-space:nowrap!important}
+        .simulation-results{justify-content:center!important}
+        .simulation-result-grid{gap:5px!important}
+        .simulation-result-item{min-height:50px!important;padding:6px!important}
+        .simulation-result-item.summary-wide{min-height:46px!important}
+        @media(max-width:767px){
+            .simulation-layout{grid-template-columns:92px minmax(0,1fr)!important;gap:6px!important}
+            .simulation-card .tank-shell{width:64px!important;height:92px!important}
+            .simulation-result-item{min-height:48px!important;padding:6px!important}
+        }
     </style>
 @endsection
 @section('content')
@@ -934,16 +955,22 @@
             var remain = Math.max(0, Number(lastCalculation.remaining_fuel_liter || 0));
             var buy = Math.max(0, Number(lastCalculation.fuel_to_buy_liter || 0));
             var total = Math.max(0, remain + buy);
-            var remainPct = total > 0 ? remain / total * 100 : 0;
-            var buyPct = total > 0 ? buy / total * 100 : 0;
+            var remainPct = total > 0 ? Math.max(0, Math.min(100, remain / total * 100)) : 0;
+            var buyPct = total > 0 ? Math.max(0, 100 - remainPct) : 0;
             $('#tankTotalText').text(formatNumber(total) + ' L');
             $('#tankBuyText').text(formatNumber(buy));
             $('#tankRemainingText').text(formatNumber(remain));
             $('#tankOdometerText').text(Number(odometerValue).toLocaleString('id-ID'));
             $('#tankBuyInside').text('+' + formatNumber(buy));
             $('#tankRemainingInside').text(formatNumber(remain));
-            $('#tankBuyPart').css('height', buyPct + '%');
-            $('#tankRemainingPart').css('height', remainPct + '%');
+            $('#tankBuyPart').css({
+                height: buyPct + '%',
+                flexBasis: buyPct + '%'
+            });
+            $('#tankRemainingPart').css({
+                height: remainPct + '%',
+                flexBasis: remainPct + '%'
+            });
             $('#summaryRemainingFuel').text(formatNumber(remain) + ' liter');
             $('#summaryFuelToBuy').text(formatNumber(buy) + ' liter');
             var noVoucher = isNoVoucherLocation();
