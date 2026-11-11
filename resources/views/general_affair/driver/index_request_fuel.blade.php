@@ -423,32 +423,35 @@
         .main-accordion>.sec-card-body{padding-top:8px}.compact-page .sec-card{margin-bottom:8px}.compact-page .page-header-modern{margin:8px 0 10px;padding:12px 18px}.compact-page .sec-card-header{padding:9px 14px}.compact-page .sec-card-body{padding:9px 14px}
         @media(max-width:767px){.fuel-visual-layout{grid-template-columns:100px minmax(0,1fr);gap:8px}.tank-shell{width:66px;height:126px}.efficiency-main{gap:5px}.efficiency-item{padding:6px}.efficiency-item strong{font-size:11px}.history-row{grid-template-columns:1fr 1fr;gap:4px}.compact-page .page-header-modern{padding:8px 10px}.compact-page .sec-card-body{padding:7px 9px}}
 
-        /* Perbaikan proporsi ringkasan BBM dan efisiensi */
-        .fuel-visual-card{padding:10px!important}
-        .fuel-visual-layout{grid-template-columns:118px minmax(0,1fr)!important;gap:10px!important;align-items:stretch!important}
-        .tank-summary{display:flex;flex-direction:column;justify-content:center;padding:4px 3px}
-        .tank-shell{width:72px!important;height:112px!important}
-        .tank-fill{height:100%!important}
-        .tank-part{min-height:18px!important;font-size:10px!important}
-        .tank-total{margin-bottom:4px!important}
-        .tank-legend{margin-top:4px!important;line-height:1.3!important}
-        .tank-odo{margin-top:4px!important}
-        .efficiency-box{display:flex;flex-direction:column;justify-content:center}
-        .efficiency-title{margin-bottom:5px!important}
-        .efficiency-main{gap:5px!important}
-        .efficiency-item{padding:7px!important;min-height:56px;display:flex;flex-direction:column;justify-content:center}
-        .efficiency-status{margin-top:5px!important}
-        .efficiency-box>.ui-accordion-toggle{margin:5px 0 0!important}
-        #efficiencyHistoryPanel{padding-top:5px!important}
-        .history-list{gap:4px!important;margin-top:0!important}
-        .history-row{padding:6px 7px!important}
+        /* Layout terbaru: input dan simulasi selalu tampil */
+        .always-visible-section .sec-card-body{display:block!important}
+        .input-divider{height:1px;background:#e2e8f0;margin:8px 0 10px}
+        .simulation-empty{min-height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;border:1px dashed #cbd5e1;border-radius:11px;background:#f8fafc;color:#64748b;padding:12px}
+        .simulation-empty i{font-size:22px;color:#94a3b8}.simulation-empty strong{font-size:13px;color:#334155}.simulation-empty span{font-size:10px}
+        .compact-empty{min-height:86px}
+        .simulation-card{display:none!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+        .simulation-card.is-visible{display:block!important}
+        .simulation-layout{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:stretch}
+        .simulation-results{min-width:0;display:flex;flex-direction:column;justify-content:center}
+        .simulation-title{font-size:12px;font-weight:800;color:#1e293b;margin-bottom:6px}
+        .simulation-result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+        .simulation-result-item{padding:8px;border:1px solid #e1e6f0;border-radius:10px;background:#f8f7ff;min-height:58px;display:flex;flex-direction:column;justify-content:center}
+        .simulation-result-item span{font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;margin-bottom:4px}
+        .simulation-result-item strong{font-size:13px;color:#312e70;overflow-wrap:anywhere}
+        .simulation-result-item.summary-wide{grid-column:1/-1;min-height:52px}
+        #efficiencyPanel{padding-top:7px}
+        #efficiencyContent .efficiency-main{margin-top:0}
         @media(max-width:767px){
-            .fuel-visual-card{padding:8px!important}
-            .fuel-visual-layout{grid-template-columns:108px minmax(0,1fr)!important;gap:7px!important}
-            .tank-shell{width:66px!important;height:104px!important}
-            .efficiency-item{padding:6px!important;min-height:52px}
-            .efficiency-item strong{font-size:11px!important}
+            .simulation-layout{grid-template-columns:105px minmax(0,1fr);gap:7px}
+            .simulation-result-grid{gap:5px}.simulation-result-item{padding:6px;min-height:52px}.simulation-result-item strong{font-size:11px}
+            .simulation-title{font-size:11px}.simulation-empty{min-height:95px}
         }
+
+        /* Penegas batas antara Input Pengisian BBM dan Simulasi Pengisian BBM */
+        .always-visible-section:first-of-type{position:relative;margin-bottom:18px!important}
+        .always-visible-section:first-of-type:after{content:"";position:absolute;left:0;right:0;bottom:-11px;height:5px;background:#cbd5e1;border-top:1px solid #94a3b8;border-bottom:1px solid #e2e8f0;border-radius:3px}
+        .simulation-submit-wrap{margin:8px 0 10px!important}
+        @media(max-width:767px){.always-visible-section:first-of-type{margin-bottom:16px!important}.always-visible-section:first-of-type:after{bottom:-10px;height:4px}.simulation-submit-wrap{margin:7px 0 9px!important}}
     </style>
 @endsection
 @section('content')
@@ -471,8 +474,9 @@
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
         </div>
-        <div class="sec-card">
-            <div class="sec-card-header"><span class="dot dot-blue"></span> Pilih Kendaraan</div>
+        {{-- 1. Input selalu tampil --}}
+        <div class="sec-card always-visible-section">
+            <div class="sec-card-header"><span class="dot dot-blue"></span> Input Pengisian BBM</div>
             <div class="sec-card-body">
                 <div class="ff required-field">
                     <label for="carSelect">Kendaraan <span class="req">*</span></label>
@@ -484,56 +488,84 @@
                     </select>
                     <span class="hint">Pilih kendaraan untuk mengisi informasi dan perhitungan BBM secara otomatis.</span>
                 </div>
+                <div class="input-divider"></div>
+                <div class="photo-card">
+                    <span class="photo-label"><i class="fas fa-tachometer-alt"></i> Foto Odometer &amp; Indikator Sebelum Pengisian <span class="req">*</span></span>
+                    <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore" accept="image/*" capture="environment" required>
+                    <button type="button" class="ui-accordion-toggle" id="photoPreviewToggle" aria-expanded="false" aria-controls="previewOdoBefore" style="display:none" onclick="toggleFuelAccordion(this, 'previewOdoBefore')">
+                        <span><i class="fas fa-image"></i> Lihat Preview Foto</span><i class="fas fa-chevron-down accordion-chevron"></i>
+                    </button>
+                    <div class="photo-preview" id="previewOdoBefore"><img id="blahOdoBefore" src="" alt="Preview odometer sebelum pengisian"></div>
+                </div>
+                <div class="g2">
+                    <div class="ff required-field"><label for="odometer">Odometer Saat Ini (KM) <span class="req">*</span></label><input type="text" readonly style="background:white;" id="odometer" name="odometer" class="numpad" placeholder="Contoh: 125000" required><span class="hint">Masukkan angka odometer yang terlihat pada dashboard.</span></div>
+                    <div class="ff required-field">
+                        <label for="remainingRange">Sisa Jarak Tempuh (KM) <span class="req">*</span></label><input type="text" readonly style="background:white;" class="numpad" id="remainingRange" name="remaining_range" placeholder="Contoh: 140" required><span class="hint">Jarak yang masih dapat ditempuh berdasarkan indikator kendaraan.</span>
+                        <div id="hiaceGuidanceWrapper" style="display:none;"><button type="button" class="ui-accordion-toggle" aria-expanded="false" aria-controls="remainingRangeGuidancePanel" onclick="toggleFuelAccordion(this, 'remainingRangeGuidancePanel')"><span><i class="fas fa-book-open"></i> Lihat Panduan HiAce</span><i class="fas fa-chevron-down accordion-chevron"></i></button><div id="remainingRangeGuidancePanel" class="ui-accordion-panel"><span class="hint">Untuk <b>Hiace</b>, gunakan indikator jarak tersisa dari odometer.</span><img src="{{ asset('images/Hiace.png') }}" alt="Panduan Jarak Tersisa Hiace" style="max-width:100%;height:auto;"></div></div>
+                    </div>
+                </div>
+                <div class="ff required-field"><label for="fuelLocation">Lokasi Pengisian BBM</label><select id="fuelLocation" name="fuel_location"><option value="" disabled selected>Pilih lokasi pengisian BBM</option><option value="POM Bensin HR Muhammad Surabaya">POM Bensin HR Muhammad Surabaya</option><option value="POM Bensin Kebon Agung Pasuruan">POM Bensin Kebon Agung Pasuruan</option></select><span class="hint">Pilih lokasi pengisian BBM.</span></div>
             </div>
         </div>
-        <div class="sec-card main-accordion">
-            <div class="sec-card-header"><span class="dot dot-yellow"></span> Input Parameter</div>
+
+        {{-- 2. Simulasi selalu tampil --}}
+        <div class="sec-card always-visible-section">
+            <div class="sec-card-header"><span class="dot dot-orange"></span> Simulasi Pengisian BBM</div>
             <div class="sec-card-body">
-                <button type="button" class="ui-accordion-toggle" id="parameterToggle" aria-expanded="false" aria-controls="parameterPanel" onclick="toggleMainAccordion(this, 'parameterPanel')">
-                    <span><i class="fas fa-sliders-h"></i> Tampilkan Input Parameter</span><i class="fas fa-chevron-down accordion-chevron"></i>
-                </button>
-                <div id="parameterPanel" class="ui-accordion-panel">
-                    <div class="photo-card">
-                        <span class="photo-label"><i class="fas fa-tachometer-alt"></i> Foto Odometer &amp; Indikator Sebelum Pengisian <span class="req">*</span></span>
-                        <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore" accept="image/*" capture="environment" required>
-                        <button type="button" class="ui-accordion-toggle" id="photoPreviewToggle" aria-expanded="false" aria-controls="previewOdoBefore" style="display:none" onclick="toggleFuelAccordion(this, 'previewOdoBefore')">
-                            <span><i class="fas fa-image"></i> Lihat Preview Foto</span><i class="fas fa-chevron-down accordion-chevron"></i>
-                        </button>
-                        <div class="photo-preview" id="previewOdoBefore"><img id="blahOdoBefore" src="" alt="Preview odometer sebelum pengisian"></div>
-                    </div>
-                    <div class="g2">
-                        <div class="ff required-field"><label for="odometer">Odometer Saat Ini (KM) <span class="req">*</span></label><input type="text" readonly style="background:white;" id="odometer" name="odometer" class="numpad" placeholder="Contoh: 125000" required><span class="hint">Masukkan angka odometer yang terlihat pada dashboard.</span></div>
-                        <div class="ff required-field">
-                            <label for="remainingRange">Sisa Jarak Tempuh (KM) <span class="req">*</span></label><input type="text" readonly style="background:white;" class="numpad" id="remainingRange" name="remaining_range" placeholder="Contoh: 140" required><span class="hint">Jarak yang masih dapat ditempuh berdasarkan indikator kendaraan.</span>
-                            <div id="hiaceGuidanceWrapper" style="display:none;"><button type="button" class="ui-accordion-toggle" aria-expanded="false" aria-controls="remainingRangeGuidancePanel" onclick="toggleFuelAccordion(this, 'remainingRangeGuidancePanel')"><span><i class="fas fa-book-open"></i> Lihat Panduan HiAce</span><i class="fas fa-chevron-down accordion-chevron"></i></button><div id="remainingRangeGuidancePanel" class="ui-accordion-panel"><span class="hint">Untuk <b>Hiace</b>, gunakan indikator jarak tersisa dari odometer.</span><img src="{{ asset('images/Hiace.png') }}" alt="Panduan Jarak Tersisa Hiace" style="max-width:100%;height:auto;"></div></div>
-                        </div>
-                    </div>
-                    <div class="ff required-field"><label for="fuelLocation">Lokasi Pengisian BBM</label><select id="fuelLocation" name="fuel_location"><option value="" disabled selected>Pilih lokasi pengisian BBM</option><option value="POM Bensin HR Muhammad Surabaya">POM Bensin HR Muhammad Surabaya</option><option value="POM Bensin Kebon Agung Pasuruan">POM Bensin Kebon Agung Pasuruan</option></select><span class="hint">Pilih lokasi pengisian BBM.</span></div>
-                </div>
-                <div id="fuelVisualCard" class="fuel-visual-card" aria-live="polite">
-                    <div class="fuel-visual-layout">
+                <div id="simulationEmpty" class="simulation-empty"><i class="fas fa-gas-pump"></i><strong>Belum ada data simulasi</strong><span>Lengkapi kendaraan, odometer, sisa jarak tempuh, dan lokasi pengisian.</span></div>
+                <div id="fuelVisualCard" class="fuel-visual-card simulation-card" aria-live="polite">
+                    <div class="simulation-layout">
                         <div class="tank-summary">
                             <div class="tank-total">Total <span id="tankTotalText">0 L</span></div>
                             <div class="tank-shell"><div class="tank-fill" id="tankFill"><div class="tank-part tank-to-buy" id="tankBuyPart"><span id="tankBuyInside">+0</span></div><div class="tank-part tank-remaining" id="tankRemainingPart"><span id="tankRemainingInside">0</span></div></div></div>
                             <div class="tank-legend"><div class="fill-text">Isi +<span id="tankBuyText">0</span> L</div><div class="remain-text">Sisa <span id="tankRemainingText">0</span> L</div></div>
                             <div class="tank-odo">ODO <span id="tankOdometerText">0</span> KM</div>
                         </div>
-                        <div class="efficiency-box">
-                            <div class="efficiency-title"><i class="fas fa-chart-line"></i> Efisiensi 3 Bulan Terakhir</div>
-                            <div class="efficiency-main">
-                                <div class="efficiency-item"><span>Efisiensi Aktual</span><strong id="efficiencyActual">Data belum tersedia</strong></div>
-                                <div class="efficiency-item"><span>Standar Kendaraan</span><strong id="efficiencyStandard">-</strong></div>
-                                <div class="efficiency-item"><span>Total Jarak</span><strong id="efficiencyDistance">-</strong></div>
-                                <div class="efficiency-item"><span>Total BBM</span><strong id="efficiencyFuel">-</strong></div>
+                        <div class="simulation-results">
+                            <div class="simulation-title"><i class="fas fa-calculator"></i> Ringkasan Hasil Perhitungan</div>
+                            <div class="simulation-result-grid">
+                                <div class="simulation-result-item"><span>Estimasi Sisa BBM</span><strong id="summaryRemainingFuel">-</strong></div>
+                                <div class="simulation-result-item"><span>Kebutuhan Beli BBM</span><strong id="summaryFuelToBuy">-</strong></div>
+                                <div class="simulation-result-item voucher-summary"><span>Nominal Voucher</span><strong id="summaryVoucherDenomination">-</strong></div>
+                                <div class="simulation-result-item voucher-summary"><span>Jumlah Voucher</span><strong id="summaryVoucherCount">-</strong></div>
+                                <div class="simulation-result-item voucher-summary summary-wide"><span>Total Nilai Voucher</span><strong id="summaryVoucherTotal">-</strong></div>
+                                <div class="simulation-result-item no-voucher-summary summary-wide" style="display:none"><span>Total Biaya BBM</span><strong id="summaryTotalCost">-</strong></div>
                             </div>
-                            <div class="efficiency-status" id="efficiencyStatus">Menunggu data kendaraan</div>
-                            <button type="button" class="ui-accordion-toggle" id="efficiencyHistoryToggle" aria-expanded="false" aria-controls="efficiencyHistoryPanel" onclick="toggleFuelAccordion(this, 'efficiencyHistoryPanel')"><span><i class="fas fa-history"></i> Lihat Riwayat 3 Bulan</span><i class="fas fa-chevron-down accordion-chevron"></i></button>
-                            <div id="efficiencyHistoryPanel" class="ui-accordion-panel"><div id="efficiencyHistoryList" class="history-list"><div class="hint">Data efisiensi belum tersedia.</div></div></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="simulation-submit-wrap">
+            <button type="button" class="btn-submit" id="submitButton" onclick="submitDriver()">
+                <i class="fas fa-paper-plane"></i> Submit Request Fuel
+            </button>
+        </div>
+
+        {{-- 3. Efisiensi default tertutup --}}
+        <div class="sec-card main-accordion">
+            <div class="sec-card-header"><span class="dot dot-blue"></span> Efisiensi 3 Bulan Terakhir</div>
+            <div class="sec-card-body">
+                <button type="button" class="ui-accordion-toggle" id="efficiencyToggle" aria-expanded="false" aria-controls="efficiencyPanel" onclick="toggleMainAccordion(this, 'efficiencyPanel')"><span><i class="fas fa-chart-line"></i> Tampilkan Efisiensi 3 Bulan Terakhir</span><i class="fas fa-chevron-down accordion-chevron"></i></button>
+                <div id="efficiencyPanel" class="ui-accordion-panel">
+                    <div id="efficiencyEmpty" class="simulation-empty compact-empty"><i class="fas fa-chart-line"></i><strong>Data efisiensi belum tersedia</strong><span>Pilih kendaraan untuk menampilkan histori tiga bulan terakhir.</span></div>
+                    <div id="efficiencyContent" style="display:none">
+                        <div class="efficiency-main">
+                            <div class="efficiency-item"><span>Efisiensi Aktual</span><strong id="efficiencyActual">-</strong></div>
+                            <div class="efficiency-item"><span>Standar Kendaraan</span><strong id="efficiencyStandard">-</strong></div>
+                            <div class="efficiency-item"><span>Total Jarak</span><strong id="efficiencyDistance">-</strong></div>
+                            <div class="efficiency-item"><span>Total BBM</span><strong id="efficiencyFuel">-</strong></div>
+                        </div>
+                        <div class="efficiency-status" id="efficiencyStatus">Data 3 bulan belum tersedia</div>
+                        <button type="button" class="ui-accordion-toggle" id="efficiencyHistoryToggle" aria-expanded="false" aria-controls="efficiencyHistoryPanel" onclick="toggleFuelAccordion(this, 'efficiencyHistoryPanel')"><span><i class="fas fa-history"></i> Lihat Riwayat 3 Bulan</span><i class="fas fa-chevron-down accordion-chevron"></i></button>
+                        <div id="efficiencyHistoryPanel" class="ui-accordion-panel"><div id="efficiencyHistoryList" class="history-list"><div class="hint">Data riwayat belum tersedia.</div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- 4. Informasi kendaraan default tertutup --}}
         <div class="sec-card main-accordion">
             <div class="sec-card-header"><span class="dot dot-purple"></span> Informasi Kendaraan</div>
             <div class="sec-card-body">
@@ -550,6 +582,8 @@
                 </div></div>
             </div>
         </div>
+
+        {{-- 5. Detail hasil default tertutup --}}
         <div class="sec-card main-accordion">
             <div class="sec-card-header"><span class="dot dot-green"></span> Hasil Perhitungan BBM</div>
             <div class="sec-card-body">
@@ -569,11 +603,7 @@
                 <input type="hidden" id="remaining_fuel_liter" name="remaining_fuel_liter"><input type="hidden" id="fuel_to_buy_liter" name="fuel_to_buy_liter"><input type="hidden" id="fuel_total_cost" name="fuel_total_cost"><input type="hidden" id="voucher_count" name="voucher_count"><input type="hidden" id="voucher_total" name="voucher_total">
             </div>
         </div>
-<div style="margin-bottom:40px;">
-            <button type="button" class="btn-submit" id="submitButton" onclick="submitDriver()">
-                <i class="fas fa-paper-plane"></i> Submit Request Fuel
-            </button>
-        </div>
+
     </div>
 @endsection
 @section('scripts')
@@ -860,61 +890,46 @@
             var platNo = $('#plat_no').val();
             var carName = $('#vehicle').val();
             var data = getEfficiencyForVehicle(platNo, carName);
-
             $('#efficiencyStandard').text(fuelConsumption > 0 ? formatNumber(fuelConsumption) + ' KM/L' : '-');
-            $('#efficiencyActual').text('Data belum tersedia');
+            $('#efficiencyActual').text('-');
             $('#efficiencyDistance, #efficiencyFuel').text('-');
             $('#efficiencyStatus').removeClass('good watch bad').text('Data 3 bulan belum tersedia');
-            $('#efficiencyHistoryList').html('<div class="hint">Data riwayat 3 bulan tidak tersedia.</div>');
-
-            if (!data) return;
-
+            $('#efficiencyHistoryList').html('<div class="hint">Data riwayat belum tersedia.</div>');
+            var hasData = !!(data && (Number(data.total_fuel || 0) > 0 || Number(data.total_distance || 0) > 0 || Number(data.efficiency || 0) > 0));
+            $('#efficiencyEmpty').toggle(!hasData);
+            $('#efficiencyContent').toggle(hasData);
+            if (!hasData) return;
             var actual = Number(data.efficiency || data.efficiency_actual || 0);
             var distance = Number(data.total_distance || 0);
             var totalFuel = Number(data.total_fuel || 0);
             if (!actual && distance > 0 && totalFuel > 0) actual = distance / totalFuel;
-
-            if (actual > 0) $('#efficiencyActual').text(formatNumber(actual) + ' KM/L');
+            $('#efficiencyActual').text(actual > 0 ? formatNumber(actual) + ' KM/L' : '-');
             $('#efficiencyDistance').text(distance > 0 ? formatNumber(distance, 0) + ' KM' : '-');
             $('#efficiencyFuel').text(totalFuel > 0 ? formatNumber(totalFuel) + ' L' : '-');
-
             var ratio = fuelConsumption > 0 && actual > 0 ? actual / fuelConsumption * 100 : 0;
             var status = $('#efficiencyStatus').removeClass('good watch bad');
-            if (ratio >= 95 && ratio <= 130) {
-                status.addClass('good').text('Efisien • ' + formatNumber(ratio, 1) + '% dari standar');
-            } else if (ratio >= 85 && ratio < 95) {
-                status.addClass('watch').text('Perlu dipantau • ' + formatNumber(ratio, 1) + '% dari standar');
-            } else if (ratio > 130) {
-                status.addClass('watch').text('Periksa data • hasil melebihi standar');
-            } else if (ratio > 0) {
-                status.addClass('bad').text('Tidak efisien • ' + formatNumber(ratio, 1) + '% dari standar');
-            }
-
+            if (ratio > 130) status.addClass('watch').text('Periksa data • hasil melebihi standar');
+            else if (ratio >= 95) status.addClass('good').text('Efisien • ' + formatNumber(ratio, 1) + '% dari standar');
+            else if (ratio >= 85) status.addClass('watch').text('Perlu dipantau • ' + formatNumber(ratio, 1) + '% dari standar');
+            else if (ratio > 0) status.addClass('bad').text('Tidak efisien • ' + formatNumber(ratio, 1) + '% dari standar');
             var monthly = Array.isArray(data.monthly) ? data.monthly : (Array.isArray(data.months) ? data.months : []);
-            if (!monthly.length) {
-                $('#efficiencyHistoryList').html('<div class="hint">Ringkasan tersedia, tetapi rincian bulanan kosong.</div>');
-                return;
+            if (monthly.length) {
+                $('#efficiencyHistoryList').html(monthly.map(function(row) {
+                    var eff = Number(row.efficiency || 0), d = Number(row.distance || 0), f = Number(row.fuel || 0);
+                    if (!eff && d > 0 && f > 0) eff = d / f;
+                    return '<div class="history-row"><strong>' + (row.month || row.period || '-') + '</strong><span>' + formatNumber(d, 0) + ' KM</span><span>' + formatNumber(f) + ' L</span><span>' + formatNumber(eff) + ' KM/L</span></div>';
+                }).join(''));
+            } else {
+                $('#efficiencyHistoryList').html('<div class="hint">Ringkasan tersedia, tetapi rincian bulanan belum tersedia.</div>');
             }
-
-            var html = monthly.map(function(row) {
-                var eff = Number(row.efficiency || 0);
-                var rowDistance = Number(row.distance || 0);
-                var rowFuel = Number(row.fuel || 0);
-                if (!eff && rowDistance > 0 && rowFuel > 0) eff = rowDistance / rowFuel;
-                return '<div class="history-row">' +
-                    '<strong>' + (row.month || row.period || '-') + '</strong>' +
-                    '<span>' + formatNumber(rowDistance, 0) + ' KM</span>' +
-                    '<span>' + formatNumber(rowFuel) + ' L</span>' +
-                    '<span>' + formatNumber(eff) + ' KM/L</span>' +
-                    '</div>';
-            }).join('');
-            $('#efficiencyHistoryList').html(html);
         }
         function updateFuelVisual() {
             var odometerValue = $('#odometer').val();
             var rangeValue = $('#remainingRange').val();
-            var ready = $('#carSelect').val() !== null && odometerValue !== '' && rangeValue !== '' && lastCalculation;
+            var ready = $('#carSelect').val() !== null && odometerValue !== '' && rangeValue !== '' && $('#fuelLocation').val() && lastCalculation;
+            $('#simulationEmpty').toggle(!ready);
             $('#fuelVisualCard').toggleClass('is-visible', !!ready);
+            renderEfficiency();
             if (!ready) return;
             var remain = Math.max(0, Number(lastCalculation.remaining_fuel_liter || 0));
             var buy = Math.max(0, Number(lastCalculation.fuel_to_buy_liter || 0));
@@ -929,7 +944,18 @@
             $('#tankRemainingInside').text(formatNumber(remain));
             $('#tankBuyPart').css('height', buyPct + '%');
             $('#tankRemainingPart').css('height', remainPct + '%');
-            renderEfficiency();
+            $('#summaryRemainingFuel').text(formatNumber(remain) + ' liter');
+            $('#summaryFuelToBuy').text(formatNumber(buy) + ' liter');
+            var noVoucher = isNoVoucherLocation();
+            $('.voucher-summary').toggle(!noVoucher);
+            $('.no-voucher-summary').toggle(noVoucher);
+            if (noVoucher) {
+                $('#summaryTotalCost').text(formatRupiah(Number(lastCalculation.fuel_total_cost || 0)));
+            } else {
+                $('#summaryVoucherDenomination').text(formatRupiah(Number(lastCalculation.voucher_denomination || 0)));
+                $('#summaryVoucherCount').text(formatNumber(Number(lastCalculation.voucher_count || 0), 0) + ' voucher');
+                $('#summaryVoucherTotal').text(formatRupiah(Number(lastCalculation.voucher_total || 0)));
+            }
         }
         function calculateFuel() {
             const rangeValue = $('#remainingRange').val();
@@ -1157,8 +1183,8 @@ const formData = new FormData();
             $('body').toggleClass('sidebar-collapse');
             $('#side_vfi').addClass('menu-open');
             $('#remainingRange, #fuelPrice, #voucherDenomination').on('input change', calculateFuel);
-            $('#carSelect').on('change', function(){ updateSelectedVehicle(); var b=document.getElementById('parameterToggle'); if(b && b.getAttribute('aria-expanded')!=='true') toggleMainAccordion(b,'parameterPanel'); });
-            $('#fuelLocation').on('change', updateFuelLocationUI);
+            $('#carSelect').on('change', updateSelectedVehicle);
+            $('#fuelLocation').on('change', function(){ updateFuelLocationUI(); calculateFuel(); });
             $('#odometer').on('input', calculateFuel);
             $('#fileDataOdoBefore').on('change', function() {
                 previewImage(this, 'blahOdoBefore', 'previewOdoBefore');
