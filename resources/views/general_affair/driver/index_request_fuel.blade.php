@@ -473,6 +473,21 @@
             .simulation-card .tank-shell{width:64px!important;height:92px!important}
             .simulation-result-item{min-height:48px!important;padding:6px!important}
         }
+
+        /* Multiple foto odometer */
+        .photo-input-list{display:grid;gap:8px}
+        .photo-input-row{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:7px;align-items:center}
+        .photo-input-row input[type=file]{min-width:0}
+        .photo-action-button{width:36px;height:36px;border:0;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;font-size:13px}
+        .photo-add-button{background:#16a34a}.photo-delete-button{background:#dc2626}
+        .photo-add-wrap{display:flex;justify-content:flex-end;margin-top:7px}
+        .photo-add-main{width:auto;padding:0 11px;gap:6px;font-weight:700;font-size:11px}
+        .multiple-photo-preview{display:none;margin-top:8px}
+        .multiple-photo-preview.is-open{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+        .photo-preview-item{position:relative;border:1px solid #dbe3ee;border-radius:9px;background:#fff;padding:5px;min-width:0}
+        .photo-preview-item img{display:block;width:100%;height:120px;object-fit:contain;border:0;border-radius:6px;background:#f8fafc}
+        .photo-preview-name{display:block;margin-top:4px;font-size:9px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        @media(max-width:767px){.photo-input-row{grid-template-columns:minmax(0,1fr) 34px}.photo-action-button{width:34px;height:34px}.photo-preview-item img{height:100px}}
     </style>
 @endsection
 @section('content')
@@ -512,11 +527,19 @@
                 <div class="input-divider"></div>
                 <div class="photo-card">
                     <span class="photo-label"><i class="fas fa-tachometer-alt"></i> Foto Odometer &amp; Indikator Sebelum Pengisian <span class="req">*</span></span>
-                    <input type="file" id="fileDataOdoBefore" name="fileDataOdoBefore" accept="image/*" capture="environment" required>
+                    <div id="photoInputList" class="photo-input-list">
+                        <div class="photo-input-row" data-photo-row="1">
+                            <input type="file" class="odo-photo-input" name="fileDataOdoBefore[]" accept="image/*" capture="environment" required>
+                            <button type="button" class="photo-action-button photo-delete-button" title="Hapus foto" onclick="removeOdoPhotoRow(this)" style="visibility:hidden"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="photo-add-wrap">
+                        <button type="button" class="photo-action-button photo-add-button photo-add-main" onclick="addOdoPhotoRow()"><i class="fas fa-plus"></i></button>
+                    </div>
                     <button type="button" class="ui-accordion-toggle" id="photoPreviewToggle" aria-expanded="false" aria-controls="previewOdoBefore" style="display:none" onclick="toggleFuelAccordion(this, 'previewOdoBefore')">
-                        <span><i class="fas fa-image"></i> Lihat Preview Foto</span><i class="fas fa-chevron-down accordion-chevron"></i>
+                        <span><i class="fas fa-images"></i> Lihat Preview Foto (<span id="photoPreviewCount">0</span>)</span><i class="fas fa-chevron-down accordion-chevron"></i>
                     </button>
-                    <div class="photo-preview" id="previewOdoBefore"><img id="blahOdoBefore" src="" alt="Preview odometer sebelum pengisian"></div>
+                    <div class="multiple-photo-preview" id="previewOdoBefore"></div>
                 </div>
                 <div class="g2">
                     <div class="ff required-field"><label for="odometer">Odometer Saat Ini (KM) <span class="req">*</span></label><input type="text" readonly style="background:white;" id="odometer" name="odometer" class="numpad" placeholder="Contoh: 125000" required><span class="hint">Masukkan angka odometer yang terlihat pada dashboard.</span></div>
@@ -1088,41 +1111,81 @@
         //         maximumAge: 0
         //     });
         // }
-        function previewImage(input, imgId, previewId) {
-            if (!input.files || !input.files[0]) {
-                $('#' + previewId).hide();
-                $('#' + imgId).attr('src', '');
-                return;
-            }
-            const file = input.files[0];
-            if (!file.type.match(/^image\//)) {
-                alert('File dokumentasi harus berupa gambar.');
+        function addOdoPhotoRow() {
+            var rowCount = document.querySelectorAll('#photoInputList .photo-input-row').length;
+            var row = document.createElement('div');
+            row.className = 'photo-input-row';
+            row.setAttribute('data-photo-row', rowCount + 1);
+            row.innerHTML = '<input type="file" class="odo-photo-input" name="fileDataOdoBefore[]" accept="image/*" capture="environment">' +
+                '<button type="button" class="photo-action-button photo-delete-button" title="Hapus foto" onclick="removeOdoPhotoRow(this)"><i class="fas fa-trash"></i></button>';
+            document.getElementById('photoInputList').appendChild(row);
+            refreshOdoPhotoRows();
+            row.querySelector('input').click();
+        }
+        function removeOdoPhotoRow(button) {
+            var rows = document.querySelectorAll('#photoInputList .photo-input-row');
+            if (rows.length <= 1) {
+                var input = rows[0].querySelector('.odo-photo-input');
                 input.value = '';
+            } else {
+                button.closest('.photo-input-row').remove();
+            }
+            refreshOdoPhotoRows();
+            renderOdoPhotoPreviews();
+        }
+        function refreshOdoPhotoRows() {
+            var rows = document.querySelectorAll('#photoInputList .photo-input-row');
+            rows.forEach(function(row, index) {
+                row.setAttribute('data-photo-row', index + 1);
+                var input = row.querySelector('.odo-photo-input');
+                input.required = index === 0;
+                var deleteButton = row.querySelector('.photo-delete-button');
+                deleteButton.style.visibility = rows.length === 1 && index === 0 ? 'hidden' : 'visible';
+            });
+        }
+        function getOdoPhotoFiles() {
+            var files = [];
+            document.querySelectorAll('.odo-photo-input').forEach(function(input) {
+                if (input.files && input.files[0]) files.push(input.files[0]);
+            });
+            return files;
+        }
+        function renderOdoPhotoPreviews() {
+            var files = getOdoPhotoFiles();
+            var preview = document.getElementById('previewOdoBefore');
+            preview.innerHTML = '';
+            document.getElementById('photoPreviewCount').textContent = files.length;
+            $('#photoPreviewToggle').toggle(files.length > 0);
+            if (!files.length) {
+                $('#previewOdoBefore').removeClass('is-open').hide();
+                $('#photoPreviewToggle').attr('aria-expanded', 'false');
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const image = new Image();
-                image.onload = function() {
-                    const maxDimension = 1600;
-                    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
-                    const canvas = document.createElement('canvas');
-                    canvas.width = Math.round(image.width * scale);
-                    canvas.height = Math.round(image.height * scale);
-                    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
-                    $('#' + imgId).attr('src', canvas.toDataURL('image/jpeg', 0.75));
-                    $('#' + previewId).removeClass('is-open').hide();
+            files.forEach(function(file, index) {
+                if (!file.type.match(/^image\//)) return;
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var item = document.createElement('div');
+                    item.className = 'photo-preview-item';
+                    var img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.alt = 'Preview foto odometer ' + (index + 1);
+                    var name = document.createElement('span');
+                    name.className = 'photo-preview-name';
+                    name.textContent = (index + 1) + '. ' + file.name;
+                    item.appendChild(img);
+                    item.appendChild(name);
+                    preview.appendChild(item);
                 };
-                image.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+                reader.readAsDataURL(file);
+            });
         }
         function submitDriver() {
             const odometerValue = $('#odometer').val();
             const fuelLocation = $('#fuelLocation').val();
             if (!$('#carSelect').val()) { alert('Kendaraan wajib dipilih.'); $('#carSelect').focus(); return; }
             const isNoVoucher = fuelLocation === 'POM Bensin HR Muhammad Surabaya';
-            const photoInput = document.getElementById('fileDataOdoBefore');
+            const photoFiles = getOdoPhotoFiles();
             if (odometerValue === '' || !Number.isFinite(Number(odometerValue)) || Number(odometerValue) < 0) {
                 alert('Odometer saat ini wajib diisi dengan angka yang valid.');
                 $('#odometer').focus();
@@ -1150,8 +1213,8 @@
                 alert('Perhitungan BBM belum valid. Periksa kembali input dan data kendaraan.');
                 return;
             }
-            if (!photoInput.files || !photoInput.files[0]) {
-                alert('Foto odometer dan indikator sebelum pengisian wajib dilampirkan.');
+            if (!photoFiles.length) {
+                alert('Minimal satu foto odometer dan indikator sebelum pengisian wajib dilampirkan.');
                 return;
             }
 const formData = new FormData();
@@ -1171,7 +1234,9 @@ const formData = new FormData();
             formData.append('fuel_total_cost', lastCalculation.fuel_total_cost);
             formData.append('latitude', $('#latitude').val());
             formData.append('longitude', $('#longitude').val());
-            formData.append('fileDataOdoBefore', photoInput.files[0]);
+            photoFiles.forEach(function(file) {
+                formData.append('fileDataOdoBefore[]', file);
+            });
             formData.append('driver_id', $('#driver').val().split(' - ')[0]);
             formData.append('driver_name', $('#driver').val().split(' - ').slice(1).join(' - '));
             formData.append('date', $('#date').val());
@@ -1213,11 +1278,16 @@ const formData = new FormData();
             $('#carSelect').on('change', updateSelectedVehicle);
             $('#fuelLocation').on('change', function(){ updateFuelLocationUI(); calculateFuel(); });
             $('#odometer').on('input', calculateFuel);
-            $('#fileDataOdoBefore').on('change', function() {
-                previewImage(this, 'blahOdoBefore', 'previewOdoBefore');
-                $('#previewOdoBefore').removeClass('is-open');
-                $('#photoPreviewToggle').attr('aria-expanded', 'false').toggle(!!(this.files && this.files.length));
+            $(document).on('change', '.odo-photo-input', function() {
+                if (this.files && this.files[0] && !this.files[0].type.match(/^image\//)) {
+                    alert('File dokumentasi harus berupa gambar.');
+                    this.value = '';
+                }
+                $('#previewOdoBefore').removeClass('is-open').hide();
+                $('#photoPreviewToggle').attr('aria-expanded', 'false');
+                renderOdoPhotoPreviews();
             });
+            refreshOdoPhotoRows();
             $('.numpad').numpad({
                 hidePlusMinusButton: true,
                 decimalSeparator: '.'
