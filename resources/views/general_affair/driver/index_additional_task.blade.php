@@ -968,6 +968,13 @@
             }
         }
 
+        var submitTimedOut = false;
+        var submitTimeout = setTimeout(function() {
+            submitTimedOut = true;
+            $('#loading').removeClass('show');
+            openErrorGritter('Error!', 'Proses membutuhkan waktu lebih dari 1 menit. Silakan klik tombol Submit lagi.');
+        }, 60000);
+
         try {
 
             /* =====================================
@@ -990,6 +997,7 @@
                     }
                 });
 
+                if (submitTimedOut) return false;
                 if (!result.status) {
                     throw new Error(result.message);
                 }
@@ -1014,6 +1022,7 @@
                     }
                 });
 
+                if (submitTimedOut) return false;
                 if (!result.status) {
                     throw new Error(result.message);
                 }
@@ -1038,6 +1047,7 @@
                     }
                 });
 
+                if (submitTimedOut) return false;
                 if (!result.status) {
                     throw new Error(result.message);
                 }
@@ -1055,10 +1065,12 @@
                 }
             });
 
+            if (submitTimedOut) return false;
             if (!finish.status) {
                 throw new Error(finish.message);
             }
 
+            clearTimeout(submitTimeout);
             $('#loading').removeClass('show');
 
             $('#div_driver_1').hide();
@@ -1073,6 +1085,8 @@
         }
         catch (err) {
 
+            clearTimeout(submitTimeout);
+            if (submitTimedOut) return false;
             $('#loading').removeClass('show');
 
             openErrorGritter(

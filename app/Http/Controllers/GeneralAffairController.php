@@ -1831,34 +1831,226 @@ class GeneralAffairController extends Controller
         }
     }
 
-    function indexRequestFuel() {
-        $title = 'Permintaan Pengisian BBM';
-        $title_jp = '燃料の補充リクエスト';
+    public function indexRequestFuel()
+{
+    $title = 'Request Fuel';
+    $title_jp = '燃料リクエスト';
 
-        $driver = DB::table('driver_lists')
-        ->where('driver_id', Auth::user()->username)
+    $driver = DB::table('driver_lists')
+        ->where('driver_id', auth()->user()->username)
         ->first();
-        
-        $car = DB::table('driver_lists')
-        ->select('car','plat_no','fuel_capacity','fuel_consumption','fuel_type')
-        ->get();
-        $pertamax = DB::table('driver_gasoline_prices')->where('type','Pertamax')->first();
-        $dex = DB::table('driver_gasoline_prices')->where('type','Dex')->first();
 
-        $bbm = [
-            'Pertamax_'.$pertamax->price,
-            'Pertamina Dex_'.$dex->price
-        ];
-        return view('general_affair.driver.index_request_fuel', [
-            'title' => $title,
-            'title_jp' => $title_jp,
-            'driver' => $driver,
-            'car' => $car,
-            'bbm' => $bbm
-        ]);
+    $car = DB::table('driver_lists')
+        ->whereNotNull('plat_no')
+        ->select('car', 'plat_no', 'fuel_capacity', 'fuel_consumption', 'fuel_type')
+        ->orderBy('car', 'asc')
+        ->get();
+
+    $pertamax = DB::table('driver_gasoline_prices')->where('type', 'Pertamax')->first();
+    $dex = DB::table('driver_gasoline_prices')->where('type', 'Dex')->first();
+
+    $bbm = array(
+        'Pertamax_' . ($pertamax ? $pertamax->price : 0),
+        'Pertamina Dex_' . ($dex ? $dex->price : 0)
+    );
+
+    $fuelEfficiency3Months = $this->buildFuelEfficiency3Months($car);
+
+    return view('general_affair.driver.index_request_fuel', compact(
+        'title',
+        'title_jp',
+        'driver',
+        'car',
+        'bbm',
+        'fuelEfficiency3Months'
+    ));
+}
+
+public function buildFuelEfficiency3Months($cars)
+{
+    $cars = collect($cars)->values();
+    $periodStart = date('Y-m-d', strtotime('-3 months'));
+    $periodEnd = date('Y-m-d');
+
+    $plateNumbers = $cars->map(function ($car) {
+        return isset($car->plat_no) ? trim((string) $car->plat_no) : null;
+    })->filter()->unique()->values();
+
+    if ($plateNumbers->isEmpty()) {
+        return array();
     }
 
-    function inputRequestFuel(Request $request) {
+    /*
+     * date_from wajib dipilih. Field times hanya berisi jam, sehingga tidak
+     * boleh dipakai sendiri untuk mengurutkan transaksi lintas tanggal.
+     */
+    $tasks = DB::table('driver_tasks')
+        ->whereNull('remark')
+        ->whereNotNull('times')
+        ->whereNotNull('date_from')
+        ->whereNotNull('fuel')
+        ->where('fuel', '>', 0)
+        ->whereNotNull('odometer')
+        ->where('odometer', '>', 0)
+        ->whereBetween(DB::raw('DATE(date_from)'), array($periodStart, $periodEnd))
+        ->whereIn('plat_no', $plateNumbers->all())
+        ->select('id', 'plat_no', 'date_from', 'times', 'fuel', 'odometer')
+        ->orderBy('plat_no', 'asc')
+        ->orderBy('date_from', 'asc')
+        ->orderBy('times', 'asc')
+        ->orderBy('id', 'asc')
+        ->get();
+
+    $tasks = collect($tasks);
+    $results = array();
+
+    foreach ($cars as $carItem) {
+        if (!isset($carItem->plat_no)) continue;
+
+        $platNo = trim((string) $carItem->plat_no);
+        if ($platNo === '') continue;
+
+        $normalizedPlate = $this->normalizeFuelPlate($platNo);
+        $vehicleTasks = $tasks->filter(function ($task) use ($normalizedPlate) {
+            return isset($task->plat_no)
+                && $this->normalizeFuelPlate($task->plat_no) === $normalizedPlate;
+        })->sortBy(function ($task) {
+            return strtotime($task->date_from . ' ' . $task->times);
+        })->values();
+
+        $summary = $this->calculateEfficiencyFromTasks($vehicleTasks);
+        $monthly = $this->calculateMonthlyEfficiency($vehicleTasks);
+
+        $results[] = array(
+            'plat_no' => $platNo,
+            'vehicle' => isset($carItem->car) ? $carItem->car : null,
+            'period_start' => $periodStart,
+            'period_end' => $periodEnd,
+            'transaction_count' => $vehicleTasks->count(),
+            'first_odometer' => $summary['first_odometer'],
+            'last_odometer' => $summary['last_odometer'],
+            'valid_interval_count' => $summary['valid_interval_count'],
+            'total_distance' => $summary['total_distance'],
+            'total_fuel' => $summary['total_fuel'],
+            'efficiency' => $summary['efficiency'],
+            'monthly' => $monthly
+        );
+    }
+
+    return $results;
+}
+
+private function normalizeFuelPlate($value)
+{
+    return strtoupper(preg_replace('/\s+/', '', trim((string) $value)));
+}
+
+private function calculateEfficiencyFromTasks($tasks)
+{
+    $tasks = collect($tasks)->values();
+    $totalDistance = 0.0;
+    $totalFuel = 0.0;
+    $firstOdometer = null;
+    $lastOdometer = null;
+    $validIntervalCount = 0;
+    $previous = null;
+
+    foreach ($tasks as $task) {
+        $currentOdometer = isset($task->odometer) ? (float) $task->odometer : 0;
+        $currentFuel = isset($task->fuel) ? (float) $task->fuel : 0;
+
+        if ($currentOdometer <= 0 || $currentFuel <= 0) continue;
+
+        if ($previous === null) {
+            $previous = $task;
+            $firstOdometer = $currentOdometer;
+            $lastOdometer = $currentOdometer;
+            continue;
+        }
+
+        $distance = $currentOdometer - (float) $previous->odometer;
+
+        /* Abaikan odometer mundur, duplikat, dan lonjakan di atas 5.000 km. */
+        if ($distance > 0 && $distance <= 5000) {
+            $totalDistance += $distance;
+            $totalFuel += $currentFuel;
+            $lastOdometer = $currentOdometer;
+            $validIntervalCount++;
+        }
+
+        $previous = $task;
+    }
+
+    return array(
+        'first_odometer' => $firstOdometer,
+        'last_odometer' => $lastOdometer,
+        'valid_interval_count' => $validIntervalCount,
+        'total_distance' => round($totalDistance, 2),
+        'total_fuel' => round($totalFuel, 2),
+        'efficiency' => $totalFuel > 0 ? round($totalDistance / $totalFuel, 2) : 0
+    );
+}
+
+private function calculateMonthlyEfficiency($tasks)
+{
+    $tasks = collect($tasks)->values();
+    $months = array();
+    $previous = null;
+
+    foreach ($tasks as $task) {
+        $currentOdometer = isset($task->odometer) ? (float) $task->odometer : 0;
+        $currentFuel = isset($task->fuel) ? (float) $task->fuel : 0;
+
+        if ($currentOdometer <= 0 || $currentFuel <= 0 || empty($task->date_from)) continue;
+
+        if ($previous === null) {
+            $previous = $task;
+            continue;
+        }
+
+        $distance = $currentOdometer - (float) $previous->odometer;
+        if ($distance <= 0 || $distance > 5000) {
+            $previous = $task;
+            continue;
+        }
+
+        $timestamp = strtotime($task->date_from);
+        if ($timestamp === false) {
+            $previous = $task;
+            continue;
+        }
+
+        $monthKey = date('Y-m', $timestamp);
+        if (!isset($months[$monthKey])) {
+            $months[$monthKey] = array(
+                'month' => date('M Y', $timestamp),
+                'distance' => 0.0,
+                'fuel' => 0.0,
+                'efficiency' => 0.0,
+                'transaction_count' => 0
+            );
+        }
+
+        $months[$monthKey]['distance'] += $distance;
+        $months[$monthKey]['fuel'] += $currentFuel;
+        $months[$monthKey]['transaction_count']++;
+        $previous = $task;
+    }
+
+    ksort($months);
+    foreach ($months as $key => $month) {
+        $distance = round($month['distance'], 2);
+        $fuel = round($month['fuel'], 2);
+        $months[$key]['distance'] = $distance;
+        $months[$key]['fuel'] = $fuel;
+        $months[$key]['efficiency'] = $fuel > 0 ? round($distance / $fuel, 2) : 0;
+    }
+
+    return array_values($months);
+}
+
+    public function inputRequestFuel(Request $request)
+    {
         try {
             $odometer = $request->get('odometer');
             $remaining_range = $request->get('remaining_range');
@@ -1874,27 +2066,33 @@ class GeneralAffairController extends Controller
             $remaining_fuel_liter = $request->get('remaining_fuel_liter');
             $fuel_to_buy_liter = $request->get('fuel_to_buy_liter');
             $fuel_total_cost = $request->get('fuel_total_cost');
-            $latitude = $request->get('latitude');
-            $longitude = $request->get('longitude');
             $driver_id = $request->get('driver_id');
             $driver_name = $request->get('driver_name');
             $date = $request->get('date');
             $vehicle = $request->get('vehicle');
             $plat_no = $request->get('plat_no');
 
+            if (!$request->hasFile('fileDataOdoBefore')) {
+                throw new \Exception('Foto odometer sebelum pengisian wajib dilampirkan.');
+            }
+
             $tujuan_upload = public_path('images/driver/request_fuel');
+            if (!is_dir($tujuan_upload)) {
+                mkdir($tujuan_upload, 0755, true);
+            }
 
             $fileDataOdoBefore = $request->file('fileDataOdoBefore');
             $fileDataOdoBefore_file = $fileDataOdoBefore->getClientOriginalName();
-            $fileDataOdoBefore_ext = pathinfo($fileDataOdoBefore_file, PATHINFO_EXTENSION);
+            $fileDataOdoBefore_ext = strtolower(pathinfo($fileDataOdoBefore_file, PATHINFO_EXTENSION));
+            $allowedExtensions = array('jpg', 'jpeg', 'png', 'webp');
+            if (!in_array($fileDataOdoBefore_ext, $allowedExtensions)) {
+                throw new \Exception('Format foto harus JPG, JPEG, PNG, atau WEBP.');
+            }
 
-            $fileDataOdoBefore_name = md5('fileDataOdoBefore' . date('YmdHis')) . '.' . $fileDataOdoBefore_ext;
+            $fileDataOdoBefore_name = md5('fileDataOdoBefore' . date('YmdHis') . uniqid()) . '.' . $fileDataOdoBefore_ext;
             $fileDataOdoBefore->move($tujuan_upload, $fileDataOdoBefore_name);
 
-            $path = public_path('images/driver/request_fuel').'/'.$fileDataOdoBefore_name;
-            $filebase64 = base64_encode(file_get_contents($path));
-
-            $input = DB::table('driver_fuel_requests')->insert([
+            DB::table('driver_fuel_requests')->insert(array(
                 'odometer' => $odometer,
                 'remaining_range' => $remaining_range,
                 'fuel_location' => $fuel_location,
@@ -1909,8 +2107,6 @@ class GeneralAffairController extends Controller
                 'remaining_fuel_liter' => $remaining_fuel_liter,
                 'fuel_to_buy_liter' => $fuel_to_buy_liter,
                 'fuel_total_cost' => $fuel_total_cost,
-                'latitude' => $latitude,
-                'longitude' => $longitude,
                 'fileDataOdoBefore' => $fileDataOdoBefore_name,
                 'driver_id' => $driver_id,
                 'driver_name' => $driver_name,
@@ -1918,129 +2114,200 @@ class GeneralAffairController extends Controller
                 'vehicle' => $vehicle,
                 'plat_no' => $plat_no,
                 'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
+                'updated_at' => date('Y-m-d H:i:s')
+            ));
 
-            $cars = DB::SELECT("SELECT
-            plat_no,
-            lower(car) as cars,
-            fuel_capacity,
-            fuel_consumption
-            FROM
-            driver_lists
-            WHERE
-            fuel_capacity IS NOT NULL
-            ORDER BY
-            lower(car)");
+            $cars = DB::select("SELECT plat_no, LOWER(car) AS cars, fuel_capacity, fuel_consumption FROM driver_lists WHERE fuel_capacity IS NOT NULL ORDER BY LOWER(car)");
+            $selectedCar = DB::table('driver_lists')
+                ->where('plat_no', $plat_no)
+                ->select('car', 'plat_no', 'fuel_capacity', 'fuel_consumption', 'fuel_type')
+                ->first();
+
+            /* Ambil ringkasan efisiensi hanya untuk kendaraan yang sedang mengajukan. */
+            $efficiencyData = null;
+            if ($selectedCar) {
+                $efficiencyResult = $this->buildFuelEfficiency3Months(collect(array($selectedCar)));
+                if (!empty($efficiencyResult)) {
+                    $efficiencyData = $efficiencyResult[0];
+                }
+            }
+
+            $actualEfficiency = $efficiencyData ? (float) $efficiencyData['efficiency'] : 0;
+            $standardEfficiency = (float) $fuel_consumption;
+            $totalDistance = $efficiencyData ? (float) $efficiencyData['total_distance'] : 0;
+            $totalFuelHistory = $efficiencyData ? (float) $efficiencyData['total_fuel'] : 0;
+            $monthlyHistory = $efficiencyData && !empty($efficiencyData['monthly']) ? $efficiencyData['monthly'] : array();
+            $efficiencyRatio = ($standardEfficiency > 0 && $actualEfficiency > 0)
+                ? ($actualEfficiency / $standardEfficiency) * 100
+                : 0;
+
+            if ($efficiencyRatio > 130) {
+                $efficiencyStatus = 'Periksa data • hasil melebihi standar';
+                $efficiencyStatusBg = '#fef3c7';
+                $efficiencyStatusColor = '#92400e';
+            } elseif ($efficiencyRatio >= 95) {
+                $efficiencyStatus = 'Efisien • ' . number_format($efficiencyRatio, 1, ',', '.') . '% dari standar';
+                $efficiencyStatusBg = '#dcfce7';
+                $efficiencyStatusColor = '#166534';
+            } elseif ($efficiencyRatio >= 85) {
+                $efficiencyStatus = 'Perlu dipantau • ' . number_format($efficiencyRatio, 1, ',', '.') . '% dari standar';
+                $efficiencyStatusBg = '#fef3c7';
+                $efficiencyStatusColor = '#92400e';
+            } elseif ($efficiencyRatio > 0) {
+                $efficiencyStatus = 'Tidak efisien • ' . number_format($efficiencyRatio, 1, ',', '.') . '% dari standar';
+                $efficiencyStatusBg = '#fee2e2';
+                $efficiencyStatusColor = '#991b1b';
+            } else {
+                $efficiencyStatus = 'Data efisiensi belum tersedia';
+                $efficiencyStatusBg = '#e2e8f0';
+                $efficiencyStatusColor = '#475569';
+            }
+
+            $tankCapacity = max(0, (float) $remaining_fuel_liter + (float) $fuel_to_buy_liter);
+            if ($tankCapacity <= 0) {
+                $tankCapacity = max(0, (float) $fuel_capacity);
+            }
+            $remainingPercent = $tankCapacity > 0 ? ((float) $remaining_fuel_liter / $tankCapacity) * 100 : 0;
+            $buyPercent = $tankCapacity > 0 ? ((float) $fuel_to_buy_liter / $tankCapacity) * 100 : 0;
+            $remainingHeight = max(24, round(126 * $remainingPercent / 100));
+            $buyHeight = max(24, 126 - $remainingHeight);
+            if ($remainingHeight + $buyHeight > 126) {
+                $buyHeight = 126 - $remainingHeight;
+            }
 
             $isHiaceVehicle = preg_match('/hiace|hi-ace|hi ace/i', $vehicle);
+            $fuelFileUrl = asset('images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name));
+            $safeFuelFileUrl = htmlspecialchars($fuelFileUrl, ENT_QUOTES, 'UTF-8');
+            $safeFuelFileName = htmlspecialchars($fileDataOdoBefore_name, ENT_QUOTES, 'UTF-8');
+            $driverControlUrl = 'http://10.109.52.4/mirai/public/index/ga_control/driver';
 
-            $fuelDetails = [
+            $fuelDetails = array(
                 'Tanggal' => $date,
                 'Driver ID' => $driver_id,
                 'Nama Driver' => $driver_name,
                 'Kendaraan' => $vehicle,
                 'Nomor Polisi' => $plat_no,
-                'Odometer' => $odometer. ' Km',
-                'Sisa Jarak Tempuh' => '<span style="color:#dc2626;font-weight:bold;">' . $remaining_range . ' Km</span>',
+                'Odometer' => number_format((float) $odometer, 0, ',', '.') . ' Km',
+                'Sisa Jarak Tempuh' => '<span style="color:#dc2626;font-weight:bold;">' . number_format((float) $remaining_range, 0, ',', '.') . ' Km</span>',
                 'Lokasi Pengisian' => $fuel_location,
-                'Konsumsi BBM' => $fuel_consumption . ' Km/Liter',
-                'Kapasitas BBM' => ROUND($fuel_capacity,2). ' Liter',
-                'Harga BBM' => 'Rp. ' . ROUND($fuel_price_per_liter,0). ' /Liter',
+                'Konsumsi BBM' => number_format((float) $fuel_consumption, 2, ',', '.') . ' Km/Liter',
+                'Kapasitas BBM' => number_format((float) $fuel_capacity, 2, ',', '.') . ' Liter',
+                'Harga BBM' => 'Rp ' . number_format((float) $fuel_price_per_liter, 0, ',', '.') . ' /Liter',
                 'Jenis BBM' => $fuel_type,
-                'Denominasi Voucher' => 'Rp. ' . $voucher_denomination,
-                'Jumlah Voucher' => '<span style="color:#dc2626;font-weight:bold;">' . $voucher_count . ' Lembar</span>',
-                'Total Voucher' => '<span style="color:#dc2626;font-weight:bold;">Rp. ' . $voucher_total . '</span>',
-                // 'Selisih Voucher' => 'Rp. ' . ROUND($voucher_difference,0),
-                'Sisa BBM' => "<b>" . ROUND($remaining_fuel_liter,2) . " Liter</b>",
-                'BBM yang Dibeli' => "<b>" . ROUND($fuel_to_buy_liter,2) . " Liter</b>",
-                'Total Biaya BBM' => "<b>Rp. " . ROUND($fuel_total_cost,0) . "</b>",
-            ];
+                'Denominasi Voucher' => 'Rp ' . number_format((float) $voucher_denomination, 0, ',', '.'),
+                'Jumlah Voucher' => '<span style="color:#dc2626;font-weight:bold;">' . number_format((float) $voucher_count, 0, ',', '.') . ' Lembar</span>',
+                'Total Voucher' => '<span style="color:#dc2626;font-weight:bold;">Rp ' . number_format((float) $voucher_total, 0, ',', '.') . '</span>',
+                'Sisa BBM' => '<b>' . number_format((float) $remaining_fuel_liter, 2, ',', '.') . ' Liter</b>',
+                'BBM yang Dibeli' => '<b>' . number_format((float) $fuel_to_buy_liter, 2, ',', '.') . ' Liter</b>',
+                'Total Biaya BBM' => '<b>Rp ' . number_format((float) $fuel_total_cost, 0, ',', '.') . '</b>'
+            );
 
-            $bodyHtml = '<!DOCTYPE html>';
-            $bodyHtml .= '<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
+            $bodyHtml = '<!DOCTYPE html><html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">';
             $bodyHtml .= '<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Request Pengisian BBM</title></head>';
-            $bodyHtml .= '<body style="margin:0;padding:24px;background-color:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#334155;">';
-            $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:700px;margin:0 auto;background:#ffffff;border:1px solid #dbe3ee;border-collapse:collapse;">';
-            $bodyHtml .= '<tr><td style="padding:22px 28px;background:#3447a5;color:#ffffff;font-size:22px;font-weight:bold;">Request Pengisian BBM</td></tr>';
-            $bodyHtml .= '<tr><td style="padding:22px 28px 10px;font-size:14px;line-height:22px;">Terdapat request pengisian BBM dengan informasi sebagai berikut.</td></tr>';
-            $bodyHtml .= '<tr><td style="padding:0 28px 22px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">';
+            $bodyHtml .= '<body style="margin:0;padding:18px;background-color:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#334155;">';
+            $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #dbe3ee;border-collapse:collapse;">';
+            $bodyHtml .= '<tr><td style="padding:20px 24px;background:#3447a5;color:#ffffff;font-size:22px;font-weight:bold;">Request Pengisian BBM</td></tr>';
+            $bodyHtml .= '<tr><td style="padding:18px 24px 10px;font-size:14px;line-height:22px;">Terdapat request pengisian BBM dengan informasi berikut.</td></tr>';
 
+            /* Simulasi kondisi BBM dan efisiensi. Tabel dipakai agar kompatibel dengan Outlook. */
+            $bodyHtml .= '<tr><td style="padding:6px 24px 18px;">';
+            $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0;background:#f8fbff;border:1px solid #cbd5e1;border-radius:12px;">';
+            $bodyHtml .= '<tr><td width="31%" valign="middle" align="center" style="padding:14px 8px;border-right:1px solid #e2e8f0;">';
+            $bodyHtml .= '<div style="font-size:13px;font-weight:bold;color:#0f172a;margin-bottom:7px;">Total ' . number_format($tankCapacity, 2, ',', '.') . ' L</div>';
+            $bodyHtml .= '<table role="presentation" width="74" cellpadding="0" cellspacing="0" style="width:74px;height:136px;border:3px solid #38536b;border-collapse:separate;border-spacing:3px;background:#ffffff;border-radius:5px;">';
+            $bodyHtml .= '<tr><td valign="middle" align="center" height="' . $buyHeight . '" style="height:' . $buyHeight . 'px;background:#f36c2c;color:#ffffff;font-size:12px;font-weight:bold;">+' . number_format((float) $fuel_to_buy_liter, 2, ',', '.') . '</td></tr>';
+            $bodyHtml .= '<tr><td valign="middle" align="center" height="' . $remainingHeight . '" style="height:' . $remainingHeight . 'px;background:#1f6f8b;color:#ffffff;font-size:12px;font-weight:bold;">' . number_format((float) $remaining_fuel_liter, 2, ',', '.') . '</td></tr>';
+            $bodyHtml .= '</table>';
+            $bodyHtml .= '<div style="margin-top:7px;color:#e84f18;font-size:11px;font-weight:bold;">Isi +' . number_format((float) $fuel_to_buy_liter, 2, ',', '.') . ' L</div>';
+            $bodyHtml .= '<div style="color:#006ba6;font-size:11px;font-weight:bold;">Sisa ' . number_format((float) $remaining_fuel_liter, 2, ',', '.') . ' L</div>';
+            $bodyHtml .= '<div style="margin-top:7px;color:#334155;font-size:11px;font-weight:bold;">ODO ' . number_format((float) $odometer, 0, ',', '.') . ' KM</div>';
+            $bodyHtml .= '</td>';
+
+            $bodyHtml .= '<td width="69%" valign="top" style="padding:12px 10px;">';
+            $bodyHtml .= '<div style="font-size:14px;font-weight:bold;color:#0f172a;margin-bottom:7px;">⌁ Efisiensi 3 Bulan Terakhir</div>';
+            $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="5" style="border-collapse:separate;">';
+            $bodyHtml .= '<tr>';
+            $bodyHtml .= '<td width="50%" valign="top" style="padding:9px;border:1px solid #dbe3ee;border-radius:9px;background:#ffffff;"><div style="font-size:10px;color:#64748b;font-weight:bold;">EFISIENSI AKTUAL</div><div style="margin-top:6px;font-size:14px;color:#312e70;font-weight:bold;">' . ($actualEfficiency > 0 ? number_format($actualEfficiency, 2, ',', '.') . ' KM/L' : '-') . '</div></td>';
+            $bodyHtml .= '<td width="50%" valign="top" style="padding:9px;border:1px solid #dbe3ee;border-radius:9px;background:#ffffff;"><div style="font-size:10px;color:#64748b;font-weight:bold;">STANDAR KENDARAAN</div><div style="margin-top:6px;font-size:14px;color:#312e70;font-weight:bold;">' . number_format($standardEfficiency, 2, ',', '.') . ' KM/L</div></td>';
+            $bodyHtml .= '</tr><tr>';
+            $bodyHtml .= '<td width="50%" valign="top" style="padding:9px;border:1px solid #dbe3ee;border-radius:9px;background:#ffffff;"><div style="font-size:10px;color:#64748b;font-weight:bold;">TOTAL JARAK</div><div style="margin-top:6px;font-size:14px;color:#312e70;font-weight:bold;">' . number_format($totalDistance, 0, ',', '.') . ' KM</div></td>';
+            $bodyHtml .= '<td width="50%" valign="top" style="padding:9px;border:1px solid #dbe3ee;border-radius:9px;background:#ffffff;"><div style="font-size:10px;color:#64748b;font-weight:bold;">TOTAL BBM</div><div style="margin-top:6px;font-size:14px;color:#312e70;font-weight:bold;">' . number_format($totalFuelHistory, 2, ',', '.') . ' L</div></td>';
+            $bodyHtml .= '</tr></table>';
+            $bodyHtml .= '<div style="margin:4px 5px 7px;padding:6px 10px;border-radius:15px;background:' . $efficiencyStatusBg . ';color:' . $efficiencyStatusColor . ';font-size:11px;font-weight:bold;">' . $efficiencyStatus . '</div>';
+            $bodyHtml .= '<div style="margin:0 5px 5px;padding:7px 9px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;color:#0f172a;font-size:12px;font-weight:bold;">↻ Riwayat 3 Bulan</div>';
+
+            if (!empty($monthlyHistory)) {
+                foreach ($monthlyHistory as $monthData) {
+                    $monthName = isset($monthData['month']) ? $monthData['month'] : '-';
+                    $monthDistance = isset($monthData['distance']) ? (float) $monthData['distance'] : 0;
+                    $monthFuel = isset($monthData['fuel']) ? (float) $monthData['fuel'] : 0;
+                    $monthEfficiency = isset($monthData['efficiency']) ? (float) $monthData['efficiency'] : 0;
+                    $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 5px 5px;border:1px solid #dbe3ee;border-radius:8px;background:#ffffff;">';
+                    $bodyHtml .= '<tr><td colspan="2" style="padding:7px 8px 3px;color:#312e70;font-size:11px;font-weight:bold;">' . htmlspecialchars($monthName, ENT_QUOTES, 'UTF-8') . '</td></tr>';
+                    $bodyHtml .= '<tr><td width="50%" style="padding:2px 8px 7px;color:#334155;font-size:11px;">' . number_format($monthDistance, 0, ',', '.') . ' KM<br>' . number_format($monthFuel, 2, ',', '.') . ' L</td>';
+                    $bodyHtml .= '<td width="50%" align="right" valign="bottom" style="padding:2px 8px 7px;color:#334155;font-size:11px;">' . number_format($monthEfficiency, 2, ',', '.') . ' KM/L</td></tr></table>';
+                }
+            } else {
+                $bodyHtml .= '<div style="margin:0 5px;padding:8px;border:1px solid #dbe3ee;border-radius:8px;background:#ffffff;color:#64748b;font-size:11px;">Rincian bulanan belum tersedia.</div>';
+            }
+            $bodyHtml .= '</td></tr></table></td></tr>';
+
+            $bodyHtml .= '<tr><td style="padding:0 24px 20px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">';
             foreach ($fuelDetails as $label => $value) {
                 if ($label == 'Sisa Jarak Tempuh') {
-                    $fuelFileUrl = asset('images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name));
-                    // $fuelFileUrl = 'http://new.bridgeforvendor.com/images/driver/request_fuel/' . rawurlencode($fileDataOdoBefore_name);
-                    $safeFuelFileUrl = htmlspecialchars($fuelFileUrl, ENT_QUOTES, 'UTF-8');
-                    $safeFuelFileName = htmlspecialchars($fileDataOdoBefore_name, ENT_QUOTES, 'UTF-8');
                     $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Foto Odometer Sebelum</th>';
                     $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><div style="margin-bottom:8px;"><img src="' . $safeFuelFileUrl . '" alt="Foto Odometer Sebelum" style="max-width:100%;width:320px;height:auto;border:1px solid #cbd5e1;border-radius:4px;display:block;"></div><div><a href="' . $safeFuelFileUrl . '" style="color:#4056b5;text-decoration:underline;">Preview File (' . $safeFuelFileName . ')</a></div></td></tr>';
                     if ($isHiaceVehicle) {
                         $hiaceImageUrl = htmlspecialchars(asset('images/Hiace.png'), ENT_QUOTES, 'UTF-8');
-                        // $hiaceImageUrl = 'http://new.bridgeforvendor.com/images/Hiace.png';
                         $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Panduan Pengecekan Hiace</th>';
                         $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><img src="' . $hiaceImageUrl . '" alt="Panduan Pengecekan Hiace" style="max-width:100%;width:320px;height:auto;border:1px solid #cbd5e1;border-radius:4px;display:block;"></td></tr>';
                     }
                 }
-                // $safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
-                // $safeValue = htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-                $safeLabel = $label;
-                $safeValue = $value;
-                $bodyHtml .= '<tr><th align="left" width="38%" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">' . $safeLabel . '</th>';
-                $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">' . $safeValue . '</td></tr>';
+                $bodyHtml .= '<tr><th align="left" width="38%" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</th>';
+                $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">' . $value . '</td></tr>';
             }
-            $driverControlUrl = 'http://10.109.52.4/mirai/public/index/ga_control/driver';
-            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Cek Penugasan Driver</th>';
-            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><a href="' . $driverControlUrl . '" style="color:#4056b5;text-decoration:underline;">Buka halaman penugasan driver</a></td></tr>';
 
-            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Data Kendaraan</th>';
-            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">';
+            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Cek Penugasan Driver</th>';
+            $bodyHtml .= '<td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;"><a href="' . htmlspecialchars($driverControlUrl, ENT_QUOTES, 'UTF-8') . '" style="color:#4056b5;text-decoration:underline;">Buka halaman penugasan driver</a></td></tr>';
+
+            $bodyHtml .= '<tr><th align="left" style="padding:9px 10px;border:1px solid #dbe3ee;background:#eef2ff;color:#3447a5;font-size:13px;">Data Kendaraan</th><td style="padding:9px 10px;border:1px solid #dbe3ee;font-size:13px;">';
             $bodyHtml .= '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">';
             $bodyHtml .= '<tr><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Nomor Polisi</th><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Kendaraan</th><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Kapasitas BBM</th><th align="left" style="padding:6px 8px;border:1px solid #dbe3ee;background:#f8fafc;color:#3447a5;font-size:12px;">Konsumsi BBM</th></tr>';
-
             if (!empty($cars)) {
                 foreach ($cars as $carData) {
-                    $carPlatNo = htmlspecialchars($carData->plat_no ?? '', ENT_QUOTES, 'UTF-8');
-                    $carName = ucwords(strtolower($carData->cars ?? ''));
-                    $carFuelCapacity = isset($carData->fuel_capacity) ? round((float) $carData->fuel_capacity, 2) . ' Liter' : '-';
-                    $carFuelConsumption = isset($carData->fuel_consumption) ? round((float) $carData->fuel_consumption, 2) . ' Km/Liter' : '-';
-                    $bodyHtml .= '<tr><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carPlatNo . '</td><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carName . '</td><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carFuelCapacity . '</td><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . $carFuelConsumption . '</td></tr>';
+                    $bodyHtml .= '<tr><td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . htmlspecialchars($carData->plat_no ?? '', ENT_QUOTES, 'UTF-8') . '</td>';
+                    $bodyHtml .= '<td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . htmlspecialchars(ucwords(strtolower($carData->cars ?? '')), ENT_QUOTES, 'UTF-8') . '</td>';
+                    $bodyHtml .= '<td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . (isset($carData->fuel_capacity) ? number_format((float) $carData->fuel_capacity, 2, ',', '.') . ' Liter' : '-') . '</td>';
+                    $bodyHtml .= '<td style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">' . (isset($carData->fuel_consumption) ? number_format((float) $carData->fuel_consumption, 2, ',', '.') . ' Km/Liter' : '-') . '</td></tr>';
                 }
             } else {
                 $bodyHtml .= '<tr><td colspan="4" style="padding:6px 8px;border:1px solid #dbe3ee;font-size:12px;">Tidak ada data kendaraan.</td></tr>';
             }
-
-            $bodyHtml .= '</table>';
-            $bodyHtml .= '</td></tr>';
-            $bodyHtml .= '</table></td></tr>';
-
-            $bodyHtml .= '<tr><td style="padding:0 28px 18px;font-size:13px;line-height:20px;color:#475569;">Data ini akan muncul maksimal 5 menit di tampilan MIRAI. Mohon ditunggu terlebih dahulu.</td></tr>';
-            $bodyHtml .= '<tr><td style="padding:14px 28px;border-top:1px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:11px;">Email ini dikirim otomatis.</td></tr>';
+            $bodyHtml .= '</table></td></tr></table></td></tr>';
+            $bodyHtml .= '<tr><td style="padding:0 24px 18px;font-size:13px;line-height:20px;color:#475569;">Data ini akan muncul maksimal 5 menit di tampilan MIRAI. Mohon ditunggu terlebih dahulu.</td></tr>';
+            $bodyHtml .= '<tr><td style="padding:14px 24px;border-top:1px solid #e2e8f0;background:#f8fafc;color:#64748b;font-size:11px;">Email ini dikirim otomatis.</td></tr>';
             $bodyHtml .= '</table></body></html>';
 
             Mail::html($bodyHtml, function ($message) {
                 $message->from('mis@ympi.co.id', 'PT. Yamaha Musical Products Indonesia');
                 $message->to('wachid.hasyim@music.yamaha.com');
-                $message->cc([
+                $message->cc(array(
                     'widura@music.yamaha.com',
-                    'maruli.sapta.adi@music.yamaha.com',
-                ]);
-                $message->bcc([
-                    'ympi-mis-ML@music.yamaha.com'
-                ]);
+                    'maruli.sapta.adi@music.yamaha.com'
+                ));
+                $message->bcc(array('ympi-mis-ML@music.yamaha.com'));
                 $message->subject('Request Pengisian BBM');
             });
 
-            $response = array(
+            return Response::json(array(
                 'status' => true,
                 'message' => 'Request fuel input successful'
-            );
-            return Response::json($response);
+            ));
         } catch (\Exception $e) {
-            $response = array(
+            return Response::json(array(
                 'status' => false,
-                'message' => $e->getMessage().' Line '.$e->getLine()
-            );
-            return Response::json($response);
+                'message' => $e->getMessage() . ' Line ' . $e->getLine()
+            ));
         }
     }
 
